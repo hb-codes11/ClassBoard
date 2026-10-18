@@ -67,7 +67,7 @@ begin
   where p.class_id = new.class_id and p.subject_id = new.subject_id
     and p.kind = new.kind and p.batch = new.batch;
   if new.classes_held < highest_attended then
-    raise exception 'Classes held cannot be lower than a student's saved attended count';
+    raise exception 'Classes held cannot be lower than a student''s saved attended count';
   end if;
   return new;
 end;
