@@ -107,6 +107,7 @@
       issueDate.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     }
     await loadLiveClassData(classId);
+    startNotificationRefresh(classId);
     if (roles.includes('admin')) await loadAdminAccounts(classId);
     gate.hidden = true;
     app.hidden = false;
@@ -141,9 +142,24 @@
 
   function addEmptyNote(container, text) {
     const note = document.createElement('div');
-    note.className = 'page-description live-empty';
+    note.className = 'live-empty';
     note.textContent = text;
     container.append(note);
+  }
+
+  function startNotificationRefresh(classId) {
+    if (window.classboardNotificationRefreshTimer) clearInterval(window.classboardNotificationRefreshTimer);
+    window.classboardNotificationRefreshTimer = window.setInterval(() => {
+      if (!document.hidden && window.classboardContext?.classId === classId) loadNotifications(classId);
+    }, 30000);
+    if (!window.classboardNotificationFocusHandler) {
+      window.classboardNotificationFocusHandler = () => {
+        const context = window.classboardContext;
+        if (!document.hidden && context?.classId) loadNotifications(context.classId);
+      };
+      window.addEventListener('focus', window.classboardNotificationFocusHandler);
+      document.addEventListener('visibilitychange', window.classboardNotificationFocusHandler);
+    }
   }
 
   function addUpdateCard(update) {
@@ -406,13 +422,27 @@
     const list = document.getElementById('notificationList');
     const userId = window.classboardContext?.userId;
     if (!userId || !list) return;
-    const result = await client.from('notifications')
-      .select('id,source_type,source_id,created_at,read_at')
-      .eq('class_id', classId).eq('recipient_id', userId).is('read_at', null)
-      .order('created_at', { ascending: false }).limit(50);
+    const [result, updateCountResult] = await Promise.all([
+      client.from('notifications')
+        .select('id,source_type,source_id,created_at,read_at')
+        .eq('class_id', classId).eq('recipient_id', userId).is('read_at', null)
+        .order('created_at', { ascending: false }).limit(50),
+      client.from('notifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('class_id', classId).eq('recipient_id', userId).eq('source_type', 'update').is('read_at', null)
+    ]);
     if (result.error) { notifyApp(`Could not load notifications: ${result.error.message}`, true); return; }
 
     const notifications = result.data || [];
+    const updateCount = updateCountResult.error
+      ? notifications.filter((item) => item.source_type === 'update').length
+      : updateCountResult.count || 0;
+    const updatesBadge = document.getElementById('updatesUnreadCount');
+    if (updatesBadge) {
+      updatesBadge.textContent = updateCount > 99 ? '99+' : String(updateCount);
+      updatesBadge.hidden = updateCount === 0;
+      updatesBadge.closest('.nav-item')?.setAttribute('aria-label', updateCount ? `Updates, ${updateCount} unread` : 'Updates');
+    }
     const ids = (type) => notifications.filter((item) => item.source_type === type).map((item) => item.source_id);
     const [updates, reminders, resources, sessions] = await Promise.all([
       ids('update').length ? client.from('updates').select('id,title,body').in('id', ids('update')) : Promise.resolve({ data: [], error: null }),
