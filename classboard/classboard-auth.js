@@ -509,6 +509,13 @@
       attendedInput.max = String(held);
       attendedInput.readOnly = !roles.includes('student');
       attendedInput.title = 'Your personal attended-class count';
+      if (isStaff && !heldInput.dataset.attendanceLimitConnected) {
+        heldInput.dataset.attendanceLimitConnected = 'true';
+        heldInput.addEventListener('input', () => {
+          const nextHeld = Number(heldInput.value);
+          attendedInput.max = String(Number.isInteger(nextHeld) && nextHeld >= 0 ? nextHeld : 0);
+        });
+      }
       heldLabel.dataset.sharedAttendanceCount = 'true';
       if (!card.dataset.attendanceStorageKey) card.dataset.attendanceStorageKey = key;
       if (!card.dataset.attendanceConnected) {
