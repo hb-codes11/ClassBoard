@@ -246,7 +246,14 @@
 
   async function signedResourceUrl(path) {
     if (!path) return null;
-    const { data, error } = await window.classboardSupabase.storage.from('class-resources').createSignedUrl(path, 300);
+    const { data, error } = await window.classboardSupabase.storage.from('class-resources').createSignedUrl(path, 3600);
+    if (error) return null;
+    return data.signedUrl;
+  }
+
+  async function signedResourceDownloadUrl(path, filename) {
+    if (!path) return null;
+    const { data, error } = await window.classboardSupabase.storage.from('class-resources').createSignedUrl(path, 3600, { download: filename });
     if (error) return null;
     return data.signedUrl;
   }
@@ -265,7 +272,6 @@
   async function addResourceCard(resource, compact = false) {
     const subject = Array.isArray(resource.subjects) ? resource.subjects[0] : resource.subjects;
     const kind = resourceKindLabel(resource.kind);
-    const link = await signedResourceUrl(resource.storage_path);
     const card = document.createElement(compact ? 'div' : 'article');
     card.className = compact ? 'resource' : 'resource-card';
     card.dataset.contentId = resource.id;
@@ -273,24 +279,24 @@
     card.dataset.subject = subject?.name || '';
     card.dataset.type = kind;
     card.dataset.search = `${resource.title} ${subject?.name || ''} ${kind} ${resource.unit_label || ''}`.toLowerCase();
+    card.dataset.resourcePath = resource.storage_path || '';
+    card.dataset.resourceTitle = resource.title;
     const icon = document.createElement('div'); icon.className = 'file-icon'; icon.textContent = 'PDF';
     const main = document.createElement('div'); main.className = 'list-main';
     const title = document.createElement('div'); title.className = 'resource-title'; title.textContent = resource.title;
     const meta = document.createElement('div'); meta.className = 'resource-meta';
     meta.textContent = [subject?.name, kind, resource.unit_label, `Added ${new Date(resource.published_at || resource.created_at).toLocaleDateString('en-IN')}`].filter(Boolean).join(' · ');
     main.append(title, meta);
-    if (link) {
-      const open = document.createElement('a');
-      open.className = compact ? 'download' : 'download';
-      open.href = link;
-      open.target = '_blank';
-      open.rel = 'noopener';
-      open.setAttribute('aria-label', `Open ${resource.title}`);
-      open.innerHTML = '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>';
-      card.append(icon, main, open);
-    } else {
-      card.append(icon, main);
-    }
+    const actions = document.createElement('div'); actions.className = 'resource-actions';
+    const preview = document.createElement('button');
+    preview.type = 'button'; preview.className = 'resource-preview-button'; preview.dataset.previewPdf = 'true';
+    preview.textContent = 'Preview'; preview.setAttribute('aria-label', `Preview ${resource.title}`);
+    const download = document.createElement('button');
+    download.type = 'button'; download.className = 'resource-download-button'; download.dataset.downloadPdf = 'true';
+    download.innerHTML = '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>';
+    download.setAttribute('aria-label', `Download ${resource.title}`);
+    actions.append(preview, download);
+    card.append(icon, main, actions);
     if (!compact) card.append(makeDeleteButton('Delete resource'));
     return card;
   }
@@ -749,6 +755,51 @@
       if (error) { button.disabled = false; notifyApp(`Could not delete item: ${error.message}`, true); return; }
       await loadLiveClassData(context.classId);
       notifyApp(`Item deleted for the class.${cleanupWarning}`, Boolean(cleanupWarning));
+    });
+
+    const previewDialog = document.getElementById('pdfPreviewDialog');
+    const previewFrame = document.getElementById('pdfPreviewFrame');
+    const previewTitle = document.getElementById('pdfPreviewTitle');
+    const previewDownload = document.getElementById('pdfPreviewDownload');
+    document.getElementById('pdfPreviewClose')?.addEventListener('click', () => previewDialog?.close());
+    previewDialog?.addEventListener('click', (event) => {
+      if (event.target === previewDialog) previewDialog.close();
+    });
+    previewDialog?.addEventListener('close', () => {
+      previewFrame.removeAttribute('src');
+      previewDownload.removeAttribute('href');
+    });
+    document.addEventListener('click', async (event) => {
+      const button = event.target.closest('[data-preview-pdf], [data-download-pdf]');
+      if (!button) return;
+      const card = button.closest('[data-resource-path]');
+      if (!card?.dataset.resourcePath) { notifyApp('This PDF is not available right now.', true); return; }
+      button.disabled = true;
+      const title = card.dataset.resourceTitle || 'Class resource';
+      const filename = `${title.replace(/[/\\?%*:|"<>]/g, '-').trim() || 'class-resource'}.pdf`;
+      if (button.dataset.previewPdf) {
+        const [viewUrl, downloadUrl] = await Promise.all([
+          signedResourceUrl(card.dataset.resourcePath),
+          signedResourceDownloadUrl(card.dataset.resourcePath, filename)
+        ]);
+        button.disabled = false;
+        if (!viewUrl || !downloadUrl) { notifyApp('Could not open this PDF. Please try again.', true); return; }
+        previewTitle.textContent = title;
+        previewFrame.src = `${viewUrl}#view=FitH`;
+        previewDownload.href = downloadUrl;
+        previewDownload.download = filename;
+        if (!previewDialog.open) previewDialog.showModal();
+      } else {
+        const url = await signedResourceDownloadUrl(card.dataset.resourcePath, filename);
+        button.disabled = false;
+        if (!url) { notifyApp('Could not download this PDF. Please try again.', true); return; }
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = filename;
+        document.body.append(anchor);
+        anchor.click();
+        anchor.remove();
+      }
     });
 
     const issueForm = document.getElementById('issueForm');
