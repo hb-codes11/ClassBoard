@@ -4,7 +4,7 @@ This folder contains the first database migration for the Intel 1 pilot.
 
 ## Decisions encoded here
 
-- A class membership stores one role. A person with multiple roles gets multiple membership rows. That supports the project owners' setup: one Admin-only user and one user with both Admin and CR.
+- A class membership stores one role. Every active class account has Student access by default; CR and Admin are additional permissions stored in separate membership rows.
 - RLS protects all app tables. The frontend must never be the authority for a user's class, roll number, or role.
 - Roll number is stored only on a Student membership. A1/A2 are derived from it (1–32 = A1, 33–66 = A2); timetable records use `all`, `A1`, or `A2`.
 - Attendance planner values are not in this schema. The class log records sessions, not student attendance.
@@ -20,7 +20,9 @@ This folder contains the first database migration for the Intel 1 pilot.
 5. Apply `migrations/005_expand_roll_numbers_to_66.sql` to update existing databases to the confirmed 1–32 = A1 and 33–66 = A2 rule.
 6. Apply `migrations/006_admin_content_management.sql` so class admins can upload resources and both admins and CRs can delete shared notes, updates, reminders, and class-log entries.
 7. Apply `migrations/007_persist_class_notifications.sql` to create durable per-member notifications when updates, reminders, resources, or class sessions are added.
-8. In Supabase Auth, create/invite the two owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and insert the initial roles:
+8. Apply `migrations/008_reviewed_attendance_concerns.sql` to support reviewed and resolved attendance concerns.
+9. Apply `migrations/009_student_access_is_default.sql` to enroll existing Medicaps auth accounts in INTEL-1, give every account Student access, and make Student access impossible to remove while assigning CR/Admin roles.
+10. In Supabase Auth, create/invite the two owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and insert the initial roles:
 
 ```sql
 -- Replace both UUID placeholders with the two Auth user IDs.
@@ -28,14 +30,18 @@ with target_class as (
   select id from public.classes where code = 'INTEL-1'
 )
 insert into public.class_memberships (user_id, class_id, role)
+select 'ADMIN_USER_UUID'::uuid, id, 'student'::public.class_role from target_class
+union all
 select 'ADMIN_USER_UUID'::uuid, id, 'admin'::public.class_role from target_class
+union all
+select 'FRIEND_USER_UUID'::uuid, id, 'student'::public.class_role from target_class
 union all
 select 'FRIEND_USER_UUID'::uuid, id, 'admin'::public.class_role from target_class
 union all
 select 'FRIEND_USER_UUID'::uuid, id, 'cr'::public.class_role from target_class;
 ```
 
-9. Before connecting real student accounts or data, review college approval, account onboarding, data retention, and backups.
+11. Before connecting real student accounts or data, review college approval, account onboarding, data retention, and backups.
 
 ## Next implementation steps
 
