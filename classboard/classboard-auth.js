@@ -444,14 +444,20 @@
       if (upcoming.length) upcoming.forEach((session) => scheduleList.append(addSessionRow(session, true)));
       else addEmptyNote(scheduleList, 'No upcoming class sessions have been scheduled yet.');
     }
-    const next = upcoming[0];
+    const studentRoll = Number(window.classboardContext?.rollNumber);
+    const studentBatch = studentRoll >= 1 && studentRoll <= 32 ? 'A1' : studentRoll >= 33 && studentRoll <= 66 ? 'A2' : null;
+    const nextOptions = document.body.dataset.role === 'student'
+      ? upcoming.filter((session) => session.batch === 'all' || session.batch === 'Both batches' || session.batch === studentBatch)
+      : upcoming;
+    const next = nextOptions[0];
     if (next) {
       const subject = Array.isArray(next.subjects) ? next.subjects[0] : next.subjects;
       const date = new Date(next.starts_at);
       document.getElementById('nextClassName').textContent = subject?.name || 'Next class';
       document.getElementById('nextClassDetail').textContent = `${date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' })} · ${date.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' })}`;
       document.getElementById('nextClassTime').textContent = date.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
-      document.getElementById('nextClassContext').textContent = `${next.kind === 'lab' ? 'Lab' : 'Lecture'} · ${next.batch === 'all' ? 'All students' : next.batch}`;
+      const batchLabel = next.batch === 'all' ? 'All students' : next.batch;
+      document.getElementById('nextClassContext').textContent = `${next.kind === 'lab' ? 'Lab' : 'Lecture'} · ${batchLabel}`;
       document.getElementById('nextClassRoom').textContent = next.room || 'Room not set';
     } else {
       document.getElementById('nextClassName').textContent = 'No class scheduled yet';
