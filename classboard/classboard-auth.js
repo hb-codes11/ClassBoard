@@ -98,7 +98,7 @@
     document.getElementById('profileRole').textContent = roleLabel;
     document.getElementById('profileEmail').textContent = user.email || 'Email unavailable';
     const greeting = document.getElementById('homeGreeting');
-    if (greeting) greeting.textContent = `Hi ${displayName}`;
+    if (greeting) greeting.textContent = `Hello, ${displayName.toLocaleUpperCase('en-IN')}`;
     const homeDate = document.getElementById('homeDate');
     if (homeDate) homeDate.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric' });
     setRoleOptions(roles);
