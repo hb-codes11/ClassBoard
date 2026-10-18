@@ -202,6 +202,26 @@
     .resource-card .resource-title { font-size: 16px; font-weight: 650; line-height: 1.4; }
     .resource-card .resource-meta { font-size: 14px; line-height: 1.45; }
     .resource-card .file-icon { font-size: 13px; }
+    .resource-actions { margin-left:auto; display:flex; align-items:center; gap:7px; flex:none; }
+    .resource-preview-button { min-height:34px; padding:0 11px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--text); font:inherit; font-size:12px; font-weight:650; cursor:pointer; }
+    .resource-preview-button:hover { border-color:var(--blue); color:var(--blue); }
+    .resource-download-button { width:34px; height:34px; display:grid; place-items:center; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--muted); cursor:pointer; }
+    .resource-download-button svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+    .resource-preview-dialog { width:min(1120px,calc(100vw - 32px)); height:min(900px,calc(100dvh - 36px)); max-width:none; max-height:none; padding:0; overflow:hidden; border:1px solid rgba(255,255,255,.34); border-radius:18px; background:rgba(238,245,252,.78); color:#17283d; box-shadow:0 28px 90px rgba(0,0,0,.35); backdrop-filter:blur(28px) saturate(150%); -webkit-backdrop-filter:blur(28px) saturate(150%); }
+    .resource-preview-dialog::backdrop { background:rgba(7,15,27,.54); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+    .pdf-preview-shell { display:flex; flex-direction:column; width:100%; height:100%; background:rgba(248,251,255,.7); }
+    .pdf-preview-toolbar { min-height:64px; display:flex; align-items:center; gap:12px; padding:10px 16px; border-bottom:1px solid rgba(255,255,255,.56); background:rgba(255,255,255,.42); }
+    .pdf-preview-file-icon { width:36px; height:40px; display:grid; place-items:center; flex:none; border-radius:9px; color:#d94b4b; background:rgba(255,255,255,.6); font-size:10px; font-weight:800; }
+    .pdf-preview-title { min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:14px; font-weight:680; }
+    .pdf-preview-download, .pdf-preview-close { min-height:36px; display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:0 12px; border:1px solid rgba(255,255,255,.7); border-radius:10px; background:rgba(255,255,255,.55); color:#17283d; font:inherit; font-size:12px; font-weight:650; text-decoration:none; cursor:pointer; box-shadow:0 3px 12px rgba(21,45,74,.08); }
+    .pdf-preview-download:hover, .pdf-preview-close:hover { background:rgba(255,255,255,.82); }
+    .pdf-preview-close { width:36px; padding:0; font-size:20px; }
+    .pdf-preview-frame { display:block; width:100%; min-height:0; flex:1; border:0; background:#eef2f7; }
+    [data-theme="dark"] .resource-preview-dialog { border-color:rgba(255,255,255,.16); background:rgba(25,31,40,.78); color:#e8eff8; }
+    [data-theme="dark"] .pdf-preview-shell { background:rgba(24,30,39,.76); }
+    [data-theme="dark"] .pdf-preview-toolbar { border-color:rgba(255,255,255,.12); background:rgba(255,255,255,.06); }
+    [data-theme="dark"] .pdf-preview-download, [data-theme="dark"] .pdf-preview-close { border-color:rgba(255,255,255,.16); background:rgba(255,255,255,.1); color:#e8eff8; }
+    [data-theme="dark"] .pdf-preview-download:hover, [data-theme="dark"] .pdf-preview-close:hover { background:rgba(255,255,255,.16); }
     .drive-add-button { display:flex; align-items:center; gap:7px; white-space:nowrap; }
     .drive-add-button span { font-size:22px; line-height: .8; }
     .resource-upload-panel { margin-bottom:16px; }
@@ -311,7 +331,7 @@
     .medical-warning { display: none; margin-top: 10px; padding: 10px 12px; border: 1px solid #e5484d55; border-radius: 9px; background: #e5484d14; color: #a92b31; font-size: 13px; font-weight: 650; }
     .medical-planner[data-enabled="true"] { border-color: #d92d35; background: #e5484d0c; }
     .medical-planner[data-enabled="true"] .medical-warning { display: block; }
-    @media (max-width: 700px) { .attendance-subject-grid { grid-template-columns: 1fr; padding: 12px; } }
+    @media (max-width: 700px) { .attendance-subject-grid { grid-template-columns: 1fr; padding: 12px; } .resource-preview-dialog { width:calc(100vw - 12px); height:calc(100dvh - 12px); border-radius:14px; } .pdf-preview-toolbar { min-height:58px; gap:7px; padding:8px; } .pdf-preview-download { padding:0 9px; } }
     @media (max-width: 560px) { .planner-results { grid-template-columns: 1fr 1fr; } }
     :root { --text-body: 16px; --text-small: 14px; --text-meta: 13px; --text-label: 14px; }
     body { font-size: var(--text-body); line-height: 1.55; }
@@ -632,6 +652,12 @@
       <button data-view="Profile"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
     </nav>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <dialog class="resource-preview-dialog" id="pdfPreviewDialog" aria-label="PDF preview">
+      <div class="pdf-preview-shell">
+        <div class="pdf-preview-toolbar"><div class="pdf-preview-file-icon">PDF</div><div class="pdf-preview-title" id="pdfPreviewTitle">PDF preview</div><a class="pdf-preview-download" id="pdfPreviewDownload" href="#" download>Download</a><button class="pdf-preview-close" id="pdfPreviewClose" type="button" aria-label="Close preview">×</button></div>
+        <iframe class="pdf-preview-frame" id="pdfPreviewFrame" title="PDF document preview"></iframe>
+      </div>
+    </dialog>
     <dialog class="app-dialog" id="appDialog"><div class="dialog-content" id="dialogContent"></div></dialog>
   </div>
   <script>
