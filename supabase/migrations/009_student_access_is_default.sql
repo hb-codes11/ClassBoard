@@ -14,7 +14,7 @@ on conflict (user_id, class_id) do update
   set email = excluded.email;
 
 insert into public.class_memberships (user_id, class_id, role, roll_number, is_active)
-select u.id, c.id, 'student'::public.class_role, null, true
+select u.id, c.id, 'student'::public.class_role, null::smallint, true
 from auth.users u
 join public.classes c on c.code = 'INTEL-1' and c.is_active
 where lower(u.email) like '%@medicaps.ac.in'
@@ -34,7 +34,7 @@ on conflict (user_id, class_id, role) do update
 -- Reset a previously inactive student roll to NULL on reactivation so a stale
 -- roll cannot collide with a currently assigned student.
 insert into public.class_memberships (user_id, class_id, role, roll_number, is_active)
-select distinct member.user_id, member.class_id, 'student'::public.class_role, null, true
+select distinct member.user_id, member.class_id, 'student'::public.class_role, null::smallint, true
 from public.class_memberships member
 where member.is_active
   and not exists (
