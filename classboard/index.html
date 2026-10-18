@@ -1,0 +1,1129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0868bd" />
+  <title>Classboard — AI &amp; Analytics - A (INTEL-1)</title>
+  <link rel="icon" type="image/svg+xml" href="./classboard-logo.svg" />
+  <link rel="shortcut icon" href="./classboard-logo.svg" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light;
+      --blue: #0868bd;
+      --blue-deep: #07539d;
+      --blue-soft: #eaf4ff;
+      --page: #f4f8fc;
+      --surface: #fff;
+      --surface-2: #f8fafc;
+      --text: #17283d;
+      --muted: #738196;
+      --line: #e6ebf1;
+      --green: #16845b;
+      --green-soft: #e8f7f0;
+      --amber: #a96912;
+      --amber-soft: #fff4df;
+      --shadow: 0 10px 30px rgba(29, 59, 91, .055);
+    }
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --blue: #4b9bed;
+      --blue-deep: #83bcff;
+      --blue-soft: #142d48;
+      --page: #000000;
+      --surface: #0a0a0a;
+      --surface-2: #111111;
+      --text: #e8eff8;
+      --muted: #98a9bd;
+      --line: #292929;
+      --green: #70d5a7;
+      --green-soft: #15372d;
+      --amber: #ffc56e;
+      --amber-soft: #3b2d19;
+      --shadow: 0 10px 30px rgba(0, 0, 0, .32);
+    }
+    [data-theme="dark"] .panel,
+    [data-theme="dark"] .stat-card { background: color-mix(in srgb, #0a0a0a 88%, transparent); border-color: #ffffff20; box-shadow: var(--shadow), inset 0 1px #ffffff12; }
+    [data-theme="dark"] .topbar { background: #000000bd; border-bottom-color: #ffffff18; }
+    @supports not ((backdrop-filter: blur(2px))) {
+      .panel, .stat-card, .topbar, .hero-class { background-color: var(--surface); }
+      .hero-class { background-color: #ffffff24; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--page); color: var(--text); font: 16px/1.55 Inter, Roboto, "Helvetica Neue", Arial, sans-serif; transition: background .2s, color .2s; }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    .app { min-height: 100vh; }
+    .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 5; display: flex; flex-direction: column; width: 236px; padding: 24px 15px 18px; background: var(--surface); border-right: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 13px; padding: 0 10px; margin-bottom: 35px; }
+    .brand-mark { display: grid; place-items: center; width: 44px; height: 44px; flex: none; overflow: hidden; border-radius: 12px; }
+    .brand-mark img { display: block; width: 100%; height: 100%; object-fit: contain; }
+    .brand-name { font-weight: 730; letter-spacing: -.035em; font-size: 19px; line-height: 1.15; }
+    .brand-sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .brand-term { display: inline-flex; margin-top: 5px; padding: 2px 7px; border-radius: 20px; background: var(--blue-soft); color: var(--blue); font-size: 11px; font-weight: 650; line-height: 1.4; }
+    .section-label { color: var(--muted); padding: 0 11px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: .11em; font-size: 10px; font-weight: 700; }
+    .nav { display: grid; gap: 5px; }
+    .nav-item { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 11px; border: 0; border-radius: 9px; background: transparent; text-align: left; color: var(--muted); cursor: pointer; transition: .16s ease; }
+    .nav-item[hidden] { display: none; }
+    .nav-item:hover { color: var(--text); background: var(--surface-2); }
+    .nav-item.active { color: var(--blue); background: var(--blue-soft); font-weight: 650; }
+    .nav-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+    .nav-count { margin-left: auto; min-width: 20px; padding: 1px 6px; border-radius: 20px; background: var(--blue); color: white; font-size: 10px; text-align: center; }
+    .sidebar-bottom { margin-top: auto; }
+    .help-card { margin: 0 4px 20px; border: 1px solid var(--line); background: var(--surface-2); border-radius: 12px; padding: 14px; }
+    .help-icon { width: 27px; height: 27px; border-radius: 8px; display: grid; place-items: center; background: var(--blue-soft); color: var(--blue); font-weight: 750; margin-bottom: 10px; }
+    .help-title { font-size: 12px; font-weight: 680; margin-bottom: 4px; }
+    .help-copy { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+    .help-link { padding: 0; border: 0; background: none; color: var(--blue); font-size: 11px; font-weight: 680; cursor: pointer; }
+    .profile { display: flex; align-items: center; gap: 10px; padding: 13px 8px 0; border-top: 1px solid var(--line); }
+    .profile { border: 0; border-top: 1px solid var(--line); width: 100%; background: transparent; text-align: left; cursor: pointer; border-radius: 8px; }
+    .profile:hover { background: var(--surface-2); }
+    .avatar { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; flex: none; background: #dcecff; color: #155da2; font-size: 11px; font-weight: 750; }
+    [data-theme="dark"] .avatar { color: #b8d9ff; background: #203c5c; }
+    .profile-name { font-size: 12px; font-weight: 650; }
+    .profile-role { font-size: 10px; color: var(--muted); }
+    .dots { margin-left: auto; color: var(--muted); border: 0; background: none; font-size: 19px; cursor: pointer; }
+    .dots:hover { color: var(--blue); }
+    .profile-menu { position: absolute; left: 15px; bottom: 76px; z-index: 8; width: 205px; padding: 7px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: 0 12px 35px #10243b24; }
+    .profile-menu[hidden] { display: none; }
+    .profile-menu button { width: 100%; padding: 10px 11px; border: 0; border-radius: 7px; background: transparent; color: var(--text); text-align: left; font-size: 13px; cursor: pointer; }
+    .profile-menu button:hover { color: var(--blue); background: var(--blue-soft); }
+    .profile-wrap { position: relative; margin-top: auto; }
+    .main { margin-left: 236px; min-height: 100vh; }
+    .topbar { height: 68px; position: sticky; top: 0; z-index: 4; display: flex; align-items: center; justify-content: space-between; padding: 0 38px; background: color-mix(in srgb, var(--surface) 72%, transparent); backdrop-filter: blur(18px) saturate(145%); -webkit-backdrop-filter: blur(18px) saturate(145%); border-bottom: 1px solid color-mix(in srgb, var(--line) 72%, transparent); }
+    .crumb { color: var(--muted); font-size: 12px; }
+    .crumb strong { color: var(--text); font-weight: 620; }
+    .top-actions { display: flex; gap: 10px; align-items: center; }
+    .section-select { display: flex; align-items: center; gap: 9px; height: 35px; padding: 0 10px; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; font-size: 11px; font-weight: 620; }
+    .section-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
+    .icon-button { width: 40px; height: 40px; display: grid; place-items: center; position: relative; border: 1px solid color-mix(in srgb, var(--line) 72%, white 28%); border-radius: 12px; background: color-mix(in srgb, var(--surface) 75%, transparent); color: var(--muted); cursor: pointer; box-shadow: 0 2px 7px #182b4210, inset 0 1px #ffffff50; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: transform .16s ease, color .16s ease, border-color .16s ease, box-shadow .16s ease; }
+    .icon-button:hover { transform: translateY(-1px); color: var(--blue); border-color: color-mix(in srgb, var(--blue) 42%, var(--line)); box-shadow: 0 5px 14px #0868bd20, inset 0 1px #ffffff70; }
+    .icon-button:active { transform: translateY(0) scale(.96); }
+    .icon-button svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    [data-theme="dark"] .icon-button { background: #101010cc; border-color: #ffffff24; box-shadow: inset 0 1px #ffffff12, 0 3px 10px #0007; }
+    [data-theme="dark"] .icon-button:hover { border-color: #4b9bed88; box-shadow: 0 5px 14px #0009, inset 0 1px #ffffff18; }
+    .unread { position: absolute; right: 7px; top: 7px; width: 6px; height: 6px; background: #ec6b65; border: 1px solid var(--surface); border-radius: 50%; }
+    .content { width: min(1120px, 100%); min-height: calc(100vh - 68px); display: flex; flex-direction: column; margin: 0 auto; padding: 31px 38px 46px; }
+    .welcome-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; margin-bottom: 23px; }
+    .eyebrow { color: var(--blue); font-size: 10px; text-transform: uppercase; letter-spacing: .13em; font-weight: 750; margin-bottom: 8px; }
+    h1 { margin: 0; font-size: clamp(25px, 3vw, 31px); line-height: 1.12; letter-spacing: -.045em; font-weight: 710; }
+    .subtitle { margin-top: 7px; color: var(--muted); font-size: 12px; }
+    .date-label { color: var(--muted); font-size: 11px; padding-bottom: 3px; }
+    .hero { min-height: 184px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 25px; padding: 25px 29px; margin-bottom: 20px; border: 1px solid #ffffff40; border-radius: 16px; color: white; background: linear-gradient(112deg, #0756a0dd 0%, #0868bddb 57%, #1486d9dd 100%); box-shadow: 0 13px 30px #0759a027, inset 0 1px #ffffff30; backdrop-filter: blur(12px) saturate(135%); -webkit-backdrop-filter: blur(12px) saturate(135%); }
+    .hero:before, .hero:after { content: ""; position: absolute; border: 1px solid #ffffff19; border-radius: 50%; pointer-events: none; }
+    .hero:before { width: 340px; height: 340px; right: 13%; top: -238px; }
+    .hero:after { width: 450px; height: 450px; right: -3%; top: -290px; }
+    .hero-copy, .hero-class { position: relative; z-index: 1; }
+    .hero-kicker { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #d2e9ff; font-weight: 680; margin-bottom: 9px; }
+    .hero h2 { font-size: 20px; letter-spacing: -.03em; margin: 0 0 6px; }
+    .hero p { margin: 0; color: #d5eaff; font-size: 11px; }
+    .hero-class { width: 221px; flex: none; padding: 15px 16px; border: 1px solid #ffffff4d; border-radius: 12px; background: #ffffff1c; box-shadow: inset 0 1px #ffffff35, 0 8px 20px #003d7620; backdrop-filter: blur(18px) saturate(145%); -webkit-backdrop-filter: blur(18px) saturate(145%); }
+    .class-meta { color: #d5eaff; font-size: 10px; display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .class-name { font-weight: 690; font-size: 13px; }
+    .class-room { color: #d5eaff; font-size: 10px; margin-top: 4px; }
+    .hero-link { display: inline-flex; align-items: center; gap: 6px; color: white; text-decoration: none; font-size: 10px; font-weight: 670; margin-top: 12px; }
+    .hero-link:hover { text-decoration: underline; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 23px; }
+    .stat-card { min-height: 91px; display: flex; align-items: center; gap: 13px; padding: 16px; border: 1px solid color-mix(in srgb, var(--line) 76%, white 24%); border-radius: 12px; background: color-mix(in srgb, var(--surface) 78%, transparent); box-shadow: var(--shadow), inset 0 1px color-mix(in srgb, white 40%, transparent); backdrop-filter: blur(12px) saturate(125%); -webkit-backdrop-filter: blur(12px) saturate(125%); }
+    .stat-icon { width: 37px; height: 37px; display: grid; place-items: center; border-radius: 10px; background: var(--blue-soft); color: var(--blue); flex: none; }
+    .stat-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .stat-value { font-size: 19px; font-weight: 720; letter-spacing: -.04em; }
+    .stat-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .stat-note { margin-left: auto; color: var(--green); background: var(--green-soft); padding: 4px 7px; border-radius: 20px; font-size: 9px; font-weight: 700; white-space: nowrap; }
+    .grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(245px, .9fr); gap: 18px; align-items: start; }
+    .stack { display: grid; gap: 18px; }
+    .panel { border: 1px solid color-mix(in srgb, var(--line) 78%, white 22%); border-radius: 12px; background: color-mix(in srgb, var(--surface) 84%, transparent); box-shadow: var(--shadow), inset 0 1px color-mix(in srgb, white 36%, transparent); backdrop-filter: blur(14px) saturate(125%); -webkit-backdrop-filter: blur(14px) saturate(125%); overflow: hidden; }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px 12px; }
+    .panel-title { font-size: 12px; font-weight: 700; letter-spacing: -.01em; }
+    #page-attendance > .panel:first-of-type > .panel-header .panel-title { font-size: 16px; text-transform: uppercase; letter-spacing: .035em; }
+    .panel-sub { color: var(--muted); font-size: 10px; margin-top: 3px; }
+    .text-link { border: 0; padding: 0; background: none; color: var(--blue); font-size: 10px; font-weight: 670; cursor: pointer; }
+    .update { display: flex; gap: 12px; padding: 12px 18px; border-top: 1px solid var(--line); }
+    .update:first-of-type { border-top: 0; }
+    .update-mark { width: 36px; height: 36px; display: grid; place-items: center; flex: none; border-radius: 11px; background: var(--amber-soft); color: var(--amber); font-weight: 750; font-size: 12px; }
+    .update-mark svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .update-mark.blue { background: var(--blue-soft); color: var(--blue); }
+    .update-title { font-size: 11px; font-weight: 670; }
+    .update-body { color: var(--muted); font-size: 10px; margin-top: 3px; }
+    .update-time { color: var(--muted); font-size: 9px; margin-top: 6px; }
+    .pill { display: inline-flex; align-items: center; padding: 3px 7px; margin-left: 5px; border-radius: 20px; background: var(--amber-soft); color: var(--amber); font-size: 8px; font-weight: 720; vertical-align: 1px; }
+    .reminder { padding: 11px 17px; display: flex; gap: 11px; align-items: flex-start; border-top: 1px solid var(--line); }
+    .reminder-date { width: 33px; height: 37px; display: grid; align-content: center; justify-items: center; border-radius: 8px; background: var(--blue-soft); color: var(--blue); flex: none; }
+    .reminder-date b { font-size: 13px; line-height: 1; }
+    .reminder-date span { font-size: 8px; margin-top: 3px; text-transform: uppercase; font-weight: 750; }
+    .reminder-title { font-size: 10px; font-weight: 680; margin-top: 1px; }
+    .reminder-detail { font-size: 9px; color: var(--muted); margin-top: 3px; }
+    .resource { display: flex; align-items: center; gap: 11px; padding: 10px 17px; border-top: 1px solid var(--line); }
+    .file-icon { display: grid; place-items: center; width: 31px; height: 34px; border-radius: 7px; color: #df5a5a; background: #fff0ef; font-size: 9px; font-weight: 800; flex: none; }
+    [data-theme="dark"] .file-icon { background: #432a2d; }
+    .resource-title { font-size: 10px; font-weight: 670; }
+    .resource-meta { color: var(--muted); font-size: 9px; margin-top: 3px; }
+    .download { margin-left: auto; width: 28px; height: 28px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--muted); cursor: pointer; }
+    .download svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .attendance { padding: 2px 18px 16px; }
+    .attendance-row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 10px; }
+    .attendance-value { font-size: 26px; letter-spacing: -.05em; font-weight: 720; }
+    .attendance-hint { color: var(--muted); font-size: 9px; }
+    .progress { height: 6px; margin-top: 9px; background: var(--surface-2); border-radius: 8px; overflow: hidden; }
+    .progress span { display: block; width: 82%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #0868bd, #48a4ef); }
+    .attendance-footer { display: flex; justify-content: space-between; margin-top: 7px; color: var(--muted); font-size: 9px; }
+    .quick-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; }
+    .quick-action { display: flex; align-items: center; gap: 10px; min-height: 57px; padding: 10px 12px; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; text-align: left; cursor: pointer; transition: border-color .15s, transform .15s; }
+    .quick-action:hover { border-color: color-mix(in srgb, var(--blue) 48%, var(--line)); transform: translateY(-1px); }
+    .quick-action-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: var(--blue-soft); color: var(--blue); flex: none; }
+    .quick-action-icon svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .quick-action-label { font-size: 10px; font-weight: 660; }
+    .quick-action-sub { font-size: 9px; color: var(--muted); margin-top: 2px; }
+    .mobile-nav { display: none; }
+    .page-view { display: none; }
+    .page-view.active { display: block; flex: 1; }
+    .page-heading { display: flex; justify-content: space-between; align-items: end; gap: 15px; margin-bottom: 22px; }
+    .page-heading h1 { font-size: 27px; }
+    .page-description { color: var(--muted); font-size: 12px; margin-top: 6px; }
+    .primary-button, .secondary-button { min-height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 0 13px; background: var(--surface); color: var(--text); font-weight: 650; font-size: 11px; cursor: pointer; }
+    .primary-button { border-color: var(--blue); background: var(--blue); color: white; }
+    .primary-button:hover { background: var(--blue-deep); }
+    .secondary-button:hover { border-color: var(--blue); color: var(--blue); }
+    .toolbar { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+    .search-field, .select-field, .text-field, .text-area { min-height: 38px; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; color: var(--text); padding: 0 11px; outline: none; }
+    .search-field { flex: 1; min-width: 190px; }
+    .search-field:focus, .select-field:focus, .text-field:focus, .text-area:focus { border-color: var(--blue); box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 15%, transparent); }
+    .filter-chip { min-height: 34px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 22px; padding: 0 12px; font-size: 10px; cursor: pointer; }
+    .filter-chip.active { border-color: var(--blue); background: var(--blue-soft); color: var(--blue); font-weight: 650; }
+    .resource-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .resource-card { display: flex; align-items: center; gap: 12px; padding: 14px; min-height: 74px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+    .resource-card .resource-title { font-size: 16px; font-weight: 650; line-height: 1.4; }
+    .resource-card .resource-meta { font-size: 14px; line-height: 1.45; }
+    .resource-card .file-icon { font-size: 13px; }
+    .drive-add-button { display:flex; align-items:center; gap:7px; white-space:nowrap; }
+    .drive-add-button span { font-size:22px; line-height: .8; }
+    .resource-upload-panel { margin-bottom:16px; }
+    .delete-content-button { flex:0 0 auto; border:1px solid var(--line); border-radius:8px; background:transparent; color:var(--muted); padding:7px 10px; cursor:pointer; font:inherit; font-size:13px; }
+    .delete-content-button:hover { color:#c0392b; border-color:#c0392b; }
+    .tabs { display: flex; gap: 18px; border-bottom: 1px solid var(--line); margin: 7px 0 16px; }
+    .tab { padding: 0 1px 10px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; }
+    .tab.active { border-bottom-color: var(--blue); color: var(--blue); font-weight: 670; }
+    .list-row { display: flex; align-items: center; gap: 14px; padding: 14px 17px; border-top: 1px solid var(--line); }
+    .list-row:first-child { border-top: 0; }
+    .case-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .account-row { align-items: flex-start; flex-wrap: wrap; }
+    .account-row .list-main { min-width: 170px; }
+    .account-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-left: auto; }
+    .account-role-options { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin: 0; padding: 6px 10px; border: 1px solid var(--line); border-radius: 9px; }
+    .account-role-options legend { padding: 0 4px; color: var(--muted); font-size: 10px; }
+    .account-role-options label { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 11px; }
+    .account-role-options input { accent-color: var(--blue); }
+    .account-roll-label { display: grid; gap: 3px; color: var(--muted); font-size: 10px; }
+    .account-roll-label input { width: 100px; padding: 7px 9px; }
+    @media (max-width: 760px) { .account-controls { width: 100%; margin-left: 48px; } }
+    .list-main { min-width: 0; flex: 1; }
+    .list-title { font-size: 11px; font-weight: 680; }
+    .list-detail { color: var(--muted); font-size: 10px; margin-top: 4px; }
+    .list-date { width: 44px; flex: none; color: var(--muted); font-size: 9px; text-align: right; }
+    .status { display: inline-flex; padding: 4px 8px; border-radius: 20px; color: var(--green); background: var(--green-soft); font-size: 9px; font-weight: 660; }
+    .status.pending { color: var(--amber); background: var(--amber-soft); }
+    .attendance-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; padding: 18px; }
+    .attendance-form > .field-label { min-width: 0; }
+    .attendance-form .select-field, .attendance-form .text-field, .attendance-form .text-area { width: 100%; min-width: 0; max-width: 100%; }
+    .field-label { display: grid; gap: 6px; color: var(--muted); font-size: 10px; }
+    .text-field { width: 100%; }
+    .calculator-result { grid-column: 1 / -1; padding: 17px; margin-top: 2px; border-radius: 10px; background: var(--blue-soft); }
+    .calculator-value { font-weight: 750; font-size: 26px; letter-spacing: -.04em; color: var(--blue); }
+    .calculator-hint { font-size: 10px; color: var(--muted); margin-top: 3px; }
+    .text-area { width: 100%; min-height: 96px; padding-top: 10px; resize: vertical; }
+    .notice-box { display: flex; gap: 10px; padding: 12px 14px; color: var(--muted); background: var(--blue-soft); border-radius: 9px; font-size: 10px; margin: 13px 17px 17px; }
+    .empty-filter { display: none; padding: 18px; color: var(--muted); font-size: 11px; text-align: center; }
+    .calendar-frame { display: block; width: 100%; height: min(76vh, 900px); min-height: 520px; border: 0; background: #fff; }
+    .calendar-missing { min-height: 320px; display: grid; place-content: center; gap: 10px; padding: 32px; text-align: center; color: var(--muted); }
+    .calendar-actions { display: flex; align-items: center; gap: 10px; }
+    .calendar-source { padding: 13px 17px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+    .home-attendance-panel .subject-attendance { padding: 8px 14px; }
+    .home-attendance-panel .subject-attendance-name { font-size: 12px; line-height: 1.35; }
+    .home-attendance-panel .subject-attendance-count { font-size: 11px; }
+    .home-attendance-panel .subject-attendance-percent { font-size: 18px; }
+    .home-attendance-panel .progress { height: 5px; margin-top: 6px; }
+    .site-footer { display: flex; justify-content: space-between; gap: 12px; padding: 18px 0 8px; margin-top: auto; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .role-switcher { height: 36px; max-width: 170px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--text); font: inherit; font-size: 12px; cursor: pointer; }
+    .workspace-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(270px, .9fr); gap: 15px; margin-bottom: 16px; }
+    .workspace-stack { display: grid; gap: 15px; align-content: start; }
+    .workspace-form { display: grid; gap: 12px; padding: 16px 17px 18px; }
+    .workspace-form .field-label { color: var(--text); font-weight: 600; }
+    .workspace-form .text-field, .workspace-form .select-field, .workspace-form .text-area { width: 100%; font-weight: 400; }
+    .workspace-form .text-area { min-height: 86px; padding: 10px 11px; resize: vertical; }
+    .form-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .action-list { display: grid; gap: 9px; padding: 13px 16px 16px; }
+    .action-tile { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); }
+    .action-tile strong { display: block; font-size: 13px; }
+    .action-tile span { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .workspace-table .list-row { min-height: 61px; }
+    .workspace-table .list-title { font-size: 13px; }
+    .workspace-table .list-detail { font-size: 11px; }
+    .workspace-section-label { padding: 16px 17px 9px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .private-note { margin: 0 16px 15px; padding: 11px 12px; border-radius: 9px; background: var(--amber-soft); color: var(--amber); font-size: 11px; }
+    .role-banner { display: flex; align-items: center; gap: 9px; margin: -5px 0 17px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; color: var(--muted); background: var(--surface-2); font-size: 11px; }
+    .batch-chip { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; background: var(--blue-soft); color: var(--blue); font-size: 12px; font-weight: 700; }
+    .account-roll { width: 78px; min-height: 38px; padding: 6px 8px; }
+    .cr-only { display: none !important; }
+    body[data-role="cr"] .cr-only { display: inline-flex !important; }
+    .app-dialog { width: min(460px, calc(100vw - 30px)); max-height: 85vh; padding: 0; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); color: var(--text); box-shadow: 0 25px 80px #06172a40; }
+    .app-dialog::backdrop { background: #07182b70; backdrop-filter: blur(3px); }
+    .dialog-content { padding: 21px; }
+    .dialog-content h2 { margin: 0 0 5px; font-size: 20px; }
+    .dialog-content p { margin: 0 0 16px; color: var(--muted); font-size: 12px; }
+    .dialog-fields { display: grid; gap: 12px; }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+    .subject-attendance { padding: 15px 17px; border-top: 1px solid var(--line); }
+    .subject-attendance:first-child { border-top: 0; }
+    .attendance-subject-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 14px 16px; }
+    .attendance-subject-grid > .subject-attendance { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .subject-attendance-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    .subject-attendance-name { font-size: 13px; font-weight: 680; }
+    .subject-attendance-count { color: var(--muted); font-size: 11px; margin-top: 3px; }
+    .subject-attendance-percent { font-size: 20px; font-weight: 740; letter-spacing: -.04em; }
+    .subject-attendance .progress { margin-top: 11px; }
+    .subject-attendance .progress span { width: var(--percent); }
+    .subject-calculator { display: grid; grid-template-columns: 1fr 1fr auto; align-items: end; gap: 10px; margin-top: 13px; padding-top: 12px; border-top: 1px dashed var(--line); }
+    .subject-calculator .field-label { min-width: 0; }
+    .subject-calculator .text-field { min-height: 34px; }
+    .subject-calculator .secondary-button { min-height: 34px; white-space: nowrap; }
+    .planner-label { margin: 14px 0 7px; color: var(--muted); font-size: 13px; font-weight: 650; }
+    .planner-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .planner-results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin-top: 12px; }
+    .planner-result { padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft, var(--surface)); }
+    .planner-result-label { color: var(--muted); font-size: 12px; }
+    .planner-result-value { margin-top: 3px; font-size: 17px; font-weight: 720; }
+    .planner-guidance { margin-top: 10px; color: var(--muted); font-size: 13px; }
+    .medical-planner { margin: 12px 0 0; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft, var(--surface)); }
+    .medical-planner[hidden] { display: none !important; }
+    .medical-choice { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 650; cursor: pointer; }
+    .medical-choice input { width: 17px; height: 17px; accent-color: #d92d35; }
+    .medical-warning { display: none; margin-top: 10px; padding: 10px 12px; border: 1px solid #e5484d55; border-radius: 9px; background: #e5484d14; color: #a92b31; font-size: 13px; font-weight: 650; }
+    .medical-planner[data-enabled="true"] { border-color: #d92d35; background: #e5484d0c; }
+    .medical-planner[data-enabled="true"] .medical-warning { display: block; }
+    @media (max-width: 700px) { .attendance-subject-grid { grid-template-columns: 1fr; padding: 12px; } }
+    @media (max-width: 560px) { .planner-results { grid-template-columns: 1fr 1fr; } }
+    :root { --text-body: 16px; --text-small: 14px; --text-meta: 13px; --text-label: 14px; }
+    body { font-size: var(--text-body); line-height: 1.55; }
+    .brand-name { font-size: 19px; }
+    .brand-sub, .section-label, .nav-item, .profile-name, .crumb, .subtitle, .page-description,
+    .panel-title, .panel-sub, .text-link, .update-title, .update-body, .update-time, .resource-title,
+    .resource-meta, .reminder-title, .reminder-detail, .list-title, .list-detail, .list-date, .status,
+    .field-label, .calculator-hint, .notice-box, .subject-attendance-name,
+    .subject-attendance-count, .attendance-hint, .attendance-footer, .quick-action-label,
+    .quick-action-sub, .help-title, .help-copy, .help-link, .profile-role, .profile-menu button,
+    .filter-chip, .tab, .primary-button, .secondary-button, .search-field, .select-field, .text-field,
+    .text-area { font-size: var(--text-small); }
+    .eyebrow, .date-label, .class-meta, .hero-kicker, .hero p, .class-room, .hero-link,
+    .stat-label, .stat-note, .reminder-date span, .pill, .file-icon, .toast, .mobile-nav button {
+      font-size: var(--text-meta);
+    }
+    h1, .page-heading h1 { font-size: 30px; }
+    .hero h2 { font-size: 22px; }
+    .class-name { font-size: 18px; }
+    .stat-value { font-size: 23px; }
+    .attendance-value, .calculator-value { font-size: 28px; }
+    .subject-attendance-percent { font-size: 23px; }
+    .reminder-date b { font-size: 16px; }
+    .nav-count { font-size: 12px; }
+    .avatar { font-size: 12px; }
+    .download svg { width: 16px; height: 16px; }
+    .toast { position: fixed; z-index: 10; bottom: 24px; left: 50%; transform: translate(-50%, 20px); opacity: 0; padding: 11px 16px; background: #17283d; color: white; border-radius: 9px; box-shadow: 0 8px 25px #0003; font-size: 12px; pointer-events: none; transition: .22s ease; }
+    .toast.show { transform: translate(-50%, 0); opacity: 1; }
+    @media (max-width: 1050px) {
+      .sidebar { width: 205px; }
+      .main { margin-left: 205px; }
+      .content { padding-inline: 25px; }
+      .topbar { padding-inline: 25px; }
+      .grid { grid-template-columns: minmax(0, 1.25fr) minmax(230px, .9fr); gap: 13px; }
+      .stat-card { padding: 13px; gap: 10px; }
+    }
+    @media (max-width: 760px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding-bottom: 68px; }
+      .topbar { height: 58px; padding: 0 17px; }
+      .crumb { font-size: var(--text-small); }
+      .top-actions { gap: 7px; }
+      .section-select { height: 36px; font-size: var(--text-small); padding: 0 8px; }
+      .icon-button { width: 38px; height: 38px; }
+      .content { padding: 24px 17px 26px; }
+      .content { min-height: calc(100vh - 126px); }
+      .role-switcher { width: 112px; max-width: 112px; padding: 0 6px; font-size: 10px; }
+      .welcome-row { margin-bottom: 18px; }
+      .date-label { display: none; }
+      .hero { min-height: 165px; padding: 21px; border-radius: 13px; align-items: flex-start; flex-direction: column; gap: 14px; }
+      .hero h2 { font-size: 20px; }
+      .hero-class { width: 100%; display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 10px 12px; }
+      .hero-class .class-meta { display: none; }
+      .class-room { margin-top: 2px; }
+      .hero-link { margin: 0; grid-column: 2; grid-row: 1 / span 2; }
+      .stats { gap: 8px; margin-bottom: 17px; }
+      .stat-card { min-height: 78px; padding: 10px; gap: 8px; border-radius: 10px; }
+      .stat-icon { width: 30px; height: 30px; border-radius: 8px; }
+      .stat-icon svg { width: 15px; height: 15px; }
+      .stat-value { font-size: 19px; }
+      .stat-note { display: none; }
+      .grid { grid-template-columns: 1fr; gap: 14px; }
+      .workspace-grid { grid-template-columns: 1fr; gap: 13px; }
+      .workspace-stack { gap: 13px; }
+      .workspace-form { padding: 14px; }
+      .workspace-table .list-row { flex-wrap: wrap; }
+      .workspace-table .list-row .list-main { flex-basis: 55%; }
+      .action-tile { align-items: flex-start; }
+      .stack { gap: 14px; }
+      .subject-calculator { grid-template-columns: 1fr 1fr; }
+      .subject-calculator .secondary-button { grid-column: 1 / -1; }
+      .panel-header { padding: 14px 15px 10px; }
+      .update { padding-inline: 15px; }
+      .quick-actions { margin-top: 14px; gap: 7px; }
+      .quick-action { display: grid; justify-items: start; gap: 7px; min-height: 78px; padding: 10px; }
+      .quick-action-sub { display: none; }
+      .mobile-nav { position: fixed; inset: auto 0 0; z-index: 6; height: 62px; display: grid; grid-template-columns: repeat(4, 1fr); padding: 5px 8px max(5px, env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--line); }
+      .mobile-nav button { display: grid; justify-items: center; align-content: center; gap: 3px; border: 0; background: transparent; color: var(--muted); font-size: var(--text-meta); cursor: pointer; }
+      .mobile-nav button.active { color: var(--blue); font-weight: 680; }
+      .mobile-nav svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    }
+    @media (max-width: 390px) {
+      .content { padding-inline: 13px; }
+      .topbar { padding-inline: 13px; }
+      .stats { gap: 6px; }
+      .stat-card { display: block; text-align: center; padding: 9px 5px; }
+      .stat-icon { margin: 0 auto 5px; }
+      .quick-action { padding: 8px; }
+    }
+    .auth-gate { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--page); }
+    .auth-card { width: min(100%, 430px); padding: 30px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow); }
+    .auth-brand { display: flex; align-items: center; gap: 9px; color: var(--blue); font-size: 13px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .auth-brand img { width: 32px; height: 32px; }
+    .auth-card h1 { margin-top: 10px; font-size: 26px; }
+    .auth-copy { color: var(--muted); font-size: 13px; margin: 9px 0 22px; }
+    .auth-field { display: grid; gap: 6px; margin: 13px 0; font-size: 12px; font-weight: 650; }
+    .auth-field input { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-2); color: var(--text); }
+    .auth-action { width: 100%; padding: 11px 14px; margin-top: 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--text); font-weight: 650; cursor: pointer; }
+    .auth-action.primary { border-color: var(--blue); background: var(--blue); color: #fff; }
+    .auth-action:disabled { opacity: .6; cursor: wait; }
+    .auth-message { min-height: 22px; margin-top: 12px; color: var(--muted); font-size: 12px; }
+    .auth-message.error { color: #c0392b; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body data-role="student">
+  <section class="auth-gate" id="authGate" aria-labelledby="authTitle">
+    <div class="auth-card">
+      <div class="auth-brand"><img src="./classboard-logo.svg" alt="" />Classboard · INTEL-1</div>
+      <h1 id="authTitle">Sign in to your class</h1>
+      <p class="auth-copy">Use your Medicaps college email ending in <strong>@medicaps.ac.in</strong>.</p>
+      <form id="authForm">
+        <label class="auth-field">College email
+          <input id="authEmail" name="email" type="email" autocomplete="email" required placeholder="you@medicaps.ac.in" />
+        </label>
+        <label class="auth-field">Password
+          <input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" required placeholder="At least 8 characters" />
+        </label>
+        <button class="auth-action primary" id="signInButton" type="submit">Sign in</button>
+      </form>
+      <button class="auth-action" id="signUpButton" type="button">Create account with email</button>
+      <button class="auth-action" id="googleSignInButton" type="button">Continue with Google</button>
+      <button class="auth-action" id="resetPasswordButton" type="button">Send password reset email</button>
+      <div class="auth-message" id="authMessage" role="status" aria-live="polite"></div>
+    </div>
+  </section>
+  <div class="app" hidden>
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark"><img src="./classboard-logo.svg" alt="Classboard logo" /></div>
+        <div><div class="brand-name">Classboard</div><div class="brand-sub">INTEL CLASS PORTAL</div><div class="brand-term">3rd Semester</div></div>
+      </div>
+      <div class="section-label">Workspace</div>
+      <nav class="nav" aria-label="Main navigation">
+        <button class="nav-item active" data-view="Home"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+        <button class="nav-item" data-view="Notes & Syllabus"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 1 4 17.5z"/><path d="M4 17.5A2.5 2.5 0 0 1 6.5 15H20M8 6h8M8 9h7"/></svg>Notes &amp; Syllabus</button>
+        <button class="nav-item" data-view="Updates"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>Updates <span class="nav-count">2</span></button>
+        <button class="nav-item" data-view="Academic Calendar"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M14 14h2M8 17h3"/></svg>Academic Calendar</button>
+        <button class="nav-item" data-view="Class Log"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M8 17h7"/></svg>Class Log</button>
+        <button class="nav-item" data-view="Attendance"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/><path d="M16 6h4v4"/></svg>Attendance</button>
+        <button class="nav-item" data-view="Notifications"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>Notifications</button>
+        <button class="nav-item" data-view="CR workspace" id="crWorkspaceNav" hidden><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h4"/></svg>CR workspace</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="profile-wrap">
+          <div class="profile" id="sidebarProfile" role="button" tabindex="0" aria-label="Open profile"><div class="avatar">CB</div><div><div class="profile-name">Your account</div><div class="profile-role">Class member</div></div><button class="dots" id="profileMenuToggle" aria-label="More profile options" aria-expanded="false">···</button></div>
+          <div class="profile-menu" id="profileMenu" hidden><button data-page="profile">View profile</button><button id="themeMenuToggle">Change appearance</button><button id="signOutButton">Sign out</button></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="crumb">Workspace <span style="padding:0 7px;color:var(--line)">/</span> <strong id="crumbPage">Home</strong></div>
+        <div class="top-actions">
+          <select class="role-switcher" id="roleSwitcher" aria-label="Your workspace" title="Switch between roles assigned to your account"><option value="student">Student view</option><option value="cr">CR workspace</option><option value="admin">Admin workspace</option></select>
+          <button class="icon-button" aria-label="Academic calendar" title="Academic calendar" data-page="calendar"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M14 14h2M8 17h3"/></svg></button>
+          <button class="icon-button" id="themeToggle" aria-label="Switch theme" title="Switch light/dark theme"><svg viewBox="0 0 24 24"><path d="M20.9 13A8.5 8.5 0 0 1 11 3.1 8.5 8.5 0 1 0 20.9 13Z"/></svg></button>
+          <button class="icon-button" aria-label="Notifications" data-page="notifications"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="unread"></span></button>
+          <button class="icon-button" aria-label="Profile" data-page="profile"><span id="topbarAvatar" style="font-size:11px;font-weight:750">CB</span></button>
+        </div>
+      </header>
+      <div class="content">
+        <section class="page-view active" id="page-home">
+        <div class="welcome-row">
+          <div><div class="eyebrow">Friday, October 17</div><h1 id="homeGreeting">Welcome</h1><div class="subtitle">Here’s what’s happening in AI &amp; Analytics - A (INTEL-1) today.</div></div>
+          <div class="date-label">Academic year 2026–27</div>
+        </div>
+
+        <section class="hero" aria-label="Next class">
+          <div class="hero-copy"><div class="hero-kicker">Your next class</div><h2 id="nextClassName">No class scheduled</h2><p id="nextClassDetail">Your CR will add upcoming classes to the timetable.</p></div>
+          <div class="hero-class"><div class="class-meta"><span>UP NEXT</span><span id="nextClassTime">—</span></div><div><div class="class-name" id="nextClassContext">Timetable</div><div class="class-room" id="nextClassRoom">No upcoming class yet</div></div><a class="hero-link" href="#class-log" data-toast="Opening today’s class log">View class log <span>→</span></a></div>
+        </section>
+
+        <section class="stats" aria-label="Class overview">
+          <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/><path d="M16 6h4v4"/></svg></div><div><div class="stat-value">6 / 6</div><div class="stat-label">Subjects at 75% or more</div></div><span class="stat-note">On track</span></div>
+          <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 1 4 17.5z"/><path d="M8 7h8M8 11h8"/></svg></div><div><div class="stat-value">24</div><div class="stat-label">Resources available</div></div></div>
+          <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3"/></svg></div><div><div class="stat-value">3</div><div class="stat-label">Upcoming reminders</div></div></div>
+        </section>
+
+        <section class="grid">
+          <div class="stack">
+            <article class="panel" id="homeUpdateList">
+              <div class="panel-header"><div><div class="panel-title">Latest updates</div><div class="panel-sub">Notes from your class reps and teachers</div></div><button class="text-link" data-page="updates">View all →</button></div>
+              <div class="update"><div class="update-mark"><svg viewBox="0 0 24 24"><path d="M12 3 2.8 19a1.4 1.4 0 0 0 1.2 2h16a1.4 1.4 0 0 0 1.2-2L12 3Z"/><path d="M12 9v4M12 17h.01"/></svg></div><div><div class="update-title">COM class moved to Friday <span class="pill">Important</span></div><div class="update-body">Computer Organisation &amp; Microprocessors will meet in Lab 3 at 2:00 PM.</div><div class="update-time">Posted by your CR · 2 hours ago</div></div></div>
+              <div class="update"><div class="update-mark blue"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div><div><div class="update-title">Mid-semester exam form is open</div><div class="update-body">Submit the form before Monday, October 20.</div><div class="update-time">Posted by your CR · Yesterday</div></div></div>
+            </article>
+            <article class="panel" id="homeResourceList">
+              <div class="panel-header"><div><div class="panel-title">New notes</div><div class="panel-sub">Recently added to your class</div></div><button class="text-link" data-page="resources">See notes →</button></div>
+              <div class="resource"><div class="file-icon">PDF</div><div><div class="resource-title">Java Programming — Notes</div><div class="resource-meta">Java Programming · Unit 3 · Added yesterday</div></div><button class="download" aria-label="Download file" data-toast="Preparing PDF download"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button></div>
+              <div class="resource"><div class="file-icon">PDF</div><div><div class="resource-title">Artificial Intelligence Notes</div><div class="resource-meta">Artificial Intelligence · Unit 2 · Added 2 days ago</div></div><button class="download" aria-label="Download file" data-toast="Preparing PDF download"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button></div>
+            </article>
+            <article class="panel">
+              <div class="panel-header"><div><div class="panel-title">Recent classes</div><div class="panel-sub">What your class has covered</div></div><button class="text-link" data-page="classes">Open class log →</button></div>
+              <div id="homeClassList"><div class="list-row"><div class="reminder-date"><b>17</b><span>Oct</span></div><div class="list-main"><div class="list-title">Software Engineering · Class 18</div><div class="list-detail">Lecture · Room 204</div></div><span class="status">Held</span></div>
+              <div class="list-row"><div class="reminder-date"><b>16</b><span>Oct</span></div><div class="list-main"><div class="list-title">Java Programming · Class 17</div><div class="list-detail">Lecture · Room 204</div></div><span class="status">Held</span></div>
+              <div class="list-row"><div class="reminder-date"><b>15</b><span>Oct</span></div><div class="list-main"><div class="list-title">Computer Organisation &amp; Microprocessors · Class 16</div><div class="list-detail">Lecture · Room 204</div></div><span class="status">Held</span></div></div>
+            </article>
+          </div>
+
+          <div class="stack">
+            <article class="panel home-attendance-panel">
+              <div class="panel-header"><div><div class="panel-title">Attendance by subject</div><div class="panel-sub">Each subject needs at least 75%</div></div><button class="text-link" data-page="attendance">See details →</button></div>
+              <div class="subject-attendance"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Software Engineering</div><div class="subject-attendance-count">18 of 20 classes attended</div></div><div class="subject-attendance-percent">90%</div></div><div class="progress"><span style="--percent:90%"></span></div></div>
+              <div class="subject-attendance"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Statistical Analysis (SA)</div><div class="subject-attendance-count">15 of 20 classes attended</div></div><div class="subject-attendance-percent">75%</div></div><div class="progress"><span style="--percent:75%"></span></div></div>
+              <div class="subject-attendance"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Computer Organisation &amp; Microprocessors (COM)</div><div class="subject-attendance-count">17 of 20 classes attended</div></div><div class="subject-attendance-percent">85%</div></div><div class="progress"><span style="--percent:85%"></span></div></div>
+              <div class="subject-attendance"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Java Programming</div><div class="subject-attendance-count">18 of 20 classes attended</div></div><div class="subject-attendance-percent">90%</div></div><div class="progress"><span style="--percent:90%"></span></div></div>
+              <div class="subject-attendance"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Soft Skills</div><div class="subject-attendance-count">17 of 20 classes attended</div></div><div class="subject-attendance-percent">85%</div></div><div class="progress"><span style="--percent:85%"></span></div></div>
+              <div class="subject-attendance"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Artificial Intelligence (AI)</div><div class="subject-attendance-count">19 of 20 classes attended</div></div><div class="subject-attendance-percent">95%</div></div><div class="progress"><span style="--percent:95%"></span></div></div>
+              <div class="attendance-footer" style="padding:0 17px 15px"><span>Target per subject: 75%</span><span>Estimates only</span></div>
+            </article>
+            <article class="panel">
+              <div class="panel-header"><div><div class="panel-title">Coming up</div><div class="panel-sub">Dates to remember</div></div><button class="text-link" data-page="updates">See all →</button></div>
+              <div id="homeReminderList"><div class="reminder"><div class="reminder-date"><b>20</b><span>Oct</span></div><div><div class="reminder-title">Exam form submission</div><div class="reminder-detail">Monday · Before 5:00 PM</div></div></div>
+              <div class="reminder"><div class="reminder-date"><b>22</b><span>Oct</span></div><div><div class="reminder-title">COM lab record</div><div class="reminder-detail">Wednesday · Bring your completed record</div></div></div></div>
+            </article>
+          </div>
+        </section>
+        </section>
+
+        <section class="page-view" id="page-resources">
+          <div class="page-heading"><div><div class="eyebrow">Study materials</div><h1>Notes &amp; Syllabus</h1><div class="page-description">Find class notes, lab manuals and the syllabus.</div></div><button class="primary-button drive-add-button" id="openResourceUpload" type="button" hidden aria-expanded="false" aria-controls="resourceUploadPanel"><span aria-hidden="true">＋</span> Add resource</button></div>
+          <article class="panel resource-upload-panel" id="resourceUploadPanel" hidden><div class="panel-header"><div><div class="panel-title">Upload class material</div><div class="panel-sub">Choose a PDF and publish it directly to the class.</div></div></div><form class="workspace-form" id="crResourceForm"><label class="field-label" id="crResourceSubjectLabel">Subject<select class="select-field" id="crResourceSubject" name="subject" required><option value="">Select a subject</option></select></label><label class="field-label">Resource type<select class="select-field" name="type"><option>Notes</option><option>Syllabus</option><option>Lab manual</option><option>Academic calendar</option></select></label><label class="field-label">Display name<input class="text-field" name="title" placeholder="e.g. Unit 4 — Graph Algorithms" required maxlength="180"></label><label class="field-label">PDF file<input class="text-field" type="file" name="file" accept="application/pdf,.pdf" required></label><div class="form-actions"><button class="primary-button" type="submit">Upload and publish</button><button class="secondary-button" id="cancelResourceUpload" type="button">Cancel</button></div></form></article>
+          <div class="toolbar"><input class="search-field" id="resourceSearch" placeholder="Search by subject or file name" aria-label="Search resources"><select class="select-field" id="subjectFilter" aria-label="Filter by subject"><option value="all">All subjects</option><option>Software Engineering</option><option>Statistical Analysis</option><option>Computer Organisation &amp; Microprocessors</option><option>Java Programming</option><option>Soft Skills</option><option>Artificial Intelligence</option></select></div>
+          <div class="tabs"><button class="tab active" data-resource-type="all">All files</button><button class="tab" data-resource-type="Notes">Notes</button><button class="tab" data-resource-type="Syllabus">Syllabus</button><button class="tab" data-resource-type="Lab manual">Lab manuals</button></div>
+          <div class="resource-grid" id="resourceGrid">
+            <article class="resource-card" data-subject="Software Engineering" data-type="Notes" data-search="software engineering unit 3 notes"><div class="file-icon">PDF</div><div class="list-main"><div class="resource-title">Software Engineering — Unit 3</div><div class="resource-meta">Software Engineering · Notes · Added yesterday</div></div><button class="download" data-toast="This sample file is not attached yet" aria-label="Open Software Engineering notes"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button></article>
+            <article class="resource-card" data-subject="Computer Organisation &amp; Microprocessors" data-type="Lab manual" data-search="computer organisation microprocessors practical manual"><div class="file-icon">PDF</div><div class="list-main"><div class="resource-title">Practical Manual</div><div class="resource-meta">Computer Organisation &amp; Microprocessors · Lab manual</div></div><button class="download" data-toast="This sample file is not attached yet" aria-label="Open COM practical manual"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button></article>
+            <article class="resource-card" data-subject="Java Programming" data-type="Notes" data-search="java programming unit 2 notes"><div class="file-icon">PDF</div><div class="list-main"><div class="resource-title">Java Programming — Unit 2</div><div class="resource-meta">Java Programming · Notes · Added Oct 10</div></div><button class="download" data-toast="This sample file is not attached yet" aria-label="Open Java Programming notes"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button></article>
+            <article class="resource-card" data-subject="Artificial Intelligence" data-type="Syllabus" data-search="artificial intelligence syllabus"><div class="file-icon">PDF</div><div class="list-main"><div class="resource-title">Course syllabus</div><div class="resource-meta">Artificial Intelligence · Syllabus</div></div><button class="download" data-toast="This sample file is not attached yet" aria-label="Open AI syllabus"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button></article>
+            <article class="resource-card" data-subject="Statistical Analysis" data-type="Notes" data-search="statistical analysis notes"><div class="file-icon">PDF</div><div class="list-main"><div class="resource-title">Statistical Analysis Notes</div><div class="resource-meta">Statistical Analysis (SA) · Notes</div></div><button class="download" data-toast="This sample file is not attached yet" aria-label="Open Statistical Analysis notes"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button></article>
+          </div><div class="empty-filter" id="resourceEmpty">No files match. Try a different search.</div>
+        </section>
+
+        <section class="page-view" id="page-updates">
+          <div class="page-heading"><div><div class="eyebrow">AI &amp; Analytics - A (INTEL-1)</div><h1>Updates</h1><div class="page-description">Deadlines, class changes and reminders from your class.</div></div></div>
+          <div class="toolbar"><button class="filter-chip active" data-update-filter="all">All updates</button><button class="filter-chip" data-update-filter="Important">Important</button><button class="filter-chip" data-update-filter="Deadline">Deadlines</button></div>
+          <article class="panel" id="updateList">
+            <div class="update" data-category="Important"><div class="update-mark"><svg viewBox="0 0 24 24"><path d="M12 3 2.8 19a1.4 1.4 0 0 0 1.2 2h16a1.4 1.4 0 0 0 1.2-2L12 3Z"/><path d="M12 9v4M12 17h.01"/></svg></div><div><div class="update-title">COM class moved to Friday <span class="pill">Important</span></div><div class="update-body">Computer Organisation &amp; Microprocessors will meet in Lab 3 at 2:00 PM.</div><div class="update-time">Your CR · Today at 9:12 AM</div></div></div>
+            <div class="update" data-category="Deadline"><div class="update-mark blue">20</div><div><div class="update-title">Mid-semester exam form is open</div><div class="update-body">Please submit the form before Monday, October 20 at 5:00 PM.</div><div class="update-time">Posted by your CR · Yesterday</div></div></div>
+            <div class="update" data-category="Deadline"><div class="update-mark blue">22</div><div><div class="update-title">COM lab record due</div><div class="update-body">Bring your completed record to Wednesday’s class.</div><div class="update-time">Your CR · Oct 15</div></div></div>
+          </article>
+        </section>
+
+        <section class="page-view" id="page-calendar">
+          <div class="page-heading"><div><div class="eyebrow">Medi-Caps University · 3rd Semester</div><h1>Academic Calendar</h1><div class="page-description">Odd Semester · July–December 2026</div></div><div class="calendar-actions"><a class="secondary-button" id="calendarOpen" href="academic-calendar-odd-semester-jul-dec-2026.pdf" target="_blank" rel="noopener">Open PDF</a><a class="primary-button" id="calendarDownload" href="academic-calendar-odd-semester-jul-dec-2026.pdf" download>Download</a></div></div>
+          <article class="panel"><iframe class="calendar-frame" id="calendarFrame" src="academic-calendar-odd-semester-jul-dec-2026.pdf#view=FitH" title="Medi-Caps University Odd Semester Academic Calendar, July to December 2026"></iframe><div class="calendar-source" id="calendarSource">Official calendar provided for AI &amp; Analytics - A (INTEL-1) · 3rd Semester.</div></article>
+        </section>
+
+        <section class="page-view" id="page-classes">
+          <div class="page-heading"><div><div class="eyebrow">AI &amp; Analytics - A (INTEL-1)</div><h1>Class log</h1><div class="page-description">See what has been covered in each subject.</div></div></div>
+          <div class="toolbar"><select class="select-field" id="classSubjectFilter" aria-label="Choose subject"><option value="all">All subjects</option><option>Software Engineering</option><option>Statistical Analysis</option><option>Computer Organisation &amp; Microprocessors</option><option>Java Programming</option><option>Soft Skills</option><option>Artificial Intelligence</option></select><select class="select-field" id="classMonthFilter" aria-label="Choose month"><option value="October 2026">October 2026</option><option value="September 2026">September 2026</option></select></div>
+          <article class="panel" id="classLogList">
+            <div class="list-row"><div class="reminder-date"><b>17</b><span>Oct</span></div><div class="list-main"><div class="list-title">Software Engineering · Class 18</div><div class="list-detail">Lecture · Room 204</div></div><span class="status">Held</span><button class="text-link" data-page="attendance">Report an issue</button></div>
+            <div class="list-row"><div class="reminder-date"><b>16</b><span>Oct</span></div><div class="list-main"><div class="list-title">Java Programming · Class 17</div><div class="list-detail">Lecture · Room 204</div></div><span class="status">Held</span><button class="text-link" data-page="attendance">Report an issue</button></div>
+            <div class="list-row"><div class="reminder-date"><b>15</b><span>Oct</span></div><div class="list-main"><div class="list-title">Computer Organisation &amp; Microprocessors · Class 16</div><div class="list-detail">Lecture · Room 204</div></div><span class="status">Held</span><button class="text-link" data-page="attendance">Report an issue</button></div>
+            <div class="list-row"><div class="reminder-date"><b>14</b><span>Oct</span></div><div class="list-main"><div class="list-title">Artificial Intelligence · Class 15</div><div class="list-detail">Lecture · Room 204</div></div><span class="status">Held</span><button class="text-link" data-page="attendance">Report an issue</button></div>
+          </article><div class="page-description" style="margin-top:12px">Class history is maintained by your class reps. It does not change official attendance.</div>
+        </section>
+
+        <section class="page-view" id="page-attendance">
+          <div class="page-heading"><div><div class="eyebrow">Just for you</div><h1>Attendance</h1><div class="page-description">Plan ahead for every subject and stay above the 75% requirement.</div></div></div>
+          <article class="panel" style="max-width:760px;margin-bottom:16px"><div class="panel-header"><div><div class="panel-title">Attendance safety planner</div><div class="panel-sub">Enter your latest college attendance and upcoming classes for each subject.</div></div></div>
+            <div class="subject-attendance" data-subject-card data-subject-name="Software Engineering"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Software Engineering</div><div class="subject-attendance-count"><span data-attended>18</span> of <span data-held>20</span> classes attended</div></div><div class="subject-attendance-percent" data-percent>90.0%</div></div><div class="progress"><span style="--percent:90%"></span></div><form class="subject-calculator"><label class="field-label">Classes held so far<input class="text-field subject-held" type="number" min="0" value="20" required></label><label class="field-label">Attended so far<input class="text-field subject-attended" type="number" min="0" value="18" required></label><button class="secondary-button" type="submit">Update record</button></form><div class="planner-label">Plan upcoming classes <span class="attendance-hint">· 75% target</span></div><div class="planner-inputs"><label class="field-label">Upcoming classes<input class="text-field future-held" type="number" min="0" value="0" inputmode="numeric"></label><label class="field-label">Plan to attend<input class="text-field future-attend" type="number" min="0" value="0" inputmode="numeric"></label></div><div class="planner-results"><div class="planner-result"><div class="planner-result-label">Projected attendance</div><div class="planner-result-value" data-projected>—</div></div><div class="planner-result"><div class="planner-result-label">Safe classes to miss</div><div class="planner-result-value" data-safe-misses>—</div></div><div class="planner-result"><div class="planner-result-label">Attend in a row to recover</div><div class="planner-result-value" data-recovery>—</div></div></div><div class="planner-guidance" data-guidance>Enter upcoming classes to see your plan.</div></div>
+            <div class="subject-attendance" data-subject-card data-subject-name="Statistical Analysis"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Statistical Analysis (SA)</div><div class="subject-attendance-count"><span data-attended>15</span> of <span data-held>20</span> classes attended</div></div><div class="subject-attendance-percent" data-percent>75.0%</div></div><div class="progress"><span style="--percent:75%"></span></div><form class="subject-calculator"><label class="field-label">Classes held so far<input class="text-field subject-held" type="number" min="0" value="20" required></label><label class="field-label">Attended so far<input class="text-field subject-attended" type="number" min="0" value="15" required></label><button class="secondary-button" type="submit">Update record</button></form><div class="planner-label">Plan upcoming classes <span class="attendance-hint">· 75% target</span></div><div class="planner-inputs"><label class="field-label">Upcoming classes<input class="text-field future-held" type="number" min="0" value="0" inputmode="numeric"></label><label class="field-label">Plan to attend<input class="text-field future-attend" type="number" min="0" value="0" inputmode="numeric"></label></div><div class="planner-results"><div class="planner-result"><div class="planner-result-label">Projected attendance</div><div class="planner-result-value" data-projected>—</div></div><div class="planner-result"><div class="planner-result-label">Safe classes to miss</div><div class="planner-result-value" data-safe-misses>—</div></div><div class="planner-result"><div class="planner-result-label">Attend in a row to recover</div><div class="planner-result-value" data-recovery>—</div></div></div><div class="planner-guidance" data-guidance>Enter upcoming classes to see your plan.</div></div>
+            <div class="subject-attendance" data-subject-card data-subject-name="Computer Organisation &amp; Microprocessors"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Computer Organisation &amp; Microprocessors (COM)</div><div class="subject-attendance-count"><span data-attended>17</span> of <span data-held>20</span> classes attended</div></div><div class="subject-attendance-percent" data-percent>85.0%</div></div><div class="progress"><span style="--percent:85%"></span></div><form class="subject-calculator"><label class="field-label">Classes held so far<input class="text-field subject-held" type="number" min="0" value="20" required></label><label class="field-label">Attended so far<input class="text-field subject-attended" type="number" min="0" value="17" required></label><button class="secondary-button" type="submit">Update record</button></form><div class="planner-label">Plan upcoming classes <span class="attendance-hint">· 75% target</span></div><div class="planner-inputs"><label class="field-label">Upcoming classes<input class="text-field future-held" type="number" min="0" value="0" inputmode="numeric"></label><label class="field-label">Plan to attend<input class="text-field future-attend" type="number" min="0" value="0" inputmode="numeric"></label></div><div class="planner-results"><div class="planner-result"><div class="planner-result-label">Projected attendance</div><div class="planner-result-value" data-projected>—</div></div><div class="planner-result"><div class="planner-result-label">Safe classes to miss</div><div class="planner-result-value" data-safe-misses>—</div></div><div class="planner-result"><div class="planner-result-label">Attend in a row to recover</div><div class="planner-result-value" data-recovery>—</div></div></div><div class="planner-guidance" data-guidance>Enter upcoming classes to see your plan.</div></div>
+            <div class="subject-attendance" data-subject-card data-subject-name="Java Programming"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Java Programming</div><div class="subject-attendance-count"><span data-attended>18</span> of <span data-held>20</span> classes attended</div></div><div class="subject-attendance-percent" data-percent>90.0%</div></div><div class="progress"><span style="--percent:90%"></span></div><form class="subject-calculator"><label class="field-label">Classes held so far<input class="text-field subject-held" type="number" min="0" value="20" required></label><label class="field-label">Attended so far<input class="text-field subject-attended" type="number" min="0" value="18" required></label><button class="secondary-button" type="submit">Update record</button></form><div class="planner-label">Plan upcoming classes <span class="attendance-hint">· 75% target</span></div><div class="planner-inputs"><label class="field-label">Upcoming classes<input class="text-field future-held" type="number" min="0" value="0" inputmode="numeric"></label><label class="field-label">Plan to attend<input class="text-field future-attend" type="number" min="0" value="0" inputmode="numeric"></label></div><div class="planner-results"><div class="planner-result"><div class="planner-result-label">Projected attendance</div><div class="planner-result-value" data-projected>—</div></div><div class="planner-result"><div class="planner-result-label">Safe classes to miss</div><div class="planner-result-value" data-safe-misses>—</div></div><div class="planner-result"><div class="planner-result-label">Attend in a row to recover</div><div class="planner-result-value" data-recovery>—</div></div></div><div class="planner-guidance" data-guidance>Enter upcoming classes to see your plan.</div></div>
+            <div class="subject-attendance" data-subject-card data-subject-name="Soft Skills"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Soft Skills</div><div class="subject-attendance-count"><span data-attended>17</span> of <span data-held>20</span> classes attended</div></div><div class="subject-attendance-percent" data-percent>85.0%</div></div><div class="progress"><span style="--percent:85%"></span></div><form class="subject-calculator"><label class="field-label">Classes held so far<input class="text-field subject-held" type="number" min="0" value="20" required></label><label class="field-label">Attended so far<input class="text-field subject-attended" type="number" min="0" value="17" required></label><button class="secondary-button" type="submit">Update record</button></form><div class="planner-label">Plan upcoming classes <span class="attendance-hint">· 75% target</span></div><div class="planner-inputs"><label class="field-label">Upcoming classes<input class="text-field future-held" type="number" min="0" value="0" inputmode="numeric"></label><label class="field-label">Plan to attend<input class="text-field future-attend" type="number" min="0" value="0" inputmode="numeric"></label></div><div class="planner-results"><div class="planner-result"><div class="planner-result-label">Projected attendance</div><div class="planner-result-value" data-projected>—</div></div><div class="planner-result"><div class="planner-result-label">Safe classes to miss</div><div class="planner-result-value" data-safe-misses>—</div></div><div class="planner-result"><div class="planner-result-label">Attend in a row to recover</div><div class="planner-result-value" data-recovery>—</div></div></div><div class="planner-guidance" data-guidance>Enter upcoming classes to see your plan.</div></div>
+            <div class="subject-attendance" data-subject-card data-subject-name="Artificial Intelligence"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Artificial Intelligence (AI)</div><div class="subject-attendance-count"><span data-attended>19</span> of <span data-held>20</span> classes attended</div></div><div class="subject-attendance-percent" data-percent>95.0%</div></div><div class="progress"><span style="--percent:95%"></span></div><form class="subject-calculator"><label class="field-label">Classes held so far<input class="text-field subject-held" type="number" min="0" value="20" required></label><label class="field-label">Attended so far<input class="text-field subject-attended" type="number" min="0" value="19" required></label><button class="secondary-button" type="submit">Update record</button></form><div class="planner-label">Plan upcoming classes <span class="attendance-hint">· 75% target</span></div><div class="planner-inputs"><label class="field-label">Upcoming classes<input class="text-field future-held" type="number" min="0" value="0" inputmode="numeric"></label><label class="field-label">Plan to attend<input class="text-field future-attend" type="number" min="0" value="0" inputmode="numeric"></label></div><div class="planner-results"><div class="planner-result"><div class="planner-result-label">Projected attendance</div><div class="planner-result-value" data-projected>—</div></div><div class="planner-result"><div class="planner-result-label">Safe classes to miss</div><div class="planner-result-value" data-safe-misses>—</div></div><div class="planner-result"><div class="planner-result-label">Attend in a row to recover</div><div class="planner-result-value" data-recovery>—</div></div></div><div class="planner-guidance" data-guidance>Enter upcoming classes to see your plan.</div></div>
+          </article>
+          <article class="panel" style="max-width:640px"><div class="panel-header"><div><div class="panel-title">Tell your CR about an attendance issue</div><div class="panel-sub">Only you, your assigned CR, and class admins can see this message.</div></div></div><form class="attendance-form" id="issueForm"><label class="field-label">Subject<select class="select-field" name="subject" required><option>Loading subjects…</option></select></label><label class="field-label">Class date<input class="text-field" type="date" name="date" required></label><label class="field-label" style="grid-column:1/-1">What happened?<textarea class="text-area" name="message" placeholder="For example, I attended this class but my record shows absent." maxlength="2500" required></textarea></label><button class="primary-button" type="submit">Send to my CR</button></form><div id="studentCaseList"><div class="list-row"><div class="list-main">Your submitted concerns will appear here.</div></div></div></article>
+        </section>
+
+        <section class="page-view" id="page-notifications">
+          <div class="page-heading"><div><div class="eyebrow">Your class</div><h1>Notifications</h1><div class="page-description">Recent class updates and reminders.</div></div><button class="secondary-button" id="markRead">Mark all as read</button></div>
+          <article class="panel" id="notificationList"><div class="list-row"><div class="update-mark"><svg viewBox="0 0 24 24"><path d="M12 3 2.8 19a1.4 1.4 0 0 0 1.2 2h16a1.4 1.4 0 0 0 1.2-2L12 3Z"/><path d="M12 9v4M12 17h.01"/></svg></div><div class="list-main"><div class="list-title">Your COM class time has changed</div><div class="list-detail">Friday at 2:00 PM in Lab 3.</div></div><div class="list-date">2 hours ago</div></div><div class="list-row"><div class="update-mark blue"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div><div class="list-main"><div class="list-title">New Java Programming notes</div><div class="list-detail">Java Programming · Unit 3</div></div><div class="list-date">Yesterday</div></div></article>
+        </section>
+
+        <section class="page-view" id="page-profile">
+          <div class="page-heading"><div><div class="eyebrow">Account settings</div><h1>Profile</h1><div class="page-description">Your class account and a few useful settings.</div></div></div>
+          <article class="panel" style="max-width:620px;margin-bottom:16px">
+            <div class="panel-header"><div><div class="panel-title">Your account</div><div class="panel-sub">Your details help us show the right class information.</div></div></div>
+            <div class="list-row"><div class="avatar" id="profileAvatar">CB</div><div class="list-main"><div class="list-title" id="profileName">Your account</div><div class="list-detail" id="profileRole">Class member</div></div></div>
+            <div class="list-row"><div class="list-main"><div class="list-title">College email</div><div class="list-detail" id="profileEmail">Sign in to see your account email</div></div></div>
+            <div class="list-row"><div class="list-main"><div class="list-title">Roll number &amp; lab batch</div><div class="list-detail">Roll <span id="profileRoll">Not assigned</span> · <span id="profileBatch">Roll number needed</span></div></div></div>
+            <div class="list-row"><div class="list-main"><div class="list-title">Class</div><div class="list-detail">AI &amp; Analytics - A (INTEL-1)</div></div></div>
+            <div class="list-row"><div class="list-main"><div class="list-title">Sign-in details</div><div class="list-detail">Password and account access</div></div><button class="secondary-button" data-toast="Password settings are not connected in this preview">Manage</button></div>
+          </article>
+          <article class="panel" style="max-width:620px;margin-bottom:16px">
+            <div class="panel-header"><div><div class="panel-title">Preferences</div><div class="panel-sub">Set up Classboard the way you like.</div></div></div>
+            <div class="list-row"><div class="list-main"><div class="list-title">Appearance</div><div class="list-detail">Switch between light and dark mode.</div></div><button class="secondary-button" id="profileThemeButton">Change theme</button></div>
+            <div class="list-row"><div class="list-main"><div class="list-title">Notifications</div><div class="list-detail">Class updates, new notes and replies.</div></div><button class="text-link" data-page="notifications">View notifications →</button></div>
+          </article>
+          <article class="panel" style="max-width:620px">
+            <div class="panel-header"><div><div class="panel-title">Privacy &amp; help</div><div class="panel-sub">A few things to know about your account.</div></div></div>
+            <div class="list-row"><div class="list-main"><div class="list-title">Attendance messages</div><div class="list-detail">Only you and your assigned CRs/admins can see your attendance concerns. Classboard does not change official attendance.</div></div></div>
+            <div class="list-row"><div class="list-main"><div class="list-title">Need an account change?</div><div class="list-detail">Ask your class admin to update your name, ID or role.</div></div></div>
+            <div class="list-row"><div class="list-main"><div class="list-title">Sign out</div><div class="list-detail">Sign out of this device.</div></div><button class="secondary-button" id="profileSignOut">Sign out</button></div>
+          </article>
+        </section>
+
+        <section class="page-view" id="page-cr">
+          <div class="page-heading"><div><div class="eyebrow">Class representative tools</div><h1>CR workspace</h1><div class="page-description">Post class updates, keep the class log current, and follow up on student concerns.</div></div></div>
+          <div class="role-banner"><strong>CR access</strong><span>Only class reps can publish class information and respond to private attendance concerns.</span></div>
+          <section class="stats"><div class="stat-card"><div><div class="stat-value" id="crCaseCount">0</div><div class="stat-label">Attendance concerns</div></div></div><div class="stat-card"><div><div class="stat-value">Today</div><div class="stat-label">Last class log update</div></div></div></section>
+          <div class="workspace-grid">
+            <div class="workspace-stack">
+              <article class="panel">
+                <div class="panel-header"><div><div class="panel-title">Post a class update</div><div class="panel-sub">Visible to students in AI &amp; Analytics - A.</div></div></div>
+                <form class="workspace-form" id="crUpdateForm"><label class="field-label">Update title<input class="text-field" name="title" placeholder="e.g. COM class moved to Friday" required maxlength="100"></label><label class="field-label">Type<select class="select-field" name="category"><option value="Important">Important</option><option value="Deadline">Deadline</option><option value="General">General update</option></select></label><label class="field-label">Message<textarea class="text-area" name="message" placeholder="Write the details students need to know" required maxlength="500"></textarea></label><div class="form-actions"><button class="primary-button" type="submit">Publish update</button></div></form>
+              </article>
+              <article class="panel">
+                <div class="panel-header"><div><div class="panel-title">Log a class</div><div class="panel-sub">Record a held or cancelled class. This does not change official attendance.</div></div></div>
+                <form class="workspace-form" id="crClassForm"><label class="field-label">Subject<select class="select-field" name="subject"><option>Software Engineering</option><option>Statistical Analysis (SA)</option><option>Computer Organisation &amp; Microprocessors (COM)</option><option>Java Programming</option><option>Soft Skills</option><option>Artificial Intelligence (AI)</option></select></label><label class="field-label">Class type<select class="select-field" name="sessionType"><option>Lecture</option><option>Lab</option></select></label><label class="field-label">Batch<select class="select-field" name="batch"><option>All students</option><option>A1</option><option>A2</option><option>Both batches</option></select></label><div class="toolbar" style="margin:0"><label class="field-label" style="flex:1">Date<input class="text-field" type="date" name="date" required></label><label class="field-label" style="flex:1">Class number<input class="text-field" type="number" min="1" name="classNumber" placeholder="e.g. 21" required></label></div><label class="field-label">Status<select class="select-field" name="status"><option>Held</option><option>No class</option></select></label><label class="field-label">Topic or note<input class="text-field" name="note" placeholder="What was covered? (optional)" maxlength="120"></label><div class="form-actions"><button class="primary-button" type="submit">Save class log</button></div></form>
+              </article>
+              <article class="panel">
+                <div class="panel-header"><div><div class="panel-title">Add to the timetable</div><div class="panel-sub">Lectures and labs use one schedule. Choose a batch for each lab.</div></div></div>
+                <form class="workspace-form" id="crScheduleForm"><label class="field-label">Subject<select class="select-field" name="subject"><option>Software Engineering</option><option>Statistical Analysis (SA)</option><option>Computer Organisation &amp; Microprocessors (COM)</option><option>Java Programming</option><option>Soft Skills</option><option>Artificial Intelligence (AI)</option></select></label><label class="field-label">Class type<select class="select-field" name="sessionType"><option>Lecture</option><option>Lab</option></select></label><label class="field-label">Batch<select class="select-field" name="batch"><option>All students</option><option>A1</option><option>A2</option><option>Both batches</option></select></label><div class="toolbar" style="margin:0"><label class="field-label" style="flex:1">Date<input class="text-field" type="date" name="date" required></label><label class="field-label" style="flex:1">Start time<input class="text-field" type="time" name="time" required></label></div><label class="field-label">Room / lab<input class="text-field" name="room" placeholder="e.g. Room 204 or Lab 3" required maxlength="60"></label><div class="form-actions"><button class="primary-button" type="submit">Add class to timetable</button></div></form><div id="crScheduleList" class="workspace-table"><div class="list-row"><div class="list-main"><div class="list-title">No classes scheduled in this preview yet</div></div></div></div>
+              </article>
+              <article class="panel"><div class="panel-header"><div><div class="panel-title">Add a reminder</div><div class="panel-sub">Share a deadline or date students should remember.</div></div></div><form class="workspace-form" id="crReminderForm"><label class="field-label">Reminder<input class="text-field" name="title" placeholder="e.g. Submit lab record" required maxlength="90"></label><label class="field-label">Date<input class="text-field" type="date" name="date" required></label><label class="field-label">Details<input class="text-field" name="details" placeholder="Time, room or what to bring" maxlength="140"></label><div class="form-actions"><button class="primary-button" type="submit">Publish reminder</button></div></form></article>
+            </div>
+            <div class="workspace-stack">
+              <article class="panel workspace-table"><div class="panel-header"><div><div class="panel-title">Private attendance concerns</div><div class="panel-sub">Visible to the student, assigned CR, and class admins.</div></div><span class="status pending" id="openCaseBadge">0 open</span></div><div id="crCaseList"><div class="list-row"><div class="list-main">Loading private concerns…</div></div></div><div class="private-note">CRs can review and forward concerns; only faculty can change official attendance.</div></article>
+              <article class="panel"><div class="panel-header"><div><div class="panel-title">Recent class log</div><div class="panel-sub">Latest records entered by the CR team.</div></div><button class="text-link" data-page="classes">View all →</button></div><div id="crRecentClasses"><div class="list-row"><div class="list-main"><div class="list-title">Software Engineering · Class 18</div><div class="list-detail">Oct 17 · Lecture · Room 204</div></div><span class="status">Held</span></div></div></article>
+            </div>
+          </div>
+          <div class="notice-box"><span>i</span><span>CR posts are class information, not official faculty notices. Follow the college process for attendance and academic decisions.</span></div>
+        </section>
+
+        <section class="page-view" id="page-admin">
+          <div class="page-heading"><div><div class="eyebrow">Portal maintenance</div><h1>Admin workspace</h1><div class="page-description">Manage access and keep Classboard running. Admins do not publish class updates.</div></div></div>
+          <div class="role-banner"><strong>Admin access</strong><span>Maintenance and access management only. CRs publish updates, manage class logs, and upload PDFs. If you also have CR access, choose “CR workspace” from the top selector.</span></div>
+          <section class="stats"><div class="stat-card"><div><div class="stat-value" id="adminStudentCount">—</div><div class="stat-label">Student accounts</div></div></div><div class="stat-card"><div><div class="stat-value" id="adminCrCount">—</div><div class="stat-label">Class representatives</div></div></div><div class="stat-card"><div><div class="stat-value" id="adminMemberCount">—</div><div class="stat-label">Class accounts</div></div></div></section>
+          <div class="workspace-grid">
+            <div class="workspace-stack">
+              <article class="panel"><div class="panel-header"><div><div class="panel-title">Access &amp; roles</div><div class="panel-sub">New college accounts start as students. Select roles and save to update class access.</div></div></div><div class="workspace-table" id="accountList"><div class="list-row">Run the new access-control migration to load class accounts.</div></div></article>
+              <article class="panel"><div class="panel-header"><div><div class="panel-title">Portal details</div><div class="panel-sub">Current class configuration.</div></div></div><div class="workspace-table"><div class="list-row"><div class="list-main"><div class="list-title">Class name</div><div class="list-detail" data-config-value="class">AI &amp; Analytics - A (INTEL-1)</div></div></div><div class="list-row"><div class="list-main"><div class="list-title">Semester</div><div class="list-detail" data-config-value="semester">3rd Semester · Odd Semester 2026</div></div></div><div class="list-row"><div class="list-main"><div class="list-title">Attendance visibility</div><div class="list-detail">Private concern messages visible to assigned CRs and admins.</div></div><span class="status">Enabled</span></div></div></article>
+            </div>
+            <div class="workspace-stack">
+              <article class="panel"><div class="panel-header"><div><div class="panel-title">How role control works</div><div class="panel-sub">Only class admins can save role changes. CRs can publish class updates and resources, but cannot grant access.</div></div></div><div class="private-note">Keep at least one active admin. Student roll numbers are optional until you assign them; rolls 1–32 are A1 and 33–66 are A2. To use Google sign-in, enable Google under Supabase Authentication → Sign In / Providers and add its OAuth credentials.</div></article>
+            </div>
+          </div>
+        </section>
+        <footer class="site-footer"><span>About Classboard · AI &amp; Analytics - A (INTEL-1), 3rd Semester</span><span>Developed by WEBCORE🕸️</span></footer>
+      </div>
+    </main>
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <button class="active" data-view="Home"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+      <button data-view="Notes & Syllabus"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 1 4 17.5z"/></svg>Learn</button>
+      <button data-view="Class Log"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Class</button>
+      <button data-view="Profile"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
+    </nav>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <dialog class="app-dialog" id="appDialog"><div class="dialog-content" id="dialogContent"></div></dialog>
+  </div>
+  <script>
+    const root = document.documentElement;
+    const batchForRoll = (roll) => roll >= 1 && roll <= 32 ? 'A1' : roll >= 33 && roll <= 66 ? 'A2' : null;
+    let currentStudentRoll = null;
+    const classSchedule = [];
+    function updateStudentBatch() {
+      const batch = batchForRoll(currentStudentRoll);
+      document.getElementById('profileRoll').textContent = currentStudentRoll ? String(currentStudentRoll) : 'Not assigned';
+      document.getElementById('profileBatch').textContent = batch ? `${batch} batch` : 'Roll number needed';
+      renderNextClass();
+    }
+    window.setClassboardRoll = (roll) => {
+      const value = Number(roll);
+      currentStudentRoll = Number.isInteger(value) && value >= 1 && value <= 66 ? value : null;
+      updateStudentBatch();
+    };
+    function renderNextClass() {
+      const batch = batchForRoll(currentStudentRoll);
+      const name = document.getElementById('nextClassName');
+      const detail = document.getElementById('nextClassDetail');
+      const timeLabel = document.getElementById('nextClassTime');
+      const context = document.getElementById('nextClassContext');
+      const room = document.getElementById('nextClassRoom');
+      if (!batch) {
+        name.textContent = 'Roll number needed';
+        detail.textContent = 'Your class admin must add your roll number (1–66).';
+        timeLabel.textContent = '—'; context.textContent = 'Batch not assigned'; room.textContent = 'Ask your class admin';
+        return;
+      }
+      const now = new Date();
+      const nextClass = classSchedule.filter((session) => (session.batch === 'All students' || session.batch === 'Both batches' || session.batch === batch) && new Date(`${session.date}T${session.time}`) >= now).sort((first, second) => new Date(`${first.date}T${first.time}`) - new Date(`${second.date}T${second.time}`))[0];
+      if (!nextClass) {
+        name.textContent = 'No class scheduled yet';
+        detail.textContent = 'Your CR will add lectures and labs to the class timetable.';
+        timeLabel.textContent = '—'; context.textContent = `${batch} batch`; room.textContent = 'Waiting for the next class';
+        return;
+      }
+      const date = new Date(`${nextClass.date}T${nextClass.time}`);
+      const visibleBatch = nextClass.batch === 'Both batches' ? batch : nextClass.batch;
+      name.textContent = nextClass.subject;
+      detail.textContent = `${date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' })} · ${date.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' })}`;
+      timeLabel.textContent = date.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
+      context.textContent = `${nextClass.sessionType} · ${visibleBatch}`;
+      room.textContent = nextClass.room;
+    }
+    updateStudentBatch();
+    const savedTheme = localStorage.getItem('class-hub-theme');
+    if (savedTheme === 'dark') root.dataset.theme = 'dark';
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const dark = root.dataset.theme !== 'dark';
+      if (dark) root.dataset.theme = 'dark'; else delete root.dataset.theme;
+      localStorage.setItem('class-hub-theme', dark ? 'dark' : 'light');
+    });
+    const profileMenu = document.getElementById('profileMenu');
+    const profileMenuToggle = document.getElementById('profileMenuToggle');
+    function toggleProfileMenu(force) {
+      const shouldOpen = typeof force === 'boolean' ? force : profileMenu.hidden;
+      profileMenu.hidden = !shouldOpen;
+      profileMenuToggle.setAttribute('aria-expanded', String(shouldOpen));
+    }
+    document.getElementById('sidebarProfile').addEventListener('click', (event) => {
+      if (event.target.closest('#profileMenuToggle')) return;
+      openPage('profile', 'Profile');
+    });
+    document.getElementById('sidebarProfile').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openPage('profile', 'Profile'); }
+    });
+    profileMenuToggle.addEventListener('click', (event) => { event.stopPropagation(); toggleProfileMenu(); });
+    document.addEventListener('click', (event) => { if (!event.target.closest('.profile-wrap')) toggleProfileMenu(false); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') toggleProfileMenu(false); });
+    document.getElementById('themeMenuToggle').addEventListener('click', () => { document.getElementById('themeToggle').click(); toggleProfileMenu(false); });
+    document.getElementById('signOutButton').addEventListener('click', () => { toggleProfileMenu(false); showToast('Sign-out is not connected in this preview'); });
+    document.getElementById('profileThemeButton').addEventListener('click', () => document.getElementById('themeToggle').click());
+    document.getElementById('profileSignOut').addEventListener('click', () => showToast('Sign-out is not connected in this preview'));
+    let toastTimer;
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2300);
+    }
+    function addNotification(titleText, detailText) {
+      const row = document.createElement('div'); row.className = 'list-row';
+      const mark = document.createElement('div'); mark.className = 'update-mark blue'; mark.textContent = '•';
+      const main = document.createElement('div'); main.className = 'list-main';
+      const title = document.createElement('div'); title.className = 'list-title'; title.textContent = titleText;
+      const detail = document.createElement('div'); detail.className = 'list-detail'; detail.textContent = detailText;
+      const date = document.createElement('div'); date.className = 'list-date'; date.textContent = 'Just now';
+      main.append(title, detail); row.append(mark, main, date); document.getElementById('notificationList').prepend(row);
+    }
+    function openFormDialog({ title, description, fields, submitLabel, onSubmit, canCancel = true }) {
+      const dialog = document.getElementById('appDialog');
+      const content = document.getElementById('dialogContent');
+      content.replaceChildren();
+      dialog.dataset.required = String(!canCancel);
+      const heading = document.createElement('h2');
+      heading.textContent = title;
+      const hint = document.createElement('p');
+      hint.textContent = description;
+      const form = document.createElement('form');
+      const fieldGrid = document.createElement('div');
+      fieldGrid.className = 'dialog-fields';
+      fields.forEach((field) => {
+        const label = document.createElement('label');
+        label.className = 'field-label';
+        label.textContent = field.label;
+        const input = document.createElement(field.options ? 'select' : field.multiline ? 'textarea' : 'input');
+        input.className = field.options ? 'select-field' : field.multiline ? 'text-area' : 'text-field';
+        input.name = field.name;
+        input.required = field.required !== false;
+        if (field.placeholder) input.placeholder = field.placeholder;
+        if (field.type) input.type = field.type;
+        if (field.options) field.options.forEach((item) => { const option = document.createElement('option'); option.value = typeof item === 'string' ? item : item.value; option.textContent = typeof item === 'string' ? item : item.label; input.append(option); });
+        if (field.value) input.value = field.value;
+        label.append(input);
+        fieldGrid.append(label);
+      });
+      const actions = document.createElement('div');
+      actions.className = 'dialog-actions';
+      if (canCancel) {
+        const cancel = document.createElement('button');
+        cancel.className = 'secondary-button';
+        cancel.type = 'button';
+        cancel.textContent = 'Cancel';
+        cancel.addEventListener('click', () => dialog.close());
+        actions.append(cancel);
+      }
+      const submit = document.createElement('button');
+      submit.className = 'primary-button';
+      submit.type = 'submit';
+      submit.textContent = submitLabel;
+      actions.append(submit);
+      const errorNote = document.createElement('div');
+      errorNote.className = 'auth-message error';
+      errorNote.hidden = true;
+      form.append(fieldGrid, errorNote, actions);
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        submit.disabled = true;
+        errorNote.hidden = true;
+        const values = Object.fromEntries(new FormData(form).entries());
+        try {
+          const result = await onSubmit(values);
+          if (typeof result === 'string') { errorNote.textContent = result; errorNote.hidden = false; }
+          else if (result !== false) dialog.close();
+        } catch (error) {
+          errorNote.textContent = error.message || 'Could not save these details. Try again.';
+          errorNote.hidden = false;
+        } finally {
+          submit.disabled = false;
+        }
+      });
+      content.append(heading, hint, form);
+      dialog.showModal();
+      form.querySelector('input, select, textarea')?.focus();
+    }
+    window.openFormDialog = openFormDialog;
+    document.getElementById('appDialog').addEventListener('cancel', (event) => {
+      if (event.currentTarget.dataset.required === 'true') event.preventDefault();
+    });
+    document.querySelectorAll('[data-toast]').forEach((item) => item.addEventListener('click', (event) => {
+      if (item.tagName === 'A') event.preventDefault();
+      showToast(item.dataset.toast);
+    }));
+    const pageMap = {
+      'Home': 'home', 'Notes & Syllabus': 'resources', 'Updates': 'updates', 'Academic Calendar': 'calendar',
+      'Class Log': 'classes', 'Attendance': 'attendance',
+      'Notifications': 'notifications', 'Profile': 'profile', 'CR workspace': 'cr', 'Admin workspace': 'admin'
+    };
+    function openPage(page, activeName) {
+      const pageId = pageMap[activeName] || page;
+      document.querySelectorAll('.page-view').forEach((section) => section.classList.toggle('active', section.id === `page-${pageId}`));
+      document.querySelectorAll('.nav-item, .mobile-nav button').forEach((button) => button.classList.toggle('active', button.dataset.view === activeName || (activeName === 'Notes & Syllabus' && button.textContent.trim() === 'Learn')));
+      document.getElementById('crumbPage').textContent = activeName || 'Home';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    document.querySelectorAll('[data-view]').forEach((item) => item.addEventListener('click', () => {
+      if (item.dataset.view === 'CR workspace') {
+        const switcher = document.getElementById('roleSwitcher');
+        if (switcher.value !== 'cr') {
+          if ([...switcher.options].some((option) => option.value === 'cr')) {
+            switcher.value = 'cr';
+            switcher.dispatchEvent(new Event('change', { bubbles: true }));
+          } else openPage('cr', 'CR workspace');
+        } else openPage('cr', 'CR workspace');
+        return;
+      }
+      openPage('', item.dataset.view);
+    }));
+    document.getElementById('roleSwitcher').addEventListener('change', (event) => {
+      const role = event.target.value;
+      document.body.dataset.role = role;
+      if (role === 'cr') openPage('cr', 'CR workspace');
+      else if (role === 'admin') openPage('admin', 'Admin workspace');
+      else openPage('home', 'Home');
+      filterClassLog();
+    });
+    document.querySelectorAll('[data-page]').forEach((item) => item.addEventListener('click', () => {
+      const page = item.dataset.page;
+      const activeName = Object.keys(pageMap).find((name) => pageMap[name] === page) || page;
+      openPage(page, activeName);
+    }));
+    document.getElementById('crUpdateForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const data = new FormData(form);
+      const row = document.createElement('div');
+      row.className = 'update';
+      row.dataset.category = data.get('category');
+      const mark = document.createElement('div');
+      mark.className = 'update-mark blue';
+      mark.textContent = data.get('category') === 'Deadline' ? '!' : 'i';
+      const body = document.createElement('div');
+      const title = document.createElement('div');
+      title.className = 'update-title';
+      title.textContent = data.get('title');
+      const message = document.createElement('div');
+      message.className = 'update-body';
+      message.textContent = data.get('message');
+      const time = document.createElement('div');
+      time.className = 'update-time';
+      time.textContent = 'Posted by your CR · Just now';
+      body.append(title, message, time);
+      row.append(mark, body);
+      document.getElementById('updateList').prepend(row);
+      document.querySelector('#homeUpdateList .panel-header').insertAdjacentElement('afterend', row.cloneNode(true));
+      addNotification(data.get('title'), data.get('message'));
+      form.reset();
+      showToast('Update published in this preview');
+    });
+    ['#crClassForm [name="batch"]', '#crScheduleForm [name="batch"]'].forEach((selector) => {
+      const batchSelect = document.querySelector(selector);
+      [...batchSelect.options].find((option) => option.textContent === 'Both batches')?.remove();
+    });
+    document.querySelector('#crClassForm .field-label').closest('article').querySelector('.panel-sub').textContent = 'Lectures are for everyone; lab classes are recorded separately for A1 or A2.';
+    document.querySelector('#crScheduleForm').closest('article').querySelector('.panel-sub').textContent = 'Lectures are for everyone. Add a separate A1 or A2 entry for each lab session.';
+    document.querySelector('#crClassForm [name="sessionType"]').addEventListener('change', (event) => {
+      const batchSelect = document.querySelector('#crClassForm [name="batch"]');
+      if (event.target.value === 'Lab' && batchSelect.value === 'All students') batchSelect.value = 'A1';
+      if (event.target.value === 'Lecture') batchSelect.value = 'All students';
+    });
+    document.getElementById('crClassForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const data = new FormData(event.currentTarget);
+      if (data.get('sessionType') === 'Lab' && data.get('batch') === 'All students') { showToast('Choose A1 or A2 for a lab'); return; }
+      const row = document.createElement('div');
+      row.className = 'list-row';
+      const sessionType = String(data.get('sessionType'));
+      const sessionBatch = sessionType === 'Lab' ? String(data.get('batch')) : 'All students';
+      row.dataset.batch = sessionBatch;
+      const detail = document.createElement('div');
+      detail.className = 'list-main';
+      const title = document.createElement('div');
+      title.className = 'list-title';
+      title.textContent = `${data.get('subject')} · Class ${data.get('classNumber')} · ${sessionType}${sessionType === 'Lab' ? ` · ${sessionBatch}` : ''}`;
+      const subtitle = document.createElement('div');
+      subtitle.className = 'list-detail';
+      subtitle.textContent = `${data.get('date')} · ${sessionBatch}${data.get('note') ? ` · ${data.get('note')}` : ''}`;
+      detail.append(title, subtitle);
+      const status = document.createElement('span');
+      status.className = 'status';
+      status.textContent = data.get('status');
+      row.append(detail, status);
+      document.getElementById('crRecentClasses').prepend(row);
+      const publicRow = row.cloneNode(true);
+      const dateParts = String(data.get('date')).split('-');
+      const dateBox = document.createElement('div');
+      dateBox.className = 'reminder-date';
+      const dayLabel = document.createElement('b'); dayLabel.textContent = dateParts[2] || '';
+      const monthLabel = document.createElement('span'); monthLabel.textContent = new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2])).toLocaleString('en', { month: 'short' });
+      dateBox.append(dayLabel, monthLabel);
+      publicRow.prepend(dateBox);
+      publicRow.dataset.classSubject = data.get('subject');
+      publicRow.dataset.batch = sessionBatch;
+      publicRow.dataset.month = `${new Date(Number(dateParts[0]), Number(dateParts[1]) - 1).toLocaleString('en', { month: 'long' })} ${dateParts[0]}`;
+      document.getElementById('classLogList').prepend(publicRow);
+      document.getElementById('homeClassList').prepend(row.cloneNode(true));
+      filterClassLog();
+      event.currentTarget.reset();
+      showToast('Class log saved in this preview');
+    });
+    document.querySelector('#crScheduleForm [name="sessionType"]').addEventListener('change', (event) => {
+      const batchSelect = document.querySelector('#crScheduleForm [name="batch"]');
+      if (event.target.value === 'Lab' && batchSelect.value === 'All students') batchSelect.value = 'A1';
+      if (event.target.value === 'Lecture') batchSelect.value = 'All students';
+    });
+    document.getElementById('crScheduleForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const data = new FormData(form);
+      const sessionType = String(data.get('sessionType'));
+      const sessionBatch = sessionType === 'Lab' ? String(data.get('batch')) : 'All students';
+      if (sessionType === 'Lab' && sessionBatch === 'All students') { showToast('Choose A1 or A2 for a lab'); return; }
+      const session = { subject: String(data.get('subject')), sessionType, batch: sessionBatch, date: String(data.get('date')), time: String(data.get('time')), room: String(data.get('room')) };
+      classSchedule.push(session);
+      const list = document.getElementById('crScheduleList');
+      if (classSchedule.length === 1) list.replaceChildren();
+      const row = document.createElement('div'); row.className = 'list-row';
+      const main = document.createElement('div'); main.className = 'list-main';
+      const title = document.createElement('div'); title.className = 'list-title'; title.textContent = `${session.subject} · ${session.sessionType} · ${session.batch}`;
+      const date = new Date(`${session.date}T${session.time}`);
+      const sub = document.createElement('div'); sub.className = 'list-detail'; sub.textContent = `${date.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })} · ${date.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' })} · ${session.room}`;
+      main.append(title, sub); row.append(main); list.prepend(row);
+      renderNextClass();
+      addNotification(`${session.subject} ${session.sessionType.toLowerCase()} scheduled`, `${session.batch} · ${session.date} · ${session.time} · ${session.room}`);
+      form.reset();
+      showToast(`${session.sessionType} added to the timetable in this preview`);
+    });
+    document.getElementById('crResourceForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const data = new FormData(form);
+      const file = data.get('file');
+      if (!file || !file.name.toLowerCase().endsWith('.pdf')) { showToast('Choose a PDF file to share'); return; }
+      const card = document.createElement('article');
+      card.className = 'resource-card';
+      card.dataset.subject = data.get('subject');
+      card.dataset.type = data.get('type');
+      card.dataset.search = `${data.get('title')} ${data.get('subject')} ${data.get('type')}`.toLowerCase();
+      const icon = document.createElement('div'); icon.className = 'file-icon'; icon.textContent = 'PDF';
+      const main = document.createElement('div'); main.className = 'list-main';
+      const name = document.createElement('div'); name.className = 'resource-title'; name.textContent = data.get('title');
+      const meta = document.createElement('div'); meta.className = 'resource-meta'; meta.textContent = `${data.get('subject')} · ${data.get('type')} · Added just now`;
+      main.append(name, meta);
+      const open = document.createElement('a'); open.className = 'download'; open.href = URL.createObjectURL(file); open.target = '_blank'; open.rel = 'noopener'; open.setAttribute('aria-label', `Open ${file.name}`); open.textContent = 'Open';
+      card.append(icon, main, open);
+      document.getElementById('resourceGrid').prepend(card);
+      addNotification(data.get('title'), `${data.get('subject')} · ${data.get('type')}`);
+      form.reset(); filterResources();
+      showToast('Resource added for this preview session');
+    });
+    document.getElementById('crReminderForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const data = new FormData(event.currentTarget);
+      const [year, month, day] = String(data.get('date')).split('-');
+      const monthName = new Date(Number(year), Number(month) - 1, Number(day)).toLocaleString('en', { month: 'short' });
+      const reminder = document.createElement('div'); reminder.className = 'reminder';
+      const dateBox = document.createElement('div'); dateBox.className = 'reminder-date';
+      const dayNode = document.createElement('b'); dayNode.textContent = day;
+      const monthNode = document.createElement('span'); monthNode.textContent = monthName;
+      dateBox.append(dayNode, monthNode);
+      const detail = document.createElement('div');
+      const name = document.createElement('div'); name.className = 'reminder-title'; name.textContent = data.get('title');
+      const note = document.createElement('div'); note.className = 'reminder-detail'; note.textContent = data.get('details') || 'Added by your CR';
+      detail.append(name, note); reminder.append(dateBox, detail);
+      document.getElementById('homeReminderList').prepend(reminder);
+      addNotification(data.get('title'), `${day} ${monthName} · ${data.get('details') || 'Reminder added by your CR'}`);
+      const update = document.createElement('div'); update.className = 'update'; update.dataset.category = 'Deadline';
+      const mark = document.createElement('div'); mark.className = 'update-mark blue'; mark.textContent = day;
+      const updateCopy = document.createElement('div');
+      const updateTitle = document.createElement('div'); updateTitle.className = 'update-title'; updateTitle.textContent = data.get('title');
+      const updateBody = document.createElement('div'); updateBody.className = 'update-body'; updateBody.textContent = data.get('details') || `${day} ${monthName} · Posted by your CR`;
+      const byline = document.createElement('div'); byline.className = 'update-time'; byline.textContent = 'Posted by your CR · Just now';
+      updateCopy.append(updateTitle, updateBody, byline); update.append(mark, updateCopy); document.getElementById('updateList').prepend(update);
+      event.currentTarget.reset(); showToast('Reminder published for your class');
+    });
+    const resourceSearch = document.getElementById('resourceSearch');
+    const subjectFilter = document.getElementById('subjectFilter');
+    let resourceType = 'all';
+    function filterResources() {
+      const query = resourceSearch.value.trim().toLowerCase();
+      let shown = 0;
+      document.querySelectorAll('.resource-card').forEach((card) => {
+        const matches = card.dataset.search.includes(query) && (subjectFilter.value === 'all' || card.dataset.subject === subjectFilter.value) && (resourceType === 'all' || card.dataset.type === resourceType);
+        card.style.display = matches ? 'flex' : 'none';
+        if (matches) shown++;
+      });
+      document.getElementById('resourceEmpty').style.display = shown ? 'none' : 'block';
+    }
+    resourceSearch.addEventListener('input', filterResources);
+    subjectFilter.addEventListener('change', filterResources);
+    document.querySelectorAll('[data-resource-type]').forEach((tab) => tab.addEventListener('click', () => {
+      resourceType = tab.dataset.resourceType;
+      document.querySelectorAll('[data-resource-type]').forEach((button) => button.classList.toggle('active', button === tab));
+      filterResources();
+    }));
+    function filterClassLog() {
+      const subject = document.getElementById('classSubjectFilter').value;
+      const month = document.getElementById('classMonthFilter').value;
+      const studentBatch = batchForRoll(currentStudentRoll);
+      document.querySelectorAll('#classLogList > .list-row').forEach((row) => {
+        const title = row.querySelector('.list-title').textContent;
+        const rowSubject = row.dataset.classSubject || title.split(' · Class ')[0];
+        const rowMonth = row.dataset.month || 'October 2026';
+        const rowBatch = row.dataset.batch || 'All students';
+        const batchMatches = document.body.dataset.role !== 'student' || rowBatch === 'All students' || rowBatch === 'Both batches' || rowBatch === studentBatch;
+        row.style.display = (subject === 'all' || rowSubject.startsWith(subject)) && rowMonth === month && batchMatches ? 'flex' : 'none';
+      });
+    }
+    document.getElementById('classSubjectFilter').addEventListener('change', filterClassLog);
+    document.getElementById('classMonthFilter').addEventListener('change', filterClassLog);
+    document.querySelectorAll('[data-update-filter]').forEach((button) => button.addEventListener('click', () => {
+      document.querySelectorAll('[data-update-filter]').forEach((chip) => chip.classList.toggle('active', chip === button));
+      document.querySelectorAll('#updateList .update').forEach((row) => row.style.display = button.dataset.updateFilter === 'all' || row.dataset.category === button.dataset.updateFilter ? 'flex' : 'none');
+    }));
+    const attendanceCards = [...document.querySelectorAll('#page-attendance [data-subject-card]')];
+    const attendanceGrid = document.createElement('div');
+    attendanceGrid.className = 'attendance-subject-grid';
+    attendanceCards[0].before(attendanceGrid);
+    attendanceCards.forEach((card) => attendanceGrid.append(card));
+    attendanceCards.forEach((card) => {
+      const heldInput = card.querySelector('.subject-held');
+      const attendedInput = card.querySelector('.subject-attended');
+      const futureHeldInput = card.querySelector('.future-held');
+      const futureAttendInput = card.querySelector('.future-attend');
+      const medicalPanel = document.createElement('div');
+      medicalPanel.className = 'medical-planner';
+      medicalPanel.dataset.enabled = 'false';
+      medicalPanel.hidden = true;
+      medicalPanel.innerHTML = '<label class="medical-choice"><input class="medical-toggle" type="checkbox"><span>Use 60% medical-certificate scenario</span></label><div class="medical-warning">⚠ This changes the target to 60% for this subject only. A valid medical certificate and college approval may be required; confirm eligibility with your college.</div>';
+      card.querySelector('.planner-results').after(medicalPanel);
+      const medicalToggle = medicalPanel.querySelector('.medical-toggle');
+      function updateAttendancePlan() {
+        const held = Number(heldInput.value);
+        const attended = Number(attendedInput.value);
+        const futureHeld = Number(futureHeldInput.value);
+        const futureAttend = Number(futureAttendInput.value);
+        const valid = [held, attended, futureHeld, futureAttend].every(Number.isInteger) && held >= 0 && attended >= 0 && attended <= held && futureHeld >= 0 && futureAttend >= 0 && futureAttend <= futureHeld;
+        card.querySelector('[data-guidance]').textContent = valid ? '' : 'Check the totals: attended cannot exceed held, and planned attendance cannot exceed upcoming classes.';
+        card.querySelectorAll('.planner-result-value').forEach((value) => value.textContent = valid ? '—' : 'Check totals');
+        if (!valid) return false;
+        const currentPercent = held ? attended / held : null;
+        card.querySelector('[data-percent]').textContent = currentPercent === null ? '—' : `${(currentPercent * 100).toFixed(1)}%`;
+        card.querySelector('[data-attended]').textContent = attended;
+        card.querySelector('[data-held]').textContent = held;
+        card.querySelector('.progress span').style.setProperty('--percent', `${currentPercent === null ? 0 : Math.min(currentPercent * 100, 100)}%`);
+        const projectedHeld = held + futureHeld;
+        const projectedAttended = attended + futureAttend;
+        const projected = projectedHeld ? projectedAttended / projectedHeld : null;
+        const medicalAvailable = currentPercent !== null && currentPercent < 0.60 || projected !== null && projected < 0.60;
+        medicalPanel.hidden = !medicalAvailable;
+        const target = medicalAvailable && medicalToggle.checked ? 0.60 : 0.75;
+        card.querySelector('.planner-label .attendance-hint').textContent = `· ${target * 100}% target`;
+        medicalPanel.dataset.enabled = String(medicalToggle.checked && medicalAvailable);
+        card.querySelector('[data-projected]').textContent = projected === null ? '—' : `${(projected * 100).toFixed(1)}%`;
+        const safeMisses = futureHeld ? Math.max(0, Math.min(futureHeld, Math.floor(attended + futureHeld - target * projectedHeld + 1e-9))) : null;
+        card.querySelector('[data-safe-misses]').textContent = safeMisses === null ? '—' : `${safeMisses} ${safeMisses === 1 ? 'class' : 'classes'}`;
+        const recoveryClasses = held === 0 ? null : Math.max(0, Math.ceil((target * held - attended) / (1 - target) - 1e-9));
+        card.querySelector('[data-recovery]').textContent = recoveryClasses === null ? '—' : `${recoveryClasses} ${recoveryClasses === 1 ? 'class' : 'classes'}`;
+        let guidance;
+        if (!futureHeld) guidance = currentPercent !== null && currentPercent < target ? `Below ${target * 100}%: attend the next ${recoveryClasses} ${recoveryClasses === 1 ? 'class' : 'classes'} in a row to reach the target.` : held === 0 ? 'Enter your current attendance and upcoming classes to see your plan.' : 'Enter upcoming classes to see how many you can safely miss.';
+        else if (currentPercent === null) guidance = 'No past classes entered. Your projection assumes the upcoming classes listed above.';
+        else if (currentPercent < target && futureAttend < recoveryClasses) guidance = `Below ${target * 100}%: attend at least ${recoveryClasses} upcoming classes in a row to recover.`;
+        else if (safeMisses === 0) guidance = `No safe absences in this plan; attend the upcoming classes to protect your ${target * 100}% target.`;
+        else guidance = `With this plan, you can miss up to ${safeMisses} of the ${futureHeld} upcoming classes and stay at or above ${target * 100}%.`;
+        card.querySelector('[data-guidance]').textContent = guidance;
+        return true;
+      }
+      card.querySelector('.subject-calculator').addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (updateAttendancePlan()) showToast(`${card.dataset.subjectName} plan updated`);
+      });
+      [heldInput, attendedInput, futureHeldInput, futureAttendInput].forEach((input) => input.addEventListener('input', updateAttendancePlan));
+      medicalToggle.addEventListener('change', updateAttendancePlan);
+      updateAttendancePlan();
+    });
+    document.getElementById('markRead').addEventListener('click', () => {
+      if (window.classboardMarkAllNotificationsRead) window.classboardMarkAllNotificationsRead();
+      else showToast('Notifications are still loading. Try again in a moment.');
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="classboard-auth.js?v=3"></script>
+</body>
+</html>

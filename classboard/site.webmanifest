@@ -1,0 +1,17 @@
+{
+  "name": "Classboard — INTEL-1",
+  "short_name": "Classboard",
+  "description": "Class portal for AI & Analytics - A (INTEL-1)",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f8fc",
+  "theme_color": "#0868bd",
+  "icons": [
+    {
+      "src": "./classboard-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

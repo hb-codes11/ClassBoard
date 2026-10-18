@@ -1,0 +1,2 @@
+[functions.admin-membership]
+verify_jwt = true
