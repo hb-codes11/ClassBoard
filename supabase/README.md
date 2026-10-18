@@ -27,7 +27,8 @@ This folder contains the database schema and follow-up migrations for the INTEL-
 12. Apply `migrations/012_cr_class_log_edit_access.sql` to allow CRs to correct saved class-log entries. Admin-only accounts cannot edit class-log details. CRs and admins can still delete an incorrect entry.
 13. Apply `migrations/013_shared_attendance_planner.sql` to store shared classes-held totals and private per-student attended counts. Only CRs/admins can change the shared total; each student can change only their own attended count.
 14. Apply `migrations/014_allow_office_resource_uploads.sql` to allow PDF, DOCX, and PPTX files in the private class-resources bucket.
-14. In Supabase Auth, create the owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and grant the initial elevated roles. Student access is already assigned automatically:
+15. Apply `migrations/015_restore_attendance_count_write_grants.sql` if CR/Admin attendance totals fail to save with a table permission error. RLS still limits writes to CRs and admins.
+16. In Supabase Auth, create the owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and grant the initial elevated roles. Student access is already assigned automatically:
 
 ```sql
 -- Replace both UUID placeholders with the two Auth user IDs.
