@@ -72,7 +72,8 @@
     .nav-item:hover { color: var(--text); background: var(--surface-2); }
     .nav-item.active { color: var(--blue); background: var(--blue-soft); font-weight: 650; }
     .nav-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-    .nav-count { margin-left: auto; min-width: 20px; padding: 1px 6px; border-radius: 20px; background: var(--blue); color: white; font-size: 10px; text-align: center; }
+    .nav-count { margin-left: auto; min-width: 20px; padding: 1px 6px; border-radius: 20px; background: var(--blue); color: white; font-size: 10px; text-align: center; line-height: 1.5; }
+    .nav-count[hidden] { display: none; }
     .sidebar-bottom { margin-top: auto; }
     .help-card { margin: 0 4px 20px; border: 1px solid var(--line); background: var(--surface-2); border-radius: 12px; padding: 14px; }
     .help-icon { width: 27px; height: 27px; border-radius: 8px; display: grid; place-items: center; background: var(--blue-soft); color: var(--blue); font-weight: 750; margin-bottom: 10px; }
@@ -184,12 +185,14 @@
     .page-heading { display: flex; justify-content: space-between; align-items: end; gap: 15px; margin-bottom: 22px; }
     .page-heading h1 { font-size: 27px; }
     .page-description { color: var(--muted); font-size: 12px; margin-top: 6px; }
+    .live-empty { display: block; min-width: 0; margin: 0; padding: 14px 18px; color: var(--muted); line-height: 1.5; overflow-wrap: anywhere; }
     .primary-button, .secondary-button { min-height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 0 13px; background: var(--surface); color: var(--text); font-weight: 650; font-size: 11px; cursor: pointer; }
     .primary-button { border-color: var(--blue); background: var(--blue); color: white; }
     .primary-button:hover { background: var(--blue-deep); }
     .secondary-button:hover { border-color: var(--blue); color: var(--blue); }
     .toolbar { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
-    .search-field, .select-field, .text-field, .text-area { min-height: 38px; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; color: var(--text); padding: 0 11px; outline: none; }
+    .search-field, .select-field, .text-field, .text-area { min-height: 38px; border: 1px solid var(--line); background-color: var(--surface); border-radius: 8px; color: var(--text); padding: 0 11px; outline: none; }
+    .select-field, .role-switcher { -webkit-appearance: none; appearance: none; padding-right: 38px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23738196' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 14px; text-overflow: ellipsis; }
     .search-field { flex: 1; min-width: 190px; }
     .search-field:focus, .select-field:focus, .text-field:focus, .text-area:focus { border-color: var(--blue); box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 15%, transparent); }
     .filter-chip { min-height: 34px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 22px; padding: 0 12px; font-size: 10px; cursor: pointer; }
@@ -247,7 +250,10 @@
     .home-attendance-panel .subject-attendance-percent { font-size: 18px; }
     .home-attendance-panel .progress { height: 5px; margin-top: 6px; }
     .site-footer { display: flex; justify-content: space-between; gap: 12px; padding: 18px 0 8px; margin-top: auto; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
-    .role-switcher { height: 36px; max-width: 170px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--text); font: inherit; font-size: 12px; cursor: pointer; }
+    .role-switcher { height: 36px; max-width: 170px; padding: 0 38px 0 12px; border: 1px solid var(--line); border-radius: 9px; background-color: var(--surface); color: var(--text); font: inherit; font-size: 12px; cursor: pointer; }
+    .panel, .stat-card, .action-tile, .resource-card, .list-row, .panel-header, .page-heading { min-width: 0; }
+    .panel-title, .panel-sub, .page-description, .update-title, .update-body, .update-time, .resource-title, .resource-meta, .reminder-title, .reminder-detail, .list-title, .list-detail, .class-name, .class-room, .stat-note, .profile-name, .profile-role { min-width: 0; overflow-wrap: anywhere; }
+    .panel-header > div, .update > div, .resource-card > div, .reminder > div, .action-tile > div { min-width: 0; }
     .workspace-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(270px, .9fr); gap: 15px; margin-bottom: 16px; }
     .workspace-stack { display: grid; gap: 15px; align-content: start; }
     .workspace-form { display: grid; gap: 12px; padding: 16px 17px 18px; }
@@ -351,7 +357,9 @@
       .icon-button { width: 38px; height: 38px; }
       .content { padding: 24px 17px 26px; }
       .content { min-height: calc(100vh - 126px); }
-      .role-switcher { width: 112px; max-width: 112px; padding: 0 6px; font-size: 10px; }
+      .role-switcher { width: 130px; max-width: 130px; padding: 0 30px 0 9px; background-position: right 8px center; font-size: 10px; }
+      .select-field { padding-right: 32px; background-position: right 9px center; }
+      .live-empty { padding: 13px 15px; }
       .welcome-row { margin-bottom: 18px; }
       .date-label { display: none; }
       .hero { min-height: 165px; padding: 21px; border-radius: 13px; align-items: flex-start; flex-direction: column; gap: 14px; }
@@ -441,7 +449,7 @@
       <nav class="nav" aria-label="Main navigation">
         <button class="nav-item active" data-view="Home"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></svg>Home</button>
         <button class="nav-item" data-view="Notes & Syllabus"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 1 4 17.5z"/><path d="M4 17.5A2.5 2.5 0 0 1 6.5 15H20M8 6h8M8 9h7"/></svg>Notes &amp; Syllabus</button>
-        <button class="nav-item" data-view="Updates"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>Updates <span class="nav-count">2</span></button>
+        <button class="nav-item" data-view="Updates"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>Updates <span class="nav-count" id="updatesUnreadCount" hidden aria-live="polite">0</span></button>
         <button class="nav-item" data-view="Academic Calendar"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M14 14h2M8 17h3"/></svg>Academic Calendar</button>
         <button class="nav-item" data-view="Class Log"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M8 17h7"/></svg>Class Log</button>
         <button class="nav-item" data-view="Attendance"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/><path d="M16 6h4v4"/></svg>Attendance</button>
