@@ -983,6 +983,7 @@
     const previewDialog = document.getElementById('pdfPreviewDialog');
     const previewFrame = document.getElementById('pdfPreviewFrame');
     const previewTitle = document.getElementById('pdfPreviewTitle');
+    const previewFileType = document.getElementById('previewFileType');
     const previewDownload = document.getElementById('pdfPreviewDownload');
     document.getElementById('pdfPreviewClose')?.addEventListener('click', () => previewDialog?.close());
     previewDialog?.addEventListener('click', (event) => {
@@ -990,33 +991,51 @@
     });
     previewDialog?.addEventListener('close', () => {
       previewFrame.removeAttribute('src');
-      previewDownload.removeAttribute('href');
+      delete previewDownload.dataset.resourcePath;
+      delete previewDownload.dataset.filename;
+    });
+    previewDownload?.addEventListener('click', async () => {
+      const path = previewDownload.dataset.resourcePath;
+      const filename = previewDownload.dataset.filename;
+      if (!path || !filename) return;
+      previewDownload.disabled = true;
+      const url = await signedResourceDownloadUrl(path, filename);
+      previewDownload.disabled = false;
+      if (!url) { notifyApp('Could not download this resource. Please try again.', true); return; }
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
     });
     document.addEventListener('click', async (event) => {
       const button = event.target.closest('[data-preview-pdf], [data-download-pdf]');
       if (!button) return;
+      event.preventDefault();
       const card = button.closest('[data-resource-path]');
-      if (!card?.dataset.resourcePath) { notifyApp('This PDF is not available right now.', true); return; }
+      if (!card?.dataset.resourcePath) { notifyApp('This resource is not available right now.', true); return; }
       button.disabled = true;
       const title = card.dataset.resourceTitle || 'Class resource';
       const extension = card.dataset.resourcePath.split('.').pop().toLowerCase();
       const filename = `${title.replace(/[/\\?%*:|"<>]/g, '-').trim() || 'class-resource'}.${['pdf', 'docx', 'pptx'].includes(extension) ? extension : 'pdf'}`;
       if (button.dataset.previewPdf) {
-        const [viewUrl, downloadUrl] = await Promise.all([
-          signedResourceUrl(card.dataset.resourcePath),
-          signedResourceDownloadUrl(card.dataset.resourcePath, filename)
-        ]);
+        const viewUrl = await signedResourceUrl(card.dataset.resourcePath);
         button.disabled = false;
-        if (!viewUrl || !downloadUrl) { notifyApp('Could not open this PDF. Please try again.', true); return; }
+        if (!viewUrl) { notifyApp('Could not open this resource. Please try again.', true); return; }
         previewTitle.textContent = title;
-        previewFrame.src = `${viewUrl}#view=FitH`;
-        previewDownload.href = downloadUrl;
-        previewDownload.download = filename;
+        previewFileType.textContent = extension.toUpperCase();
+        previewFrame.src = extension === 'pdf'
+          ? `${viewUrl}#view=FitH`
+          : `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(viewUrl)}`;
+        previewDownload.dataset.resourcePath = card.dataset.resourcePath;
+        previewDownload.dataset.filename = filename;
+        previewDownload.disabled = false;
         if (!previewDialog.open) previewDialog.showModal();
       } else {
         const url = await signedResourceDownloadUrl(card.dataset.resourcePath, filename);
         button.disabled = false;
-        if (!url) { notifyApp('Could not download this PDF. Please try again.', true); return; }
+        if (!url) { notifyApp('Could not download this resource. Please try again.', true); return; }
         const anchor = document.createElement('a');
         anchor.href = url;
         anchor.download = filename;
