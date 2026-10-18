@@ -107,9 +107,9 @@
     const homeDate = document.getElementById('homeDate');
     if (homeDate) homeDate.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric' });
     setRoleOptions(roles);
-    const classId = data[0].class_id;
-    window.classboardContext = { classId, userId: user.id, roles };
     const studentMembership = data.find((row) => row.role === 'student');
+    const classId = data[0].class_id;
+    window.classboardContext = { classId, userId: user.id, roles, rollNumber: studentMembership?.roll_number ?? null };
     if (studentMembership && window.setClassboardRoll) window.setClassboardRoll(studentMembership.roll_number);
     const issueDate = document.querySelector('#issueForm input[name="date"]');
     if (issueDate) {
@@ -117,6 +117,7 @@
       issueDate.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     }
     await loadLiveClassData(classId);
+    await loadAttendancePlanner(classId, user.id, roles, studentMembership?.roll_number ?? null);
     startNotificationRefresh(classId);
     if (roles.includes('admin')) await loadAdminAccounts(classId);
     gate.hidden = true;
@@ -442,6 +443,127 @@
       document.getElementById('nextClassContext').textContent = 'Timetable';
       document.getElementById('nextClassRoom').textContent = 'Waiting for the next class';
     }
+  }
+
+  async function loadAttendancePlanner(classId, userId, roles, rollNumber) {
+    const client = window.classboardSupabase;
+    const cards = [...document.querySelectorAll('#page-attendance [data-subject-card]')];
+    const subjectByName = new Map((window.classboardSubjects || []).map((subject) => [subject.name, subject]));
+    const isStaff = roles.includes('cr') || roles.includes('admin');
+    const batchFromRoll = Number(rollNumber) >= 1 && Number(rollNumber) <= 32 ? 'A1' : Number(rollNumber) >= 33 && Number(rollNumber) <= 66 ? 'A2' : null;
+    const batchPickerWrap = document.getElementById('attendanceLabBatchWrap');
+    const batchPicker = document.getElementById('attendanceLabBatch');
+    if (batchPickerWrap) batchPickerWrap.hidden = !isStaff;
+    if (batchPicker && !isStaff && batchFromRoll) batchPicker.value = batchFromRoll;
+    cards.forEach((card) => {
+      card.querySelector('.subject-held').readOnly = !isStaff;
+      card.querySelector('.subject-attended').readOnly = !roles.includes('student');
+    });
+    const activeBatch = isStaff ? batchPicker?.value || 'A1' : batchFromRoll || 'A1';
+    const [countsResult, progressResult] = await Promise.all([
+      client.from('attendance_class_counts').select('subject_id,kind,batch,classes_held').eq('class_id', classId),
+      client.from('student_attendance_progress').select('subject_id,kind,batch,attended_classes').eq('class_id', classId).eq('user_id', userId)
+    ]);
+    if (countsResult.error || progressResult.error) {
+      notifyApp(`Could not load attendance figures: ${(countsResult.error || progressResult.error).message}`, true);
+      return;
+    }
+    const countKey = (subjectId, kind, batch) => `${subjectId}:${kind}:${batch}`;
+    const heldCounts = new Map((countsResult.data || []).map((row) => [countKey(row.subject_id, row.kind, row.batch), row.classes_held]));
+    const personalCounts = new Map((progressResult.data || []).map((row) => [countKey(row.subject_id, row.kind, row.batch), row.attended_classes]));
+    cards.forEach((card) => {
+      const subjectName = card.dataset.attendanceSubjectName || String(card.dataset.subjectName || '').replace(/ Lab$/, '');
+      const subject = subjectByName.get(subjectName);
+      if (!subject) return;
+      const kind = card.dataset.attendanceMode === 'lab' ? 'lab' : 'lecture';
+      const batch = kind === 'lab' ? activeBatch : 'all';
+      const key = countKey(subject.id, kind, batch);
+      const held = heldCounts.get(key) ?? 0;
+      const attended = personalCounts.get(key) ?? 0;
+      const heldInput = card.querySelector('.subject-held');
+      const attendedInput = card.querySelector('.subject-attended');
+      const heldLabel = heldInput.closest('label');
+      const submit = card.querySelector('.subject-calculator button[type="submit"]');
+      heldInput.value = String(held);
+      heldInput.readOnly = !isStaff;
+      heldInput.setAttribute('aria-readonly', String(!isStaff));
+      heldInput.title = isStaff ? 'Shared class count managed by CRs and admins' : 'Set by a class representative or admin';
+      attendedInput.value = String(attended);
+      attendedInput.max = String(held);
+      attendedInput.readOnly = !roles.includes('student');
+      attendedInput.title = 'Your personal attended-class count';
+      heldLabel.dataset.sharedAttendanceCount = 'true';
+      if (!card.dataset.attendanceStorageKey) card.dataset.attendanceStorageKey = key;
+      if (!card.dataset.attendanceConnected) {
+        card.dataset.attendanceConnected = 'true';
+        card.querySelector('.subject-calculator').addEventListener('submit', async (event) => {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          const activeContext = window.classboardContext;
+          const activeRoles = activeContext?.roles || [];
+          const activeStaff = activeRoles.includes('cr') || activeRoles.includes('admin');
+          const enteredHeld = Number(heldInput.value);
+          const enteredAttended = Number(attendedInput.value);
+          if (!Number.isInteger(enteredAttended) || enteredAttended < 0 || enteredAttended > Number(heldInput.value)) {
+            notifyApp('Attended classes must be between 0 and the shared classes-held total.', true);
+            return;
+          }
+          if (activeStaff && (!Number.isInteger(enteredHeld) || enteredHeld < 0 || enteredAttended > enteredHeld)) {
+            notifyApp('Classes held must be a whole number at least as large as your attended count.', true);
+            return;
+          }
+          const activeSubject = subjectByName.get(card.dataset.attendanceSubjectName || String(card.dataset.subjectName || '').replace(/ Lab$/, ''));
+          if (!activeSubject) {
+            notifyApp('Could not identify this subject. Refresh and try again.', true);
+            button.disabled = false;
+            return;
+          }
+          const activeKind = card.dataset.attendanceMode === 'lab' ? 'lab' : 'lecture';
+          const activeBatch = activeKind === 'lab' ? (activeStaff ? document.getElementById('attendanceLabBatch')?.value || 'A1' : batchFromRoll || 'A1') : 'all';
+          const button = card.querySelector('.subject-calculator button[type="submit"]');
+          button.disabled = true;
+          try {
+            if (activeStaff) {
+              const savedHeld = await client.from('attendance_class_counts').upsert({
+                class_id: classId, subject_id: activeSubject.id, kind: activeKind, batch: activeBatch,
+                classes_held: enteredHeld, updated_by: userId
+              }, { onConflict: 'class_id,subject_id,kind,batch' }).select('classes_held').maybeSingle();
+              if (savedHeld.error) throw savedHeld.error;
+            }
+            if (activeRoles.includes('student')) {
+              const savedProgress = await client.from('student_attendance_progress').upsert({
+                class_id: classId, user_id: userId, subject_id: activeSubject.id, kind: activeKind,
+                batch: activeBatch, attended_classes: enteredAttended
+              }, { onConflict: 'user_id,class_id,subject_id,kind,batch' }).select('attended_classes').maybeSingle();
+              if (savedProgress.error) throw savedProgress.error;
+            }
+            heldInput.value = String(activeStaff ? enteredHeld : held);
+            heldInput.max = String(heldInput.value);
+            attendedInput.value = String(enteredAttended);
+            card.updateAttendancePlan?.();
+            notifyApp(activeStaff ? (activeRoles.includes('student') ? 'Shared classes-held total and your attendance were saved.' : 'Shared classes-held total was saved.') : 'Your attended-class count was saved.');
+            if (activeStaff) await loadAttendancePlanner(classId, userId, roles, rollNumber);
+          } catch (error) {
+            notifyApp(`Attendance figures did not save: ${error.message}`, true);
+          } finally {
+            button.disabled = false;
+          }
+        }, true);
+      }
+      card.updateAttendancePlan?.();
+    });
+    const modePicker = document.getElementById('attendanceMode');
+    if (modePicker && !modePicker.dataset.batchConnected) {
+      modePicker.dataset.batchConnected = 'true';
+      modePicker.addEventListener('change', () => {
+        if (batchPickerWrap) batchPickerWrap.hidden = !isStaff || modePicker.value !== 'lab';
+      });
+    }
+    if (batchPicker && isStaff && !batchPicker.dataset.reloadConnected) {
+      batchPicker.dataset.reloadConnected = 'true';
+      batchPicker.addEventListener('change', () => loadAttendancePlanner(classId, userId, roles, rollNumber));
+    }
+    if (batchPickerWrap) batchPickerWrap.hidden = !isStaff || modePicker?.value !== 'lab';
   }
 
   function addReminderCard(reminder) {
