@@ -727,6 +727,11 @@
         const close = document.createElement('button'); close.type = 'button'; close.className = 'secondary-button case-close'; close.textContent = 'Close issue';
         actions.append(close);
       }
+      if (['referred', 'resolved'].includes(issue.state)) {
+        const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'delete-content-button case-delete'; remove.textContent = 'Remove';
+        remove.setAttribute('aria-label', `Remove reviewed attendance concern from ${names.get(issue.student_id) || 'student'}`);
+        actions.append(remove);
+      }
       main.append(title, detail);
       (replies.get(issue.id) || []).forEach((reply) => {
         const replyDetail = document.createElement('div'); replyDetail.className = 'list-detail'; replyDetail.textContent = `Reply: ${reply.body}`; main.append(replyDetail);
@@ -1084,6 +1089,27 @@
     }, true);
 
     document.getElementById('crCaseList')?.addEventListener('click', async (event) => {
+      const deleteButton = event.target.closest('.case-delete');
+      if (deleteButton) {
+        event.preventDefault(); event.stopImmediatePropagation();
+        const context = window.classboardContext;
+        const issueId = deleteButton.closest('[data-case-id]')?.dataset.caseId;
+        const issue = window.classboardCurrentIssues?.find((item) => item.id === issueId);
+        if (!context || !issue) return;
+        if (!['referred', 'resolved'].includes(issue.state)) {
+          notifyApp('Only reviewed concerns can be removed.', true);
+          return;
+        }
+        if (!window.confirm('Remove this reviewed attendance concern and its replies? This cannot be undone.')) return;
+        deleteButton.disabled = true;
+        const { data, error } = await window.classboardSupabase.from('attendance_issues')
+          .delete().eq('id', issueId).eq('class_id', context.classId).select('id');
+        if (error) { deleteButton.disabled = false; notifyApp(`Could not remove the concern: ${error.message}`, true); return; }
+        if (!data?.length) { deleteButton.disabled = false; notifyApp('Could not remove this concern. Check your CR or admin access.', true); return; }
+        await loadAttendanceIssues(context.classId);
+        notifyApp('Reviewed attendance concern removed.');
+        return;
+      }
       const closeButton = event.target.closest('.case-close');
       if (closeButton) {
         event.preventDefault(); event.stopImmediatePropagation();

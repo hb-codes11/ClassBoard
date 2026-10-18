@@ -29,7 +29,8 @@ This folder contains the database schema and follow-up migrations for the INTEL-
 14. Apply `migrations/014_allow_office_resource_uploads.sql` to allow PDF, DOCX, and PPTX files in the private class-resources bucket.
 15. Apply `migrations/015_restore_attendance_count_write_grants.sql` if CR/Admin attendance totals fail to save with a table permission error. RLS still limits writes to CRs and admins.
 16. Apply `migrations/016_grant_attendance_upsert_access.sql` if attendance upserts still fail with a table permission error. Existing row-level policies still restrict writes to CRs and admins.
-17. In Supabase Auth, create the owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and grant the initial elevated roles. Student access is already assigned automatically:
+17. Apply `migrations/017_remove_reviewed_attendance_concerns.sql` to let CRs/admins remove referred or resolved attendance concerns. Replies are removed with the concern.
+18. In Supabase Auth, create the owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and grant the initial elevated roles. Student access is already assigned automatically:
 
 ```sql
 -- Replace both UUID placeholders with the two Auth user IDs.
