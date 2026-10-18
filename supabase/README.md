@@ -22,7 +22,8 @@ This folder contains the database schema and follow-up migrations for the INTEL-
 7. Apply `migrations/007_persist_class_notifications.sql` to create durable per-member notifications when updates, reminders, resources, or class sessions are added.
 8. Apply `migrations/008_reviewed_attendance_concerns.sql` to support reviewed and resolved attendance concerns.
 9. Apply `migrations/009_student_access_is_default.sql` to enroll existing Medicaps auth accounts in INTEL-1, give every account Student access, and make Student access impossible to remove while assigning CR/Admin roles.
-10. In Supabase Auth, create the owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and grant the initial elevated roles. Student access is already assigned automatically:
+10. Apply `migrations/010_lock_class_log_edits.sql` so saved class sessions cannot be edited after they are posted. CRs and admins can still delete an incorrect entry and add a corrected one.
+11. In Supabase Auth, create the owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and grant the initial elevated roles. Student access is already assigned automatically:
 
 ```sql
 -- Replace both UUID placeholders with the two Auth user IDs.
@@ -37,11 +38,11 @@ union all
 select 'FRIEND_USER_UUID'::uuid, id, 'cr'::public.class_role from target_class;
 ```
 
-11. Confirm the two owners can sign in and that each new college account appears as a Student. Assign CR/Admin access from Admin workspace; only a CR can publish class updates, class logs, timetables, and reminders. Admins manage roles, review attendance concerns, and can upload or remove shared content.
+12. Confirm the two owners can sign in and that each new college account appears as a Student. Assign CR/Admin access from Admin workspace; only a CR can publish class updates, class logs, timetables, and reminders. Admins manage roles, review attendance concerns, and can upload or remove shared content.
 
 ## Before sharing with the class
 
-- Apply all migrations through `009_student_access_is_default.sql` to the Supabase project used by the deployed site.
+- Apply all migrations through `010_lock_class_log_edits.sql` to the Supabase project used by the deployed site.
 - Keep the Supabase service-role key out of frontend code and Vercel's public variables. The browser only needs the project URL and publishable key.
 - Keep the college email allowlist, Google OAuth redirect URLs, and Supabase site/redirect URLs pointed at the deployed Classboard domain.
 - Review college approval, account onboarding, data retention, backups, and who should receive CR/Admin permissions before sharing the sign-in link broadly.
