@@ -939,6 +939,7 @@
     };
     function openPage(page, activeName) {
       const pageId = pageMap[activeName] || page;
+      if (pageId) sessionStorage.setItem('classboard-page', pageId);
       document.querySelectorAll('.page-view').forEach((section) => section.classList.toggle('active', section.id === `page-${pageId}`));
       document.querySelectorAll('.nav-item, .mobile-nav button').forEach((button) => button.classList.toggle('active', button.dataset.view === activeName || (activeName === 'Notes & Syllabus' && button.textContent.trim() === 'Learn')));
       const mobileMoreButton = document.querySelector('[data-mobile-more]');
@@ -952,6 +953,10 @@
       document.getElementById('crumbPage').textContent = activeName || 'Home';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+    window.openClassboardPage = (pageId) => {
+      const activeName = Object.keys(pageMap).find((name) => pageMap[name] === pageId);
+      if (activeName) openPage(pageId, activeName);
+    };
     const mobileMoreButton = document.querySelector('[data-mobile-more]');
     const mobileMoreMenu = document.getElementById('mobileMoreMenu');
     mobileMoreButton.addEventListener('click', () => {
@@ -975,6 +980,7 @@
     }));
     document.getElementById('roleSwitcher').addEventListener('change', (event) => {
       const role = event.target.value;
+      sessionStorage.setItem('classboard-role', role);
       document.body.dataset.role = role;
       if (role === 'cr') openPage('cr', 'Class representatives');
       else if (role === 'admin') openPage('admin', 'Admin workspace');
@@ -1268,7 +1274,7 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=5"></script>
+  <script src="classboard-auth.js?v=6"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>

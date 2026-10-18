@@ -59,8 +59,17 @@
       option.textContent = labels[role];
       return option;
     }));
-    switcher.value = roles.includes('admin') ? 'admin' : roles.includes('cr') ? 'cr' : 'student';
+    const savedRole = sessionStorage.getItem('classboard-role');
+    switcher.value = roles.includes(savedRole) ? savedRole : roles.includes('admin') ? 'admin' : roles.includes('cr') ? 'cr' : 'student';
+    const savedPage = sessionStorage.getItem('classboard-page');
     switcher.dispatchEvent(new Event('change', { bubbles: true }));
+    const roleForPage = switcher.value;
+    const canRestorePage = savedPage && (savedPage === 'admin'
+      ? roleForPage === 'admin'
+      : savedPage === 'cr' ? roleForPage === 'cr' : true);
+    if (canRestorePage) {
+      window.openClassboardPage?.(savedPage);
+    }
   }
 
   async function enterClass(user) {
@@ -867,7 +876,8 @@
     if (error) showMessage(error.message, true);
     else await handleSession(session);
 
-    window.classboardSupabase.auth.onAuthStateChange((_event, nextSession) => {
+    window.classboardSupabase.auth.onAuthStateChange((event, nextSession) => {
+      if (event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') return;
       queueMicrotask(() => handleSession(nextSession));
     });
     connectCrForms();
