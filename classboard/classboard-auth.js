@@ -94,6 +94,8 @@
     document.getElementById('profileEmail').textContent = user.email || 'Email unavailable';
     const greeting = document.getElementById('homeGreeting');
     if (greeting) greeting.textContent = `Hi ${displayName}`;
+    const homeDate = document.getElementById('homeDate');
+    if (homeDate) homeDate.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric' });
     setRoleOptions(roles);
     const classId = data[0].class_id;
     window.classboardContext = { classId, userId: user.id, roles };
@@ -337,6 +339,7 @@
     if (resources.length) document.getElementById('resourceSearch')?.dispatchEvent(new Event('input', { bubbles: true }));
     document.querySelectorAll('.stat-label').forEach((label) => {
       if (label.textContent.trim() === 'Resources available') label.previousElementSibling.textContent = String(resources.length);
+      if (label.textContent.trim() === 'Upcoming reminders') label.previousElementSibling.textContent = String((reminderResult.data || []).length);
     });
 
     const sessions = sessionResult.data || [];
