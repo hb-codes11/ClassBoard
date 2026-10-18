@@ -48,8 +48,11 @@
 
   function setRoleOptions(roles) {
     const switcher = document.getElementById('roleSwitcher');
-    const labels = { student: 'Student view', cr: 'CR workspace', admin: 'Admin workspace' };
-    const orderedRoles = ['student', 'cr', 'admin'].filter((role) => roles.includes(role));
+    const labels = { student: 'Student view', cr: 'Class representatives', admin: 'Admin workspace' };
+    const hasStaffRole = roles.includes('cr') || roles.includes('admin');
+    const orderedRoles = hasStaffRole
+      ? ['cr', 'admin'].filter((role) => roles.includes(role))
+      : ['student'].filter((role) => roles.includes(role));
     switcher.replaceChildren(...orderedRoles.map((role) => {
       const option = document.createElement('option');
       option.value = role;
@@ -83,14 +86,16 @@
       const form = document.getElementById(id);
       if (form) form.closest('article').hidden = !roles.includes('cr');
     });
+    const isStaffAccount = roles.includes('cr') || roles.includes('admin');
     const issuePanel = document.getElementById('issueForm')?.closest('article');
-    if (issuePanel) issuePanel.hidden = !roles.includes('student');
+    if (issuePanel) issuePanel.hidden = !roles.includes('student') || isStaffAccount;
     const uploadButton = document.getElementById('openResourceUpload');
     if (uploadButton) uploadButton.hidden = !(roles.includes('cr') || roles.includes('admin'));
     const initials = displayName.split(/[\s._-]+/).filter(Boolean).slice(0, 2).map((part) => part[0].toUpperCase()).join('') || 'CB';
     document.querySelectorAll('.profile-name').forEach((el) => { el.textContent = displayName; });
     document.querySelectorAll('.profile .avatar').forEach((el) => { el.textContent = initials; });
-    const roleLabel = `${roles.map((role) => role.toUpperCase()).join(' + ')} · AI & Analytics - A (INTEL-1)`;
+    const displayedRoles = isStaffAccount ? roles.filter((role) => role !== 'student') : roles;
+    const roleLabel = `${displayedRoles.map((role) => role.toUpperCase()).join(' + ')} · AI & Analytics - A (INTEL-1)`;
     document.querySelector('.profile-role').textContent = roleLabel;
     document.getElementById('profileAvatar').textContent = initials;
     document.getElementById('topbarAvatar').textContent = initials;
@@ -623,8 +628,7 @@
       const controls = document.createElement('div'); controls.className = 'account-controls';
       const roleGroup = document.createElement('fieldset'); roleGroup.className = 'account-role-options';
       const legend = document.createElement('legend'); legend.textContent = 'Roles'; roleGroup.append(legend);
-      const defaultRole = document.createElement('span'); defaultRole.className = 'account-default-role'; defaultRole.textContent = 'Student · default'; roleGroup.append(defaultRole);
-      [['cr', 'CR'], ['admin', 'Admin']].forEach(([value, label]) => {
+      [['cr', 'Class representative'], ['admin', 'Admin']].forEach(([value, label]) => {
         const roleLabel = document.createElement('label');
         const check = document.createElement('input'); check.type = 'checkbox'; check.value = value; check.checked = user.roles.has(value);
         roleLabel.append(check, document.createTextNode(label)); roleGroup.append(roleLabel);
@@ -729,7 +733,7 @@
       const button = event.target.closest('[data-delete-content]');
       if (!button) return;
       const context = window.classboardContext;
-      if (!context?.roles.some((role) => role === 'cr' || role === 'admin')) { notifyApp('Only class reps and admins can delete class content.', true); return; }
+      if (!context?.roles.some((role) => role === 'cr' || role === 'admin')) { notifyApp('Only class representatives and admins can delete class content.', true); return; }
       const row = button.closest('[data-content-id]');
       if (!row || !window.confirm('Delete this item for the whole class? This cannot be undone.')) return;
       button.disabled = true;
@@ -982,7 +986,7 @@
       event.preventDefault();
       event.stopImmediatePropagation();
       const context = window.classboardContext;
-      if (!context?.roles.some((role) => role === 'cr' || role === 'admin')) { notifyApp('Only class reps and admins can upload class resources.', true); return; }
+      if (!context?.roles.some((role) => role === 'cr' || role === 'admin')) { notifyApp('Only class representatives and admins can upload class resources.', true); return; }
       const values = new FormData(resourceForm);
       const file = values.get('file');
       if (!(file instanceof File) || !file.name.toLowerCase().endsWith('.pdf') || (file.type && file.type !== 'application/pdf') || file.size === 0 || file.size > 10 * 1024 * 1024) {
