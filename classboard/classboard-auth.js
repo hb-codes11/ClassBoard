@@ -652,7 +652,22 @@
         await loadAdminAccounts(classId);
         notifyApp(`Saved access for ${user.name}.`);
       });
-      controls.append(roleGroup, rollLabel, save); row.append(avatar, main, controls); container.append(row);
+      const remove = document.createElement('button'); remove.className = 'account-remove-button'; remove.type = 'button'; remove.textContent = 'Remove access';
+      remove.disabled = user.userId === window.classboardContext?.userId;
+      remove.title = remove.disabled ? 'You cannot remove your own access here.' : 'Remove this account from the Classboard class';
+      remove.addEventListener('click', async () => {
+        if (user.userId === window.classboardContext?.userId) return;
+        const confirmed = window.confirm(`Remove ${user.name} from this Classboard class? They will lose access to its resources and workspaces. Their Google account will not be deleted.`);
+        if (!confirmed) return;
+        remove.disabled = true;
+        const { error } = await client.rpc('remove_class_member_access', {
+          p_user_id: user.userId, p_class_id: classId
+        });
+        if (error) { remove.disabled = false; notifyApp(`Could not remove class access: ${error.message}`, true); return; }
+        await loadAdminAccounts(classId);
+        notifyApp(`Removed ${user.name} from this Classboard class.`);
+      });
+      controls.append(roleGroup, rollLabel, save, remove); row.append(avatar, main, controls); container.append(row);
     });
     document.getElementById('adminMemberCount').textContent = String(userRows.length);
     document.getElementById('adminStudentCount').textContent = String(userRows.filter((user) => user.roles.has('student') && user.rollNumber !== null).length);
