@@ -446,7 +446,7 @@
     }
     const studentRoll = Number(window.classboardContext?.rollNumber);
     const studentBatch = studentRoll >= 1 && studentRoll <= 32 ? 'A1' : studentRoll >= 33 && studentRoll <= 66 ? 'A2' : null;
-    const nextOptions = document.body.dataset.role === 'student'
+    const nextOptions = studentBatch
       ? upcoming.filter((session) => session.batch === 'all' || session.batch === 'Both batches' || session.batch === studentBatch)
       : upcoming;
     const next = nextOptions[0];
