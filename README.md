@@ -10,6 +10,7 @@ Classboard gives students and their class representatives one place to find clas
 - Student onboarding with roll number and lab batch assignment.
 - Class notes, syllabi, and lab manuals stored in Supabase Storage.
 - Class updates, reminders, and a shared class log.
+- Separate lecture and lab attendance planning (excluding Soft Skills labs); only CRs can edit saved class-log entries.
 - Private attendance concern messages between students, CRs, and admins.
 - Database access protected by Supabase Row Level Security (RLS).
 

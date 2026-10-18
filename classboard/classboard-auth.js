@@ -238,6 +238,13 @@
     const status = document.createElement('span'); status.className = 'status'; status.textContent = session.state.replaceAll('_', ' ');
     row.append(dateBox, main, status);
     row.append(makeDeleteButton('Delete'));
+    if (!compact && session.state !== 'scheduled' && window.classboardContext?.roles.includes('cr')) {
+      const edit = document.createElement('button');
+      edit.type = 'button'; edit.className = 'secondary-button class-log-edit-button';
+      edit.dataset.editClassSession = session.id; edit.textContent = 'Edit';
+      edit.setAttribute('aria-label', `Edit ${subject?.name || 'class'} class log`);
+      row.append(edit);
+    }
     if (!compact) {
       const report = document.createElement('button'); report.className = 'text-link'; report.dataset.page = 'attendance'; report.textContent = 'Report an issue';
       row.append(report);
@@ -312,7 +319,7 @@
       client.from('classes').select('id,code,name,semester').eq('id', classId).single(),
       client.from('subjects').select('id,slug,name,short_name,display_order').eq('class_id', classId).eq('is_active', true).order('display_order'),
       client.from('updates').select('id,title,body,category,importance,created_at,published_at').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20),
-      client.from('class_sessions').select('id,class_number,kind,batch,state,starts_at,room,topic,subjects(name,short_name)').eq('class_id', classId).order('starts_at', { ascending: false }).limit(50),
+      client.from('class_sessions').select('id,subject_id,class_number,kind,batch,state,starts_at,room,topic,subjects(name,short_name)').eq('class_id', classId).order('starts_at', { ascending: false }).limit(50),
       client.from('resources').select('id,title,kind,unit_label,storage_path,created_at,published_at,subjects(name)').eq('class_id', classId).not('published_at', 'is', null).is('deleted_at', null).order('published_at', { ascending: false }).limit(50),
       client.from('reminders').select('id,title,body,due_at').eq('class_id', classId).eq('is_active', true).gte('due_at', new Date().toISOString()).order('due_at').limit(20)
     ]);
@@ -375,6 +382,25 @@
     });
 
     const sessions = sessionResult.data || [];
+    window.classboardCurrentSessions = sessions;
+    window.classboardSubjects = subjectResult.data || [];
+    const monthSelect = document.getElementById('classMonthFilter');
+    const previousMonth = monthSelect.value;
+    const monthRows = new Map();
+    sessions.forEach((session) => {
+      const date = new Date(session.starts_at);
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      monthRows.set(key, date.toLocaleString('en-IN', { month: 'long', year: 'numeric' }));
+    });
+    if (!monthRows.size) {
+      const now = new Date();
+      monthRows.set(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`, now.toLocaleString('en-IN', { month: 'long', year: 'numeric' }));
+    }
+    const monthOptions = [...monthRows].sort(([a], [b]) => b.localeCompare(a));
+    monthSelect.replaceChildren(...monthOptions.map(([, label]) => {
+      const option = document.createElement('option'); option.value = label; option.textContent = label; return option;
+    }));
+    monthSelect.value = monthOptions.some(([, label]) => label === previousMonth) ? previousMonth : monthOptions[0][1];
     const sessionContainers = [
       [document.getElementById('classLogList'), sessions, false],
       [document.getElementById('homeClassList'), sessions.slice(0, 3), true],
@@ -775,6 +801,60 @@
       await loadLiveClassData(context.classId);
       notifyApp(`Item deleted for the class.${cleanupWarning}`, Boolean(cleanupWarning));
     });
+
+    document.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-edit-class-session]');
+      if (!button) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      const context = window.classboardContext;
+      if (!context?.roles.includes('cr')) { notifyApp('Only class representatives can edit saved class-log entries.', true); return; }
+      const session = window.classboardCurrentSessions?.find((item) => item.id === button.dataset.editClassSession);
+      if (!session || session.state === 'scheduled') { notifyApp('This saved class-log entry is no longer available to edit.', true); return; }
+      const subjects = window.classboardSubjects || [];
+      const classDate = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit'
+      }).formatToParts(new Date(session.starts_at)).map((part) => [part.type, part.value]));
+      if (typeof window.openFormDialog !== 'function') return;
+      window.openFormDialog({
+        title: 'Edit class-log entry',
+        description: 'Correct this saved class record. Only CRs can edit class-log details.',
+        fields: [
+          { name: 'subjectId', label: 'Subject', value: session.subject_id, options: subjects.map((item) => ({ value: item.id, label: item.short_name ? `${item.name} (${item.short_name})` : item.name })) },
+          { name: 'sessionType', label: 'Class type', value: session.kind, options: [{ value: 'lecture', label: 'Lecture' }, { value: 'lab', label: 'Lab' }] },
+          { name: 'batch', label: 'Lab batch', value: session.batch === 'all' ? 'A1' : session.batch, options: ['A1', 'A2'] },
+          { name: 'date', label: 'Class date', type: 'date', value: `${classDate.year}-${classDate.month}-${classDate.day}` },
+          { name: 'classNumber', label: 'Class number', type: 'number', required: false, value: session.class_number == null ? '' : String(session.class_number), placeholder: 'Optional' },
+          { name: 'status', label: 'Status', value: session.state, options: [{ value: 'held', label: 'Held' }, { value: 'no_class', label: 'No class' }] },
+          { name: 'note', label: 'Topic or note', required: false, value: session.topic || '', placeholder: 'Optional' }
+        ],
+        submitLabel: 'Save changes',
+        onSubmit: async ({ subjectId, sessionType, batch, date, classNumber, status, note }) => {
+          if (!subjects.some((item) => item.id === subjectId)) return 'Choose a valid subject.';
+          if (!date) return 'Choose the class date.';
+          const kind = String(sessionType);
+          if (!['lecture', 'lab'].includes(kind)) return 'Choose Lecture or Lab.';
+          if (kind === 'lab' && !['A1', 'A2'].includes(batch)) return 'Choose A1 or A2 for the lab.';
+          const numberText = String(classNumber || '').trim();
+          const number = numberText ? Number(numberText) : null;
+          if (number !== null && (!Number.isInteger(number) || number < 1)) return 'Class number must be a positive whole number.';
+          const updated = await window.classboardSupabase.from('class_sessions').update({
+            subject_id: subjectId,
+            class_number: number,
+            kind,
+            batch: kind === 'lecture' ? 'all' : batch,
+            state: status,
+            starts_at: `${date}T12:00:00+05:30`,
+            topic: String(note || '').trim() || null,
+            updated_by: context.userId
+          }).eq('id', session.id).eq('class_id', context.classId).select('id');
+          if (updated.error) return updated.error.message;
+          if (!updated.data?.length) return 'The entry was not changed. Confirm the CR edit migration is applied and try again.';
+          await loadLiveClassData(context.classId);
+          notifyApp('Class-log entry updated.');
+        }
+      });
+    }, true);
 
     const previewDialog = document.getElementById('pdfPreviewDialog');
     const previewFrame = document.getElementById('pdfPreviewFrame');

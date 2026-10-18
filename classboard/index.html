@@ -309,6 +309,7 @@
     .subject-attendance:first-child { border-top: 0; }
     .attendance-subject-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 14px 16px; }
     .attendance-subject-grid > .subject-attendance { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .attendance-mode-control { display: grid; gap: 6px; width: min(calc(100% - 32px), 280px); margin: 6px 16px 0; }
     .subject-attendance-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
     .subject-attendance-name { font-size: 13px; font-weight: 680; }
     .subject-attendance-count { color: var(--muted); font-size: 11px; margin-top: 3px; }
@@ -558,12 +559,12 @@
         <section class="page-view" id="page-classes">
           <div class="page-heading"><div><div class="eyebrow">AI &amp; Analytics - A (INTEL-1)</div><h1>Class log</h1><div class="page-description">See what has been covered in each subject.</div></div></div>
           <div class="toolbar"><select class="select-field" id="classSubjectFilter" aria-label="Choose subject"><option value="all">All subjects</option><option>Software Engineering</option><option>Statistical Analysis</option><option>Computer Organisation &amp; Microprocessors</option><option>Java Programming</option><option>Soft Skills</option><option>Artificial Intelligence</option></select><select class="select-field" id="classMonthFilter" aria-label="Choose month"><option value="October 2026">October 2026</option><option value="September 2026">September 2026</option></select></div>
-          <article class="panel" id="classLogList"></article><div class="page-description" style="margin-top:12px">Only CRs and admins can remove an entry; saved records cannot be edited. Class history does not update official attendance. Use the attendance planner for your own figures.</div>
+          <article class="panel" id="classLogList"></article><div class="page-description" style="margin-top:12px">Only CRs can edit saved class-log entries. CRs and admins can remove an incorrect entry. Class history does not update official attendance. Use the attendance planner for your own figures.</div>
         </section>
 
         <section class="page-view" id="page-attendance">
           <div class="page-heading"><div><div class="eyebrow">Just for you</div><h1>Attendance</h1><div class="page-description">Plan ahead for every subject and stay above the 75% requirement.</div></div></div>
-          <article class="panel" style="max-width:760px;margin-bottom:16px"><div class="panel-header"><div><div class="panel-title">Attendance safety planner</div><div class="panel-sub">Enter your latest college attendance and upcoming classes for each subject.</div></div></div>
+          <article class="panel" style="max-width:760px;margin-bottom:16px"><div class="panel-header"><div><div class="panel-title">Attendance safety planner</div><div class="panel-sub">Enter your latest college attendance and upcoming classes for each subject.</div></div></div><label class="field-label attendance-mode-control">Attendance view<select class="select-field" id="attendanceMode" aria-label="Attendance view"><option value="lecture">Lecture attendance</option><option value="lab">Lab attendance</option></select></label>
             <div class="subject-attendance" data-subject-card data-subject-name="Software Engineering"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Software Engineering</div><div class="subject-attendance-count"><span data-attended>0</span> of <span data-held>0</span> classes attended</div></div><div class="subject-attendance-percent" data-percent>—</div></div><div class="progress"><span style="--percent:0%"></span></div><form class="subject-calculator"><label class="field-label">Classes held so far<input class="text-field subject-held" type="number" min="0" value="0" required></label><label class="field-label">Attended so far<input class="text-field subject-attended" type="number" min="0" value="0" required></label><button class="secondary-button" type="submit">Update record</button></form><div class="planner-label">Plan upcoming classes <span class="attendance-hint">· 75% target</span></div><div class="planner-inputs"><label class="field-label">Upcoming classes<input class="text-field future-held" type="number" min="0" value="0" inputmode="numeric"></label><label class="field-label">Plan to attend<input class="text-field future-attend" type="number" min="0" value="0" inputmode="numeric"></label></div><div class="planner-results"><div class="planner-result"><div class="planner-result-label">Projected attendance</div><div class="planner-result-value" data-projected>—</div></div><div class="planner-result"><div class="planner-result-label">Safe classes to miss</div><div class="planner-result-value" data-safe-misses>—</div></div><div class="planner-result"><div class="planner-result-label">Attend in a row to recover</div><div class="planner-result-value" data-recovery>—</div></div></div><div class="planner-guidance" data-guidance>Enter upcoming classes to see your plan.</div></div>
             <div class="subject-attendance" data-subject-card data-subject-name="Statistical Analysis"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Statistical Analysis (SA)</div><div class="subject-attendance-count"><span data-attended>0</span> of <span data-held>0</span> classes attended</div></div><div class="subject-attendance-percent" data-percent>—</div></div><div class="progress"><span style="--percent:0%"></span></div><form class="subject-calculator"><label class="field-label">Classes held so far<input class="text-field subject-held" type="number" min="0" value="0" required></label><label class="field-label">Attended so far<input class="text-field subject-attended" type="number" min="0" value="0" required></label><button class="secondary-button" type="submit">Update record</button></form><div class="planner-label">Plan upcoming classes <span class="attendance-hint">· 75% target</span></div><div class="planner-inputs"><label class="field-label">Upcoming classes<input class="text-field future-held" type="number" min="0" value="0" inputmode="numeric"></label><label class="field-label">Plan to attend<input class="text-field future-attend" type="number" min="0" value="0" inputmode="numeric"></label></div><div class="planner-results"><div class="planner-result"><div class="planner-result-label">Projected attendance</div><div class="planner-result-value" data-projected>—</div></div><div class="planner-result"><div class="planner-result-label">Safe classes to miss</div><div class="planner-result-value" data-safe-misses>—</div></div><div class="planner-result"><div class="planner-result-label">Attend in a row to recover</div><div class="planner-result-value" data-recovery>—</div></div></div><div class="planner-guidance" data-guidance>Enter upcoming classes to see your plan.</div></div>
             <div class="subject-attendance" data-subject-card data-subject-name="Computer Organisation &amp; Microprocessors"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Computer Organisation &amp; Microprocessors (COM)</div><div class="subject-attendance-count"><span data-attended>0</span> of <span data-held>0</span> classes attended</div></div><div class="subject-attendance-percent" data-percent>—</div></div><div class="progress"><span style="--percent:0%"></span></div><form class="subject-calculator"><label class="field-label">Classes held so far<input class="text-field subject-held" type="number" min="0" value="0" required></label><label class="field-label">Attended so far<input class="text-field subject-attended" type="number" min="0" value="0" required></label><button class="secondary-button" type="submit">Update record</button></form><div class="planner-label">Plan upcoming classes <span class="attendance-hint">· 75% target</span></div><div class="planner-inputs"><label class="field-label">Upcoming classes<input class="text-field future-held" type="number" min="0" value="0" inputmode="numeric"></label><label class="field-label">Plan to attend<input class="text-field future-attend" type="number" min="0" value="0" inputmode="numeric"></label></div><div class="planner-results"><div class="planner-result"><div class="planner-result-label">Projected attendance</div><div class="planner-result-value" data-projected>—</div></div><div class="planner-result"><div class="planner-result-label">Safe classes to miss</div><div class="planner-result-value" data-safe-misses>—</div></div><div class="planner-result"><div class="planner-result-label">Attend in a row to recover</div><div class="planner-result-value" data-recovery>—</div></div></div><div class="planner-guidance" data-guidance>Enter upcoming classes to see your plan.</div></div>
@@ -847,7 +848,7 @@
             switcher.value = 'cr';
             switcher.dispatchEvent(new Event('change', { bubbles: true }));
           } else openPage('cr', 'Class representatives');
-        } else openPage('cr', 'CR workspace');
+        } else openPage('cr', 'Class representatives');
         return;
       }
       openPage('', item.dataset.view);
@@ -855,7 +856,7 @@
     document.getElementById('roleSwitcher').addEventListener('change', (event) => {
       const role = event.target.value;
       document.body.dataset.role = role;
-      if (role === 'cr') openPage('cr', 'CR workspace');
+      if (role === 'cr') openPage('cr', 'Class representatives');
       else if (role === 'admin') openPage('admin', 'Admin workspace');
       else openPage('home', 'Home');
       filterClassLog();
@@ -1046,7 +1047,7 @@
       document.querySelectorAll('#classLogList > .list-row').forEach((row) => {
         const title = row.querySelector('.list-title').textContent;
         const rowSubject = row.dataset.classSubject || title.split(' · Class ')[0];
-        const rowMonth = row.dataset.month || 'October 2026';
+        const rowMonth = row.dataset.month || new Date().toLocaleString('en-IN', { month: 'long', year: 'numeric' });
         const rowBatch = row.dataset.batch || 'All students';
         const batchMatches = document.body.dataset.role !== 'student' || rowBatch === 'All students' || rowBatch === 'Both batches' || rowBatch === studentBatch;
         row.style.display = (subject === 'all' || rowSubject.startsWith(subject)) && rowMonth === month && batchMatches ? 'flex' : 'none';
@@ -1062,8 +1063,26 @@
     const attendanceGrid = document.createElement('div');
     attendanceGrid.className = 'attendance-subject-grid';
     attendanceCards[0].before(attendanceGrid);
-    attendanceCards.forEach((card) => attendanceGrid.append(card));
+    const labAttendanceCards = [];
     attendanceCards.forEach((card) => {
+      card.dataset.attendanceMode = 'lecture';
+      attendanceGrid.append(card);
+      if (card.dataset.subjectName === 'Soft Skills') return;
+      const labCard = card.cloneNode(true);
+      labCard.dataset.attendanceMode = 'lab';
+      labCard.dataset.subjectName = `${card.dataset.subjectName} Lab`;
+      const labName = labCard.querySelector('.subject-attendance-name');
+      labName.textContent = `${labName.textContent} Lab`;
+      labCard.querySelectorAll('.subject-held, .subject-attended, .future-held, .future-attend').forEach((input) => { input.value = '0'; });
+      labAttendanceCards.push(labCard);
+    });
+    labAttendanceCards.forEach((card) => attendanceGrid.append(card));
+    const allAttendanceCards = [...attendanceCards, ...labAttendanceCards];
+    const attendanceMode = document.getElementById('attendanceMode');
+    const showAttendanceMode = () => allAttendanceCards.forEach((card) => { card.hidden = card.dataset.attendanceMode !== attendanceMode.value; });
+    attendanceMode.addEventListener('change', showAttendanceMode);
+    showAttendanceMode();
+    allAttendanceCards.forEach((card) => {
       const heldInput = card.querySelector('.subject-held');
       const attendedInput = card.querySelector('.subject-attended');
       const futureHeldInput = card.querySelector('.future-held');
