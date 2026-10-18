@@ -187,20 +187,20 @@
     const card = document.createElement('div');
     card.className = 'update';
     card.dataset.contentId = update.id;
-    card.dataset.contentType = 'updates';
+    card.dataset.contentType = update.isReminder ? 'reminders' : 'updates';
     const category = update.category.toLowerCase();
-    card.dataset.category = category === 'deadline' ? 'Deadline' : category === 'important' ? 'Important' : 'General';
+    card.dataset.category = update.isReminder ? 'Deadline' : category === 'deadline' ? 'Deadline' : category === 'important' ? 'Important' : 'General';
     const mark = document.createElement('div');
     mark.className = 'update-mark blue';
-    mark.textContent = category === 'deadline' || update.importance === 'important' ? '!' : 'i';
+    mark.textContent = update.isReminder || category === 'deadline' || update.importance === 'important' ? '!' : 'i';
     const copy = document.createElement('div');
     const title = document.createElement('div');
     title.className = 'update-title';
     title.textContent = update.title;
-    if (update.importance === 'important') {
+    if (update.isReminder || update.importance === 'important') {
       const pill = document.createElement('span');
       pill.className = 'pill';
-      pill.textContent = 'Important';
+      pill.textContent = update.isReminder ? 'Reminder' : 'Important';
       title.append(' ', pill);
     }
     const body = document.createElement('div');
@@ -208,10 +208,12 @@
     body.textContent = update.body;
     const time = document.createElement('div');
     time.className = 'update-time';
-    time.textContent = `Posted ${new Date(update.published_at || update.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`;
+    time.textContent = update.isReminder
+      ? `Due ${new Date(update.due_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`
+      : `Posted ${new Date(update.published_at || update.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`;
     copy.append(title, body, time);
     card.append(mark, copy);
-    card.append(makeDeleteButton('Delete update'));
+    card.append(makeDeleteButton(update.isReminder ? 'Delete reminder' : 'Delete update'));
     return card;
   }
 
@@ -333,7 +335,7 @@
       client.from('updates').select('id,title,body,category,importance,created_at,published_at').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20),
       client.from('class_sessions').select('id,subject_id,class_number,kind,batch,state,starts_at,room,topic,subjects(name,short_name)').eq('class_id', classId).order('starts_at', { ascending: false }).limit(50),
       client.from('resources').select('id,title,kind,unit_label,storage_path,created_at,published_at,subjects(name)').eq('class_id', classId).not('published_at', 'is', null).is('deleted_at', null).order('published_at', { ascending: false }).limit(50),
-      client.from('reminders').select('id,title,body,due_at').eq('class_id', classId).eq('is_active', true).gte('due_at', new Date().toISOString()).order('due_at').limit(20)
+      client.from('reminders').select('id,title,body,due_at,created_at').eq('class_id', classId).eq('is_active', true).gte('due_at', new Date().toISOString()).order('due_at').limit(20)
     ]);
 
     const failed = [classResult, subjectResult, updateResult, sessionResult, resourceResult, reminderResult].find((result) => result.error);
@@ -362,11 +364,15 @@
       }));
     });
 
+    const updateFeed = [
+      ...(updateResult.data || []).map((item) => ({ ...item, isReminder: false })),
+      ...(reminderResult.data || []).map((item) => ({ ...item, category: 'deadline', importance: 'normal', isReminder: true }))
+    ].sort((a, b) => new Date(b.isReminder ? b.created_at : b.published_at || b.created_at) - new Date(a.isReminder ? a.created_at : a.published_at || a.created_at));
     const updateContainers = [document.getElementById('updateList'), document.getElementById('homeUpdateList')];
     updateContainers.forEach((container, index) => {
       container.querySelectorAll('.update, .live-empty').forEach((node) => node.remove());
-      if (!updateResult.data.length) { addEmptyNote(container, 'No class updates have been published yet.'); return; }
-      updateResult.data.slice(0, index === 0 ? 20 : 2).forEach((update) => container.append(addUpdateCard(update)));
+      if (!updateFeed.length) { addEmptyNote(container, 'No class updates or reminders have been published yet.'); return; }
+      updateFeed.slice(0, index === 0 ? 40 : 2).forEach((item) => container.append(addUpdateCard(item)));
     });
 
     const resourceGrid = document.getElementById('resourceGrid');
@@ -597,20 +603,23 @@
     const list = document.getElementById('notificationList');
     const userId = window.classboardContext?.userId;
     if (!userId || !list) return;
-    const [result, updateCountResult] = await Promise.all([
+    const [result, updateCountResult, unreadCountResult] = await Promise.all([
       client.from('notifications')
         .select('id,source_type,source_id,created_at,read_at')
-        .eq('class_id', classId).eq('recipient_id', userId).is('read_at', null)
+        .eq('class_id', classId).eq('recipient_id', userId)
         .order('created_at', { ascending: false }).limit(50),
       client.from('notifications')
         .select('id', { count: 'exact', head: true })
-        .eq('class_id', classId).eq('recipient_id', userId).eq('source_type', 'update').is('read_at', null)
+        .eq('class_id', classId).eq('recipient_id', userId).eq('source_type', 'update').is('read_at', null),
+      client.from('notifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('class_id', classId).eq('recipient_id', userId).is('read_at', null)
     ]);
     if (result.error) { notifyApp(`Could not load notifications: ${result.error.message}`, true); return; }
 
     const notifications = result.data || [];
     const updateCount = updateCountResult.error
-      ? notifications.filter((item) => item.source_type === 'update').length
+      ? notifications.filter((item) => item.source_type === 'update' && !item.read_at).length
       : updateCountResult.count || 0;
     const updatesBadge = document.getElementById('updatesUnreadCount');
     if (updatesBadge) {
@@ -620,7 +629,7 @@
     }
     const ids = (type) => notifications.filter((item) => item.source_type === type).map((item) => item.source_id);
     const [updates, reminders, resources, sessions] = await Promise.all([
-      ids('update').length ? client.from('updates').select('id,title,body').in('id', ids('update')) : Promise.resolve({ data: [], error: null }),
+      ids('update').length ? client.from('updates').select('id,title,body,category,importance').in('id', ids('update')) : Promise.resolve({ data: [], error: null }),
       ids('reminder').length ? client.from('reminders').select('id,title,body,due_at').in('id', ids('reminder')) : Promise.resolve({ data: [], error: null }),
       ids('resource').length ? client.from('resources').select('id,title,kind,subjects(name)').in('id', ids('resource')) : Promise.resolve({ data: [], error: null }),
       ids('class_session').length ? client.from('class_sessions').select('id,class_number,kind,batch,starts_at,room,subjects(name)').in('id', ids('class_session')) : Promise.resolve({ data: [], error: null })
@@ -635,14 +644,15 @@
       const subject = Array.isArray(source.subjects) ? source.subjects[0] : source.subjects;
       let title = source.title;
       let detail = '';
-      if (notification.source_type === 'update') detail = source.body || '';
-      else if (notification.source_type === 'reminder') detail = source.body || `Due ${new Date(source.due_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`;
+      if (notification.source_type === 'update') detail = [source.category === 'deadline' ? 'Deadline' : source.category === 'important' ? 'Important' : 'Update', source.body || ''].filter(Boolean).join(' · ');
+      else if (notification.source_type === 'reminder') detail = [source.body, `Due ${new Date(source.due_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`].filter(Boolean).join(' · ');
       else if (notification.source_type === 'resource') detail = [subject?.name, resourceKindLabel(source.kind)].filter(Boolean).join(' · ');
       else {
         title = `${subject?.name || 'Class'}${source.class_number ? ` · Class ${source.class_number}` : ''}`;
         detail = `${source.kind === 'lab' ? `Lab · ${source.batch}` : 'Lecture'} · ${new Date(source.starts_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}${source.room ? ` · ${source.room}` : ''}`;
       }
       const row = document.createElement('div'); row.className = 'list-row'; row.dataset.notificationId = notification.id;
+      if (notification.read_at) row.classList.add('notification-read');
       const mark = document.createElement('div'); mark.className = 'update-mark blue'; mark.textContent = notification.source_type === 'resource' ? 'PDF' : notification.source_type === 'reminder' ? '•' : notification.source_type === 'class_session' ? '↗' : '!';
       const main = document.createElement('div'); main.className = 'list-main';
       const heading = document.createElement('div'); heading.className = 'list-title'; heading.textContent = title;
@@ -650,9 +660,9 @@
       const date = document.createElement('div'); date.className = 'list-date'; date.textContent = new Date(notification.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
       main.append(heading, sub); row.append(mark, main, date); list.append(row);
     });
-    if (!list.children.length) addEmptyNote(list, 'You’re all caught up. No unread notifications.');
+    if (!list.children.length) addEmptyNote(list, 'No class notifications yet. New updates and reminders will appear here.');
     document.querySelectorAll('.unread').forEach((dot) => dot.remove());
-    if (notifications.length) document.querySelectorAll('[aria-label="Notifications"]').forEach((button) => {
+    if ((unreadCountResult.count || 0) > 0) document.querySelectorAll('[aria-label="Notifications"]').forEach((button) => {
       if (!button.querySelector('.unread')) { const dot = document.createElement('span'); dot.className = 'unread'; button.append(dot); }
     });
   }
