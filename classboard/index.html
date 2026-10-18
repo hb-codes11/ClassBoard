@@ -220,6 +220,7 @@
     .account-role-options legend { padding: 0 4px; color: var(--muted); font-size: 10px; }
     .account-role-options label { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 11px; }
     .account-role-options input { accent-color: var(--blue); }
+    .account-default-role { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 20px; background: var(--blue-soft); color: var(--blue); font-size: 11px; font-weight: 650; white-space: nowrap; }
     .account-roll-label { display: grid; gap: 3px; color: var(--muted); font-size: 10px; }
     .account-roll-label input { width: 100px; padding: 7px 9px; }
     @media (max-width: 760px) { .account-controls { width: 100%; margin-left: 48px; } }
@@ -581,7 +582,7 @@
 
         <section class="page-view" id="page-cr">
           <div class="page-heading"><div><div class="eyebrow">Class representative tools</div><h1>CR workspace</h1><div class="page-description">Post class updates, keep the class log current, and follow up on student concerns.</div></div></div>
-          <div class="role-banner"><strong>CR access</strong><span>Only class reps can publish class information and respond to private attendance concerns.</span></div>
+          <div class="role-banner"><strong>CR access</strong><span>Only class reps can publish updates, class logs, schedules, and reminders. Admins can review attendance concerns and manage shared content from this workspace.</span></div>
           <section class="stats"><div class="stat-card"><div><div class="stat-value" id="crCaseCount">0</div><div class="stat-label">Attendance concerns</div></div></div><div class="stat-card"><div><div class="stat-value">—</div><div class="stat-label">Latest class log</div></div></div></section>
           <div class="workspace-grid">
             <div class="workspace-stack">
@@ -609,15 +610,15 @@
 
         <section class="page-view" id="page-admin">
           <div class="page-heading"><div><div class="eyebrow">Portal maintenance</div><h1>Admin workspace</h1><div class="page-description">Manage access and keep Classboard running. Admins do not publish class updates.</div></div></div>
-          <div class="role-banner"><strong>Admin access</strong><span>Maintenance and access management only. CRs publish updates, manage class logs, and upload PDFs. If you also have CR access, choose “CR workspace” from the top selector.</span></div>
-          <section class="stats"><div class="stat-card"><div><div class="stat-value" id="adminStudentCount">—</div><div class="stat-label">Student accounts</div></div></div><div class="stat-card"><div><div class="stat-value" id="adminCrCount">—</div><div class="stat-label">Class representatives</div></div></div><div class="stat-card"><div><div class="stat-value" id="adminMemberCount">—</div><div class="stat-label">Class accounts</div></div></div></section>
+          <div class="role-banner"><strong>Admin access</strong><span>Admins manage roles and shared content. CRs publish updates, class logs, timetables, and reminders. Admins can also upload PDFs and remove shared content.</span></div>
+          <section class="stats"><div class="stat-card"><div><div class="stat-value" id="adminStudentCount">—</div><div class="stat-label">Roll numbers assigned</div></div></div><div class="stat-card"><div><div class="stat-value" id="adminCrCount">—</div><div class="stat-label">Class representatives</div></div></div><div class="stat-card"><div><div class="stat-value" id="adminMemberCount">—</div><div class="stat-label">Class accounts</div></div></div></section>
           <div class="workspace-grid">
             <div class="workspace-stack">
-              <article class="panel"><div class="panel-header"><div><div class="panel-title">Access &amp; roles</div><div class="panel-sub">New college accounts start as students. Select roles and save to update class access.</div></div></div><div class="workspace-table" id="accountList"><div class="list-row">Run the new access-control migration to load class accounts.</div></div></article>
+              <article class="panel"><div class="panel-header"><div><div class="panel-title">Access &amp; roles</div><div class="panel-sub">Every account has Student access by default. Add CR or Admin access, then save.</div></div></div><div class="workspace-table" id="accountList"><div class="list-row">Run the latest access-control migration to load class accounts.</div></div></article>
               <article class="panel"><div class="panel-header"><div><div class="panel-title">Portal details</div><div class="panel-sub">Current class configuration.</div></div></div><div class="workspace-table"><div class="list-row"><div class="list-main"><div class="list-title">Class name</div><div class="list-detail" data-config-value="class">AI &amp; Analytics - A (INTEL-1)</div></div></div><div class="list-row"><div class="list-main"><div class="list-title">Semester</div><div class="list-detail" data-config-value="semester">3rd Semester · Odd Semester 2026</div></div></div><div class="list-row"><div class="list-main"><div class="list-title">Attendance visibility</div><div class="list-detail">Private concern messages visible to assigned CRs and admins.</div></div><span class="status">Enabled</span></div></div></article>
             </div>
             <div class="workspace-stack">
-              <article class="panel"><div class="panel-header"><div><div class="panel-title">How role control works</div><div class="panel-sub">Only class admins can save role changes. CRs can publish class updates and resources, but cannot grant access.</div></div></div><div class="private-note">Keep at least one active admin. Student roll numbers are optional until you assign them; rolls 1–32 are A1 and 33–66 are A2. To use Google sign-in, enable Google under Supabase Authentication → Sign In / Providers and add its OAuth credentials.</div></article>
+              <article class="panel"><div class="panel-header"><div><div class="panel-title">How role control works</div><div class="panel-sub">Student access stays on for every class account. Only admins can grant or remove CR and Admin access.</div></div></div><div class="private-note">Keep at least one active admin. Roll numbers are optional for admins and CRs; students can enter theirs when they join. Rolls 1–32 are A1 and 33–66 are A2. CRs publish class information; admins manage access, upload PDFs, and can remove shared content.</div></article>
             </div>
           </div>
         </section>
