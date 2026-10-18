@@ -475,7 +475,7 @@
         <button class="nav-item" data-view="Class Log"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M8 17h7"/></svg>Class Log</button>
         <button class="nav-item" data-view="Attendance"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/><path d="M16 6h4v4"/></svg>Attendance</button>
         <button class="nav-item" data-view="Notifications"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>Notifications</button>
-        <button class="nav-item" data-view="CR workspace" id="crWorkspaceNav" hidden><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h4"/></svg>CR workspace</button>
+        <button class="nav-item" data-view="Class representatives" id="crWorkspaceNav" hidden><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h4"/></svg>Class representatives</button>
       </nav>
       <div class="sidebar-bottom">
         <div class="profile-wrap">
@@ -489,7 +489,7 @@
       <header class="topbar">
         <div class="crumb">Workspace <span style="padding:0 7px;color:var(--line)">/</span> <strong id="crumbPage">Home</strong></div>
         <div class="top-actions">
-          <select class="role-switcher" id="roleSwitcher" aria-label="Your workspace" title="Switch between roles assigned to your account"><option value="student">Student view</option><option value="cr">CR workspace</option><option value="admin">Admin workspace</option></select>
+          <select class="role-switcher" id="roleSwitcher" aria-label="Your workspace" title="Switch between roles assigned to your account"><option value="student">Student view</option><option value="cr">Class representatives</option><option value="admin">Admin workspace</option></select>
           <button class="icon-button" aria-label="Academic calendar" title="Academic calendar" data-page="calendar"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M14 14h2M8 17h3"/></svg></button>
           <button class="icon-button" id="themeToggle" aria-label="Switch theme" title="Switch light/dark theme"><svg viewBox="0 0 24 24"><path d="M20.9 13A8.5 8.5 0 0 1 11 3.1 8.5 8.5 0 1 0 20.9 13Z"/></svg></button>
           <button class="icon-button" aria-label="Notifications" data-page="notifications"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="unread"></span></button>
@@ -516,7 +516,7 @@
 
         <section class="grid">
           <div class="stack">
-            <article class="panel" id="homeUpdateList"><div class="panel-header"><div><div class="panel-title">Latest updates</div><div class="panel-sub">Notes from your class reps and teachers</div></div><button class="text-link" data-page="updates">View all →</button></div></article>
+            <article class="panel" id="homeUpdateList"><div class="panel-header"><div><div class="panel-title">Latest updates</div><div class="panel-sub">Notes from your class representatives and teachers</div></div><button class="text-link" data-page="updates">View all →</button></div></article>
             <article class="panel" id="homeResourceList"><div class="panel-header"><div><div class="panel-title">New notes</div><div class="panel-sub">Recently added to your class</div></div><button class="text-link" data-page="resources">See notes →</button></div></article>
             <article class="panel">
               <div class="panel-header"><div><div class="panel-title">Recent classes</div><div class="panel-sub">What your class has covered</div></div><button class="text-link" data-page="classes">Open class log →</button></div>
@@ -601,8 +601,8 @@
         </section>
 
         <section class="page-view" id="page-cr">
-          <div class="page-heading"><div><div class="eyebrow">Class representative tools</div><h1>CR workspace</h1><div class="page-description">Post class updates, keep the class log current, and follow up on student concerns.</div></div></div>
-          <div class="role-banner"><strong>CR access</strong><span>Only class reps can publish updates, class logs, schedules, and reminders. Admins can review attendance concerns and manage shared content from this workspace.</span></div>
+          <div class="page-heading"><div><div class="eyebrow">Class representative tools</div><h1>Class representatives</h1><div class="page-description">Post class updates, keep the class log current, and follow up on student concerns.</div></div></div>
+          <div class="role-banner"><strong>Class representative access</strong><span>Only class representatives can publish updates, class logs, schedules, and reminders. Admins can review attendance concerns and manage shared content from this workspace.</span></div>
           <section class="stats"><div class="stat-card"><div><div class="stat-value" id="crCaseCount">0</div><div class="stat-label">Attendance concerns</div></div></div><div class="stat-card"><div><div class="stat-value">—</div><div class="stat-label">Latest class log</div></div></div></section>
           <div class="workspace-grid">
             <div class="workspace-stack">
@@ -828,7 +828,7 @@
     const pageMap = {
       'Home': 'home', 'Notes & Syllabus': 'resources', 'Updates': 'updates', 'Academic Calendar': 'calendar',
       'Class Log': 'classes', 'Attendance': 'attendance',
-      'Notifications': 'notifications', 'Profile': 'profile', 'CR workspace': 'cr', 'Admin workspace': 'admin'
+      'Notifications': 'notifications', 'Profile': 'profile', 'Class representatives': 'cr', 'Admin workspace': 'admin'
     };
     function openPage(page, activeName) {
       const pageId = pageMap[activeName] || page;
@@ -838,13 +838,13 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     document.querySelectorAll('[data-view]').forEach((item) => item.addEventListener('click', () => {
-      if (item.dataset.view === 'CR workspace') {
+      if (item.dataset.view === 'Class representatives') {
         const switcher = document.getElementById('roleSwitcher');
         if (switcher.value !== 'cr') {
           if ([...switcher.options].some((option) => option.value === 'cr')) {
             switcher.value = 'cr';
             switcher.dispatchEvent(new Event('change', { bubbles: true }));
-          } else openPage('cr', 'CR workspace');
+          } else openPage('cr', 'Class representatives');
         } else openPage('cr', 'CR workspace');
         return;
       }
