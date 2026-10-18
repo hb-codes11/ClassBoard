@@ -602,7 +602,7 @@
 
         <section class="hero" aria-label="Next class">
           <div class="hero-copy"><div class="hero-kicker">Your next class</div><h2 id="nextClassName">No class scheduled</h2><p id="nextClassDetail">Your CR will add upcoming classes to the timetable.</p></div>
-          <div class="hero-class"><div class="class-meta"><span>UP NEXT</span><span id="nextClassTime">—</span></div><div><div class="class-name" id="nextClassContext">Timetable</div><div class="class-room" id="nextClassRoom">No upcoming class yet</div></div><a class="hero-link" href="#class-log" data-toast="Opening today’s class log">View class log <span>→</span></a></div>
+          <div class="hero-class"><div class="class-meta"><span>UP NEXT</span><span id="nextClassTime">—</span></div><div><div class="class-name" id="nextClassContext">Timetable</div><div class="class-room" id="nextClassRoom">No upcoming class yet</div></div><a class="hero-link" href="#class-log" data-page="classes">View class log <span>→</span></a></div>
         </section>
 
         <section class="stats" aria-label="Class overview">
@@ -987,7 +987,8 @@
       else openPage('home', 'Home');
       filterClassLog();
     });
-    document.querySelectorAll('[data-page]').forEach((item) => item.addEventListener('click', () => {
+    document.querySelectorAll('[data-page]').forEach((item) => item.addEventListener('click', (event) => {
+      if (item.tagName === 'A') event.preventDefault();
       const page = item.dataset.page;
       const activeName = Object.keys(pageMap).find((name) => pageMap[name] === page) || page;
       openPage(page, activeName);
