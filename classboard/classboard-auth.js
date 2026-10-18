@@ -49,7 +49,8 @@
   function setRoleOptions(roles) {
     const switcher = document.getElementById('roleSwitcher');
     const labels = { student: 'Student view', cr: 'CR workspace', admin: 'Admin workspace' };
-    switcher.replaceChildren(...roles.map((role) => {
+    const orderedRoles = ['student', 'cr', 'admin'].filter((role) => roles.includes(role));
+    switcher.replaceChildren(...orderedRoles.map((role) => {
       const option = document.createElement('option');
       option.value = role;
       option.textContent = labels[role];
@@ -78,6 +79,10 @@
 
     const displayName = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.custom_claims?.name || user.email.split('@')[0];
     document.getElementById('crWorkspaceNav').hidden = !(roles.includes('cr') || roles.includes('admin'));
+    ['crUpdateForm', 'crClassForm', 'crScheduleForm', 'crReminderForm'].forEach((id) => {
+      const form = document.getElementById(id);
+      if (form) form.closest('article').hidden = !roles.includes('cr');
+    });
     const issuePanel = document.getElementById('issueForm')?.closest('article');
     if (issuePanel) issuePanel.hidden = !roles.includes('student');
     const uploadButton = document.getElementById('openResourceUpload');
@@ -112,7 +117,7 @@
     gate.hidden = true;
     app.hidden = false;
     showMessage('');
-    if (studentMembership && !studentMembership.roll_number) {
+    if (studentMembership && !studentMembership.roll_number && !roles.includes('cr') && !roles.includes('admin')) {
       window.openFormDialog({
         title: 'Set up your student details',
         description: 'Enter your lab batch and serial roll number. Your roll number and batch must match the class list.',
@@ -612,7 +617,8 @@
       const controls = document.createElement('div'); controls.className = 'account-controls';
       const roleGroup = document.createElement('fieldset'); roleGroup.className = 'account-role-options';
       const legend = document.createElement('legend'); legend.textContent = 'Roles'; roleGroup.append(legend);
-      [['student', 'Student'], ['cr', 'CR'], ['admin', 'Admin']].forEach(([value, label]) => {
+      const defaultRole = document.createElement('span'); defaultRole.className = 'account-default-role'; defaultRole.textContent = 'Student · default'; roleGroup.append(defaultRole);
+      [['cr', 'CR'], ['admin', 'Admin']].forEach(([value, label]) => {
         const roleLabel = document.createElement('label');
         const check = document.createElement('input'); check.type = 'checkbox'; check.value = value; check.checked = user.roles.has(value);
         roleLabel.append(check, document.createTextNode(label)); roleGroup.append(roleLabel);
@@ -622,8 +628,8 @@
       rollLabel.append(roll);
       const save = document.createElement('button'); save.className = 'secondary-button'; save.type = 'button'; save.textContent = 'Save roles';
       save.addEventListener('click', async () => {
-        const roles = [...roleGroup.querySelectorAll('input:checked')].map((input) => input.value);
-        const rollNumber = roles.includes('student') && roll.value ? Number(roll.value) : null;
+        const roles = ['student', ...[...roleGroup.querySelectorAll('input:checked')].map((input) => input.value)];
+        const rollNumber = roll.value ? Number(roll.value) : null;
         if (rollNumber !== null && (!Number.isInteger(rollNumber) || rollNumber < 1 || rollNumber > 66)) {
           notifyApp('Student roll number must be between 1 and 66.', true); return;
         }
@@ -639,7 +645,7 @@
       controls.append(roleGroup, rollLabel, save); row.append(avatar, main, controls); container.append(row);
     });
     document.getElementById('adminMemberCount').textContent = String(userRows.length);
-    document.getElementById('adminStudentCount').textContent = String(userRows.filter((user) => user.roles.has('student')).length);
+    document.getElementById('adminStudentCount').textContent = String(userRows.filter((user) => user.roles.has('student') && user.rollNumber !== null).length);
     document.getElementById('adminCrCount').textContent = String(userRows.filter((user) => user.roles.has('cr')).length);
   }
 
