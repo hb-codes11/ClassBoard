@@ -45,11 +45,11 @@ union all
 select 'FRIEND_USER_UUID'::uuid, id, 'cr'::public.class_role from target_class;
 ```
 
-15. Confirm the two owners can sign in and that each new college account appears as a Student. Assign CR/Admin access from Admin workspace; only a CR can publish class updates, class logs, timetables, and reminders. Admins manage roles, review attendance concerns, and can upload or remove shared content.
+19. Confirm the two owners can sign in and that each new college account appears as a Student. Assign CR/Admin access from Admin workspace; only a CR can publish class updates, class logs, timetables, and reminders. Admins manage roles, review attendance concerns, and can upload or remove shared content.
 
 ## Before sharing with the class
 
-- Apply all migrations through `013_shared_attendance_planner.sql` to the Supabase project used by the deployed site.
+- Apply all migrations through `017_remove_reviewed_attendance_concerns.sql` to the Supabase project used by the deployed site.
 - Keep the Supabase service-role key out of frontend code and Vercel's public variables. The browser only needs the project URL and publishable key.
 - Keep the college email allowlist, Google OAuth redirect URLs, and Supabase site/redirect URLs pointed at the deployed Classboard domain.
 - Review college approval, account onboarding, data retention, backups, and who should receive CR/Admin permissions before sharing the sign-in link broadly.
