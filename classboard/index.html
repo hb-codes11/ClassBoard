@@ -428,6 +428,98 @@
       .stat-icon { margin: 0 auto 5px; }
       .quick-action { padding: 8px; }
     }
+    @media (max-width: 760px) {
+      html, body { max-width: 100%; overflow-x: hidden; }
+      body { -webkit-tap-highlight-color: transparent; }
+      .main { padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
+      .topbar { height: calc(58px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left)); }
+      .crumb { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .top-actions { flex: none; gap: 6px; }
+      .top-actions [aria-label="Academic calendar"], .top-actions #themeToggle { display: none; }
+      .role-switcher { width: min(34vw, 128px); max-width: 128px; min-height: 44px; font-size: 12px; }
+      .icon-button { width: 44px; height: 44px; border-radius: 13px; }
+      .content { min-height: calc(100svh - 124px); padding: 20px max(14px, env(safe-area-inset-right)) 22px max(14px, env(safe-area-inset-left)); }
+      .text-field, .select-field, .search-field, .text-area, .auth-field input { min-height: 44px; font-size: 16px; }
+      .auth-gate { min-height: 100svh; padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+      .auth-card { padding: 22px; }
+      .auth-action { min-height: 48px; font-size: 15px; }
+      .welcome-row, .page-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
+      .welcome-row { margin-bottom: 16px; }
+      h1, .page-heading h1 { font-size: clamp(25px, 7vw, 30px); }
+      .subtitle, .page-description { line-height: 1.5; }
+      .hero { width: 100%; }
+      .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .stat-card { min-width: 0; }
+      .stat-label { line-height: 1.3; overflow-wrap: anywhere; }
+      .panel-header { align-items: flex-start; gap: 10px; }
+      .panel-header > button { flex: none; }
+      .toolbar { align-items: stretch; }
+      .toolbar > * { min-width: 0; }
+      .toolbar .search-field { flex-basis: 100%; }
+      .toolbar .select-field, .toolbar .primary-button, .toolbar .secondary-button { flex: 1 1 auto; }
+      .workspace-form, .attendance-form { grid-template-columns: minmax(0, 1fr); }
+      .attendance-form > * { grid-column: 1 / -1 !important; }
+      .form-actions { flex-wrap: wrap; }
+      .form-actions > button { flex: 1 1 140px; }
+      .list-row { align-items: flex-start; gap: 10px; padding: 13px 14px; }
+      .list-date { width: auto; min-width: 48px; }
+      .case-actions { width: 100%; }
+      .case-actions button { min-height: 44px; }
+      .account-controls { margin-left: 0; gap: 10px; }
+      .account-role-options { width: 100%; }
+      .account-roll-label { flex: 1; }
+      .account-remove-button { min-height: 44px; }
+      .calendar-frame { height: calc(100svh - 220px); min-height: 360px; }
+      .site-footer { flex-direction: column; font-size: 12px; }
+      .app-dialog { width: calc(100vw - 20px); max-height: calc(100dvh - 24px); }
+      .dialog-content { max-height: calc(100dvh - 24px); overflow-y: auto; padding: 18px; }
+      .dialog-actions { flex-wrap: wrap; }
+      .dialog-actions button { min-height: 44px; flex: 1 1 120px; }
+      .mobile-nav { height: calc(64px + env(safe-area-inset-bottom)); padding: 5px max(8px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(8px, env(safe-area-inset-left)); }
+      .mobile-nav button { min-width: 0; min-height: 48px; font-size: 11px; }
+      .mobile-nav svg { width: 20px; height: 20px; }
+      .mobile-more-menu { position: absolute; right: max(12px, env(safe-area-inset-right)); bottom: calc(100% + 9px); width: min(300px, calc(100vw - 24px)); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 9px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); box-shadow: 0 12px 34px #10243b30; }
+      .mobile-more-menu[hidden] { display: none; }
+      .mobile-more-menu button { min-height: 46px; display: flex; align-items: center; justify-content: flex-start; gap: 9px; padding: 8px 10px; border: 0; border-radius: 9px; background: transparent; color: var(--text); text-align: left; font: inherit; font-size: 12px; }
+      .mobile-more-menu button:hover, .mobile-more-menu button:focus-visible { background: var(--blue-soft); color: var(--blue); }
+      .mobile-more-menu button[hidden] { display: none; }
+      .mobile-more-menu .mobile-more-divider { grid-column: 1 / -1; height: 1px; margin: 3px 0; background: var(--line); }
+      .mobile-more-menu .mobile-more-theme { grid-column: 1 / -1; }
+      .mobile-nav .mobile-more-button.active { color: var(--blue); font-weight: 680; }
+      .toast { bottom: calc(74px + env(safe-area-inset-bottom)); width: min(420px, calc(100vw - 28px)); text-align: center; }
+      .resource-preview-dialog { width: calc(100vw - 12px); height: calc(100dvh - 12px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); margin: auto; border-radius: 14px; }
+      .pdf-preview-toolbar { padding-top: max(8px, env(safe-area-inset-top)); }
+      .pdf-preview-download, .pdf-preview-close { min-height: 44px; }
+      .pdf-preview-close { width: 44px; }
+    }
+    @media (max-width: 390px) {
+      .content { padding-top: 17px; }
+      .topbar { padding-inline: 10px; }
+      .role-switcher { width: min(32vw, 112px); font-size: 11px; }
+      .top-actions { gap: 4px; }
+      .icon-button { width: 40px; height: 40px; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stats .stat-card:last-child { grid-column: 1 / -1; }
+      .stat-card { min-height: 72px; display: flex; text-align: left; padding: 10px; }
+      .stat-icon { margin: 0; }
+      .quick-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .quick-action:last-child { grid-column: 1 / -1; }
+      .planner-results { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .planner-result:last-child { grid-column: 1 / -1; }
+      .attendance-mode-controls { padding-inline: 12px; }
+      .attendance-mode-control { width: 100%; margin-inline: 0; }
+      .subject-calculator { gap: 8px; }
+      .subject-calculator .field-label { font-size: 12px; }
+      .subject-attendance-grid { padding-inline: 9px; }
+      .auth-card { padding: 18px; }
+    }
+    @media (max-width: 350px) {
+      .top-actions > .icon-button[aria-label="Profile"] { display: none; }
+      .crumb { font-size: 12px; }
+      .role-switcher { width: 104px; }
+      .mobile-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .mobile-nav button { font-size: 10px; }
+    }
     .auth-gate { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--page); }
     .auth-card { width: min(100%, 430px); padding: 30px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow); }
     .auth-brand { display: flex; align-items: center; gap: 9px; color: var(--blue); font-size: 13px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
@@ -653,8 +745,18 @@
     <nav class="mobile-nav" aria-label="Mobile navigation">
       <button class="active" data-view="Home"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></svg>Home</button>
       <button data-view="Notes & Syllabus"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 1 4 17.5z"/></svg>Learn</button>
-      <button data-view="Class Log"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Class</button>
-      <button data-view="Profile"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
+      <button data-view="Updates"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>Updates</button>
+      <button class="mobile-more-button" type="button" data-mobile-more aria-expanded="false" aria-controls="mobileMoreMenu"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>More</button>
+      <div class="mobile-more-menu" id="mobileMoreMenu" hidden>
+        <button data-view="Academic Calendar"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Academic calendar</button>
+        <button data-view="Class Log"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Class log</button>
+        <button data-view="Attendance"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/></svg>Attendance</button>
+        <button data-view="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>Notifications</button>
+        <button data-view="Class representatives" id="mobileCrWorkspaceNav" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h4"/></svg>Class representatives</button>
+        <button data-view="Profile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
+        <span class="mobile-more-divider" aria-hidden="true"></span>
+        <button class="mobile-more-theme" type="button" id="mobileThemeToggle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.9 13A8.5 8.5 0 0 1 11 3.1 8.5 8.5 0 1 0 20.9 13Z"/></svg>Change appearance</button>
+      </div>
     </nav>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <dialog class="resource-preview-dialog" id="pdfPreviewDialog" aria-label="PDF preview">
@@ -839,9 +941,25 @@
       const pageId = pageMap[activeName] || page;
       document.querySelectorAll('.page-view').forEach((section) => section.classList.toggle('active', section.id === `page-${pageId}`));
       document.querySelectorAll('.nav-item, .mobile-nav button').forEach((button) => button.classList.toggle('active', button.dataset.view === activeName || (activeName === 'Notes & Syllabus' && button.textContent.trim() === 'Learn')));
+      const mobileMoreButton = document.querySelector('[data-mobile-more]');
+      const mobileMoreMenu = document.getElementById('mobileMoreMenu');
+      if (mobileMoreButton && mobileMoreMenu) {
+        const primaryMobileViews = ['Home', 'Notes & Syllabus', 'Updates'];
+        mobileMoreButton.classList.toggle('active', !primaryMobileViews.includes(activeName));
+        mobileMoreMenu.hidden = true;
+        mobileMoreButton.setAttribute('aria-expanded', 'false');
+      }
       document.getElementById('crumbPage').textContent = activeName || 'Home';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+    const mobileMoreButton = document.querySelector('[data-mobile-more]');
+    const mobileMoreMenu = document.getElementById('mobileMoreMenu');
+    mobileMoreButton.addEventListener('click', () => {
+      const open = mobileMoreMenu.hidden;
+      mobileMoreMenu.hidden = !open;
+      mobileMoreButton.setAttribute('aria-expanded', String(open));
+    });
+    document.getElementById('mobileThemeToggle').addEventListener('click', () => document.getElementById('themeToggle').click());
     document.querySelectorAll('[data-view]').forEach((item) => item.addEventListener('click', () => {
       if (item.dataset.view === 'Class representatives') {
         const switcher = document.getElementById('roleSwitcher');

@@ -82,6 +82,7 @@
 
     const displayName = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.custom_claims?.name || user.email.split('@')[0];
     document.getElementById('crWorkspaceNav').hidden = !(roles.includes('cr') || roles.includes('admin'));
+    document.getElementById('mobileCrWorkspaceNav').hidden = !(roles.includes('cr') || roles.includes('admin'));
     ['crUpdateForm', 'crClassForm', 'crScheduleForm', 'crReminderForm'].forEach((id) => {
       const form = document.getElementById(id);
       if (form) form.closest('article').hidden = !roles.includes('cr');
