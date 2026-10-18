@@ -996,7 +996,7 @@
     if (!validCollegeEmail()) return;
     busy(true);
     const { error } = await window.classboardSupabase.auth.resetPasswordForEmail(cleanEmail(), {
-      redirectTo: window.location.href.split('#')[0]
+      redirectTo: new URL('./reset-password.html', window.location.href).href
     });
     showMessage(error ? error.message : 'If an account exists for this email, a password reset link is on its way.', Boolean(error));
     busy(false);
