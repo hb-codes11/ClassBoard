@@ -295,7 +295,8 @@
     card.dataset.search = `${resource.title} ${subject?.name || ''} ${kind} ${resource.unit_label || ''}`.toLowerCase();
     card.dataset.resourcePath = resource.storage_path || '';
     card.dataset.resourceTitle = resource.title;
-    const icon = document.createElement('div'); icon.className = 'file-icon'; icon.textContent = 'PDF';
+    const extension = resource.storage_path?.split('.').pop()?.toUpperCase();
+    const icon = document.createElement('div'); icon.className = 'file-icon'; icon.textContent = ['PDF', 'DOCX', 'PPTX'].includes(extension) ? extension : 'FILE';
     const main = document.createElement('div'); main.className = 'list-main';
     const title = document.createElement('div'); title.className = 'resource-title'; title.textContent = resource.title;
     const meta = document.createElement('div'); meta.className = 'resource-meta';
@@ -998,7 +999,8 @@
       if (!card?.dataset.resourcePath) { notifyApp('This PDF is not available right now.', true); return; }
       button.disabled = true;
       const title = card.dataset.resourceTitle || 'Class resource';
-      const filename = `${title.replace(/[/\\?%*:|"<>]/g, '-').trim() || 'class-resource'}.pdf`;
+      const extension = card.dataset.resourcePath.split('.').pop().toLowerCase();
+      const filename = `${title.replace(/[/\\?%*:|"<>]/g, '-').trim() || 'class-resource'}.${['pdf', 'docx', 'pptx'].includes(extension) ? extension : 'pdf'}`;
       if (button.dataset.previewPdf) {
         const [viewUrl, downloadUrl] = await Promise.all([
           signedResourceUrl(card.dataset.resourcePath),
@@ -1207,8 +1209,14 @@
       if (!context?.roles.some((role) => role === 'cr' || role === 'admin')) { notifyApp('Only class representatives and admins can upload class resources.', true); return; }
       const values = new FormData(resourceForm);
       const file = values.get('file');
-      if (!(file instanceof File) || !file.name.toLowerCase().endsWith('.pdf') || (file.type && file.type !== 'application/pdf') || file.size === 0 || file.size > 10 * 1024 * 1024) {
-        notifyApp('Choose a non-empty PDF file smaller than 10 MB.', true);
+      const extension = file instanceof File ? file.name.split('.').pop().toLowerCase() : '';
+      const resourceMimeTypes = {
+        pdf: 'application/pdf',
+        docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+      };
+      if (!(file instanceof File) || !resourceMimeTypes[extension] || (file.type && file.type !== resourceMimeTypes[extension]) || file.size === 0 || file.size > 10 * 1024 * 1024) {
+        notifyApp('Choose a non-empty PDF, DOCX, or PPTX file smaller than 10 MB.', true);
         return;
       }
       const subjectResult = await window.classboardSupabase.from('subjects').select('id,name').eq('class_id', context.classId);
@@ -1217,13 +1225,13 @@
       const subject = kind === 'calendar' ? null : subjectResult.data.find((item) => item.name === values.get('subject'));
       if (kind !== 'calendar' && !subject) { notifyApp('Choose one of the listed class subjects.', true); return; }
       const resourceId = crypto.randomUUID();
-      const safeName = file.name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g, '_').replace(/^[_\.]+|[_\.]+$/g, '') || 'resource.pdf';
+      const safeName = file.name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g, '_').replace(/^[_\.]+|[_\.]+$/g, '') || `resource.${extension}`;
       const storagePath = `${context.classId}/${resourceId}/${safeName}`;
       const upload = await window.classboardSupabase.storage.from('class-resources').upload(storagePath, file, {
-        contentType: 'application/pdf',
+        contentType: resourceMimeTypes[extension],
         upsert: false
       });
-      if (upload.error) { notifyApp(`PDF upload failed: ${upload.error.message}`, true); return; }
+      if (upload.error) { notifyApp(`Resource upload failed: ${upload.error.message}`, true); return; }
       const insert = await window.classboardSupabase.from('resources').insert({
         id: resourceId,
         class_id: context.classId,
@@ -1236,14 +1244,14 @@
       });
       if (insert.error) {
         await window.classboardSupabase.storage.from('class-resources').remove([storagePath]);
-        notifyApp(`PDF uploaded, but its resource record could not be saved: ${insert.error.message}`, true);
+        notifyApp(`File uploaded, but its resource record could not be saved: ${insert.error.message}`, true);
         return;
       }
       resourceForm.reset();
       syncResourceSubject();
       closeUpload();
       await loadLiveClassData(context.classId);
-      notifyApp('PDF published to the class resources.');
+      notifyApp('Resource published to the class.');
     }, true);
 
     const reminderForm = document.getElementById('crReminderForm');
