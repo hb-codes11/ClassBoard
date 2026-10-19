@@ -185,42 +185,66 @@
 
   function addUpdateCard(update) {
     const card = document.createElement('div');
-    card.className = 'update';
+    const category = update.category.toLowerCase();
+    const cardType = update.isReminder ? 'reminder' : category === 'deadline' ? 'deadline' : category === 'important' || update.importance === 'important' ? 'important' : 'general';
+    card.className = `update update-card update-${cardType}`;
     card.dataset.contentId = update.id;
     card.dataset.contentType = update.isReminder ? 'reminders' : 'updates';
-    const category = update.category.toLowerCase();
     card.dataset.category = update.isReminder ? 'Deadline' : category === 'deadline' ? 'Deadline' : category === 'important' ? 'Important' : 'General';
-    const mark = document.createElement('div');
-    mark.className = 'update-mark blue';
-    mark.textContent = update.isReminder || category === 'deadline' || update.importance === 'important' ? '!' : 'i';
-    const copy = document.createElement('div');
+    const displayDate = update.isReminder ? update.due_at : cardType === 'deadline' && update.expires_at ? update.expires_at : update.published_at || update.created_at;
+    const date = new Date(displayDate);
+    const dateTile = document.createElement('div'); dateTile.className = 'update-date';
+    const month = document.createElement('span'); month.className = 'update-date-month'; month.textContent = date.toLocaleString('en-IN', { month: 'short' });
+    const day = document.createElement('span'); day.className = 'update-date-day'; day.textContent = String(date.getDate());
+    dateTile.append(month, day);
+    const icon = document.createElement('div'); icon.className = 'update-icon';
+    icon.innerHTML = update.isReminder
+      ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l3 2M5 3 3 5m16-2 2 2"></path></svg>'
+      : cardType === 'deadline'
+        ? '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18M8 14h2m4 0h2"></path></svg>'
+        : cardType === 'important'
+          ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6m0 4h.01"></path></svg>'
+          : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5m0-8h.01"></path></svg>';
+    const copy = document.createElement('div'); copy.className = 'update-copy';
     const title = document.createElement('div');
     title.className = 'update-title';
     title.textContent = update.title;
-    if (update.isReminder || update.importance === 'important') {
-      const pill = document.createElement('span');
-      pill.className = 'pill';
-      pill.textContent = update.isReminder ? 'Reminder' : 'Important';
+    if (cardType !== 'general') {
+      const pill = document.createElement('span'); pill.className = 'update-tag';
+      pill.textContent = cardType === 'reminder' ? 'Reminder' : cardType === 'deadline' ? 'Deadline' : 'Important';
       title.append(' ', pill);
     }
-    const body = document.createElement('div');
-    body.className = 'update-body';
-    body.textContent = update.body;
+    const urgent = update.isReminder && /\burgent\b/i.test(update.body || '');
+    if (urgent) {
+      const status = document.createElement('span'); status.className = 'update-urgent'; status.textContent = 'Urgent';
+      title.append(' ', status);
+    }
+    const body = document.createElement('div'); body.className = 'update-body';
+    const bodyText = String(update.body || '').trim();
+    if (bodyText && !(urgent && /^urgent[.!]?$/i.test(bodyText))) body.textContent = bodyText;
     const time = document.createElement('div');
     time.className = 'update-time';
-    time.textContent = update.isReminder
-      ? `Due ${new Date(update.due_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`
+    const dueAt = update.isReminder ? update.due_at : cardType === 'deadline' ? update.expires_at : null;
+    time.textContent = dueAt
+      ? `Due ${new Date(dueAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`
       : `Posted ${new Date(update.published_at || update.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`;
-    copy.append(title, body, time);
-    card.append(mark, copy);
-    card.append(makeDeleteButton(update.isReminder ? 'Delete reminder' : 'Delete update'));
+    copy.append(title);
+    if (bodyText && !(urgent && /^urgent[.!]?$/i.test(bodyText))) copy.append(body);
+    copy.append(time);
+    card.append(dateTile, icon, copy);
+    card.append(makeDeleteButton(update.isReminder ? 'Delete reminder' : 'Delete update', true));
     return card;
   }
 
-  function makeDeleteButton(label = 'Delete') {
+  function makeDeleteButton(label = 'Delete', iconOnly = false) {
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'delete-content-button';
-    button.dataset.deleteContent = 'true'; button.textContent = label;
+    button.dataset.deleteContent = 'true';
+    if (iconOnly) {
+      button.classList.add('update-delete');
+      button.setAttribute('aria-label', label);
+      button.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6m4-6v6M5 7l1 14h12l1-14M9 7V4h6v3"></path></svg>';
+    } else button.textContent = label;
     button.hidden = !window.classboardContext?.roles.some((role) => role === 'cr' || role === 'admin');
     return button;
   }
@@ -332,7 +356,7 @@
     const [classResult, subjectResult, updateResult, sessionResult, resourceResult, reminderResult] = await Promise.all([
       client.from('classes').select('id,code,name,semester').eq('id', classId).single(),
       client.from('subjects').select('id,slug,name,short_name,display_order').eq('class_id', classId).eq('is_active', true).order('display_order'),
-      client.from('updates').select('id,title,body,category,importance,created_at,published_at').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20),
+      client.from('updates').select('id,title,body,category,importance,created_at,published_at,expires_at').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20),
       client.from('class_sessions').select('id,subject_id,class_number,kind,batch,state,starts_at,room,topic,subjects(name,short_name)').eq('class_id', classId).order('starts_at', { ascending: false }).limit(50),
       client.from('resources').select('id,title,kind,unit_label,storage_path,created_at,published_at,subjects(name)').eq('class_id', classId).not('published_at', 'is', null).is('deleted_at', null).order('published_at', { ascending: false }).limit(50),
       client.from('reminders').select('id,title,body,due_at,created_at').eq('class_id', classId).eq('is_active', true).gte('due_at', new Date().toISOString()).order('due_at').limit(20)
@@ -1187,6 +1211,14 @@
     }, true);
 
     const updatesForm = document.getElementById('crUpdateForm');
+    const deadlineField = document.getElementById('crUpdateDeadlineField');
+    const syncDeadlineField = () => {
+      const isDeadline = updatesForm?.elements.namedItem('category').value === 'Deadline';
+      deadlineField.hidden = !isDeadline;
+      deadlineField.querySelector('input').required = isDeadline;
+    };
+    updatesForm?.elements.namedItem('category').addEventListener('change', syncDeadlineField);
+    syncDeadlineField();
     updatesForm?.addEventListener('submit', async (event) => {
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -1194,17 +1226,20 @@
       if (!context?.roles.includes('cr')) { notifyApp('Only an assigned CR can publish class updates.', true); return; }
       const values = new FormData(updatesForm);
       const category = String(values.get('category'));
+      const expiresAt = category === 'Deadline' ? new Date(String(values.get('deadline'))).toISOString() : null;
       const { error } = await window.classboardSupabase.from('updates').insert({
         class_id: context.classId,
         title: String(values.get('title')).trim(),
         body: String(values.get('message')).trim(),
         category: category.toLowerCase(),
         importance: category === 'Important' ? 'important' : 'normal',
+        expires_at: expiresAt,
         created_by: context.userId,
         published_at: new Date().toISOString()
       });
       if (error) { notifyApp(`Update did not save: ${error.message}`, true); return; }
       updatesForm.reset();
+      syncDeadlineField();
       await loadLiveClassData(context.classId);
       notifyApp('Update published for the class.');
     }, true);
