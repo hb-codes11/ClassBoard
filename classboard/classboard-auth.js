@@ -738,6 +738,7 @@
     if (failed) { notifyApp(`Could not load notification details: ${failed.error.message}`, true); return; }
     const sources = new Map([updates, reminders, resources, sessions].flatMap((request) => (request.data || []).map((source) => [source.id, source])));
     list.replaceChildren();
+    let currentDay = '';
     notifications.forEach((notification) => {
       const source = sources.get(notification.source_id);
       if (!source) return;
@@ -751,14 +752,31 @@
         title = `${subject?.name || 'Class'}${source.class_number ? ` · Class ${source.class_number}` : ''}`;
         detail = `${source.kind === 'lab' ? `Lab · ${source.batch}` : 'Lecture'} · ${new Date(source.starts_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}${source.room ? ` · ${source.room}` : ''}`;
       }
-      const row = document.createElement('div'); row.className = 'list-row'; row.dataset.notificationId = notification.id;
+      const createdAt = new Date(notification.created_at);
+      const dayKey = `${createdAt.getFullYear()}-${createdAt.getMonth()}-${createdAt.getDate()}`;
+      if (dayKey !== currentDay) {
+        currentDay = dayKey;
+        const group = document.createElement('section'); group.className = 'notification-day';
+        const label = document.createElement('div'); label.className = 'notification-day-label';
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+        const notificationDay = new Date(createdAt); notificationDay.setHours(0, 0, 0, 0);
+        label.textContent = notificationDay.getTime() === today.getTime() ? 'Today' : notificationDay.getTime() === yesterday.getTime() ? 'Yesterday' : createdAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+        group.append(label); list.append(group);
+      }
+      let type = notification.source_type === 'reminder' ? 'reminder' : notification.source_type === 'resource' ? 'resource' : notification.source_type === 'class_session' ? 'class' : source.category === 'deadline' ? 'deadline' : source.category === 'important' ? 'important' : 'update';
+      const labels = { update: 'Class update', important: 'Important notice', deadline: 'Deadline', reminder: 'Reminder', resource: 'New resource', class: 'Class schedule' };
+      const row = document.createElement('article'); row.className = `notification-item notification-${type}`; row.dataset.notificationId = notification.id;
       if (notification.read_at) row.classList.add('notification-read');
-      const mark = document.createElement('div'); mark.className = 'update-mark blue'; mark.textContent = notification.source_type === 'resource' ? 'PDF' : notification.source_type === 'reminder' ? '•' : notification.source_type === 'class_session' ? '↗' : '!';
-      const main = document.createElement('div'); main.className = 'list-main';
+      const mark = document.createElement('div'); mark.className = 'notification-icon'; mark.textContent = notification.source_type === 'resource' ? resourceKindLabel(source.kind).split(' ')[0].toUpperCase() : notification.source_type === 'reminder' ? 'REM' : notification.source_type === 'class_session' ? 'CLASS' : type === 'deadline' ? 'DUE' : type === 'important' ? '!' : 'INFO';
+      const main = document.createElement('div'); main.className = 'notification-main';
+      const typeLabel = document.createElement('div'); typeLabel.className = 'notification-type'; typeLabel.textContent = labels[type];
       const heading = document.createElement('div'); heading.className = 'list-title'; heading.textContent = title;
       const sub = document.createElement('div'); sub.className = 'list-detail'; sub.textContent = detail;
-      const date = document.createElement('div'); date.className = 'list-date'; date.textContent = new Date(notification.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
-      main.append(heading, sub); row.append(mark, main, date); list.append(row);
+      const meta = document.createElement('div'); meta.className = 'notification-meta';
+      const date = document.createElement('time'); date.dateTime = notification.created_at; date.textContent = createdAt.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
+      const unread = document.createElement('span'); unread.className = 'notification-unread'; unread.setAttribute('aria-label', notification.read_at ? 'Read' : 'Unread');
+      meta.append(date, unread); main.append(typeLabel, heading, sub); row.append(mark, main, meta); list.lastElementChild.append(row);
     });
     if (!list.children.length) addEmptyNote(list, 'No class notifications yet. New updates and reminders will appear here.');
     document.querySelectorAll('.unread').forEach((dot) => dot.remove());

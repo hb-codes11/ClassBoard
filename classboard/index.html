@@ -252,6 +252,24 @@
     .tab.active { border-bottom-color: var(--blue); color: var(--blue); font-weight: 670; }
     .list-row { display: flex; align-items: center; gap: 14px; padding: 14px 17px; border-top: 1px solid var(--line); }
     .list-row:first-child { border-top: 0; }
+    #notificationList { padding: 12px; }
+    .notification-day + .notification-day { margin-top: 18px; }
+    .notification-day-label { padding: 4px 6px 9px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .notification-item { --notification-accent: var(--blue); display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; align-items: center; gap: 14px; position: relative; padding: 14px 16px; margin-top: 10px; border: 1px solid color-mix(in srgb, var(--notification-accent) 23%, var(--line)); border-radius: 12px; background: linear-gradient(105deg, color-mix(in srgb, var(--notification-accent) 7%, var(--surface)), var(--surface) 68%); }
+    .notification-item.notification-important { --notification-accent: #8054d8; }
+    .notification-item.notification-deadline { --notification-accent: #c8780b; }
+    .notification-item.notification-reminder { --notification-accent: #078b86; }
+    .notification-item.notification-resource { --notification-accent: #1474c8; }
+    .notification-item.notification-class { --notification-accent: #3678cb; }
+    .notification-icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; background: color-mix(in srgb, var(--notification-accent) 12%, var(--surface)); color: var(--notification-accent); font-size: 11px; font-weight: 800; }
+    .notification-main { min-width: 0; }
+    .notification-type { margin-bottom: 3px; color: var(--notification-accent); font-size: 10px; line-height: 1.25; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+    .notification-item .list-title { font-size: 14px; line-height: 1.4; }
+    .notification-item .list-detail { margin-top: 3px; font-size: 12px; line-height: 1.5; }
+    .notification-meta { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 11px; white-space: nowrap; }
+    .notification-unread { width: 9px; height: 9px; border-radius: 50%; background: var(--blue); }
+    .notification-read { opacity: .76; background: var(--surface); }
+    .notification-read .notification-unread { visibility: hidden; }
     .case-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
     .account-row { align-items: flex-start; flex-wrap: wrap; }
     .account-row .list-main { min-width: 170px; }
@@ -562,6 +580,13 @@
       .form-actions > button { flex: 1 1 140px; }
       .list-row { align-items: flex-start; gap: 10px; padding: 13px 14px; }
       .list-date { width: auto; min-width: 48px; }
+      #notificationList { padding: 10px; }
+      .notification-item { grid-template-columns: 40px minmax(0, 1fr); align-items: start; gap: 10px; padding: 12px; }
+      .notification-icon { width: 38px; height: 38px; border-radius: 10px; }
+      .notification-meta { grid-column: 2; grid-row: 2; justify-content: flex-start; margin-top: 2px; font-size: 10px; }
+      .notification-type { font-size: 9px; }
+      .notification-item .list-title { font-size: 13px; }
+      .notification-item .list-detail { font-size: 11px; }
       .case-actions { width: 100%; }
       .case-actions button { min-height: 44px; }
       .account-controls { margin-left: 0; gap: 10px; }
