@@ -274,8 +274,8 @@
     .profile-account { padding: 18px; }
     .profile-identity { display: flex; align-items: center; gap: 14px; padding: 2px 4px 17px; border-bottom: 1px solid var(--line); }
     .profile-identity .avatar { width: 50px; height: 50px; font-size: 15px; }
-    .profile-identity .list-title { font-size: 15px; letter-spacing: -.02em; }
-    .profile-identity .list-detail { font-size: 11px; }
+    .profile-identity .list-title { font-size: 17px; letter-spacing: -.02em; }
+    .profile-identity .list-detail { font-size: 12px; }
     .profile-details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 7px; }
     .profile-detail-row { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 12px 10px; }
     .profile-detail-row:nth-child(odd) { padding-left: 4px; padding-right: 16px; border-right: 1px solid var(--line); }
@@ -283,17 +283,17 @@
     .profile-detail-row:nth-child(n+3) { border-top: 1px solid var(--line); }
     .profile-detail-icon { display: grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 10px; background: var(--blue-soft); color: var(--blue); }
     .profile-detail-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-    .profile-detail-row .list-title { font-size: 10px; }
-    .profile-detail-row .list-detail { font-size: 10px; line-height: 1.5; }
+    .profile-detail-row .list-title { font-size: 12px; }
+    .profile-detail-row .list-detail { font-size: 12px; line-height: 1.5; }
     .profile-detail-row .secondary-button { flex: none; }
     .profile-section-heading { display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); }
-    .profile-section-heading .panel-title { font-size: 12px; }
-    .profile-section-heading .panel-sub { font-size: 10px; margin-top: 3px; }
+    .profile-section-heading .panel-title { font-size: 14px; }
+    .profile-section-heading .panel-sub { font-size: 12px; margin-top: 3px; }
     .profile-row-icon { display: grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 9px; background: var(--surface-2); color: var(--blue); }
     .profile-row-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .profile-side-stack .list-row { gap: 12px; padding: 10px 18px; }
-    .profile-side-stack .list-row .list-title { font-size: 10px; }
-    .profile-side-stack .list-row .list-detail { font-size: 9px; margin-top: 2px; }
+    .profile-side-stack .list-row .list-title { font-size: 12px; }
+    .profile-side-stack .list-row .list-detail { font-size: 11px; margin-top: 3px; }
     @media (max-width: 760px) {
       .profile-details-grid { grid-template-columns: minmax(0, 1fr); }
       .profile-layout, .profile-side-stack { gap: 14px; }
@@ -302,6 +302,17 @@
       .profile-detail-row:nth-child(n+2) { border-top: 1px solid var(--line); }
       .profile-section-heading { padding: 12px 14px; }
       .profile-side-stack .list-row { padding: 10px 14px; }
+    }
+    @media (max-width: 480px) {
+      .profile-account { padding: 14px; }
+      .profile-identity { gap: 12px; padding: 2px 2px 14px; }
+      .profile-identity .avatar { width: 44px; height: 44px; }
+      .profile-identity .list-title { font-size: 15px; }
+      .profile-detail-row { gap: 10px; }
+      .profile-detail-icon, .profile-row-icon { width: 34px; height: 34px; border-radius: 8px; }
+      .profile-detail-icon svg, .profile-row-icon svg { width: 16px; height: 16px; }
+      .profile-side-stack .list-row { flex-wrap: wrap; gap: 9px; }
+      .profile-side-stack .list-row .secondary-button, .profile-side-stack .list-row .text-link { margin-left: 45px; }
     }
     .list-date { width: 44px; flex: none; color: var(--muted); font-size: 9px; text-align: right; }
     .status { display: inline-flex; padding: 4px 8px; border-radius: 20px; color: var(--green); background: var(--green-soft); font-size: 9px; font-weight: 660; }
