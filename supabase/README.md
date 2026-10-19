@@ -31,7 +31,8 @@ This folder contains the database schema and follow-up migrations for the INTEL-
 16. Apply `migrations/016_grant_attendance_upsert_access.sql` to allow PostgREST upserts for shared totals. Row-level policies still restrict writes to CRs and admins.
 17. Apply `migrations/017_remove_reviewed_attendance_concerns.sql` to let CRs/admins remove referred or resolved attendance concerns. Replies are removed with the concern.
 18. Apply `migrations/019_add_mst_pyq_resource_type.sql` to add the MST / PYQs resource type to the existing `resource_kind` enum.
-19. In Supabase Auth, create the owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and grant the initial elevated roles. Student access is already assigned automatically:
+19. Apply `migrations/020_grant_student_attendance_upsert_access.sql` to allow each Student to save their own attended-class count through PostgREST upsert. Row-level policies still restrict access to the account's own progress.
+20. In Supabase Auth, create the owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and grant the initial elevated roles. Student access is already assigned automatically:
 
 ```sql
 -- Replace both UUID placeholders with the two Auth user IDs.
@@ -46,11 +47,11 @@ union all
 select 'FRIEND_USER_UUID'::uuid, id, 'cr'::public.class_role from target_class;
 ```
 
-20. Confirm the two owners can sign in and that each new college account appears as a Student. Assign CR/Admin access from Admin workspace; only a CR can publish class updates, class logs, timetables, and reminders. Admins manage roles, review attendance concerns, and can upload or remove shared content.
+21. Confirm the two owners can sign in and that each new college account appears as a Student. Assign CR/Admin access from Admin workspace; only a CR can publish class updates, class logs, timetables, and reminders. Admins manage roles, review attendance concerns, and can upload or remove shared content.
 
 ## Before sharing with the class
 
-- Apply all migrations through `019_add_mst_pyq_resource_type.sql` to the Supabase project used by the deployed site.
+- Apply all migrations through `020_grant_student_attendance_upsert_access.sql` to the Supabase project used by the deployed site.
 - Keep the Supabase service-role key out of frontend code and Vercel's public variables. The browser only needs the project URL and publishable key.
 - Keep the college email allowlist, Google OAuth redirect URLs, and Supabase site/redirect URLs pointed at the deployed Classboard domain.
 - Review college approval, account onboarding, data retention, backups, and who should receive CR/Admin permissions before sharing the sign-in link broadly.
