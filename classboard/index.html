@@ -280,6 +280,7 @@
     .class-log-kind-heading span { margin-left: auto; color: var(--muted); font-weight: 600; }
     .class-log-session-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
     .class-log-session { --class-accent: #397dcc; display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; grid-template-rows: auto auto; align-items: center; gap: 8px 10px; min-width: 0; margin: 0; padding: 11px 12px; border: 1px solid var(--line); border-top: 3px solid var(--class-accent); border-top-color: var(--class-accent); border-radius: 10px; background: var(--surface); }
+    .class-log-session-grid > .class-log-session:first-child { border-top: 3px solid var(--class-accent); }
     .class-log-session[data-kind="lab"] { --class-accent: #2788dc; }
     .class-log-session[data-subject-color="red"] { --class-accent: #df4c55; }
     .class-log-session[data-subject-color="purple"] { --class-accent: #8957d8; }
