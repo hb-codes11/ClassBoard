@@ -661,7 +661,7 @@
               if (savedProgress.error) throw savedProgress.error;
             }
             heldInput.value = String(activeStaff ? enteredHeld : held);
-            heldInput.max = String(heldInput.value);
+            attendedInput.max = String(heldInput.value);
             attendedInput.value = String(enteredAttended);
             card.updateAttendancePlan?.();
             notifyApp(activeStaff && activeRoles.includes('student') && !savePersonalAttendance
