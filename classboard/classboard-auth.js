@@ -221,15 +221,39 @@
     }
     const body = document.createElement('div'); body.className = 'update-body';
     const bodyText = String(update.body || '').trim();
-    if (bodyText && !(urgent && /^urgent[.!]?$/i.test(bodyText))) body.textContent = bodyText;
+    let readableBody = bodyText;
+    let sessionUrl = null;
+    if (update.isReminder) {
+      const linkMatch = bodyText.match(/https?:\/\/[^\s<>"']+/i);
+      if (linkMatch) {
+        const candidate = linkMatch[0].replace(/[.,;!?)}\]]+$/, '');
+        try {
+          const parsedUrl = new URL(candidate);
+          if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+            sessionUrl = parsedUrl.href;
+            readableBody = bodyText.replace(candidate, '').replace(/\b(?:session\s*)?link\s*:\s*/gi, ' ').replace(/\s*[,·|]\s*/g, ' · ').replace(/^(?:\s*·\s*)+|(?:\s*·\s*)+$/g, '').replace(/\s+/g, ' ').trim();
+          }
+        } catch {}
+      }
+    }
+    if (readableBody && !(urgent && /^urgent[.!]?$/i.test(readableBody))) body.textContent = readableBody;
     const time = document.createElement('div');
     time.className = 'update-time';
     const dueAt = update.isReminder ? update.due_at : cardType === 'deadline' ? update.expires_at : null;
     time.textContent = dueAt
-      ? `Due ${new Date(dueAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`
+      ? `${update.isReminder ? 'Reminder due' : 'Due'} ${new Date(dueAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`
       : `Posted ${new Date(update.published_at || update.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`;
     copy.append(title);
-    if (bodyText && !(urgent && /^urgent[.!]?$/i.test(bodyText))) copy.append(body);
+    if (readableBody && !(urgent && /^urgent[.!]?$/i.test(readableBody))) copy.append(body);
+    if (sessionUrl) {
+      const joinLink = document.createElement('a');
+      joinLink.className = 'update-join-link';
+      joinLink.href = sessionUrl;
+      joinLink.target = '_blank';
+      joinLink.rel = 'noopener noreferrer';
+      joinLink.textContent = 'Join session ↗';
+      copy.append(joinLink);
+    }
     copy.append(time);
     card.append(dateTile, icon, copy);
     card.append(makeDeleteButton(update.isReminder ? 'Delete reminder' : 'Delete update', true));
