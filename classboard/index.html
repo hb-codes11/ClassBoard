@@ -340,6 +340,7 @@
     .attendance-form > .field-label { min-width: 0; }
     .attendance-form .select-field, .attendance-form .text-field, .attendance-form .text-area { width: 100%; min-width: 0; max-width: 100%; }
     .field-label { display: grid; gap: 6px; color: var(--muted); font-size: 10px; }
+    .field-label[hidden] { display: none; }
     .text-field { width: 100%; }
     .calculator-result { grid-column: 1 / -1; padding: 17px; margin-top: 2px; border-radius: 10px; background: var(--blue-soft); }
     .calculator-value { font-weight: 750; font-size: 26px; letter-spacing: -.04em; color: var(--blue); }
@@ -1178,6 +1179,7 @@
     ['crClassForm', 'crScheduleForm'].forEach((formId) => {
       const form = document.getElementById(formId);
       form.querySelector('[name="sessionType"]').addEventListener('change', () => syncLabBatchField(form));
+      form.addEventListener('reset', () => requestAnimationFrame(() => syncLabBatchField(form)));
       syncLabBatchField(form);
     });
     document.getElementById('crClassForm').addEventListener('submit', (event) => {
