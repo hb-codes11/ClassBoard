@@ -396,9 +396,8 @@
     .home-attendance-empty { padding: 0 17px 15px; color: var(--muted); font-size: 11px; }
     .site-footer { display: flex; justify-content: space-between; gap: 12px; padding: 18px 0 8px; margin-top: auto; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
     .footer-credit { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
-    .footer-wordmark { position: relative; display: inline-block; color: #123b8a; font-weight: 800; letter-spacing: .015em; }
-    .footer-web { position: absolute; z-index: 0; top: 50%; right: -80px; width: 80px; height: 34px; overflow: visible; transform: translateY(-50%); }
-    .footer-wordmark-text { position: relative; z-index: 1; }
+    .footer-wordmark { color: var(--text); font-weight: 800; letter-spacing: .015em; }
+    .footer-web-emoji { display: inline-block; margin-left: 2px; color: var(--text); font-size: 15px; font-weight: 800; filter: grayscale(1) brightness(.48); }
     .role-switcher { height: 36px; max-width: 170px; padding: 0 38px 0 12px; border: 1px solid var(--line); border-radius: 9px; background-color: var(--surface); color: var(--text); font: inherit; font-size: 12px; cursor: pointer; }
     .panel, .stat-card, .action-tile, .resource-card, .list-row, .panel-header, .page-heading { min-width: 0; }
     .panel-title, .panel-sub, .page-description, .update-title, .update-body, .update-time, .resource-title, .resource-meta, .reminder-title, .reminder-detail, .list-title, .list-detail, .class-name, .class-room, .stat-note, .profile-name, .profile-role { min-width: 0; overflow-wrap: anywhere; }
@@ -911,7 +910,7 @@
             </div>
           </div>
         </section>
-        <footer class="site-footer"><span>About Classboard · AI &amp; Analytics - A (INTEL-1), 3rd Semester</span><span class="footer-credit"><span>Developed by</span><span class="footer-wordmark"><span class="footer-wordmark-text">WEBCORE</span><svg class="footer-web" viewBox="0 0 88 38" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.1"><path stroke="#d93642" d="M0 19C19 19 32 18 44 15S65 7 78 2"/><path stroke="#2459bd" d="M0 19C19 19 32 20 44 23S65 31 78 36"/><path stroke="#6689cf" d="M0 19C25 19 48 19 78 19"/><path stroke="#d93642" d="M78 2Q82 10 86 19M86 19Q82 28 78 36"/><path stroke="#2459bd" d="M78 2Q70 5 65 9M86 19Q76 15 68 14M86 19Q76 23 68 24M78 36Q70 33 65 29"/><path stroke="#6689cf" d="M65 9Q76 10 82 10M68 14Q78 15 85 15M68 24Q78 23 85 23M65 29Q76 28 82 28"/></g></svg></span></span></footer>
+        <footer class="site-footer"><span>About Classboard · AI &amp; Analytics - A (INTEL-1), 3rd Semester</span><span class="footer-credit"><span>Developed by</span><span class="footer-wordmark">WEBCORE</span><span class="footer-web-emoji" aria-label="spider web">🕸️</span></span></footer>
       </div>
     </main>
     <nav class="mobile-nav" aria-label="Mobile navigation">
