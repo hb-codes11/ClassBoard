@@ -223,18 +223,16 @@
     const bodyText = String(update.body || '').trim();
     let readableBody = bodyText;
     let sessionUrl = null;
-    if (update.isReminder) {
-      const linkMatch = bodyText.match(/https?:\/\/[^\s<>"']+/i);
-      if (linkMatch) {
-        const candidate = linkMatch[0].replace(/[.,;!?)}\]]+$/, '');
-        try {
-          const parsedUrl = new URL(candidate);
-          if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
-            sessionUrl = parsedUrl.href;
-            readableBody = bodyText.replace(candidate, '').replace(/\b(?:session\s*)?link\s*:\s*/gi, ' ').replace(/\s*[,·|]\s*/g, ' · ').replace(/^(?:\s*·\s*)+|(?:\s*·\s*)+$/g, '').replace(/\s+/g, ' ').trim();
-          }
-        } catch {}
-      }
+    const linkMatch = bodyText.match(/https?:\/\/[^\s<>"']+/i);
+    if (linkMatch) {
+      const candidate = linkMatch[0].replace(/[.,;!?)}\]]+$/, '');
+      try {
+        const parsedUrl = new URL(candidate);
+        if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+          sessionUrl = parsedUrl.href;
+          readableBody = bodyText.replace(candidate, '').replace(/\b(?:(?:session|meeting)\s*)?(?:link|url)\s*:\s*/gi, ' ').replace(/\s*[,·|]\s*/g, ' · ').replace(/^(?:\s*·\s*)+|(?:\s*·\s*)+$/g, '').replace(/\s+/g, ' ').trim();
+        }
+      } catch {}
     }
     if (readableBody && !(urgent && /^urgent[.!]?$/i.test(readableBody))) body.textContent = readableBody;
     const time = document.createElement('div');
@@ -245,17 +243,18 @@
       : `Posted ${new Date(update.published_at || update.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`;
     copy.append(title);
     if (readableBody && !(urgent && /^urgent[.!]?$/i.test(readableBody))) copy.append(body);
+    let joinLink = null;
     if (sessionUrl) {
-      const joinLink = document.createElement('a');
+      joinLink = document.createElement('a');
       joinLink.className = 'update-join-link';
       joinLink.href = sessionUrl;
       joinLink.target = '_blank';
       joinLink.rel = 'noopener noreferrer';
-      joinLink.textContent = 'Join session ↗';
-      copy.append(joinLink);
+      joinLink.textContent = update.isReminder ? 'Join session ↗' : 'Open link ↗';
     }
     copy.append(time);
     card.append(dateTile, icon, copy);
+    if (joinLink) card.append(joinLink);
     card.append(makeDeleteButton(update.isReminder ? 'Delete reminder' : 'Delete update', true));
     return card;
   }
