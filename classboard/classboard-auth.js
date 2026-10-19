@@ -492,44 +492,66 @@
     }
   }
 
-  function renderHomeAttendanceSummary(subjects, sharedRows, personalRows) {
-    const percentElement = document.getElementById('homeAttendancePercent');
-    const textElement = document.getElementById('homeAttendanceText');
-    const progressElement = document.getElementById('homeAttendanceProgress');
-    const progressFill = document.getElementById('homeAttendanceProgressFill');
-    if (!percentElement || !textElement || !progressElement || !progressFill) return;
+  function renderHomeAttendanceSummary(subjects, sharedRows, personalRows, rollNumber) {
+    const root = document.getElementById('homeAttendanceSummary');
+    if (!root) return;
 
-    const subjectIds = new Set((subjects || []).map((subject) => subject.id));
-    const heldBySubject = new Map((sharedRows || [])
-      .filter((row) => row.kind === 'lecture' && row.batch === 'all' && subjectIds.has(row.subject_id))
-      .map((row) => [row.subject_id, Number(row.classes_held) || 0]));
-    const attendedBySubject = new Map((personalRows || [])
-      .filter((row) => row.kind === 'lecture' && row.batch === 'all' && subjectIds.has(row.subject_id))
-      .map((row) => [row.subject_id, Number(row.attended_classes) || 0]));
-    let totalHeld = 0;
-    let totalAttended = 0;
-    let trackedSubjects = 0;
+    const subjectById = new Map((subjects || []).map((subject) => [subject.id, subject]));
+    const heldByKey = new Map((sharedRows || []).map((row) => [
+      `${row.subject_id}:${row.kind}:${row.batch}`,
+      Number(row.classes_held) || 0
+    ]));
+    const roll = Number(rollNumber);
+    const studentBatch = roll >= 1 && roll <= 32 ? 'A1' : roll >= 33 && roll <= 66 ? 'A2' : null;
+    const entries = (personalRows || []).reduce((items, row) => {
+      const subject = subjectById.get(row.subject_id);
+      if (!subject || !['lecture', 'lab'].includes(row.kind)) return items;
+      if (row.kind === 'lecture' && row.batch !== 'all') return items;
+      if (row.kind === 'lab' && studentBatch && row.batch !== studentBatch) return items;
+      const held = heldByKey.get(`${row.subject_id}:${row.kind}:${row.batch}`) || 0;
+      if (!held) return items;
+      const attended = Number(row.attended_classes) || 0;
+      const percentage = Math.min(100, attended / held * 100);
+      items.push({
+        name: subject.name,
+        meta: `${row.kind === 'lab' ? `Lab · ${row.batch} · ` : 'Lecture · '}${attended} of ${held} classes`,
+        percentage
+      });
+      return items;
+    }, []).sort((left, right) => right.percentage - left.percentage || left.name.localeCompare(right.name));
 
-    attendedBySubject.forEach((attended, subjectId) => {
-      totalHeld += heldBySubject.get(subjectId) || 0;
-      totalAttended += attended;
-      trackedSubjects += 1;
-    });
-
-    if (!trackedSubjects) {
-      percentElement.textContent = '—';
-      textElement.textContent = totalHeld
-        ? `${totalHeld} lecture classes held · add your attended counts in the planner.`
-        : 'No attendance figures entered yet.';
-      progressElement.hidden = true;
+    root.replaceChildren();
+    if (!entries.length) {
+      const empty = document.createElement('div');
+      empty.className = 'home-attendance-empty';
+      empty.textContent = 'Add attendance in the planner to see your subject and lab summaries.';
+      root.append(empty);
       return;
     }
 
-    const percentage = totalHeld ? Math.min(100, totalAttended / totalHeld * 100) : 0;
-    percentElement.textContent = `${percentage.toFixed(1)}%`;
-    textElement.textContent = `${totalAttended} of ${totalHeld} lecture classes · ${trackedSubjects} ${trackedSubjects === 1 ? 'subject' : 'subjects'}`;
-    progressFill.style.setProperty('--percent', `${percentage}%`);
-    progressElement.hidden = false;
+    entries.slice(0, 3).forEach((entry) => {
+      const row = document.createElement('div');
+      row.className = 'home-attendance-row';
+      const details = document.createElement('div');
+      const name = document.createElement('div');
+      name.className = 'home-attendance-name';
+      name.textContent = entry.name;
+      const meta = document.createElement('div');
+      meta.className = 'home-attendance-meta';
+      meta.textContent = entry.meta;
+      details.append(name, meta);
+      const value = document.createElement('div');
+      value.className = 'home-attendance-value';
+      value.textContent = `${entry.percentage.toFixed(1)}%`;
+      const progress = document.createElement('div');
+      progress.className = 'progress';
+      progress.setAttribute('aria-label', `${entry.name} attendance ${entry.percentage.toFixed(1)}%`);
+      const fill = document.createElement('span');
+      fill.style.setProperty('--percent', `${entry.percentage}%`);
+      progress.append(fill);
+      row.append(details, value, progress);
+      root.append(row);
+    });
   }
 
   async function loadAttendancePlanner(classId, userId, roles, rollNumber) {
@@ -555,7 +577,7 @@
       notifyApp(`Could not load attendance figures: ${(countsResult.error || progressResult.error).message}`, true);
       return;
     }
-    renderHomeAttendanceSummary(window.classboardSubjects, countsResult.data, progressResult.data);
+    renderHomeAttendanceSummary(window.classboardSubjects, countsResult.data, progressResult.data, rollNumber);
     const countKey = (subjectId, kind, batch) => `${subjectId}:${kind}:${batch}`;
     const heldCounts = new Map((countsResult.data || []).map((row) => [countKey(row.subject_id, row.kind, row.batch), row.classes_held]));
     const personalCounts = new Map((progressResult.data || []).map((row) => [countKey(row.subject_id, row.kind, row.batch), row.attended_classes]));
