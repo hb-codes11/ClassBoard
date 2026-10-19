@@ -81,16 +81,16 @@
     .help-title { font-size: 12px; font-weight: 680; margin-bottom: 4px; }
     .help-copy { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
     .help-link { padding: 0; border: 0; background: none; color: var(--blue); font-size: 11px; font-weight: 680; cursor: pointer; }
-    .profile { display: flex; align-items: center; gap: 10px; padding: 13px 8px 0; border-top: 1px solid var(--line); }
-    .profile { border: 0; border-top: 1px solid var(--line); width: 100%; background: transparent; text-align: left; cursor: pointer; border-radius: 8px; }
+    .profile { position: relative; display: grid; grid-template-columns: 36px minmax(0, 1fr); align-items: center; gap: 9px; width: 100%; padding: 11px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); text-align: left; cursor: pointer; }
     .profile:hover { background: var(--surface-2); }
-    .avatar { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; flex: none; background: #dcecff; color: #155da2; font-size: 11px; font-weight: 750; }
+    .avatar { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; flex: none; background: #dcecff; color: #155da2; font-size: 11px; font-weight: 750; }
     [data-theme="dark"] .avatar { color: #b8d9ff; background: #203c5c; }
-    .profile-name { font-size: 12px; font-weight: 650; }
-    .profile-role { font-size: 10px; color: var(--muted); }
-    .dots { margin-left: auto; color: var(--muted); border: 0; background: none; font-size: 19px; cursor: pointer; }
+    .profile-copy { min-width: 0; padding-right: 20px; }
+    .profile-name { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: 13px; line-height: 1.3; font-weight: 700; }
+    .profile-role { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; margin-top: 3px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .dots { position: absolute; top: 5px; right: 6px; display: grid; place-items: center; width: 24px; height: 24px; padding: 0; color: var(--muted); border: 0; border-radius: 6px; background: transparent; font-size: 18px; cursor: pointer; }
     .dots:hover { color: var(--blue); }
-    .profile-menu { position: absolute; left: 15px; bottom: 76px; z-index: 8; width: 205px; padding: 7px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: 0 12px 35px #10243b24; }
+    .profile-menu { position: absolute; left: 0; bottom: calc(100% + 8px); z-index: 8; width: min(205px, calc(100vw - 30px)); padding: 7px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: 0 12px 35px #10243b24; }
     .profile-menu[hidden] { display: none; }
     .profile-menu button { width: 100%; padding: 10px 11px; border: 0; border-radius: 7px; background: transparent; color: var(--text); text-align: left; font-size: 13px; cursor: pointer; }
     .profile-menu button:hover { color: var(--blue); background: var(--blue-soft); }
@@ -700,7 +700,7 @@
       </nav>
       <div class="sidebar-bottom">
         <div class="profile-wrap">
-          <div class="profile" id="sidebarProfile" role="button" tabindex="0" aria-label="Open profile"><div class="avatar">CB</div><div><div class="profile-name">Your account</div><div class="profile-role">Class member</div></div><button class="dots" id="profileMenuToggle" aria-label="More profile options" aria-expanded="false">···</button></div>
+          <div class="profile" id="sidebarProfile" role="button" tabindex="0" aria-label="Open profile"><div class="avatar">CB</div><div class="profile-copy"><div class="profile-name">Your account</div><div class="profile-role">Class member</div></div><button class="dots" id="profileMenuToggle" aria-label="More profile options" aria-expanded="false">···</button></div>
           <div class="profile-menu" id="profileMenu" hidden><button data-page="profile">View profile</button><button id="themeMenuToggle">Change appearance</button><button id="signOutButton">Sign out</button></div>
         </div>
       </div>
