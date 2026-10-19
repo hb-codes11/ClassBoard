@@ -492,6 +492,46 @@
     }
   }
 
+  function renderHomeAttendanceSummary(subjects, sharedRows, personalRows) {
+    const percentElement = document.getElementById('homeAttendancePercent');
+    const textElement = document.getElementById('homeAttendanceText');
+    const progressElement = document.getElementById('homeAttendanceProgress');
+    const progressFill = document.getElementById('homeAttendanceProgressFill');
+    if (!percentElement || !textElement || !progressElement || !progressFill) return;
+
+    const subjectIds = new Set((subjects || []).map((subject) => subject.id));
+    const heldBySubject = new Map((sharedRows || [])
+      .filter((row) => row.kind === 'lecture' && row.batch === 'all' && subjectIds.has(row.subject_id))
+      .map((row) => [row.subject_id, Number(row.classes_held) || 0]));
+    const attendedBySubject = new Map((personalRows || [])
+      .filter((row) => row.kind === 'lecture' && row.batch === 'all' && subjectIds.has(row.subject_id))
+      .map((row) => [row.subject_id, Number(row.attended_classes) || 0]));
+    let totalHeld = 0;
+    let totalAttended = 0;
+    let trackedSubjects = 0;
+
+    attendedBySubject.forEach((attended, subjectId) => {
+      totalHeld += heldBySubject.get(subjectId) || 0;
+      totalAttended += attended;
+      trackedSubjects += 1;
+    });
+
+    if (!trackedSubjects) {
+      percentElement.textContent = '—';
+      textElement.textContent = totalHeld
+        ? `${totalHeld} lecture classes held · add your attended counts in the planner.`
+        : 'No attendance figures entered yet.';
+      progressElement.hidden = true;
+      return;
+    }
+
+    const percentage = totalHeld ? Math.min(100, totalAttended / totalHeld * 100) : 0;
+    percentElement.textContent = `${percentage.toFixed(1)}%`;
+    textElement.textContent = `${totalAttended} of ${totalHeld} lecture classes · ${trackedSubjects} ${trackedSubjects === 1 ? 'subject' : 'subjects'}`;
+    progressFill.style.setProperty('--percent', `${percentage}%`);
+    progressElement.hidden = false;
+  }
+
   async function loadAttendancePlanner(classId, userId, roles, rollNumber) {
     const client = window.classboardSupabase;
     const cards = [...document.querySelectorAll('#page-attendance [data-subject-card]')];
@@ -515,6 +555,7 @@
       notifyApp(`Could not load attendance figures: ${(countsResult.error || progressResult.error).message}`, true);
       return;
     }
+    renderHomeAttendanceSummary(window.classboardSubjects, countsResult.data, progressResult.data);
     const countKey = (subjectId, kind, batch) => `${subjectId}:${kind}:${batch}`;
     const heldCounts = new Map((countsResult.data || []).map((row) => [countKey(row.subject_id, row.kind, row.batch), row.classes_held]));
     const personalCounts = new Map((progressResult.data || []).map((row) => [countKey(row.subject_id, row.kind, row.batch), row.attended_classes]));
@@ -596,7 +637,7 @@
             attendedInput.value = String(enteredAttended);
             card.updateAttendancePlan?.();
             notifyApp(activeStaff ? (activeRoles.includes('student') ? 'Shared classes-held total and your attendance were saved.' : 'Shared classes-held total was saved.') : 'Your attended-class count was saved.');
-            if (activeStaff) await loadAttendancePlanner(classId, userId, roles, rollNumber);
+            await loadAttendancePlanner(classId, userId, roles, rollNumber);
           } catch (error) {
             notifyApp(`Attendance figures did not save: ${error.message}`, true);
           } finally {

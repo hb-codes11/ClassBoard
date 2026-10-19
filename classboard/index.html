@@ -337,6 +337,11 @@
     .home-attendance-panel .subject-attendance-count { font-size: 11px; }
     .home-attendance-panel .subject-attendance-percent { font-size: 18px; }
     .home-attendance-panel .progress { height: 5px; margin-top: 6px; }
+    .home-attendance-summary { padding: 0 17px 15px; }
+    .home-attendance-summary-line { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px 9px; color: var(--muted); font-size: 11px; }
+    .home-attendance-summary-line strong { color: var(--text); font-size: 22px; letter-spacing: -.04em; }
+    .home-attendance-summary .progress { margin: 7px 0 0; }
+    .home-attendance-summary .progress[hidden] { display: none; }
     .site-footer { display: flex; justify-content: space-between; gap: 12px; padding: 18px 0 8px; margin-top: auto; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
     .role-switcher { height: 36px; max-width: 170px; padding: 0 38px 0 12px; border: 1px solid var(--line); border-radius: 9px; background-color: var(--surface); color: var(--text); font: inherit; font-size: 12px; cursor: pointer; }
     .panel, .stat-card, .action-tile, .resource-card, .list-row, .panel-header, .page-heading { min-width: 0; }
@@ -708,7 +713,7 @@
           </div>
 
           <div class="stack">
-            <article class="panel home-attendance-panel"><div class="panel-header"><div><div class="panel-title">Attendance planner</div><div class="panel-sub">Add your own attendance figures for an estimate.</div></div><button class="text-link" data-page="attendance">Open planner →</button></div><div class="page-description live-empty" style="padding:0 17px 15px">No attendance figures entered yet.</div></article>
+            <article class="panel home-attendance-panel"><div class="panel-header"><div><div class="panel-title">Attendance planner</div><div class="panel-sub">Your saved lecture attendance.</div></div><button class="text-link" data-page="attendance">Open planner →</button></div><div class="home-attendance-summary" id="homeAttendanceSummary" aria-live="polite"><div class="home-attendance-summary-line"><strong id="homeAttendancePercent">—</strong><span id="homeAttendanceText">No attendance figures entered yet.</span></div><div class="progress" id="homeAttendanceProgress" hidden><span id="homeAttendanceProgressFill" style="--percent:0%"></span></div></div></article>
             <article class="panel">
               <div class="panel-header"><div><div class="panel-title">Coming up</div><div class="panel-sub">Dates to remember</div></div><button class="text-link" data-page="updates">See all →</button></div>
               <div id="homeReminderList"></div>
