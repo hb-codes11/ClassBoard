@@ -621,14 +621,20 @@
           const activeStaff = activeRoles.includes('cr') || activeRoles.includes('admin');
           const enteredHeld = Number(heldInput.value);
           const enteredAttended = Number(attendedInput.value);
-          if (!Number.isInteger(enteredAttended) || enteredAttended < 0 || enteredAttended > Number(heldInput.value)) {
-            notifyApp('Attended classes must be between 0 and the shared classes-held total.', true);
+          if (!Number.isInteger(enteredAttended) || enteredAttended < 0) {
+            notifyApp('Attended classes must be a whole number of 0 or more.', true);
             return;
           }
-          if (activeStaff && (!Number.isInteger(enteredHeld) || enteredHeld < 0 || enteredAttended > enteredHeld)) {
-            notifyApp('Classes held must be a whole number at least as large as your attended count.', true);
+          if (!activeStaff && enteredAttended > Number(heldInput.value)) {
+            notifyApp('Attended classes cannot exceed the shared classes-held total.', true);
             return;
           }
+          if (activeStaff && (!Number.isInteger(enteredHeld) || enteredHeld < 0)) {
+            notifyApp('Classes held must be a whole number of 0 or more.', true);
+            return;
+          }
+          const savePersonalAttendance = activeRoles.includes('student')
+            && enteredAttended <= (activeStaff ? enteredHeld : Number(heldInput.value));
           const activeSubject = subjectByName.get(card.dataset.attendanceSubjectName || String(card.dataset.subjectName || '').replace(/ Lab$/, ''));
           if (!activeSubject) {
             notifyApp('Could not identify this subject. Refresh and try again.', true);
@@ -647,7 +653,7 @@
               }, { onConflict: 'class_id,subject_id,kind,batch' }).select('classes_held').maybeSingle();
               if (savedHeld.error) throw savedHeld.error;
             }
-            if (activeRoles.includes('student')) {
+            if (savePersonalAttendance) {
               const savedProgress = await client.from('student_attendance_progress').upsert({
                 class_id: classId, user_id: userId, subject_id: activeSubject.id, kind: activeKind,
                 batch: activeBatch, attended_classes: enteredAttended
@@ -658,7 +664,9 @@
             heldInput.max = String(heldInput.value);
             attendedInput.value = String(enteredAttended);
             card.updateAttendancePlan?.();
-            notifyApp(activeStaff ? (activeRoles.includes('student') ? 'Shared classes-held total and your attendance were saved.' : 'Shared classes-held total was saved.') : 'Your attended-class count was saved.');
+            notifyApp(activeStaff && activeRoles.includes('student') && !savePersonalAttendance
+              ? 'Shared total saved. Your attended count is above it; update your own count to continue.'
+              : activeStaff ? (activeRoles.includes('student') ? 'Shared classes-held total and your attendance were saved.' : 'Shared classes-held total was saved.') : 'Your attended-class count was saved.', activeStaff && activeRoles.includes('student') && !savePersonalAttendance);
             await loadAttendancePlanner(classId, userId, roles, rollNumber);
           } catch (error) {
             notifyApp(`Attendance figures did not save: ${error.message}`, true);
