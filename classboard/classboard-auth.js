@@ -265,6 +265,9 @@
     if (!compact && /software engineering/.test(subjectName)) row.dataset.subjectColor = 'violet';
     else if (!compact && /artificial intelligence/.test(subjectName)) row.dataset.subjectColor = 'orange';
     else if (!compact && /statistical analysis/.test(subjectName)) row.dataset.subjectColor = 'green';
+    else if (!compact && /computer organisation|computer organization/.test(subjectName)) row.dataset.subjectColor = 'teal';
+    else if (!compact && /java programming/.test(subjectName)) row.dataset.subjectColor = 'blue';
+    else if (!compact && /soft skills/.test(subjectName)) row.dataset.subjectColor = 'rose';
     const dateBox = document.createElement('div');
     if (compact) {
       dateBox.className = 'reminder-date';
@@ -466,7 +469,8 @@
     classLogList.replaceChildren();
     if (!sessions.length) addEmptyNote(classLogList, 'No class sessions have been added yet.');
     const dayGroups = new Map();
-    sessions.forEach((session) => {
+    const chronologicalSessions = [...sessions].sort((first, second) => new Date(first.starts_at) - new Date(second.starts_at));
+    chronologicalSessions.forEach((session) => {
       const date = new Date(session.starts_at);
       const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
       if (!dayGroups.has(key)) {
@@ -482,7 +486,7 @@
         const kindGroup = document.createElement('section'); kindGroup.className = 'class-log-kind-group'; kindGroup.dataset.classLogKind = category;
         const kindHeading = document.createElement('div'); kindHeading.className = 'class-log-kind-heading';
         kindHeading.textContent = category === 'lab' ? 'Labs' : 'Lectures';
-        const count = document.createElement('span'); count.textContent = String(sessions.filter((item) => {
+        const count = document.createElement('span'); count.textContent = String(chronologicalSessions.filter((item) => {
           const itemDate = new Date(item.starts_at);
           return itemDate.getFullYear() === date.getFullYear() && itemDate.getMonth() === date.getMonth() && itemDate.getDate() === date.getDate() && (item.kind === 'lab' ? 'lab' : 'lecture') === category;
         }).length);
