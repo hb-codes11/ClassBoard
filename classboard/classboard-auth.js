@@ -266,7 +266,7 @@
   }
 
   function resourceKindLabel(kind) {
-    return ({ notes: 'Notes', syllabus: 'Syllabus', lab_manual: 'Lab manual', calendar: 'Calendar' })[kind] || kind;
+    return ({ notes: 'Notes', syllabus: 'Syllabus', lab_manual: 'Lab manual', mst_pyq: 'MST / PYQs', calendar: 'Calendar' })[kind] || kind;
   }
 
   async function signedResourceUrl(path) {
@@ -1299,7 +1299,7 @@
       }
       const subjectResult = await window.classboardSupabase.from('subjects').select('id,name').eq('class_id', context.classId);
       if (subjectResult.error) { notifyApp(`Could not load subjects: ${subjectResult.error.message}`, true); return; }
-      const kind = ({ Notes: 'notes', Syllabus: 'syllabus', 'Lab manual': 'lab_manual', 'Academic calendar': 'calendar' })[String(values.get('type'))];
+      const kind = ({ Notes: 'notes', Syllabus: 'syllabus', 'Lab manual': 'lab_manual', 'MST / PYQs': 'mst_pyq', 'Academic calendar': 'calendar' })[String(values.get('type'))];
       const subject = kind === 'calendar' ? null : subjectResult.data.find((item) => item.name === values.get('subject'));
       if (kind !== 'calendar' && !subject) { notifyApp('Choose one of the listed class subjects.', true); return; }
       const resourceId = crypto.randomUUID();
