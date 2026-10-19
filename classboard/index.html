@@ -532,6 +532,17 @@
       .toolbar > * { min-width: 0; }
       .toolbar .search-field { flex-basis: 100%; }
       .toolbar .select-field, .toolbar .primary-button, .toolbar .secondary-button { flex: 1 1 auto; }
+      .tabs { max-width: 100%; gap: 16px; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: none; }
+      .tabs::-webkit-scrollbar { display: none; }
+      .tab { flex: 0 0 auto; min-height: 40px; white-space: nowrap; }
+      .resource-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+      .resource-card { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: start; gap: 8px 11px; padding: 12px; }
+      .resource-card > .file-icon { grid-column: 1; grid-row: 1 / span 3; width: 34px; height: 36px; }
+      .resource-card > .list-main { grid-column: 2; grid-row: 1; width: 100%; min-width: 0; flex: none; }
+      .resource-card .resource-title { font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+      .resource-card .resource-meta { font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; }
+      .resource-card .resource-actions { grid-column: 2; grid-row: 2; justify-self: start; margin: 2px 0 0; }
+      .resource-card > .delete-content-button { grid-column: 2; grid-row: 3; justify-self: start; margin: 0; }
       .workspace-form, .attendance-form { grid-template-columns: minmax(0, 1fr); }
       .attendance-form > * { grid-column: 1 / -1 !important; }
       .form-actions { flex-wrap: wrap; }
