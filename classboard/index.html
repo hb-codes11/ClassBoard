@@ -395,6 +395,11 @@
     .home-attendance-row .progress span { width: var(--percent); }
     .home-attendance-empty { padding: 0 17px 15px; color: var(--muted); font-size: 11px; }
     .site-footer { display: flex; justify-content: space-between; gap: 12px; padding: 18px 0 8px; margin-top: auto; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .footer-credit { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+    .footer-wordmark { position: relative; display: inline-block; color: #123b8a; font-weight: 800; letter-spacing: .015em; }
+    .footer-wordmark::before { position: absolute; z-index: 0; top: 50%; right: 1px; left: 0; height: 1px; background: linear-gradient(90deg, #d93642, #2459bd); content: ""; }
+    .footer-web { position: absolute; z-index: 0; top: 50%; right: -15px; width: 30px; height: 30px; overflow: visible; transform: translateY(-50%); filter: drop-shadow(0 1px 1px rgb(18 59 138 / 18%)); }
+    .footer-wordmark-text { position: relative; z-index: 1; }
     .role-switcher { height: 36px; max-width: 170px; padding: 0 38px 0 12px; border: 1px solid var(--line); border-radius: 9px; background-color: var(--surface); color: var(--text); font: inherit; font-size: 12px; cursor: pointer; }
     .panel, .stat-card, .action-tile, .resource-card, .list-row, .panel-header, .page-heading { min-width: 0; }
     .panel-title, .panel-sub, .page-description, .update-title, .update-body, .update-time, .resource-title, .resource-meta, .reminder-title, .reminder-detail, .list-title, .list-detail, .class-name, .class-room, .stat-note, .profile-name, .profile-role { min-width: 0; overflow-wrap: anywhere; }
@@ -907,7 +912,7 @@
             </div>
           </div>
         </section>
-        <footer class="site-footer"><span>About Classboard · AI &amp; Analytics - A (INTEL-1), 3rd Semester</span><span>Developed by WEBCORE🕸️</span></footer>
+        <footer class="site-footer"><span>About Classboard · AI &amp; Analytics - A (INTEL-1), 3rd Semester</span><span class="footer-credit"><span>Developed by</span><span class="footer-wordmark"><span class="footer-wordmark-text">WEBCORE</span><svg class="footer-web" viewBox="0 0 40 40" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="1.15"><path stroke="#2459bd" d="M20 20 38 4M20 20 39 15M20 20 38 27M20 20 31 39M20 20 9 39M20 20 2 29M20 20 2 13M20 20 10 2"/><path stroke="#d93642" d="M38 4Q20 8 10 2M39 15Q22 14 2 13M38 27Q21 24 2 29M31 39Q18 31 9 39"/><path stroke="#6689cf" d="M32 9Q21 13 15 9M35 20Q22 18 8 20M30 32Q19 26 7 26"/></g></svg></span></span></footer>
       </div>
     </main>
     <nav class="mobile-nav" aria-label="Mobile navigation">
