@@ -837,12 +837,12 @@
                 <form class="workspace-form" id="crUpdateForm"><label class="field-label">Update title<input class="text-field" name="title" placeholder="e.g. Schedule change" required maxlength="100"></label><label class="field-label">Type<select class="select-field" name="category"><option value="Important">Important</option><option value="Deadline">Deadline</option><option value="General">General update</option></select></label><label class="field-label" id="crUpdateDeadlineField" hidden>Deadline date and time<input class="text-field" name="deadline" type="datetime-local"></label><label class="field-label">Message<textarea class="text-area" name="message" placeholder="Write the details students need to know" required maxlength="500"></textarea></label><div class="form-actions"><button class="primary-button" type="submit">Publish update</button></div></form>
               </article>
               <article class="panel">
-                <div class="panel-header"><div><div class="panel-title">Log a class</div><div class="panel-sub">Record a held or cancelled class. This does not change official attendance.</div></div></div>
-                <form class="workspace-form" id="crClassForm"><label class="field-label">Subject<select class="select-field" name="subject"><option>Software Engineering</option><option>Statistical Analysis (SA)</option><option>Computer Organisation &amp; Microprocessors (COM)</option><option>Java Programming</option><option>Soft Skills</option><option>Artificial Intelligence (AI)</option></select></label><label class="field-label">Class type<select class="select-field" name="sessionType"><option>Lecture</option><option>Lab</option></select></label><label class="field-label">Batch<select class="select-field" name="batch"><option>All students</option><option>A1</option><option>A2</option><option>Both batches</option></select></label><div class="toolbar" style="margin:0"><label class="field-label" style="flex:1">Date<input class="text-field" type="date" name="date" required></label><label class="field-label" style="flex:1">Class number<input class="text-field" type="number" min="1" name="classNumber" placeholder="e.g. 21" required></label></div><label class="field-label">Status<select class="select-field" name="status"><option>Held</option><option>No class</option></select></label><label class="field-label">Topic or note<input class="text-field" name="note" placeholder="What was covered? (optional)" maxlength="120"></label><div class="form-actions"><button class="primary-button" type="submit">Save class log</button></div></form>
+                <div class="panel-header"><div><div class="panel-title">Log a class</div><div class="panel-sub">Lectures count once for both batches. For labs, add separate A1 and A2 entries. This does not change official attendance.</div></div></div>
+                <form class="workspace-form" id="crClassForm"><label class="field-label">Subject<select class="select-field" name="subject"><option>Software Engineering</option><option>Statistical Analysis (SA)</option><option>Computer Organisation &amp; Microprocessors (COM)</option><option>Java Programming</option><option>Soft Skills</option><option>Artificial Intelligence (AI)</option></select></label><label class="field-label">Class type<select class="select-field" name="sessionType"><option>Lecture</option><option>Lab</option></select></label><label class="field-label" data-lab-batch-field>Lab batch<select class="select-field" name="batch"><option>All students</option><option>A1</option><option>A2</option></select></label><div class="toolbar" style="margin:0"><label class="field-label" style="flex:1">Date<input class="text-field" type="date" name="date" required></label><label class="field-label" style="flex:1">Class number<input class="text-field" type="number" min="1" name="classNumber" placeholder="e.g. 21" required></label></div><label class="field-label">Status<select class="select-field" name="status"><option>Held</option><option>No class</option></select></label><label class="field-label">Topic or note<input class="text-field" name="note" placeholder="What was covered? (optional)" maxlength="120"></label><div class="form-actions"><button class="primary-button" type="submit">Save class log</button></div></form>
               </article>
               <article class="panel">
-                <div class="panel-header"><div><div class="panel-title">Add to the timetable</div><div class="panel-sub">Lectures and labs use one schedule. Choose a batch for each lab.</div></div></div>
-                <form class="workspace-form" id="crScheduleForm"><label class="field-label">Subject<select class="select-field" name="subject"><option>Software Engineering</option><option>Statistical Analysis (SA)</option><option>Computer Organisation &amp; Microprocessors (COM)</option><option>Java Programming</option><option>Soft Skills</option><option>Artificial Intelligence (AI)</option></select></label><label class="field-label">Class type<select class="select-field" name="sessionType"><option>Lecture</option><option>Lab</option></select></label><label class="field-label">Batch<select class="select-field" name="batch"><option>All students</option><option>A1</option><option>A2</option><option>Both batches</option></select></label><div class="toolbar" style="margin:0"><label class="field-label" style="flex:1">Date<input class="text-field" type="date" name="date" required></label><label class="field-label" style="flex:1">Start time<input class="text-field" type="time" name="time" required></label></div><label class="field-label">Room / lab<input class="text-field" name="room" placeholder="Building or room number" required maxlength="60"></label><div class="form-actions"><button class="primary-button" type="submit">Add class to timetable</button></div></form><div id="crScheduleList" class="workspace-table"></div>
+                <div class="panel-header"><div><div class="panel-title">Add to the timetable</div><div class="panel-sub">Lectures apply to both batches. Schedule each lab separately for A1 or A2.</div></div></div>
+                <form class="workspace-form" id="crScheduleForm"><label class="field-label">Subject<select class="select-field" name="subject"><option>Software Engineering</option><option>Statistical Analysis (SA)</option><option>Computer Organisation &amp; Microprocessors (COM)</option><option>Java Programming</option><option>Soft Skills</option><option>Artificial Intelligence (AI)</option></select></label><label class="field-label">Class type<select class="select-field" name="sessionType"><option>Lecture</option><option>Lab</option></select></label><label class="field-label" data-lab-batch-field>Lab batch<select class="select-field" name="batch"><option>All students</option><option>A1</option><option>A2</option></select></label><div class="toolbar" style="margin:0"><label class="field-label" style="flex:1">Date<input class="text-field" type="date" name="date" required></label><label class="field-label" style="flex:1">Start time<input class="text-field" type="time" name="time" required></label></div><label class="field-label">Room / lab<input class="text-field" name="room" placeholder="Building or room number" required maxlength="60"></label><div class="form-actions"><button class="primary-button" type="submit">Add class to timetable</button></div></form><div id="crScheduleList" class="workspace-table"></div>
               </article>
               <article class="panel"><div class="panel-header"><div><div class="panel-title">Add a reminder</div><div class="panel-sub">Share a deadline or date students should remember.</div></div></div><form class="workspace-form" id="crReminderForm"><label class="field-label">Reminder<input class="text-field" name="title" placeholder="e.g. Submit lab record" required maxlength="90"></label><label class="field-label">Date<input class="text-field" type="date" name="date" required></label><label class="field-label">Details<input class="text-field" name="details" placeholder="Time, room or what to bring" maxlength="140"></label><div class="form-actions"><button class="primary-button" type="submit">Publish reminder</button></div></form></article>
             </div>
@@ -1166,10 +1166,19 @@
     });
     document.querySelector('#crClassForm .field-label').closest('article').querySelector('.panel-sub').textContent = 'Lectures are for everyone; lab classes are recorded separately for A1 or A2.';
     document.querySelector('#crScheduleForm').closest('article').querySelector('.panel-sub').textContent = 'Lectures are for everyone. Add a separate A1 or A2 entry for each lab session.';
-    document.querySelector('#crClassForm [name="sessionType"]').addEventListener('change', (event) => {
-      const batchSelect = document.querySelector('#crClassForm [name="batch"]');
-      if (event.target.value === 'Lab' && batchSelect.value === 'All students') batchSelect.value = 'A1';
-      if (event.target.value === 'Lecture') batchSelect.value = 'All students';
+    function syncLabBatchField(form) {
+      const typeSelect = form.querySelector('[name="sessionType"]');
+      const batchSelect = form.querySelector('[name="batch"]');
+      const batchField = batchSelect.closest('[data-lab-batch-field]');
+      const isLab = typeSelect.value === 'Lab';
+      batchField.hidden = !isLab;
+      if (!isLab) batchSelect.value = 'All students';
+      else if (!['A1', 'A2'].includes(batchSelect.value)) batchSelect.value = 'A1';
+    }
+    ['crClassForm', 'crScheduleForm'].forEach((formId) => {
+      const form = document.getElementById(formId);
+      form.querySelector('[name="sessionType"]').addEventListener('change', () => syncLabBatchField(form));
+      syncLabBatchField(form);
     });
     document.getElementById('crClassForm').addEventListener('submit', (event) => {
       event.preventDefault();
@@ -1211,11 +1220,7 @@
       event.currentTarget.reset();
       showToast('Class log saved in this preview');
     });
-    document.querySelector('#crScheduleForm [name="sessionType"]').addEventListener('change', (event) => {
-      const batchSelect = document.querySelector('#crScheduleForm [name="batch"]');
-      if (event.target.value === 'Lab' && batchSelect.value === 'All students') batchSelect.value = 'A1';
-      if (event.target.value === 'Lecture') batchSelect.value = 'All students';
-    });
+    
     document.getElementById('crScheduleForm').addEventListener('submit', (event) => {
       event.preventDefault();
       const form = event.currentTarget;
