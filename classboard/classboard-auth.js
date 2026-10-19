@@ -1337,6 +1337,7 @@
       const subject = subjectResult.data.find((item) => item.name === values.get('subject'));
       const kind = String(values.get('sessionType')).toLowerCase();
       const batchValue = String(values.get('batch'));
+      if (kind === 'lab' && !['A1', 'A2'].includes(batchValue)) { notifyApp('Choose A1 or A2 for the lab.', true); return; }
       const { error } = await window.classboardSupabase.from('class_sessions').insert({
         class_id: context.classId,
         subject_id: subject?.id,
@@ -1367,6 +1368,7 @@
       const subject = subjectResult.data.find((item) => item.name === values.get('subject'));
       const kind = String(values.get('sessionType')).toLowerCase();
       const batchValue = String(values.get('batch'));
+      if (kind === 'lab' && !['A1', 'A2'].includes(batchValue)) { notifyApp('Choose A1 or A2 for the lab.', true); return; }
       const startsAt = new Date(`${values.get('date')}T${values.get('time')}:00+05:30`).toISOString();
       const { error } = await window.classboardSupabase.from('class_sessions').insert({
         class_id: context.classId,
