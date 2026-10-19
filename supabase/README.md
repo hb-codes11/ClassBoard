@@ -33,7 +33,8 @@ This folder contains the database schema and follow-up migrations for the INTEL-
 18. Apply `migrations/019_add_mst_pyq_resource_type.sql` to add the MST / PYQs resource type to the existing `resource_kind` enum.
 19. Apply `migrations/020_grant_student_attendance_upsert_access.sql` to allow each Student to save their own attended-class count through PostgREST upsert. Row-level policies still restrict access to the account's own progress.
 20. Apply `migrations/021_ignore_inactive_attendance_progress.sql` so deactivated accounts' old test attendance cannot block shared class totals. The guard still protects every active student's saved count.
-21. In Supabase Auth, create the owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and grant the initial elevated roles. Student access is already assigned automatically:
+21. Apply `migrations/022_allow_staff_to_correct_class_totals.sql` to let CRs/admins set the authoritative shared classes-held total without a student's saved planner count blocking the correction. Students still cannot save an attended count above the current shared total; if a total is lowered below an existing personal count, that student must correct their own count.
+22. In Supabase Auth, create the owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and grant the initial elevated roles. Student access is already assigned automatically:
 
 ```sql
 -- Replace both UUID placeholders with the two Auth user IDs.
@@ -48,11 +49,11 @@ union all
 select 'FRIEND_USER_UUID'::uuid, id, 'cr'::public.class_role from target_class;
 ```
 
-22. Confirm the two owners can sign in and that each new college account appears as a Student. Assign CR/Admin access from Admin workspace; only a CR can publish class updates, class logs, timetables, and reminders. Admins manage roles, review attendance concerns, and can upload or remove shared content.
+23. Confirm the two owners can sign in and that each new college account appears as a Student. Assign CR/Admin access from Admin workspace; only a CR can publish class updates, class logs, timetables, and reminders. Admins manage roles, review attendance concerns, and can upload or remove shared content.
 
 ## Before sharing with the class
 
-- Apply all migrations through `021_ignore_inactive_attendance_progress.sql` to the Supabase project used by the deployed site.
+- Apply all migrations through `022_allow_staff_to_correct_class_totals.sql` to the Supabase project used by the deployed site.
 - Keep the Supabase service-role key out of frontend code and Vercel's public variables. The browser only needs the project URL and publishable key.
 - Keep the college email allowlist, Google OAuth redirect URLs, and Supabase site/redirect URLs pointed at the deployed Classboard domain.
 - Review college approval, account onboarding, data retention, backups, and who should receive CR/Admin permissions before sharing the sign-in link broadly.
