@@ -270,6 +270,30 @@
     .notification-unread { width: 9px; height: 9px; border-radius: 50%; background: var(--blue); }
     .notification-read { opacity: .76; background: var(--surface); }
     .notification-read .notification-unread { visibility: hidden; }
+    #classLogList { display: grid; gap: 14px; padding: 14px; }
+    .class-log-day-group { min-width: 0; }
+    .class-log-day-heading { display: flex; align-items: center; gap: 10px; margin: 1px 2px 12px; font-size: 16px; font-weight: 730; }
+    .class-log-day-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--blue-soft); color: var(--blue); }
+    .class-log-day-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .class-log-kind-group + .class-log-kind-group { margin-top: 14px; }
+    .class-log-kind-heading { display: flex; align-items: center; gap: 8px; min-height: 38px; margin-bottom: 8px; padding: 0 11px; border-radius: 9px; background: var(--blue-soft); color: var(--text); font-size: 12px; font-weight: 700; }
+    .class-log-kind-heading span { margin-left: auto; color: var(--muted); font-weight: 600; }
+    .class-log-session-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+    .class-log-session { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; grid-template-rows: auto auto; align-items: center; gap: 8px 10px; min-width: 0; margin: 0; padding: 11px 12px; border: 1px solid var(--line); border-top: 3px solid var(--class-accent, var(--blue)); border-radius: 10px; background: var(--surface); }
+    .class-log-session[data-kind="lab"] { --class-accent: #2788dc; }
+    .class-log-session[data-subject-color="violet"] { --class-accent: #9655df; }
+    .class-log-session[data-subject-color="orange"] { --class-accent: #e67a2e; }
+    .class-log-session[data-subject-color="green"] { --class-accent: #27a77a; }
+    .class-log-time { display: grid; place-items: center; min-height: 38px; padding: 4px 6px; border-radius: 8px; background: var(--blue-soft); color: var(--blue); font-size: 11px; font-weight: 750; text-align: center; }
+    .class-log-session .list-main { grid-column: 2; grid-row: 1; }
+    .class-log-session .list-title { font-size: 13px; line-height: 1.3; }
+    .class-log-session .list-detail { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+    .class-log-tag { padding: 3px 7px; border-radius: 20px; background: var(--surface-2); color: var(--muted); font-size: 10px; line-height: 1.3; }
+    .class-log-session > .status { grid-column: 3; grid-row: 1; white-space: nowrap; }
+    .class-log-actions { grid-column: 2 / -1; grid-row: 2; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding-top: 7px; border-top: 1px solid var(--line); }
+    .class-log-actions .delete-content-button { min-height: 30px; padding: 4px 9px; font-size: 11px; }
+    .class-log-actions .class-log-edit-button { min-height: 30px; padding: 4px 9px; font-size: 11px; }
+    .class-log-actions .text-link { font-size: 11px; }
     .case-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
     .account-row { align-items: flex-start; flex-wrap: wrap; }
     .account-row .list-main { min-width: 170px; }
@@ -588,6 +612,16 @@
       .notification-type { font-size: 9px; }
       .notification-item .list-title { font-size: 13px; }
       .notification-item .list-detail { font-size: 11px; }
+      #classLogList { gap: 12px; padding: 10px; }
+      .class-log-day-heading { font-size: 14px; }
+      .class-log-session-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+      .class-log-session { grid-template-columns: 62px minmax(0, 1fr); gap: 7px 9px; padding: 10px; }
+      .class-log-time { grid-column: 1; grid-row: 1; font-size: 10px; }
+      .class-log-session .list-main { grid-column: 2; grid-row: 1; }
+      .class-log-session > .status { grid-column: 2; grid-row: 2; justify-self: start; }
+      .class-log-actions { grid-column: 1 / -1; grid-row: 3; justify-content: flex-start; flex-wrap: wrap; }
+      .class-log-session .list-title { font-size: 12px; }
+      .class-log-tag { font-size: 9px; }
       .case-actions { width: 100%; }
       .case-actions button { min-height: 44px; }
       .account-controls { margin-left: 0; gap: 10px; }
@@ -1208,14 +1242,17 @@
       const publicRow = row.cloneNode(true);
       const dateParts = String(data.get('date')).split('-');
       const dateBox = document.createElement('div');
-      dateBox.className = 'reminder-date';
-      const dayLabel = document.createElement('b'); dayLabel.textContent = dateParts[2] || '';
-      const monthLabel = document.createElement('span'); monthLabel.textContent = new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2])).toLocaleString('en', { month: 'short' });
-      dateBox.append(dayLabel, monthLabel);
+      dateBox.className = 'class-log-time';
+      dateBox.textContent = new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2])).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
       publicRow.prepend(dateBox);
+      publicRow.classList.add('class-log-session');
+      publicRow.dataset.kind = sessionType.toLowerCase() === 'lab' ? 'lab' : 'lecture';
       publicRow.dataset.classSubject = data.get('subject');
       publicRow.dataset.batch = sessionBatch;
       publicRow.dataset.month = `${new Date(Number(dateParts[0]), Number(dateParts[1]) - 1).toLocaleString('en', { month: 'long' })} ${dateParts[0]}`;
+      const actions = document.createElement('div'); actions.className = 'class-log-actions';
+      const report = document.createElement('button'); report.className = 'text-link'; report.dataset.page = 'attendance'; report.textContent = 'Report an issue';
+      actions.append(report); publicRow.append(actions);
       document.getElementById('classLogList').prepend(publicRow);
       document.getElementById('homeClassList').prepend(row.cloneNode(true));
       filterClassLog();
@@ -1317,13 +1354,19 @@
       const subject = document.getElementById('classSubjectFilter').value;
       const month = document.getElementById('classMonthFilter').value;
       const studentBatch = batchForRoll(currentStudentRoll);
-      document.querySelectorAll('#classLogList > .list-row').forEach((row) => {
+      document.querySelectorAll('#classLogList .class-log-session').forEach((row) => {
         const title = row.querySelector('.list-title').textContent;
         const rowSubject = row.dataset.classSubject || title.split(' · Class ')[0];
         const rowMonth = row.dataset.month || new Date().toLocaleString('en-IN', { month: 'long', year: 'numeric' });
         const rowBatch = row.dataset.batch || 'All students';
         const batchMatches = document.body.dataset.role !== 'student' || rowBatch === 'All students' || rowBatch === 'Both batches' || rowBatch === studentBatch;
-        row.style.display = (subject === 'all' || rowSubject.startsWith(subject)) && rowMonth === month && batchMatches ? 'flex' : 'none';
+        row.hidden = !((subject === 'all' || rowSubject.startsWith(subject)) && rowMonth === month && batchMatches);
+      });
+      document.querySelectorAll('#classLogList .class-log-kind-group').forEach((group) => {
+        group.hidden = !group.querySelector('.class-log-session:not([hidden])');
+      });
+      document.querySelectorAll('#classLogList .class-log-day-group').forEach((group) => {
+        group.hidden = !group.querySelector('.class-log-session:not([hidden])');
       });
     }
     document.getElementById('classSubjectFilter').addEventListener('change', filterClassLog);

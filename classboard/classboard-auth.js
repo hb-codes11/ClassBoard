@@ -254,37 +254,56 @@
     const date = new Date(session.starts_at);
     const month = date.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
     const row = document.createElement('div');
-    row.className = 'list-row';
+    row.className = compact ? 'list-row' : 'list-row class-log-session';
     row.dataset.contentId = session.id;
     row.dataset.contentType = 'class_sessions';
     row.dataset.classSubject = subject?.name || 'Class';
     row.dataset.month = month;
     row.dataset.batch = session.batch === 'all' ? 'All students' : session.batch;
+    row.dataset.kind = session.kind === 'lab' ? 'lab' : 'lecture';
+    const subjectName = (subject?.name || '').toLowerCase();
+    if (!compact && /software engineering/.test(subjectName)) row.dataset.subjectColor = 'violet';
+    else if (!compact && /artificial intelligence/.test(subjectName)) row.dataset.subjectColor = 'orange';
+    else if (!compact && /statistical analysis/.test(subjectName)) row.dataset.subjectColor = 'green';
     const dateBox = document.createElement('div');
-    dateBox.className = 'reminder-date';
-    const day = document.createElement('b'); day.textContent = String(date.getDate());
-    const monthLabel = document.createElement('span'); monthLabel.textContent = date.toLocaleString('en-IN', { month: 'short' });
-    dateBox.append(day, monthLabel);
+    if (compact) {
+      dateBox.className = 'reminder-date';
+      const day = document.createElement('b'); day.textContent = String(date.getDate());
+      const monthLabel = document.createElement('span'); monthLabel.textContent = date.toLocaleString('en-IN', { month: 'short' });
+      dateBox.append(day, monthLabel);
+    } else {
+      dateBox.className = 'class-log-time';
+      dateBox.textContent = date.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
+    }
     const main = document.createElement('div'); main.className = 'list-main';
     const title = document.createElement('div'); title.className = 'list-title';
     title.textContent = `${subject?.name || 'Class'}${session.class_number ? ` · Class ${session.class_number}` : ''}`;
     const detail = document.createElement('div'); detail.className = 'list-detail';
-    const type = session.kind === 'lab' ? `Lab · ${session.batch}` : 'Lecture';
-    detail.textContent = `${type} · ${date.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}${session.room ? ` · ${session.room}` : ''}${session.topic ? ` · ${session.topic}` : ''}`;
+    if (compact) {
+      const type = session.kind === 'lab' ? `Lab · ${session.batch}` : 'Lecture';
+      detail.textContent = `${type} · ${date.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}${session.room ? ` · ${session.room}` : ''}${session.topic ? ` · ${session.topic}` : ''}`;
+    } else {
+      [session.kind === 'lab' ? 'Lab' : 'Lecture', ...(session.kind === 'lab' && session.batch ? [session.batch] : []), ...(session.room ? [session.room] : []), ...(session.topic ? [session.topic] : [])].forEach((label) => {
+        const tag = document.createElement('span'); tag.className = 'class-log-tag'; tag.textContent = label; detail.append(tag);
+      });
+    }
     main.append(title, detail);
     const status = document.createElement('span'); status.className = 'status'; status.textContent = session.state.replaceAll('_', ' ');
     row.append(dateBox, main, status);
-    row.append(makeDeleteButton('Delete'));
+    const actions = compact ? row : document.createElement('div');
+    if (!compact) actions.className = 'class-log-actions';
+    actions.append(makeDeleteButton('Delete'));
     if (!compact && session.state !== 'scheduled' && window.classboardContext?.roles.includes('cr')) {
       const edit = document.createElement('button');
       edit.type = 'button'; edit.className = 'secondary-button class-log-edit-button';
       edit.dataset.editClassSession = session.id; edit.textContent = 'Edit';
       edit.setAttribute('aria-label', `Edit ${subject?.name || 'class'} class log`);
-      row.append(edit);
+      actions.append(edit);
     }
     if (!compact) {
       const report = document.createElement('button'); report.className = 'text-link'; report.dataset.page = 'attendance'; report.textContent = 'Report an issue';
-      row.append(report);
+      actions.append(report);
+      row.append(actions);
     }
     return row;
   }
@@ -443,15 +462,44 @@
       const option = document.createElement('option'); option.value = label; option.textContent = label; return option;
     }));
     monthSelect.value = monthOptions.some(([, label]) => label === previousMonth) ? previousMonth : monthOptions[0][1];
+    const classLogList = document.getElementById('classLogList');
+    classLogList.replaceChildren();
+    if (!sessions.length) addEmptyNote(classLogList, 'No class sessions have been added yet.');
+    const dayGroups = new Map();
+    sessions.forEach((session) => {
+      const date = new Date(session.starts_at);
+      const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+      if (!dayGroups.has(key)) {
+        const group = document.createElement('section'); group.className = 'class-log-day-group'; group.dataset.classLogDay = key;
+        const heading = document.createElement('h2'); heading.className = 'class-log-day-heading';
+        heading.innerHTML = '<span class="class-log-day-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg></span>';
+        const dateLabel = document.createElement('span'); dateLabel.textContent = date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        heading.append(dateLabel); group.append(heading); classLogList.append(group); dayGroups.set(key, { group, categories: new Map() });
+      }
+      const day = dayGroups.get(key);
+      const category = session.kind === 'lab' ? 'lab' : 'lecture';
+      if (!day.categories.has(category)) {
+        const kindGroup = document.createElement('section'); kindGroup.className = 'class-log-kind-group'; kindGroup.dataset.classLogKind = category;
+        const kindHeading = document.createElement('div'); kindHeading.className = 'class-log-kind-heading';
+        kindHeading.textContent = category === 'lab' ? 'Labs' : 'Lectures';
+        const count = document.createElement('span'); count.textContent = String(sessions.filter((item) => {
+          const itemDate = new Date(item.starts_at);
+          return itemDate.getFullYear() === date.getFullYear() && itemDate.getMonth() === date.getMonth() && itemDate.getDate() === date.getDate() && (item.kind === 'lab' ? 'lab' : 'lecture') === category;
+        }).length);
+        kindHeading.append(count);
+        const grid = document.createElement('div'); grid.className = 'class-log-session-grid';
+        kindGroup.append(kindHeading, grid); day.group.append(kindGroup); day.categories.set(category, grid);
+      }
+      day.categories.get(category).append(addSessionRow(session));
+    });
     const sessionContainers = [
-      [document.getElementById('classLogList'), sessions, false],
-      [document.getElementById('homeClassList'), sessions.slice(0, 3), true],
-      [document.getElementById('crRecentClasses'), sessions.slice(0, 5), true]
+      [document.getElementById('homeClassList'), sessions.slice(0, 3)],
+      [document.getElementById('crRecentClasses'), sessions.slice(0, 5)]
     ];
     sessionContainers.forEach(([container, rows, compact]) => {
       container.replaceChildren();
       if (!rows.length) { addEmptyNote(container, 'No class sessions have been added yet.'); return; }
-      rows.forEach((session) => container.append(addSessionRow(session, compact)));
+      rows.forEach((session) => container.append(addSessionRow(session, true)));
     });
     const reminderContainer = document.getElementById('homeReminderList');
     reminderContainer.replaceChildren();
