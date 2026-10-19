@@ -262,11 +262,11 @@
     row.dataset.batch = session.batch === 'all' ? 'All students' : session.batch;
     row.dataset.kind = session.kind === 'lab' ? 'lab' : 'lecture';
     const subjectName = (subject?.name || '').toLowerCase();
-    if (!compact && /software engineering/.test(subjectName)) row.dataset.subjectColor = 'violet';
-    else if (!compact && /artificial intelligence/.test(subjectName)) row.dataset.subjectColor = 'orange';
+    if (!compact && /software engineering/.test(subjectName)) row.dataset.subjectColor = 'purple';
+    else if (!compact && /artificial intelligence/.test(subjectName)) row.dataset.subjectColor = 'red';
     else if (!compact && /statistical analysis/.test(subjectName)) row.dataset.subjectColor = 'green';
-    else if (!compact && /computer organisation|computer organization/.test(subjectName)) row.dataset.subjectColor = 'teal';
-    else if (!compact && /java programming/.test(subjectName)) row.dataset.subjectColor = 'blue';
+    else if (!compact && /computer organisation|computer organization/.test(subjectName)) row.dataset.subjectColor = 'yellow';
+    else if (!compact && /java programming/.test(subjectName)) row.dataset.subjectColor = 'orange';
     else if (!compact && /soft skills/.test(subjectName)) row.dataset.subjectColor = 'rose';
     const dateBox = document.createElement('div');
     if (compact) {
