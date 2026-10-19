@@ -397,8 +397,7 @@
     .site-footer { display: flex; justify-content: space-between; gap: 12px; padding: 18px 0 8px; margin-top: auto; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
     .footer-credit { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
     .footer-wordmark { position: relative; display: inline-block; color: #123b8a; font-weight: 800; letter-spacing: .015em; }
-    .footer-wordmark::before { position: absolute; z-index: 0; top: 50%; right: 1px; left: 0; height: 1px; background: linear-gradient(90deg, #d93642, #2459bd); content: ""; }
-    .footer-web { position: absolute; z-index: 0; top: 50%; right: -15px; width: 30px; height: 30px; overflow: visible; transform: translateY(-50%); filter: drop-shadow(0 1px 1px rgb(18 59 138 / 18%)); }
+    .footer-web { position: absolute; z-index: 0; top: 50%; right: -80px; width: 80px; height: 34px; overflow: visible; transform: translateY(-50%); }
     .footer-wordmark-text { position: relative; z-index: 1; }
     .role-switcher { height: 36px; max-width: 170px; padding: 0 38px 0 12px; border: 1px solid var(--line); border-radius: 9px; background-color: var(--surface); color: var(--text); font: inherit; font-size: 12px; cursor: pointer; }
     .panel, .stat-card, .action-tile, .resource-card, .list-row, .panel-header, .page-heading { min-width: 0; }
@@ -819,7 +818,7 @@
         </section>
 
         <section class="page-view" id="page-classes">
-          <div class="page-heading"><div><div class="eyebrow">AI &amp; Analytics - A (INTEL-1)</div><h1>Class log</h1><div class="page-description">See what has been covered in each subject.</div></div></div>
+          <div class="page-heading"><div><div class="eyebrow">AI &amp; Analytics - A (INTEL-1)</div><h1>Class log</h1><div class="page-description">View your scheduled lectures and labs by subject, date, and batch.</div></div></div>
           <div class="toolbar"><select class="select-field" id="classSubjectFilter" aria-label="Choose subject"><option value="all">All subjects</option><option>Software Engineering</option><option>Statistical Analysis</option><option>Computer Organisation &amp; Microprocessors</option><option>Java Programming</option><option>Soft Skills</option><option>Artificial Intelligence</option></select><select class="select-field" id="classMonthFilter" aria-label="Choose month"><option value="October 2026">October 2026</option><option value="September 2026">September 2026</option></select></div>
           <article class="panel" id="classLogList"></article><div class="page-description" style="margin-top:12px">Only CRs can edit saved class-log entries. CRs and admins can remove an incorrect entry. Class history does not update official attendance. Use the attendance planner for your own figures.</div>
         </section>
@@ -912,7 +911,7 @@
             </div>
           </div>
         </section>
-        <footer class="site-footer"><span>About Classboard · AI &amp; Analytics - A (INTEL-1), 3rd Semester</span><span class="footer-credit"><span>Developed by</span><span class="footer-wordmark"><span class="footer-wordmark-text">WEBCORE</span><svg class="footer-web" viewBox="0 0 40 40" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="1.15"><path stroke="#2459bd" d="M20 20 38 4M20 20 39 15M20 20 38 27M20 20 31 39M20 20 9 39M20 20 2 29M20 20 2 13M20 20 10 2"/><path stroke="#d93642" d="M38 4Q20 8 10 2M39 15Q22 14 2 13M38 27Q21 24 2 29M31 39Q18 31 9 39"/><path stroke="#6689cf" d="M32 9Q21 13 15 9M35 20Q22 18 8 20M30 32Q19 26 7 26"/></g></svg></span></span></footer>
+        <footer class="site-footer"><span>About Classboard · AI &amp; Analytics - A (INTEL-1), 3rd Semester</span><span class="footer-credit"><span>Developed by</span><span class="footer-wordmark"><span class="footer-wordmark-text">WEBCORE</span><svg class="footer-web" viewBox="0 0 88 38" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.1"><path stroke="#d93642" d="M0 19C19 19 32 18 44 15S65 7 78 2"/><path stroke="#2459bd" d="M0 19C19 19 32 20 44 23S65 31 78 36"/><path stroke="#6689cf" d="M0 19C25 19 48 19 78 19"/><path stroke="#d93642" d="M78 2Q82 10 86 19M86 19Q82 28 78 36"/><path stroke="#2459bd" d="M78 2Q70 5 65 9M86 19Q76 15 68 14M86 19Q76 23 68 24M78 36Q70 33 65 29"/><path stroke="#6689cf" d="M65 9Q76 10 82 10M68 14Q78 15 85 15M68 24Q78 23 85 23M65 29Q76 28 82 28"/></g></svg></span></span></footer>
       </div>
     </main>
     <nav class="mobile-nav" aria-label="Mobile navigation">
