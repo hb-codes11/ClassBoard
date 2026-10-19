@@ -268,6 +268,31 @@
     .list-main { min-width: 0; flex: 1; }
     .list-title { font-size: 11px; font-weight: 680; }
     .list-detail { color: var(--muted); font-size: 10px; margin-top: 4px; }
+    .profile-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+    .profile-side-stack { display: grid; gap: 16px; }
+    .profile-panel { max-width: none !important; margin: 0 !important; }
+    .profile-account { padding: 18px; }
+    .profile-identity { display: flex; align-items: center; gap: 14px; padding: 2px 4px 17px; border-bottom: 1px solid var(--line); }
+    .profile-identity .avatar { width: 50px; height: 50px; font-size: 15px; }
+    .profile-identity .list-title { font-size: 15px; letter-spacing: -.02em; }
+    .profile-identity .list-detail { font-size: 11px; }
+    .profile-details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 7px; }
+    .profile-detail-row { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 12px 10px; }
+    .profile-detail-row:nth-child(odd) { padding-left: 4px; padding-right: 16px; border-right: 1px solid var(--line); }
+    .profile-detail-row:nth-child(even) { padding-left: 16px; }
+    .profile-detail-row:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .profile-detail-icon { display: grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 10px; background: var(--blue-soft); color: var(--blue); }
+    .profile-detail-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .profile-detail-row .list-title { font-size: 10px; }
+    .profile-detail-row .list-detail { font-size: 10px; line-height: 1.5; }
+    .profile-detail-row .secondary-button { flex: none; }
+    @media (max-width: 760px) {
+      .profile-layout, .profile-details-grid { grid-template-columns: minmax(0, 1fr); }
+      .profile-layout, .profile-side-stack { gap: 14px; }
+      .profile-account { padding: 15px; }
+      .profile-detail-row:nth-child(odd), .profile-detail-row:nth-child(even) { padding: 12px 4px; border-right: 0; }
+      .profile-detail-row:nth-child(n+2) { border-top: 1px solid var(--line); }
+    }
     .list-date { width: 44px; flex: none; color: var(--muted); font-size: 9px; text-align: right; }
     .status { display: inline-flex; padding: 4px 8px; border-radius: 20px; color: var(--green); background: var(--green-soft); font-size: 9px; font-weight: 660; }
     .status.pending { color: var(--amber); background: var(--amber-soft); }
@@ -705,25 +730,30 @@
 
         <section class="page-view" id="page-profile">
           <div class="page-heading"><div><div class="eyebrow">Account settings</div><h1>Profile</h1><div class="page-description">Your class account and a few useful settings.</div></div></div>
-          <article class="panel" style="max-width:620px;margin-bottom:16px">
-            <div class="panel-header"><div><div class="panel-title">Your account</div><div class="panel-sub">Your details help us show the right class information.</div></div></div>
-            <div class="list-row"><div class="avatar" id="profileAvatar">CB</div><div class="list-main"><div class="list-title" id="profileName">Your account</div><div class="list-detail" id="profileRole">Class member</div></div></div>
-            <div class="list-row"><div class="list-main"><div class="list-title">College email</div><div class="list-detail" id="profileEmail">Sign in to see your account email</div></div></div>
-            <div class="list-row"><div class="list-main"><div class="list-title">Roll number &amp; lab batch</div><div class="list-detail">Roll <span id="profileRoll">Not assigned</span> · <span id="profileBatch">Roll number needed</span></div></div></div>
-            <div class="list-row"><div class="list-main"><div class="list-title">Class</div><div class="list-detail">AI &amp; Analytics - A (INTEL-1)</div></div></div>
-            <div class="list-row"><div class="list-main"><div class="list-title">Sign-in details</div><div class="list-detail">Password and account access</div></div><button class="secondary-button" data-toast="Choose Forgot password on the sign-in screen to reset your password">Manage</button></div>
-          </article>
-          <article class="panel" style="max-width:620px;margin-bottom:16px">
-            <div class="panel-header"><div><div class="panel-title">Preferences</div><div class="panel-sub">Set up Classboard the way you like.</div></div></div>
-            <div class="list-row"><div class="list-main"><div class="list-title">Appearance</div><div class="list-detail">Switch between light and dark mode.</div></div><button class="secondary-button" id="profileThemeButton">Change theme</button></div>
-            <div class="list-row"><div class="list-main"><div class="list-title">Notifications</div><div class="list-detail">Class updates, new notes and replies.</div></div><button class="text-link" data-page="notifications">View notifications →</button></div>
-          </article>
-          <article class="panel" style="max-width:620px">
-            <div class="panel-header"><div><div class="panel-title">Privacy &amp; help</div><div class="panel-sub">A few things to know about your account.</div></div></div>
-            <div class="list-row"><div class="list-main"><div class="list-title">Attendance messages</div><div class="list-detail">Only you and your assigned CRs/admins can see your attendance concerns. Classboard does not change official attendance.</div></div></div>
-            <div class="list-row"><div class="list-main"><div class="list-title">Need an account change?</div><div class="list-detail">Ask your class admin to update your name, ID or role.</div></div></div>
-            <div class="list-row"><div class="list-main"><div class="list-title">Sign out</div><div class="list-detail">Sign out of this device.</div></div><button class="secondary-button" id="profileSignOut">Sign out</button></div>
-          </article>
+          <div class="profile-layout">
+            <article class="panel profile-panel profile-account">
+              <div class="profile-identity"><div class="avatar" id="profileAvatar">CB</div><div class="list-main"><div class="list-title" id="profileName">Your account</div><div class="list-detail" id="profileRole">Class member</div></div></div>
+              <div class="profile-details-grid">
+                <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg></span><div class="list-main"><div class="list-title">College email</div><div class="list-detail" id="profileEmail">Sign in to see your account email</div></div></div>
+                <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M10 3 8 21m8-18-2 18"></path></svg></span><div class="list-main"><div class="list-title">Roll number &amp; lab batch</div><div class="list-detail">Roll <span id="profileRoll">Not assigned</span> · <span id="profileBatch">Roll number needed</span></div></div></div>
+                <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><div class="list-main"><div class="list-title">Class</div><div class="list-detail">AI &amp; Analytics - A (INTEL-1)</div></div></div>
+                <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span><div class="list-main"><div class="list-title">Sign-in details</div><div class="list-detail">Password and account access</div></div><button class="secondary-button" data-toast="Choose Forgot password on the sign-in screen to reset your password">Manage</button></div>
+              </div>
+            </article>
+            <div class="profile-side-stack">
+              <article class="panel profile-panel">
+                <div class="panel-header"><div><div class="panel-title">Preferences</div><div class="panel-sub">Set up Classboard the way you like.</div></div></div>
+                <div class="list-row"><div class="list-main"><div class="list-title">Appearance</div><div class="list-detail">Switch between light and dark mode.</div></div><button class="secondary-button" id="profileThemeButton">Change theme</button></div>
+                <div class="list-row"><div class="list-main"><div class="list-title">Notifications</div><div class="list-detail">Class updates, new notes and replies.</div></div><button class="text-link" data-page="notifications">View notifications →</button></div>
+              </article>
+              <article class="panel profile-panel">
+                <div class="panel-header"><div><div class="panel-title">Privacy &amp; help</div><div class="panel-sub">A few things to know about your account.</div></div></div>
+                <div class="list-row"><div class="list-main"><div class="list-title">Attendance messages</div><div class="list-detail">Only you and your assigned CRs/admins can see your attendance concerns. Classboard does not change official attendance.</div></div></div>
+                <div class="list-row"><div class="list-main"><div class="list-title">Need an account change?</div><div class="list-detail">Ask your class admin to update your name, ID or role.</div></div></div>
+                <div class="list-row"><div class="list-main"><div class="list-title">Sign out</div><div class="list-detail">Sign out of this device.</div></div><button class="secondary-button" id="profileSignOut">Sign out</button></div>
+              </article>
+            </div>
+          </div>
         </section>
 
         <section class="page-view" id="page-cr">
