@@ -801,6 +801,9 @@
     if (result.error) { notifyApp(`Could not load notifications: ${result.error.message}`, true); return; }
 
     const notifications = result.data || [];
+    const unreadTotal = unreadCountResult.error
+      ? notifications.filter((item) => !item.read_at).length
+      : unreadCountResult.count || 0;
     const updateCount = updateCountResult.error
       ? notifications.filter((item) => item.source_type === 'update' && !item.read_at).length
       : updateCountResult.count || 0;
@@ -820,7 +823,17 @@
     const failed = [updates, reminders, resources, sessions].find((request) => request.error);
     if (failed) { notifyApp(`Could not load notification details: ${failed.error.message}`, true); return; }
     const sources = new Map([updates, reminders, resources, sessions].flatMap((request) => (request.data || []).map((source) => [source.id, source])));
+    const seenByUser = window.classboardNotificationSeenByUser || (window.classboardNotificationSeenByUser = new Map());
+    const seenKey = `${classId}:${userId}`;
+    const seenIds = seenByUser.get(seenKey);
+    const firstNotificationLoad = !seenIds;
+    const newNotificationIds = new Set(firstNotificationLoad ? [] : notifications.filter((item) => !seenIds.has(String(item.id))).map((item) => String(item.id)));
+    const updatedSeenIds = new Set(seenIds || []);
+    notifications.forEach((item) => updatedSeenIds.add(String(item.id)));
+    while (updatedSeenIds.size > 500) updatedSeenIds.delete(updatedSeenIds.values().next().value);
+    seenByUser.set(seenKey, updatedSeenIds);
     list.replaceChildren();
+    const renderedNotificationDetails = [];
     let currentDay = '';
     notifications.forEach((notification) => {
       const source = sources.get(notification.source_id);
@@ -849,6 +862,7 @@
       }
       let type = notification.source_type === 'reminder' ? 'reminder' : notification.source_type === 'resource' ? 'resource' : notification.source_type === 'class_session' ? 'class' : source.category === 'deadline' ? 'deadline' : source.category === 'important' ? 'important' : 'update';
       const labels = { update: 'Class update', important: 'Important notice', deadline: 'Deadline', reminder: 'Reminder', resource: 'New resource', class: 'Class schedule' };
+      renderedNotificationDetails.push({ id: String(notification.id), title, message: detail, label: labels[type] });
       const row = document.createElement('article'); row.className = `notification-item notification-${type}`; row.dataset.notificationId = notification.id;
       if (notification.read_at) row.classList.add('notification-read');
       const mark = document.createElement('div'); mark.className = 'notification-icon'; mark.textContent = notification.source_type === 'resource' ? resourceKindLabel(source.kind).split(' ')[0].toUpperCase() : notification.source_type === 'reminder' ? 'REM' : notification.source_type === 'class_session' ? 'CLASS' : type === 'deadline' ? 'DUE' : type === 'important' ? '!' : 'INFO';
@@ -866,6 +880,18 @@
     if ((unreadCountResult.count || 0) > 0) document.querySelectorAll('[aria-label="Notifications"]').forEach((button) => {
       if (!button.querySelector('.unread')) { const dot = document.createElement('span'); dot.className = 'unread'; button.append(dot); }
     });
+    const freshDetails = renderedNotificationDetails.filter((item) => newNotificationIds.has(item.id));
+    if (freshDetails.length) {
+      window.dispatchEvent(new CustomEvent('classboard:new-notification', { detail: { ...freshDetails[0], count: freshDetails.length } }));
+    } else if (firstNotificationLoad && unreadTotal === 0) {
+      const promptKey = `classboard-empty-notifications:${seenKey}`;
+      let alreadyPrompted = false;
+      try { alreadyPrompted = sessionStorage.getItem(promptKey) === 'shown'; } catch (_) {}
+      if (!alreadyPrompted) {
+        try { sessionStorage.setItem(promptKey, 'shown'); } catch (_) {}
+        window.dispatchEvent(new CustomEvent('classboard:new-notification', { detail: { kind: 'empty' } }));
+      }
+    }
   }
 
   async function markAllNotificationsRead() {
