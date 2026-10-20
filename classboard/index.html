@@ -228,7 +228,7 @@
     .resource-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .resource-card { display: flex; align-items: center; gap: 12px; padding: 14px; min-height: 74px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
     .resource-card .resource-title { font-size: 16px; font-weight: 650; line-height: 1.4; }
-    .resource-card .resource-meta { font-size: 14px; line-height: 1.45; }
+    .resource-card .resource-meta { min-width: 0; max-width: 100%; white-space: normal; font-size: 14px; line-height: 1.45; }
     .resource-card .file-icon { font-size: 13px; }
     .resource-actions { margin-left:auto; display:flex; align-items:center; gap:7px; flex:none; }
     .resource-preview-button { min-height:34px; padding:0 11px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--text); font:inherit; font-size:12px; font-weight:650; cursor:pointer; }
@@ -599,8 +599,9 @@
       .topbar-start .crumb { display: none; }
       .mobile-brand { min-width: 0; display: flex; align-items: center; gap: 7px; color: var(--text); font-size: 16px; font-weight: 750; letter-spacing: -.035em; white-space: nowrap; }
       .mobile-brand img { display: block; width: 28px; height: 28px; object-fit: contain; flex: none; }
-      .top-actions { width: 100%; flex: none; justify-content: space-between; gap: 6px; }
+      .top-actions { width: 100%; flex: none; justify-content: flex-start; gap: 6px; }
       .top-actions [aria-label="Academic calendar"], .top-actions #themeToggle { display: none; }
+      .top-actions > .icon-button[aria-label="Notifications"] { margin-left: auto; }
       .role-switcher { width: min(34vw, 128px); max-width: 128px; min-height: 44px; font-size: 12px; }
       .icon-button { width: 44px; height: 44px; border-radius: 13px; }
       .content { min-height: calc(100svh - 124px); padding: 20px max(14px, env(safe-area-inset-right)) 22px max(14px, env(safe-area-inset-left)); }
@@ -628,7 +629,7 @@
       .resource-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
       .resource-card { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: start; gap: 8px 11px; padding: 12px; }
       .resource-card > .file-icon { grid-column: 1; grid-row: 1 / span 3; width: 34px; height: 36px; }
-      .resource-card > .list-main { grid-column: 2; grid-row: 1; width: 100%; min-width: 0; flex: none; }
+      .resource-card > .list-main { grid-column: 2; grid-row: 1; min-width: 0; max-width: 100%; flex: none; }
       .resource-card .resource-title { font-size: 15px; line-height: 1.35; overflow-wrap: break-word; word-break: normal; }
       .resource-card .resource-meta { font-size: 12px; line-height: 1.4; overflow-wrap: break-word; word-break: normal; }
       .resource-card .resource-actions { grid-column: 2; grid-row: 2; justify-self: start; margin: 2px 0 0; }
@@ -707,7 +708,6 @@
       .auth-card { padding: 18px; }
     }
     @media (max-width: 350px) {
-      .top-actions > .icon-button[aria-label="Profile"] { display: none; }
       .crumb { font-size: 12px; }
       .role-switcher { width: 104px; }
       .mobile-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
