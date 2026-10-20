@@ -1151,14 +1151,11 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     document.getElementById('pageBackButton').addEventListener('click', () => {
-      if (currentPage?.activeName === 'Admin workspace' || currentPage?.activeName === 'Class representatives') {
-        pageHistory.length = 0;
-        openPage('home', 'Home', { recordHistory: false });
-        return;
-      }
-      const previousPage = pageHistory.pop();
-      if (!previousPage) return;
-      openPage(previousPage.pageId, previousPage.activeName, { recordHistory: false });
+      const role = document.getElementById('roleSwitcher').value;
+      pageHistory.length = 0;
+      if (role === 'admin') openPage('admin', 'Admin workspace', { recordHistory: false });
+      else if (role === 'cr') openPage('cr', 'Class representatives', { recordHistory: false });
+      else openPage('home', 'Home', { recordHistory: false });
     });
     window.openClassboardPage = (pageId) => {
       const activeName = Object.keys(pageMap).find((name) => pageMap[name] === pageId);
