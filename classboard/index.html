@@ -1151,11 +1151,8 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     document.getElementById('pageBackButton').addEventListener('click', () => {
-      const role = document.getElementById('roleSwitcher').value;
-      pageHistory.length = 0;
-      if (role === 'admin') openPage('admin', 'Admin workspace', { recordHistory: false });
-      else if (role === 'cr') openPage('cr', 'Class representatives', { recordHistory: false });
-      else openPage('home', 'Home', { recordHistory: false });
+      const previousPage = pageHistory.pop();
+      if (previousPage) openPage(previousPage.pageId, previousPage.activeName, { recordHistory: false });
     });
     window.openClassboardPage = (pageId) => {
       const activeName = Object.keys(pageMap).find((name) => pageMap[name] === pageId);
