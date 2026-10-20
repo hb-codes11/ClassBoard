@@ -531,6 +531,13 @@
       .resource-card { gap: 12px; }
       .resource-card .resource-actions { margin-left: auto; }
     }
+    @media (min-width: 761px) and (max-width: 850px) {
+      .topbar { height: auto; min-height: 108px; flex-wrap: wrap; gap: 9px; padding: 10px 16px; }
+      .topbar-start, .top-actions { width: 100%; flex: 1 1 100%; }
+      .topbar-start { min-height: 38px; }
+      .top-actions { justify-content: flex-end; }
+      .crumb { white-space: normal; overflow-wrap: anywhere; }
+    }
     @media (max-width: 760px) {
       .sidebar { display: none; }
       .main { margin-left: 0; padding-bottom: 68px; }
@@ -635,13 +642,15 @@
       .tabs { max-width: 100%; display: flex; flex-wrap: wrap; gap: 0 16px; overflow: visible; }
       .tab { flex: 0 1 auto; min-height: 40px; white-space: nowrap; }
       .resource-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-      .resource-card { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: start; gap: 8px 11px; padding: 12px; }
-      .resource-card > .file-icon { grid-column: 1; grid-row: 1 / span 3; width: 34px; height: 36px; }
-      .resource-card > .list-main { grid-column: 2; grid-row: 1; min-width: 0; max-width: 100%; width: auto; flex: none; }
+      .resource-card { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 11px; padding: 12px; }
+      .resource-card > .file-icon { width: 34px; height: 36px; flex: 0 0 34px; }
+      .resource-card > .list-main { min-width: 0; max-width: calc(100% - 45px); width: auto; flex: 1 1 calc(100% - 45px); }
       .resource-card .resource-title { font-size: 15px; line-height: 1.35; overflow-wrap: break-word; word-break: normal; }
       .resource-card .resource-meta { max-width: 100%; font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; word-break: normal; }
-      .resource-card .resource-actions { grid-column: 2; grid-row: 2; justify-self: start; justify-content: flex-start; flex-wrap: wrap; max-width: 100%; margin: 2px 0 0; }
-      .resource-card > .delete-content-button { grid-column: 2; grid-row: 3; justify-self: start; margin: 0; }
+      .resource-card .resource-actions { flex: 1 1 calc(100% - 45px); justify-content: flex-start; flex-wrap: wrap; max-width: calc(100% - 45px); margin: 2px 0 0 45px; }
+      .resource-card > :not(.file-icon):not(.list-main):not(.resource-actions):not(.delete-content-button) { max-width: calc(100% - 45px); margin-left: 45px; }
+      .resource-card > .download { flex: 0 0 auto; width: auto; height: 34px; display: inline-flex; align-items: center; justify-content: center; padding: 0 10px; margin: 2px 0 0 45px; }
+      .resource-card > .delete-content-button { margin: 0 0 0 45px; }
       .workspace-form, .attendance-form { grid-template-columns: minmax(0, 1fr); }
       .attendance-form > * { grid-column: 1 / -1 !important; }
       .form-actions { flex-wrap: wrap; }
