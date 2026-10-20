@@ -1,39 +1,102 @@
-# Classboard
+# 🎓 Classboard
 
-**A private class portal for Medi-Caps University’s INTEL-1, with study resources, class updates, scheduling, and attendance concern follow-up, powered by Supabase.**
+<p align="center">
+  <strong>A private class portal for Medi-Caps University’s INTEL-1</strong><br>
+  Study resources, class updates, schedules, and attendance planning — all in one place.
+</p>
 
-Classboard gives students and their class representatives one place to find class materials and updates. Students sign in with their college account, while class admins and CRs manage class information through role-based access.
+<p align="center">
+  <a href="https://classboard-omega.vercel.app"><img alt="Live on Vercel" src="https://img.shields.io/badge/Live%20site-Classboard-2563EB?style=for-the-badge&logo=vercel&logoColor=white"></a>
+  <img alt="Supabase" src="https://img.shields.io/badge/Powered%20by-Supabase-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white">
+  <img alt="Built for Medi-Caps INTEL-1" src="https://img.shields.io/badge/For-Medi--Caps%20INTEL--1-7C3AED?style=for-the-badge">
+</p>
 
-## Features
+Classboard gives students and their class representatives one shared place to find class materials and stay up to date. College accounts sign in to a role-aware portal, while CRs and admins manage the class information they are responsible for.
 
-- College-email sign-in with Google and email/password.
-- Student onboarding with roll number and lab batch assignment.
-- Class notes, syllabus, and lab manuals stored in Supabase Storage.
-- Class updates, reminders, and a shared class log.
-- Separate lecture and lab attendance planning (excluding Soft Skills labs), with shared classes-held totals managed by CRs/admins and private attended counts for each student; only CRs can edit saved class-log entries.
-- Private attendance concern messages between students, CRs, and admins.
-- Database access protected by Supabase Row Level Security (RLS).
+---
 
-## Project layout
+## ✨ What you can do
 
-- `classboard/` — static frontend and the academic calendar PDF.
-- `supabase/migrations/` — database schema, RLS policies, and follow-up migrations.
-- `supabase/functions/` — Supabase Edge Functions.
+| 📚 Learn | 📣 Stay informed | 🗓️ Plan |
+| --- | --- | --- |
+| Browse notes, syllabus, lab manuals, and exam resources | Read class updates and reminders, with in-app notification slides | View the class timetable and preview the timetable image |
+| Preview shared files before downloading | Check the shared class log | Plan lecture and lab attendance separately |
 
-## Run locally
+### 📖 Study resources
+- Share class notes, syllabus, lab manuals, and exam materials.
+- Store PDFs, Word documents, and PowerPoint files in Supabase Storage.
+- Preview supported files in the portal before choosing to download them.
 
-From this repository directory:
+### 🔔 Class updates and schedule
+- Publish class updates, reminders, timetable entries, and class-log records.
+- See new activity through unread counts and responsive in-app notification slides.
+- Open the class timetable preview from the attendance page.
+
+### 📊 Attendance planner
+- Plan lecture attendance separately from lab attendance; Soft Skills has no lab planner.
+- Keep shared classes-held totals consistent for the class. CRs and admins maintain those totals.
+- Let each student update their own attended-class count and upcoming attendance plan.
+- Send private attendance concerns to CRs and admins for follow-up.
+
+> The attendance planner is for personal planning and class coordination; it does not change official college attendance records.
+
+### 🛡️ Roles and access
+- Every active class account has Student access.
+- Admins manage account roles and shared content.
+- CRs publish class updates and manage class information, including class-log entries.
+- Supabase Row Level Security (RLS) enforces access in the database.
+
+---
+
+## 🧰 Built with
+
+![HTML](https://img.shields.io/badge/HTML-111827?style=flat-square&logo=html5&logoColor=E34F26)
+![CSS](https://img.shields.io/badge/CSS-111827?style=flat-square&logo=css3&logoColor=1572B6)
+![JavaScript](https://img.shields.io/badge/JavaScript-111827?style=flat-square&logo=javascript&logoColor=F7DF1E)
+![Supabase](https://img.shields.io/badge/Supabase-111827?style=flat-square&logo=supabase&logoColor=3FCF8E)
+![Vercel](https://img.shields.io/badge/Vercel-111827?style=flat-square&logo=vercel&logoColor=white)
+
+Classboard is a static frontend backed by Supabase Auth, Postgres, Storage, Row Level Security, and Edge Functions.
+
+## 📁 Project layout
+
+```text
+classboard/             Static frontend and academic calendar PDF
+supabase/
+  functions/            Supabase Edge Functions
+  migrations/           Database schema, RLS policies, and follow-up changes
+  README.md             Supabase setup and migration guide
+```
+
+## 🚀 Run locally
+
+From the repository directory:
 
 ```sh
 python3 -m http.server 4173 --directory classboard
 ```
 
-Open `http://localhost:4173`. The app uses the Supabase URL and publishable key in `classboard/supabase-config.js`. The publishable key is intended for browser use; **never put a Supabase service-role or secret key in the frontend**. Keep RLS enabled and apply the migrations before connecting accounts.
+Then open [http://localhost:4173](http://localhost:4173).
 
-## Deploy on Vercel
+The frontend reads the Supabase project URL and publishable key from `classboard/supabase-config.js`. A publishable key is meant for browser use. **Never put a Supabase service-role or secret key in frontend code.** Keep RLS enabled.
 
-Import this repository into Vercel and set the project **Root Directory** to `classboard`. It is a static site, so no build command or output directory is needed. After deployment, add the Vercel domain to the Supabase Auth site URL and redirect URL allowlist, and configure the matching Google OAuth redirect URLs.
+## ☁️ Deploy on Vercel
 
-## Database setup
+1. Import this repository into Vercel.
+2. Set **Root Directory** to `classboard`.
+3. Deploy as a static site; no build command or output directory is needed.
+4. Add the deployed domain to Supabase Auth’s site URL and redirect URL allowlist.
+5. Add the matching OAuth redirect URL in Google Cloud Console.
 
-See [`supabase/README.md`](supabase/README.md) for Supabase setup and migration guidance. Apply migrations in numeric order, including the latest migration, before using the matching frontend features.
+## 🗄️ Supabase setup
+
+Follow [`supabase/README.md`](supabase/README.md) for project setup, Auth configuration, role setup, and migrations. Apply the migrations in order to the Supabase project used by the deployed site before using the features they enable.
+
+Keep the Supabase service-role key private. The browser should only receive the project URL and publishable key.
+
+---
+
+<p align="center">
+  <strong>Made for the INTEL-1 class community 💙</strong><br>
+  <sub>Built to keep class resources, updates, schedules, and coordination together.</sub>
+</p>
