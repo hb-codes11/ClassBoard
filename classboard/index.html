@@ -767,6 +767,20 @@
     .timetable-dialog-content { flex: 1; min-height: 0; overflow: auto; }
     @media (max-width: 1050px) { .attendance-layout { grid-template-columns: minmax(0, 1fr); } .timetable-card { max-width: none; } }
     @media (max-width: 760px) { .attendance-layout { gap: 12px; } .attendance-planner { margin-bottom: 0 !important; } .timetable-dialog { width: calc(100vw - 16px); height: calc(100dvh - 24px); border-radius: 12px; } .timetable-dialog-header { min-height: 56px; padding: 8px 10px; } }
+      .notification-slide { position: fixed; z-index: 30; top: max(16px, calc(env(safe-area-inset-top) + 10px)); right: max(16px, calc(env(safe-area-inset-right) + 10px)); display: grid; grid-template-columns: 40px minmax(0, 1fr) 34px; gap: 12px; align-items: start; width: min(390px, calc(100vw - 32px)); padding: 14px; border: 1px solid color-mix(in srgb, var(--blue) 30%, var(--line)); border-radius: 15px; background: color-mix(in srgb, var(--surface) 93%, transparent); color: var(--text); box-shadow: 0 16px 50px #10243b35, inset 0 1px #ffffff40; backdrop-filter: blur(18px) saturate(145%); -webkit-backdrop-filter: blur(18px) saturate(145%); transform: translateX(calc(100% + 32px)); opacity: 0; pointer-events: none; transition: transform .38s cubic-bezier(.2,.8,.2,1), opacity .25s ease; }
+    .notification-slide[hidden] { display: none !important; }
+    .notification-slide.is-visible { transform: translateX(0); opacity: 1; pointer-events: auto; }
+    .notification-slide-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--blue-soft); color: var(--blue); }
+    .notification-slide-icon svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .notification-slide-copy { min-width: 0; }
+    .notification-slide-kicker { margin: 1px 0 3px; color: var(--blue); font-size: 11px; font-weight: 760; letter-spacing: .04em; text-transform: uppercase; }
+    .notification-slide-title { overflow-wrap: anywhere; font-size: 14px; line-height: 1.35; font-weight: 730; }
+    .notification-slide-body { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.45; overflow-wrap: anywhere; }
+    .notification-slide-open { margin-top: 10px; padding: 0; border: 0; background: transparent; color: var(--blue); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .notification-slide-close { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--muted); font-size: 20px; line-height: 1; cursor: pointer; }
+    .notification-slide-close:hover { color: var(--text); border-color: var(--blue); }
+    @media (max-width: 760px) { .notification-slide { top: auto; right: max(12px, env(safe-area-inset-right)); bottom: calc(74px + env(safe-area-inset-bottom)); left: max(12px, env(safe-area-inset-left)); width: auto; transform: translateX(calc(100% + 20px)); } }
+    @media (prefers-reduced-motion: reduce) { .notification-slide { transition: none; } }
   </style>
 </head>
 <body data-role="student">
@@ -1010,6 +1024,11 @@
       </div>
     </nav>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <aside class="notification-slide" id="notificationSlide" role="status" aria-live="polite" aria-atomic="true" hidden>
+      <div class="notification-slide-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></div>
+      <div class="notification-slide-copy"><div class="notification-slide-kicker" id="notificationSlideKicker">New notification</div><div class="notification-slide-title" id="notificationSlideTitle"></div><div class="notification-slide-body" id="notificationSlideBody"></div><button class="notification-slide-open" id="notificationSlideOpen" type="button">View notifications →</button></div>
+      <button class="notification-slide-close" id="notificationSlideClose" type="button" aria-label="Dismiss notification" title="Dismiss">×</button>
+    </aside>
     <dialog class="resource-preview-dialog" id="pdfPreviewDialog" aria-label="Document preview">
       <div class="pdf-preview-shell">
         <div class="pdf-preview-toolbar"><div class="pdf-preview-file-icon" id="previewFileType">FILE</div><div class="pdf-preview-title" id="pdfPreviewTitle">Document preview</div><button class="pdf-preview-download" id="pdfPreviewDownload" type="button">Download</button><button class="pdf-preview-close" id="pdfPreviewClose" type="button" aria-label="Close preview">×</button></div>
@@ -1584,10 +1603,47 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=6"></script>
+  <script src="classboard-auth.js?v=7"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
-</body>
+  <script>
+    (() => {
+      const slide = document.getElementById('notificationSlide');
+      const kicker = document.getElementById('notificationSlideKicker');
+      const title = document.getElementById('notificationSlideTitle');
+      const body = document.getElementById('notificationSlideBody');
+      const openButton = document.getElementById('notificationSlideOpen');
+      let slideTimer;
+      let hideTimer;
+      function dismissNotificationSlide() {
+        clearTimeout(slideTimer);
+        slide.classList.remove('is-visible');
+        hideTimer = setTimeout(() => { slide.hidden = true; }, 400);
+      }
+      function showNotificationSlide(detail) {
+        clearTimeout(slideTimer);
+        clearTimeout(hideTimer);
+        kicker.textContent = detail.kind === 'empty'
+          ? 'No new notifications'
+          : detail.count > 1 ? `${detail.count} new notifications` : detail.label || 'New notification';
+        title.textContent = detail.kind === 'empty' ? "You're all caught up" : detail.title || 'New class update';
+        body.textContent = detail.kind === 'empty'
+          ? 'No new notifications right now. Check notifications anytime.'
+          : detail.message || 'There is a new update for your class.';
+        openButton.textContent = detail.kind === 'empty' ? 'Check notifications →' : 'View notifications →';
+        slide.hidden = false;
+        requestAnimationFrame(() => slide.classList.add('is-visible'));
+        slideTimer = setTimeout(dismissNotificationSlide, detail.kind === 'empty' ? 6000 : 8000);
+      }
+      window.addEventListener('classboard:new-notification', (event) => showNotificationSlide(event.detail || {}));
+      document.getElementById('notificationSlideClose').addEventListener('click', dismissNotificationSlide);
+      openButton.addEventListener('click', () => {
+        dismissNotificationSlide();
+        document.querySelector('[data-view="Notifications"]')?.click();
+      });
+    })();
+  </script>
+  </body>
 </html>
