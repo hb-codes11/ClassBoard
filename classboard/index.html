@@ -408,7 +408,7 @@
     .footer-web-emoji { display: inline-block; margin-left: -5px; color: var(--text); font-size: 15px; font-weight: 800; filter: grayscale(1) brightness(.35); }
     .role-switcher { height: 36px; max-width: 170px; padding: 0 38px 0 12px; border: 1px solid var(--line); border-radius: 9px; background-color: var(--surface); color: var(--text); font: inherit; font-size: 12px; cursor: pointer; }
     .panel, .stat-card, .action-tile, .resource-card, .list-row, .panel-header, .page-heading { min-width: 0; }
-    .panel-title, .panel-sub, .page-description, .update-title, .update-body, .update-time, .resource-title, .resource-meta, .reminder-title, .reminder-detail, .list-title, .list-detail, .class-name, .class-room, .stat-note, .profile-name, .profile-role { min-width: 0; overflow-wrap: anywhere; }
+    .panel-title, .panel-sub, .page-description, .update-title, .update-body, .update-time, .resource-title, .resource-meta, .reminder-title, .reminder-detail, .list-title, .list-detail, .class-name, .class-room, .stat-note, .profile-name, .profile-role { min-width: 0; overflow-wrap: break-word; word-break: normal; }
     .panel-header > div, .update > div, .resource-card > div, .reminder > div, .action-tile > div { min-width: 0; }
     .workspace-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(270px, .9fr); gap: 15px; margin-bottom: 16px; }
     .workspace-stack { display: grid; gap: 15px; align-content: start; }
@@ -509,6 +509,20 @@
       .grid { grid-template-columns: minmax(0, 1.25fr) minmax(230px, .9fr); gap: 13px; }
       .stat-card { padding: 13px; gap: 10px; }
     }
+    @media (min-width: 761px) and (max-width: 1000px) {
+      .topbar { padding-inline: 17px; }
+      .topbar .top-actions [aria-label="Academic calendar"], .topbar .top-actions #themeToggle { display: none; }
+      .crumb { white-space: nowrap; }
+      .content { padding-inline: 20px; }
+      .welcome-row, .page-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
+      .grid, .workspace-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stats .stat-card:first-child { grid-column: 1 / -1; }
+      .resource-grid, .class-log-session-grid, .attendance-subject-grid { grid-template-columns: minmax(0, 1fr); }
+      .panel-header { flex-wrap: wrap; align-items: flex-start; gap: 10px; }
+      .panel-header > button { flex: none; white-space: nowrap; }
+      .stat-note { flex: none; }
+    }
     @media (max-width: 760px) {
       .sidebar { display: none; }
       .main { margin-left: 0; padding-bottom: 68px; }
@@ -601,7 +615,7 @@
       .hero { width: 100%; }
       .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .stat-card { min-width: 0; }
-      .stat-label { line-height: 1.3; overflow-wrap: anywhere; }
+      .stat-label { line-height: 1.3; overflow-wrap: break-word; word-break: normal; }
       .panel-header { align-items: flex-start; gap: 10px; }
       .panel-header > button { flex: none; }
       .toolbar { align-items: stretch; }
@@ -615,8 +629,8 @@
       .resource-card { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: start; gap: 8px 11px; padding: 12px; }
       .resource-card > .file-icon { grid-column: 1; grid-row: 1 / span 3; width: 34px; height: 36px; }
       .resource-card > .list-main { grid-column: 2; grid-row: 1; width: 100%; min-width: 0; flex: none; }
-      .resource-card .resource-title { font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
-      .resource-card .resource-meta { font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; }
+      .resource-card .resource-title { font-size: 15px; line-height: 1.35; overflow-wrap: break-word; word-break: normal; }
+      .resource-card .resource-meta { font-size: 12px; line-height: 1.4; overflow-wrap: break-word; word-break: normal; }
       .resource-card .resource-actions { grid-column: 2; grid-row: 2; justify-self: start; margin: 2px 0 0; }
       .resource-card > .delete-content-button { grid-column: 2; grid-row: 3; justify-self: start; margin: 0; }
       .workspace-form, .attendance-form { grid-template-columns: minmax(0, 1fr); }
