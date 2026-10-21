@@ -746,6 +746,10 @@
     .auth-copy { color: var(--muted); font-size: 13px; margin: 9px 0 22px; }
     .auth-field { display: grid; gap: 6px; margin: 13px 0; font-size: 12px; font-weight: 650; }
     .auth-field input { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-2); color: var(--text); }
+    .password-entry { position: relative; }
+    .password-entry input { padding-right: 66px; }
+    .password-visibility { position: absolute; inset: 0 5px 0 auto; min-width: 48px; padding: 0 7px; border: 0; background: transparent; color: var(--blue); font-size: 12px; font-weight: 700; cursor: pointer; }
+    .password-visibility:focus-visible { outline: 2px solid var(--blue); outline-offset: -3px; border-radius: 7px; }
     .auth-action { width: 100%; padding: 11px 14px; margin-top: 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--text); font-weight: 650; cursor: pointer; }
     .auth-action.primary { border-color: var(--blue); background: var(--blue); color: #fff; }
     .auth-action:disabled { opacity: .6; cursor: wait; }
@@ -796,9 +800,13 @@
         <label class="auth-field">College email
           <input id="authEmail" name="email" type="email" autocomplete="email" required placeholder="you@medicaps.ac.in" />
         </label>
-        <label class="auth-field">Password
-          <input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" required placeholder="At least 8 characters" />
-        </label>
+        <div class="auth-field">
+          <label for="authPassword">Password</label>
+          <div class="password-entry">
+            <input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" required placeholder="At least 8 characters" />
+            <button class="password-visibility" id="togglePasswordVisibility" type="button" aria-controls="authPassword" aria-pressed="false">Show</button>
+          </div>
+        </div>
         <button class="auth-action primary" id="signInButton" type="submit">Sign in</button>
       </form>
       <button class="auth-action" id="signUpButton" type="button">Create account with email</button>
