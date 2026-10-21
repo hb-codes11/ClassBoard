@@ -136,6 +136,9 @@
     .hero-link:hover { text-decoration: underline; }
     .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 23px; }
     .stat-card { min-height: 91px; display: flex; align-items: center; gap: 13px; padding: 16px; border: 1px solid color-mix(in srgb, var(--line) 76%, white 24%); border-radius: 12px; background: color-mix(in srgb, var(--surface) 78%, transparent); box-shadow: var(--shadow), inset 0 1px color-mix(in srgb, white 40%, transparent); backdrop-filter: blur(12px) saturate(125%); -webkit-backdrop-filter: blur(12px) saturate(125%); }
+    .stat-card { color: inherit; text-decoration: none; cursor: pointer; transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease; }
+    .stat-card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--blue) 56%, var(--line)); }
+    .stat-card:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
     .stat-icon { width: 37px; height: 37px; display: grid; place-items: center; border-radius: 10px; background: var(--blue-soft); color: var(--blue); flex: none; }
     .stat-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
     .stat-value { font-size: 19px; font-weight: 720; letter-spacing: -.04em; }
@@ -857,9 +860,15 @@
         </section>
 
         <section class="stats" aria-label="Class overview">
-          <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/><path d="M16 6h4v4"/></svg></div><div><div class="stat-value">75%</div><div class="stat-label">Attendance target</div></div><span class="stat-note">Target</span></div>
-          <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 1 4 17.5z"/><path d="M8 7h8M8 11h8"/></svg></div><div><div class="stat-value">—</div><div class="stat-label">Resources available</div></div></div>
-          <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3"/></svg></div><div><div class="stat-value">—</div><div class="stat-label">Upcoming reminders</div></div></div>
+          <a class="stat-card" href="#attendance" data-page="attendance" aria-label="Open attendance planner">
+            <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/><path d="M16 6h4v4"/></svg></div><div><div class="stat-value">75%</div><div class="stat-label">Attendance target</div></div><span class="stat-note">Target</span>
+          </a>
+          <a class="stat-card" href="#resources" data-page="resources" aria-label="Open Notes and Syllabus">
+            <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 1 4 17.5z"/><path d="M8 7h8M8 11h8"/></svg></div><div><div class="stat-value">—</div><div class="stat-label">Resources available</div></div>
+          </a>
+          <a class="stat-card" href="#updates" data-page="updates" aria-label="Open updates and reminders">
+            <div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3"/></svg></div><div><div class="stat-value">—</div><div class="stat-label">Upcoming reminders</div></div>
+          </a>
         </section>
 
         <section class="grid">
