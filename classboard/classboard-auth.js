@@ -4,7 +4,24 @@
   const form = document.getElementById('authForm');
   const emailInput = document.getElementById('authEmail');
   const passwordInput = document.getElementById('authPassword');
+  const passwordVisibility = document.getElementById('togglePasswordVisibility');
   const message = document.getElementById('authMessage');
+  function hidePassword() {
+    if (passwordInput.type === 'password') return;
+    passwordInput.type = 'password';
+    passwordVisibility.textContent = 'Show';
+    passwordVisibility.setAttribute('aria-label', 'Show password');
+    passwordVisibility.setAttribute('aria-pressed', 'false');
+  }
+  passwordVisibility.addEventListener('click', () => {
+    const willShow = passwordInput.type === 'password';
+    passwordInput.type = willShow ? 'text' : 'password';
+    passwordVisibility.textContent = willShow ? 'Hide' : 'Show';
+    passwordVisibility.setAttribute('aria-label', willShow ? 'Hide password' : 'Show password');
+    passwordVisibility.setAttribute('aria-pressed', String(willShow));
+  });
+  document.getElementById('authForm').addEventListener('submit', hidePassword);
+  document.getElementById('signUpButton').addEventListener('click', hidePassword);
   const buttons = ['signInButton', 'signUpButton', 'googleSignInButton', 'resetPasswordButton']
     .map((id) => document.getElementById(id));
   const emailPattern = /^[^@\s]+@medicaps[.]ac[.]in$/i;
