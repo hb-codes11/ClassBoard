@@ -25,6 +25,11 @@
   const buttons = ['signInButton', 'signUpButton', 'googleSignInButton', 'resetPasswordButton']
     .map((id) => document.getElementById(id));
   const emailPattern = /^[^@\s]+@medicaps[.]ac[.]in$/i;
+  const roleSwitcher = document.getElementById('roleSwitcher');
+  roleSwitcher.addEventListener('change', () => {
+    const issuePanel = document.getElementById('issueForm')?.closest('article');
+    if (issuePanel) issuePanel.hidden = roleSwitcher.value !== 'student';
+  });
 
   function showMessage(text, isError = false) {
     message.textContent = text;
@@ -112,8 +117,6 @@
       if (form) form.closest('article').hidden = !roles.includes('cr');
     });
     const isStaffAccount = roles.includes('cr') || roles.includes('admin');
-    const issuePanel = document.getElementById('issueForm')?.closest('article');
-    if (issuePanel) issuePanel.hidden = !roles.includes('student') || isStaffAccount;
     const uploadButton = document.getElementById('openResourceUpload');
     if (uploadButton) uploadButton.hidden = !(roles.includes('cr') || roles.includes('admin'));
     const initials = displayName.split(/[\s._-]+/).filter(Boolean).slice(0, 2).map((part) => part[0].toUpperCase()).join('') || 'CB';
