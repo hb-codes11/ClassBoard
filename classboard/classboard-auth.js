@@ -397,6 +397,16 @@
     document.getElementById('calendarSource').textContent = `${calendar.title} · Published for AI & Analytics - A (INTEL-1).`;
   }
 
+  function resourceSubjectColor(name = '') {
+    const subjectName = name.toLowerCase();
+    if (/software engineering/.test(subjectName)) return 'se';
+    if (/statistical analysis/.test(subjectName)) return 'sa';
+    if (/artificial intelligence/.test(subjectName)) return 'ai';
+    if (/java programming/.test(subjectName)) return 'java';
+    if (/computer organisation|computer organization/.test(subjectName)) return 'com';
+    return 'default';
+  }
+
   async function addResourceCard(resource, compact = false) {
     const subject = Array.isArray(resource.subjects) ? resource.subjects[0] : resource.subjects;
     const kind = resourceKindLabel(resource.kind);
@@ -405,6 +415,7 @@
     card.dataset.contentId = resource.id;
     card.dataset.contentType = 'resources';
     card.dataset.subject = subject?.name || '';
+    card.dataset.subjectColor = resourceSubjectColor(subject?.name || '');
     card.dataset.type = kind;
     card.dataset.search = `${resource.title} ${subject?.name || ''} ${kind} ${resource.unit_label || ''}`.toLowerCase();
     card.dataset.resourcePath = resource.storage_path || '';
@@ -414,7 +425,17 @@
     const main = document.createElement('div'); main.className = 'list-main';
     const title = document.createElement('div'); title.className = 'resource-title'; title.textContent = resource.title;
     const meta = document.createElement('div'); meta.className = 'resource-meta';
-    meta.textContent = [subject?.name, kind, resource.unit_label, `Added ${new Date(resource.published_at || resource.created_at).toLocaleDateString('en-IN')}`].filter(Boolean).join(' · ');
+    const metaLine = document.createElement('div'); metaLine.className = 'resource-meta-line';
+    const subjectLabel = document.createElement('span'); subjectLabel.className = 'resource-subject'; subjectLabel.textContent = subject?.name || '';
+    const kindLabel = document.createElement('span'); kindLabel.textContent = [kind, resource.unit_label].filter(Boolean).join(' · ');
+    if (subjectLabel.textContent) metaLine.append(subjectLabel);
+    if (subjectLabel.textContent && kindLabel.textContent) {
+      const separator = document.createElement('span'); separator.className = 'resource-meta-separator'; separator.textContent = '·'; metaLine.append(separator);
+    }
+    if (kindLabel.textContent) metaLine.append(kindLabel);
+    const addedDate = document.createElement('div'); addedDate.className = 'resource-added-date';
+    addedDate.textContent = `Added ${new Date(resource.published_at || resource.created_at).toLocaleDateString('en-IN')}`;
+    meta.append(metaLine, addedDate);
     main.append(title, meta);
     const actions = document.createElement('div'); actions.className = 'resource-actions';
     const preview = document.createElement('button');
@@ -426,7 +447,14 @@
     download.setAttribute('aria-label', `Download ${resource.title}`);
     actions.append(preview, download);
     card.append(icon, main, actions);
-    if (!compact) card.append(makeDeleteButton('Delete resource'));
+    if (!compact) {
+      const remove = makeDeleteButton('Delete resource');
+      remove.classList.add('resource-delete-button');
+      remove.setAttribute('aria-label', `Delete ${resource.title}`);
+      remove.title = 'Delete resource';
+      remove.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6m4-6v6M5 7l1 14h12l1-14M9 7V4h6v3"/></svg>';
+      card.append(remove);
+    }
     return card;
   }
 

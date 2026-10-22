@@ -249,17 +249,36 @@
     .search-field:focus, .select-field:focus, .text-field:focus, .text-area:focus { border-color: var(--blue); box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 15%, transparent); }
     .filter-chip { min-height: 34px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 22px; padding: 0 12px; font-size: 10px; cursor: pointer; }
     .filter-chip.active { border-color: var(--blue); background: var(--blue-soft); color: var(--blue); font-weight: 650; }
-    .resource-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .resource-card { display: flex; align-items: center; gap: 12px; padding: 14px; min-height: 74px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
-    .resource-card .resource-title { font-size: 16px; font-weight: 650; line-height: 1.4; }
-    .resource-card .resource-meta { min-width: 0; max-width: 100%; white-space: normal; font-size: 14px; line-height: 1.45; }
+    .resource-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .resource-card { --resource-accent: var(--blue); display: flex; align-items: center; gap: 11px; padding: 12px; min-height: 80px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); transition: border-color .16s, background-color .16s, transform .16s; }
+    .resource-card:hover { border-color: color-mix(in srgb, var(--resource-accent) 32%, var(--line)); transform: translateY(-1px); }
+    .resource-card[data-subject-color="se"] { --resource-accent: #8050c8; }
+    .resource-card[data-subject-color="sa"] { --resource-accent: #19845d; }
+    .resource-card[data-subject-color="ai"] { --resource-accent: #d94b55; }
+    .resource-card[data-subject-color="java"] { --resource-accent: #d77a15; }
+    .resource-card[data-subject-color="com"] { --resource-accent: #ad7a00; }
+    .resource-card[data-subject-color="default"] { --resource-accent: var(--blue); }
+    [data-theme="dark"] .resource-card[data-subject-color="se"] { --resource-accent: #c09aff; }
+    [data-theme="dark"] .resource-card[data-subject-color="sa"] { --resource-accent: #70d5a7; }
+    [data-theme="dark"] .resource-card[data-subject-color="ai"] { --resource-accent: #ff777f; }
+    [data-theme="dark"] .resource-card[data-subject-color="java"] { --resource-accent: #ffae57; }
+    [data-theme="dark"] .resource-card[data-subject-color="com"] { --resource-accent: #f2cc58; }
+    .resource-card .resource-title { font-size: 14px; font-weight: 670; line-height: 1.35; letter-spacing: -.01em; }
+    .resource-card .resource-meta { display: grid; gap: 2px; min-width: 0; max-width: 100%; white-space: normal; font-size: 11px; line-height: 1.4; }
+    .resource-meta-line { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+    .resource-subject { color: var(--resource-accent); font-weight: 600; }
+    .resource-meta-separator, .resource-added-date { color: var(--muted); }
+    .resource-added-date { font-size: 10px; }
     .resource-card .list-main { width: auto; min-width: 0; flex: 1 1 0; }
-    .resource-card .file-icon { font-size: 13px; }
-    .resource-actions { margin-left:auto; display:flex; align-items:center; justify-content:flex-end; gap:7px; flex:0 1 auto; min-width:0; }
-    .resource-preview-button { min-height:34px; padding:0 11px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--text); font:inherit; font-size:12px; font-weight:650; cursor:pointer; }
+    .resource-card .file-icon { width: 38px; height: 40px; border-radius: 10px; background: color-mix(in srgb, var(--resource-accent) 13%, var(--surface-2)); color: var(--resource-accent); font-size: 10px; }
+    .resource-actions { margin-left:auto; display:flex; align-items:center; justify-content:flex-end; gap:6px; flex:0 1 auto; min-width:0; }
+    .resource-preview-button { min-height:32px; padding:0 10px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--text); font:inherit; font-size:11px; font-weight:650; cursor:pointer; }
     .resource-preview-button:hover { border-color:var(--blue); color:var(--blue); }
-    .resource-download-button { width:34px; height:34px; display:grid; place-items:center; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--muted); cursor:pointer; }
+    .resource-download-button { width:32px; height:32px; display:grid; place-items:center; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--muted); cursor:pointer; }
     .resource-download-button svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+    .resource-delete-button { display:grid; place-items:center; width:32px; height:32px; flex:0 0 32px; padding:0; border-radius:8px; }
+    .resource-delete-button[hidden] { display:none; }
+    .resource-delete-button svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
     .resource-preview-dialog { width:min(1120px,calc(100vw - 32px)); height:min(900px,calc(100dvh - 36px)); max-width:none; max-height:none; padding:0; overflow:hidden; border:1px solid rgba(255,255,255,.34); border-radius:18px; background:rgba(238,245,252,.78); color:#17283d; box-shadow:0 28px 90px rgba(0,0,0,.35); backdrop-filter:blur(28px) saturate(150%); -webkit-backdrop-filter:blur(28px) saturate(150%); }
     .resource-preview-dialog::backdrop { background:rgba(7,15,27,.54); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
     .pdf-preview-shell { display:flex; flex-direction:column; width:100%; height:100%; background:rgba(248,251,255,.7); }
@@ -1665,6 +1684,8 @@
       const card = document.createElement('article');
       card.className = 'resource-card';
       card.dataset.subject = data.get('subject');
+      const resourceSubject = String(data.get('subject')).toLowerCase();
+      card.dataset.subjectColor = /software engineering/.test(resourceSubject) ? 'se' : /statistical analysis/.test(resourceSubject) ? 'sa' : /artificial intelligence/.test(resourceSubject) ? 'ai' : /java programming/.test(resourceSubject) ? 'java' : /computer organisation|computer organization/.test(resourceSubject) ? 'com' : 'default';
       card.dataset.type = data.get('type');
       card.dataset.search = `${data.get('title')} ${data.get('subject')} ${data.get('type')}`.toLowerCase();
       const icon = document.createElement('div'); icon.className = 'file-icon'; icon.textContent = file.name.split('.').pop().toUpperCase();
