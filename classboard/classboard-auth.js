@@ -1275,11 +1275,175 @@
     const previewTitle = document.getElementById('pdfPreviewTitle');
     const previewFileType = document.getElementById('previewFileType');
     const previewDownload = document.getElementById('pdfPreviewDownload');
+    const previewShell = previewDialog?.querySelector('.pdf-preview-shell');
+    const mobilePdfPages = document.createElement('div');
+    mobilePdfPages.className = 'pdf-preview-pages';
+    mobilePdfPages.hidden = true;
+    previewFrame?.insertAdjacentElement('afterend', mobilePdfPages);
+    const mobilePdfStyles = document.createElement('style');
+    mobilePdfStyles.textContent = `
+      .pdf-preview-pages[hidden] { display: none !important; }
+      .pdf-preview-shell.mobile-pdf-rendering .pdf-preview-frame { display: none; }
+      .pdf-preview-shell.mobile-pdf-rendering .pdf-preview-pages { display: block; flex: 1 1 auto; min-height: 0; overflow: auto; padding: 12px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; background: #e8edf3; }
+      .pdf-preview-page { position: relative; width: 100%; margin: 0 auto 14px; overflow: hidden; background: #fff; box-shadow: 0 2px 12px #17283d24; }
+      .pdf-preview-page canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+      .pdf-preview-loading { padding: 24px 16px; color: #738196; text-align: center; }
+      [data-theme="dark"] .pdf-preview-pages { background: #20262e; }
+    `;
+    document.head.append(mobilePdfStyles);
+    const mobilePdfViewport = window.matchMedia('(max-width: 700px)');
+    const pdfJsScriptUrl = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    const pdfJsWorkerUrl = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    let pdfJsLoadPromise;
+    let pdfLoadingTask = null;
+    let activePdfDocument = null;
+    let pdfPageObserver = null;
+    let pdfPreviewGeneration = 0;
+    let pdfResizeTimer;
+    const pdfPageRecords = new Map();
+
+    function loadPdfJs() {
+      if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+      if (pdfJsLoadPromise) return pdfJsLoadPromise;
+      pdfJsLoadPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = pdfJsScriptUrl;
+        script.async = true;
+        script.onload = () => window.pdfjsLib ? resolve(window.pdfjsLib) : reject(new Error('PDF.js did not load.'));
+        script.onerror = () => {
+          pdfJsLoadPromise = null;
+          reject(new Error('Could not load the mobile PDF viewer.'));
+        };
+        document.head.append(script);
+      });
+      return pdfJsLoadPromise;
+    }
+
+    function releasePdfPage(record) {
+      if (record.renderTask) {
+        try { record.renderTask.cancel(); } catch (_) {}
+        record.renderTask = null;
+      }
+      record.canvas?.remove();
+      record.canvas = null;
+      record.rendered = false;
+      record.rendering = false;
+    }
+
+    async function renderPdfPage(record) {
+      if (!activePdfDocument || record.rendered || record.rendering) return;
+      record.rendering = true;
+      try {
+        const page = await activePdfDocument.getPage(record.pageNumber);
+        if (!activePdfDocument || !record.inView) { record.rendering = false; return; }
+        const baseViewport = page.getViewport({ scale: 1 });
+        const availableWidth = Math.max(220, mobilePdfPages.clientWidth - 24);
+        const viewport = page.getViewport({ scale: availableWidth / baseViewport.width });
+        record.placeholder.style.aspectRatio = `${baseViewport.width} / ${baseViewport.height}`;
+        const canvas = document.createElement('canvas');
+        canvas.setAttribute('aria-label', `PDF page ${record.pageNumber}`);
+        const outputScale = Math.min(window.devicePixelRatio || 1, 1.5);
+        canvas.width = Math.floor(viewport.width * outputScale);
+        canvas.height = Math.floor(viewport.height * outputScale);
+        record.placeholder.append(canvas);
+        record.canvas = canvas;
+        const context = canvas.getContext('2d', { alpha: false });
+        record.renderTask = page.render({
+          canvasContext: context,
+          viewport,
+          transform: outputScale === 1 ? null : [outputScale, 0, 0, outputScale, 0, 0]
+        });
+        await record.renderTask.promise;
+        record.renderTask = null;
+        record.rendered = true;
+        record.rendering = false;
+        if (!record.inView) releasePdfPage(record);
+      } catch (error) {
+        record.renderTask = null;
+        record.rendering = false;
+        if (error?.name !== 'RenderingCancelledException') throw error;
+      }
+    }
+
+    async function renderMobilePdf(url) {
+      const generation = ++pdfPreviewGeneration;
+      mobilePdfPages.replaceChildren();
+      mobilePdfPages.hidden = false;
+      previewShell?.classList.add('mobile-pdf-rendering');
+      mobilePdfPages.innerHTML = '<div class="pdf-preview-loading">Loading document…</div>';
+      const pdfjsLib = await loadPdfJs();
+      if (generation !== pdfPreviewGeneration || !previewDialog?.open) return;
+      pdfjsLib.GlobalWorkerOptions.workerSrc = pdfJsWorkerUrl;
+      const loadingTask = pdfjsLib.getDocument({ url });
+      pdfLoadingTask = loadingTask;
+      const pdf = await loadingTask.promise;
+      if (generation !== pdfPreviewGeneration || !previewDialog?.open) {
+        await loadingTask.destroy();
+        return;
+      }
+      activePdfDocument = pdf;
+      pdfPageRecords.clear();
+      mobilePdfPages.replaceChildren();
+      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'pdf-preview-page';
+        placeholder.setAttribute('role', 'img');
+        placeholder.setAttribute('aria-label', `PDF page ${pageNumber} of ${pdf.numPages}`);
+        mobilePdfPages.append(placeholder);
+        const record = { pageNumber, placeholder, inView: false, rendered: false, rendering: false, canvas: null, renderTask: null };
+        pdfPageRecords.set(pageNumber, record);
+      }
+      pdfPageObserver?.disconnect();
+      pdfPageObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const record = pdfPageRecords.get(Number(entry.target.dataset.pdfPage));
+          if (!record) return;
+          record.inView = entry.isIntersecting;
+          if (record.inView) {
+            renderPdfPage(record).catch(() => notifyApp('Could not render this PDF page. Try downloading the file.', true));
+          } else if (record.rendered) {
+            releasePdfPage(record);
+          }
+        });
+      }, { root: mobilePdfPages, rootMargin: '500px 0px', threshold: 0.01 });
+      pdfPageRecords.forEach((record, pageNumber) => {
+        record.placeholder.dataset.pdfPage = String(pageNumber);
+        pdfPageObserver.observe(record.placeholder);
+      });
+    }
+
+    function clearMobilePdfPreview() {
+      pdfPreviewGeneration += 1;
+      pdfPageObserver?.disconnect();
+      pdfPageObserver = null;
+      pdfPageRecords.forEach(releasePdfPage);
+      pdfPageRecords.clear();
+      mobilePdfPages.replaceChildren();
+      mobilePdfPages.hidden = true;
+      previewShell?.classList.remove('mobile-pdf-rendering');
+      const loadingTask = pdfLoadingTask;
+      pdfLoadingTask = null;
+      activePdfDocument = null;
+      if (loadingTask) loadingTask.destroy().catch(() => {});
+    }
+
+    window.addEventListener('resize', () => {
+      clearTimeout(pdfResizeTimer);
+      pdfResizeTimer = setTimeout(() => {
+        if (!activePdfDocument) return;
+        pdfPageRecords.forEach((record) => {
+          releasePdfPage(record);
+          if (record.inView) renderPdfPage(record).catch(() => notifyApp('Could not render this PDF page. Try downloading the file.', true));
+        });
+      }, 180);
+    });
+
     document.getElementById('pdfPreviewClose')?.addEventListener('click', () => previewDialog?.close());
     previewDialog?.addEventListener('click', (event) => {
       if (event.target === previewDialog) previewDialog.close();
     });
     previewDialog?.addEventListener('close', () => {
+      clearMobilePdfPreview();
       previewFrame.removeAttribute('src');
       delete previewDownload.dataset.resourcePath;
       delete previewDownload.dataset.filename;
@@ -1315,13 +1479,23 @@
         if (!viewUrl) { notifyApp('Could not open this resource. Please try again.', true); return; }
         previewTitle.textContent = title;
         previewFileType.textContent = extension.toUpperCase();
-        previewFrame.src = extension === 'pdf'
-          ? `${viewUrl}#view=FitH`
-          : `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(viewUrl)}`;
         previewDownload.dataset.resourcePath = card.dataset.resourcePath;
         previewDownload.dataset.filename = filename;
         previewDownload.disabled = false;
         if (!previewDialog.open) previewDialog.showModal();
+        if (extension === 'pdf' && mobilePdfViewport.matches && 'IntersectionObserver' in window) {
+          previewFrame.removeAttribute('src');
+          renderMobilePdf(viewUrl).catch(() => {
+            clearMobilePdfPreview();
+            previewFrame.src = `${viewUrl}#view=FitH`;
+            notifyApp('Mobile preview could not load all pages. Use Download to open the PDF.', true);
+          });
+        } else {
+          clearMobilePdfPreview();
+          previewFrame.src = extension === 'pdf'
+            ? `${viewUrl}#view=FitH`
+            : `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(viewUrl)}`;
+        }
       } else {
         const url = await signedResourceDownloadUrl(card.dataset.resourcePath, filename);
         button.disabled = false;
