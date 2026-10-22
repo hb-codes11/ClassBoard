@@ -541,7 +541,7 @@
     const homeClassList = document.getElementById('homeClassList');
     homeClassList.replaceChildren();
     if (!sessions.length) addEmptyNote(homeClassList, 'No class sessions have been added yet.');
-    sessions.slice(0, 3).forEach((session) => {
+    sessions.slice(0, 3).sort((first, second) => new Date(first.starts_at) - new Date(second.starts_at)).forEach((session) => {
       const row = addSessionRow(session);
       row.querySelector('.class-log-actions')?.remove();
       homeClassList.append(row);
