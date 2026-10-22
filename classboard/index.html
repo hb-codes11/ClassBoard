@@ -636,15 +636,17 @@
       html, body { max-width: 100%; overflow-x: hidden; }
       body { -webkit-tap-highlight-color: transparent; }
       .main { padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
-      .topbar { height: auto; min-height: calc(98px + env(safe-area-inset-top)); display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: 44px 40px; align-content: center; gap: 4px; padding: env(safe-area-inset-top) max(14px, env(safe-area-inset-right)) 6px max(14px, env(safe-area-inset-left)); }
-      .topbar-start { width: 100%; min-width: 0; gap: 10px; }
+      .topbar { height: auto; min-height: calc(120px + env(safe-area-inset-top)); display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px 44px; grid-template-rows: 44px 44px; align-content: center; gap: 8px; padding: calc(8px + env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 8px max(14px, env(safe-area-inset-left)); }
+      .topbar-start, .top-actions { display: contents; }
       .topbar-start .crumb { display: none; }
-      .mobile-brand { min-width: 0; display: flex; align-items: center; gap: 7px; color: var(--text); font-size: 16px; font-weight: 750; letter-spacing: -.035em; white-space: nowrap; }
-      .mobile-brand img { display: block; width: 28px; height: 28px; object-fit: contain; flex: none; }
-      .top-actions { width: 100%; flex: none; justify-content: flex-start; gap: 6px; }
+      .sidebar-toggle { grid-column: 1; grid-row: 1; }
+      .page-back-button { display: none; }
+      .mobile-brand { grid-column: 2; grid-row: 1; min-width: 0; display: flex; align-items: center; gap: 7px; overflow: hidden; color: var(--text); font-size: 16px; font-weight: 750; letter-spacing: -.035em; white-space: nowrap; }
+      .mobile-brand img { display: block; width: 30px; height: 30px; object-fit: contain; flex: none; }
       .top-actions [aria-label="Academic calendar"], .top-actions #themeToggle { display: none; }
-      .top-actions > .icon-button[aria-label="Notifications"] { margin-left: auto; }
-      .role-switcher { width: min(34vw, 128px); max-width: 128px; min-height: 44px; font-size: 12px; }
+      .top-actions > .icon-button[aria-label="Notifications"] { grid-column: 3; grid-row: 1; }
+      .top-actions > .icon-button[aria-label="Profile"] { grid-column: 4; grid-row: 1; }
+      .role-switcher { grid-column: 1 / -1; grid-row: 2; width: 100%; max-width: none; min-height: 44px; padding-left: 40px; border-radius: 12px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23738196' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='8' width='18' height='12' rx='2'/%3E%3Cpath d='M8 8V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3M3 13h18m-11 0v2h4v-2'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23738196' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 12px center, right 12px center; background-size: 18px, 14px; font-size: 14px; }
       .icon-button { width: 44px; height: 44px; border-radius: 13px; }
       .content { min-height: calc(100svh - 124px); padding: 20px max(14px, env(safe-area-inset-right)) 22px max(14px, env(safe-area-inset-left)); }
       .text-field, .select-field, .search-field, .text-area, .auth-field input { min-height: 44px; font-size: 16px; }
