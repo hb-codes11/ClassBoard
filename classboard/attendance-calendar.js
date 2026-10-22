@@ -1,0 +1,256 @@
+(() => {
+  const grid = document.getElementById('attendanceCalendarGrid');
+  const dialog = document.getElementById('calendarDayDialog');
+  if (!grid || !dialog) return;
+
+  const monthTitle = document.getElementById('attendanceCalendarMonthTitle');
+  const batchSelect = document.getElementById('attendanceCalendarBatch');
+  const classList = document.getElementById('calendarClassList');
+  const dialogDate = document.getElementById('calendarDialogDate');
+  const dialogSub = document.getElementById('calendarDialogSub');
+  const resetButton = document.getElementById('resetCalendarDay');
+  const addForm = document.getElementById('calendarAddForm');
+  const monthButtons = [...document.querySelectorAll('[data-calendar-month]')];
+  const months = [9, 10];
+  const subjects = [
+    { name: 'Software Engineering', short: 'SE' },
+    { name: 'Statistical Analysis', short: 'SA' },
+    { name: 'Computer Organisation & Microprocessors', short: 'COM' },
+    { name: 'Java Programming', short: 'JAVA' },
+    { name: 'Soft Skills-I', short: 'SS-I' },
+    { name: 'Artificial Intelligence', short: 'AI' },
+    { name: 'Mentoring-III', short: 'MEN' }
+  ];
+  const times = {
+    first: ['08:30', '09:20'], second: ['09:20', '10:10'], third: ['10:20', '11:10'],
+    fourth: ['11:10', '12:00'], sixth: ['12:50', '13:40'], seventh: ['13:40', '14:20']
+  };
+  const weekdaySchedule = {
+    1: [
+      ['Java Programming', 'lab', 'A1', ...times.first, 'L.V102'], ['Statistical Analysis', 'lab', 'A2', ...times.first, 'L.V015'],
+      ['Java Programming', 'lab', 'A1', ...times.second, 'L.V102'], ['Statistical Analysis', 'lab', 'A2', ...times.second, 'L.V015'],
+      ['Artificial Intelligence', 'lecture', 'all', ...times.third, 'V306'], ['Software Engineering', 'lecture', 'all', ...times.fourth, 'V306'],
+      ['Statistical Analysis', 'lecture', 'all', ...times.sixth, 'V306'], ['Computer Organisation & Microprocessors', 'lecture', 'all', ...times.seventh, 'V306']
+    ],
+    2: [
+      ['Java Programming', 'lecture', 'all', ...times.first, 'V306'], ['Computer Organisation & Microprocessors', 'lecture', 'all', ...times.second, 'V306'],
+      ['Artificial Intelligence', 'lab', 'A1', ...times.third, 'L.V002'], ['Java Programming', 'lab', 'A2', ...times.third, 'L.V102'],
+      ['Artificial Intelligence', 'lab', 'A1', ...times.fourth, 'L.V002'], ['Java Programming', 'lab', 'A2', ...times.fourth, 'L.V102'],
+      ['Soft Skills-I', 'lecture', 'all', ...times.sixth, 'V306'], ['Soft Skills-I', 'lecture', 'all', ...times.seventh, 'V306']
+    ],
+    3: [
+      ['Statistical Analysis', 'lab', 'A1', ...times.first, 'L.V015'], ['Computer Organisation & Microprocessors', 'lab', 'A2', ...times.first, 'B207'],
+      ['Statistical Analysis', 'lab', 'A1', ...times.second, 'L.V015'], ['Computer Organisation & Microprocessors', 'lab', 'A2', ...times.second, 'B207'],
+      ['Computer Organisation & Microprocessors', 'lecture', 'all', ...times.third, 'V306'], ['Software Engineering', 'lecture', 'all', ...times.fourth, 'V306'],
+      ['Java Programming', 'lecture', 'all', ...times.sixth, 'V306'], ['Mentoring-III', 'lecture', 'all', ...times.seventh, 'V306']
+    ],
+    4: [
+      ['Computer Organisation & Microprocessors', 'lab', 'A1', ...times.first, 'B207'], ['Software Engineering', 'lab', 'A2', ...times.first, 'L.V203'],
+      ['Computer Organisation & Microprocessors', 'lab', 'A1', ...times.second, 'B207'], ['Software Engineering', 'lab', 'A2', ...times.second, 'L.V203'],
+      ['Artificial Intelligence', 'lecture', 'all', ...times.third, 'V306'], ['Statistical Analysis', 'lecture', 'all', ...times.fourth, 'V306'],
+      ['Java Programming', 'lecture', 'all', ...times.sixth, 'V306']
+    ],
+    5: [
+      ['Java Programming', 'lecture', 'all', ...times.first, 'V306'], ['Statistical Analysis', 'lecture', 'all', ...times.second, 'V306'],
+      ['Software Engineering', 'lecture', 'all', ...times.third, 'V306'], ['Statistical Analysis', 'lecture', 'all', ...times.fourth, 'V306'],
+      ['Software Engineering', 'lab', 'A1', ...times.sixth, 'L.V203'], ['Artificial Intelligence', 'lab', 'A2', ...times.sixth, 'L.V002'],
+      ['Software Engineering', 'lab', 'A1', ...times.seventh, 'L.V203'], ['Artificial Intelligence', 'lab', 'A2', ...times.seventh, 'L.V002']
+    ]
+  };
+  const eventMap = {
+    '2026-10-01': { label: 'MST-I', kind: 'exam' },
+    '2026-10-02': { label: 'Gandhi Jayanti', kind: 'holiday' },
+    '2026-10-03': { label: 'MST-I', kind: 'exam' },
+    '2026-10-05': { label: 'SVAR test', kind: 'event' },
+    '2026-10-20': { label: 'Vijayadashami', kind: 'holiday' },
+    ...Object.fromEntries([2, 3, 4, 5, 6, 7].map((day) => [`2026-11-${String(day).padStart(2, '0')}`, { label: 'Deepawali break', kind: 'holiday' }])),
+    '2026-11-14': { label: 'Soft skill course', kind: 'event' },
+    ...Object.fromEntries([16, 17, 18, 19, 20].map((day) => [`2026-11-${String(day).padStart(2, '0')}`, { label: 'MST-II', kind: 'exam' }])),
+    '2026-11-24': { label: 'Guru Nanak Jayanti', kind: 'holiday' },
+    '2026-11-27': { label: 'End of teaching', kind: 'event' },
+    '2026-11-29': { label: 'Convocation', kind: 'convocation' }
+  };
+  let activeMonth = 9;
+  let activeDateKey = '';
+  let selectedClassId = '';
+
+  const dateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  const contextKey = () => {
+    const context = window.classboardContext;
+    return `classboard-personal-calendar:${context?.classId || 'class'}:${context?.userId || 'guest'}`;
+  };
+  const readOverrides = () => {
+    try { return JSON.parse(localStorage.getItem(contextKey()) || '{}') || {}; } catch { return {}; }
+  };
+  const writeOverrides = (overrides) => localStorage.setItem(contextKey(), JSON.stringify(overrides));
+  const subjectInfo = (name) => subjects.find((subject) => subject.name === name) || { name, short: name.slice(0, 6).toUpperCase() };
+  const createClass = ([subject, kind, batch, start, end, room], id) => ({ id, subject, kind, batch, start, end, room });
+  const defaultClasses = (date) => {
+    const key = dateKey(date);
+    const event = eventMap[key];
+    if (event?.kind === 'holiday' || event?.kind === 'exam' || event?.kind === 'convocation') return [];
+    return (weekdaySchedule[date.getDay()] || []).map((item, index) => createClass(item, `base-${date.getDay()}-${index}`));
+  };
+  const classesForDate = (date, overrides = readOverrides()) => Object.hasOwn(overrides, dateKey(date)) ? overrides[dateKey(date)] : defaultClasses(date);
+  const visibleClasses = (classes) => classes.filter((item) => item.kind !== 'lab' || item.batch === batchSelect.value);
+  const calendarLabels = (date, classes) => {
+    const event = eventMap[dateKey(date)];
+    const labels = [];
+    if (event) labels.push(event.label);
+    const unique = new Set();
+    visibleClasses(classes).forEach((item) => {
+      const subject = subjectInfo(item.subject);
+      const label = `${subject.short}${item.kind === 'lab' ? ' (P)' : ''}`;
+      if (!unique.has(label)) { unique.add(label); labels.push(label); }
+    });
+    return labels.slice(0, 5);
+  };
+
+  function renderCalendar() {
+    const year = 2026;
+    const month = activeMonth;
+    const firstWeekday = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const overrides = readOverrides();
+    monthTitle.textContent = new Date(year, month, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+    monthButtons.forEach((button) => button.setAttribute('aria-pressed', String(Number(button.dataset.calendarMonth) === month)));
+    grid.replaceChildren();
+    for (let index = 0; index < firstWeekday; index += 1) {
+      const empty = document.createElement('span'); empty.className = 'attendance-day empty'; empty.setAttribute('aria-hidden', 'true'); grid.append(empty);
+    }
+    for (let day = 1; day <= daysInMonth; day += 1) {
+      const date = new Date(year, month, day);
+      const key = dateKey(date);
+      const event = eventMap[key];
+      const classes = classesForDate(date, overrides);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `attendance-day${date.getDay() === 0 || date.getDay() === 6 ? ' weekend' : ''}${event ? ` ${event.kind}` : ''}${Object.hasOwn(overrides, key) ? ' modified' : ''}${activeDateKey === key ? ' selected' : ''}`;
+      button.setAttribute('role', 'gridcell');
+      button.setAttribute('aria-label', `${date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}${Object.hasOwn(overrides, key) ? ', edited' : ''}`);
+      const number = document.createElement('span'); number.className = 'attendance-day-number'; number.textContent = String(day); button.append(number);
+      calendarLabels(date, classes).forEach((label) => {
+        const eventLabel = label === event?.label;
+        const line = document.createElement('span'); line.className = 'attendance-day-label'; line.textContent = label;
+        if (!eventLabel && classes.length) line.title = label;
+        button.append(line);
+      });
+      button.addEventListener('click', () => openDay(date));
+      grid.append(button);
+    }
+  }
+
+  function buildSelect(options, selected) {
+    const select = document.createElement('select');
+    select.className = 'select-field';
+    options.forEach(([value, label]) => {
+      const option = document.createElement('option'); option.value = value; option.textContent = label; select.append(option);
+    });
+    select.value = selected;
+    return select;
+  }
+
+  function persistClasses(classes) {
+    const overrides = readOverrides();
+    overrides[activeDateKey] = classes;
+    writeOverrides(overrides);
+    renderCalendar();
+    const date = new Date(`${activeDateKey}T12:00:00`);
+    renderDayDialog(date);
+  }
+
+  function renderDayDialog(date) {
+    const classes = visibleClasses(classesForDate(date));
+    const event = eventMap[activeDateKey];
+    dialogDate.textContent = date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    dialogSub.textContent = [event?.label, `${classes.length} ${classes.length === 1 ? 'class' : 'classes'} for ${batchSelect.value}`].filter(Boolean).join(' · ');
+    resetButton.disabled = !Object.hasOwn(readOverrides(), activeDateKey);
+    classList.replaceChildren();
+    if (!classes.length) {
+      const empty = document.createElement('div'); empty.className = 'list-row'; empty.textContent = event?.kind === 'holiday' ? `${event.label} · No scheduled classes. Add a makeup class below if needed.` : 'No classes scheduled. Add a class below if needed.'; classList.append(empty);
+    }
+    classes.forEach((session) => {
+      const row = document.createElement('article'); row.className = 'calendar-class-row';
+      const main = document.createElement('div'); main.className = 'calendar-class-main';
+      const title = document.createElement('div'); title.className = 'calendar-class-title'; title.textContent = subjectInfo(session.subject).name;
+      const meta = document.createElement('div'); meta.className = 'calendar-class-meta';
+      meta.textContent = `${session.start}–${session.end} · ${session.kind === 'lab' ? `Lab · ${session.batch}` : 'Lecture'}${session.room ? ` · ${session.room}` : ''}`;
+      main.append(title, meta);
+      const actions = document.createElement('div'); actions.className = 'calendar-class-actions';
+      const replaceButton = document.createElement('button'); replaceButton.type = 'button'; replaceButton.className = 'secondary-button'; replaceButton.textContent = 'Replace';
+      const removeButton = document.createElement('button'); removeButton.type = 'button'; removeButton.className = 'secondary-button'; removeButton.textContent = 'Remove';
+      actions.append(replaceButton, removeButton);
+      const editForm = document.createElement('form'); editForm.className = 'calendar-class-edit'; editForm.hidden = true;
+      const subjectSelect = buildSelect(subjects.map((item) => [item.name, item.name]), session.subject);
+      const kindSelect = buildSelect([['lecture', 'Lecture'], ['lab', 'Lab']], session.kind);
+      const batchSelectEdit = buildSelect([['A1', 'Lab batch A1'], ['A2', 'Lab batch A2']], session.batch === 'all' ? batchSelect.value : session.batch);
+      const subjectLabel = document.createElement('label'); subjectLabel.className = 'field-label'; subjectLabel.textContent = 'Subject'; subjectLabel.append(subjectSelect);
+      const kindLabel = document.createElement('label'); kindLabel.className = 'field-label'; kindLabel.textContent = 'Type'; kindLabel.append(kindSelect);
+      const batchLabel = document.createElement('label'); batchLabel.className = 'field-label'; batchLabel.textContent = 'Lab batch'; batchLabel.append(batchSelectEdit); batchLabel.hidden = kindSelect.value !== 'lab';
+      const formActions = document.createElement('div'); formActions.className = 'calendar-edit-actions';
+      const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'secondary-button'; cancel.textContent = 'Cancel';
+      const save = document.createElement('button'); save.type = 'submit'; save.className = 'primary-button'; save.textContent = 'Save';
+      formActions.append(cancel, save); editForm.append(subjectLabel, kindLabel, batchLabel, formActions);
+      kindSelect.addEventListener('change', () => { batchLabel.hidden = kindSelect.value !== 'lab'; });
+      replaceButton.addEventListener('click', () => { selectedClassId = session.id; editForm.hidden = !editForm.hidden; });
+      cancel.addEventListener('click', () => { editForm.hidden = true; });
+      removeButton.addEventListener('click', () => persistClasses(classesForDate(date).filter((item) => item.id !== session.id)));
+      editForm.addEventListener('submit', (eventObject) => {
+        eventObject.preventDefault();
+        if (selectedClassId !== session.id) return;
+        const updated = { ...session, subject: subjectSelect.value, kind: kindSelect.value, batch: kindSelect.value === 'lab' ? batchSelectEdit.value : 'all' };
+        persistClasses(classesForDate(date).map((item) => item.id === session.id ? updated : item));
+      });
+      row.append(main, actions, editForm); classList.append(row);
+    });
+  }
+
+  function openDay(date) {
+    activeDateKey = dateKey(date);
+    selectedClassId = '';
+    renderCalendar();
+    renderDayDialog(date);
+    if (!dialog.open) dialog.showModal();
+  }
+
+  const addSubjectSelect = addForm.elements.subject;
+  addSubjectSelect.replaceChildren(...subjects.map((subject) => {
+    const option = document.createElement('option'); option.value = subject.name; option.textContent = subject.name; return option;
+  }));
+  const addKindSelect = addForm.elements.kind;
+  const addBatchLabel = addForm.querySelector('[data-calendar-add-batch]');
+  addKindSelect.addEventListener('change', () => { addBatchLabel.hidden = addKindSelect.value !== 'lab'; });
+  addForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!activeDateKey) return;
+    const values = new FormData(addForm);
+    const start = String(values.get('start'));
+    const end = String(values.get('end'));
+    if (!start || !end || start >= end) { addForm.elements.end.setCustomValidity('End time must be after start time.'); addForm.elements.end.reportValidity(); return; }
+    addForm.elements.end.setCustomValidity('');
+    const date = new Date(`${activeDateKey}T12:00:00`);
+    const currentClasses = classesForDate(date);
+    currentClasses.push({ id: `added-${Date.now()}`, subject: String(values.get('subject')), kind: String(values.get('kind')), batch: values.get('kind') === 'lab' ? String(values.get('batch')) : 'all', start, end, room: String(values.get('room') || '').trim() });
+    addForm.reset(); addBatchLabel.hidden = true;
+    persistClasses(currentClasses);
+  });
+
+  monthButtons.forEach((button) => button.addEventListener('click', () => {
+    activeMonth = Number(button.dataset.calendarMonth);
+    renderCalendar();
+  }));
+  batchSelect.addEventListener('change', () => {
+    renderCalendar();
+    if (dialog.open && activeDateKey) renderDayDialog(new Date(`${activeDateKey}T12:00:00`));
+  });
+  resetButton.addEventListener('click', () => {
+    const overrides = readOverrides(); delete overrides[activeDateKey]; writeOverrides(overrides);
+    renderCalendar(); renderDayDialog(new Date(`${activeDateKey}T12:00:00`));
+  });
+  document.getElementById('closeCalendarDialog').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+  window.addEventListener('classboard:attendance-calendar-context', renderCalendar);
+  const studentBatch = Number(window.classboardContext?.rollNumber);
+  if (studentBatch >= 1 && studentBatch <= 66) batchSelect.value = studentBatch <= 32 ? 'A1' : 'A2';
+  renderCalendar();
+})();

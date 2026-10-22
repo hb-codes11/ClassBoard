@@ -138,6 +138,7 @@
     const studentMembership = data.find((row) => row.role === 'student');
     const classId = data[0].class_id;
     window.classboardContext = { classId, userId: user.id, roles, rollNumber: studentMembership?.roll_number ?? null };
+    window.dispatchEvent(new Event('classboard:attendance-calendar-context'));
     if (studentMembership && window.setClassboardRoll) window.setClassboardRoll(studentMembership.roll_number);
     const issueDate = document.querySelector('#issueForm input[name="date"]');
     if (issueDate) {

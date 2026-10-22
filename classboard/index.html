@@ -756,8 +756,45 @@
     .auth-message { min-height: 22px; margin-top: 12px; color: var(--muted); font-size: 12px; }
     .auth-message.error { color: #c0392b; }
     [hidden] { display: none !important; }
-      .attendance-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(270px, 310px); gap: 16px; align-items: start; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    .attendance-layout { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(390px, .92fr); gap: 16px; align-items: start; }
     .attendance-planner { min-width: 0; max-width: none !important; margin: 0 0 16px !important; }
+    .attendance-sidecar { position: sticky; top: 84px; display: grid; gap: 12px; align-self: start; min-width: 0; max-height: calc(100dvh - 100px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+    .attendance-calendar { overflow: hidden; }
+    .attendance-calendar-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 15px 8px; }
+    .attendance-calendar-title { min-width: 0; font-size: 17px; font-weight: 750; }
+    .attendance-calendar-controls { display: flex; align-items: center; gap: 6px; }
+    .attendance-calendar-controls .select-field { width: auto; min-height: 34px; padding: 5px 26px 5px 9px; font-size: 11px; }
+    .attendance-month-switch { display: flex; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; }
+    .attendance-month-switch button, .attendance-month-nav { min-height: 34px; padding: 5px 9px; border: 0; background: var(--surface); color: var(--muted); font: inherit; font-size: 10px; font-weight: 650; cursor: pointer; }
+    .attendance-month-switch button[aria-pressed="true"] { background: var(--blue-soft); color: var(--blue); }
+    .attendance-month-nav { display: grid; place-items: center; width: 30px; border: 1px solid var(--line); border-radius: 8px; font-size: 17px; }
+    .attendance-calendar-highlights { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 14px 8px; }
+    .attendance-highlight { max-width: 100%; padding: 4px 7px; border-radius: 99px; color: #8e3c39; background: #fff0ed; font-size: 9px; line-height: 1.35; }
+    .attendance-highlight.exam { color: #815c13; background: #fff5d8; }
+    .attendance-highlight.term { color: #285da3; background: #eaf2ff; }
+    .attendance-weekdays, .attendance-calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; padding-inline: 10px; }
+    .attendance-weekdays { padding-bottom: 4px; color: var(--muted); text-align: center; font-size: 9px; font-weight: 650; }
+    .attendance-calendar-grid { padding-bottom: 8px; }
+    .attendance-day { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; min-height: 57px; padding: 5px 4px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); text-align: left; cursor: pointer; }
+    .attendance-day:hover, .attendance-day:focus-visible { border-color: var(--blue); outline: none; }
+    .attendance-day.empty { visibility: hidden; pointer-events: none; }
+    .attendance-day.weekend { background: var(--surface-2); }
+    .attendance-day.holiday { border-color: #f4dddd; background: #fff4f3; }
+    .attendance-day.exam { border-color: #f2e6c5; background: #fff9e9; }
+    .attendance-day.event { border-color: #dce9ff; background: #f1f6ff; }
+    .attendance-day.selected { outline: 2px solid var(--blue); outline-offset: -2px; }
+    .attendance-day-number { font-size: 10px; font-weight: 750; line-height: 1; }
+    .attendance-day-label { display: -webkit-box; overflow: hidden; max-width: 100%; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: var(--muted); font-size: 7px; line-height: 1.15; overflow-wrap: anywhere; }
+    .attendance-day.holiday .attendance-day-label { color: #ad5a58; }
+    .attendance-day.modified::after { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: #0877d1; content: ""; }
+    .attendance-calendar-legend { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 13px 12px; color: var(--muted); font-size: 9px; }
+    .attendance-calendar-legend span { display: inline-flex; align-items: center; gap: 4px; }
+    .attendance-legend-dot { width: 8px; height: 8px; border: 1px solid var(--line); border-radius: 3px; background: var(--surface); }
+    .attendance-legend-dot.holiday { background: #fff0ed; }
+    .attendance-legend-dot.exam { background: #fff1c7; }
+    .attendance-legend-dot.event { background: #eaf2ff; }
+    .attendance-calendar-note { margin: -3px 13px 12px; color: var(--muted); font-size: 9px; }
     .timetable-card { min-width: 0; }
     .timetable-card-header { padding-bottom: 10px; }
     .timetable-card-header .eyebrow { margin-bottom: 4px; }
@@ -772,8 +809,31 @@
     .timetable-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 62px; padding: 10px 14px; border-bottom: 1px solid var(--line); }
     .timetable-dialog-image { display: block; width: 100%; height: 100%; min-height: 0; object-fit: contain; background: var(--surface-2); }
     .timetable-dialog-content { flex: 1; min-height: 0; overflow: auto; }
-    @media (max-width: 1050px) { .attendance-layout { grid-template-columns: minmax(0, 1fr); } .timetable-card { max-width: none; } }
-    @media (max-width: 760px) { .attendance-layout { gap: 12px; } .attendance-planner { margin-bottom: 0 !important; } .timetable-dialog { width: calc(100vw - 16px); height: calc(100dvh - 24px); border-radius: 12px; } .timetable-dialog-header { min-height: 56px; padding: 8px 10px; } }
+    .calendar-day-dialog { width: min(620px, calc(100vw - 28px)); max-width: none; max-height: min(88dvh, 820px); padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); color: var(--text); box-shadow: 0 24px 80px #0005; }
+    .calendar-day-dialog::backdrop { background: #07111fb8; backdrop-filter: blur(6px); }
+    .calendar-dialog-shell { display: flex; flex-direction: column; max-height: min(88dvh, 820px); }
+    .calendar-dialog-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 16px 18px 12px; border-bottom: 1px solid var(--line); }
+    .calendar-dialog-content { min-height: 0; padding: 14px 18px 18px; overflow-y: auto; }
+    .calendar-dialog-date { font-size: 18px; font-weight: 750; }
+    .calendar-dialog-sub { margin-top: 4px; color: var(--muted); font-size: 12px; }
+    .calendar-class-list { display: grid; gap: 9px; }
+    .calendar-class-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 9px; padding: 11px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface-2); }
+    .calendar-class-main { min-width: 0; }
+    .calendar-class-title { font-size: 13px; font-weight: 700; overflow-wrap: anywhere; }
+    .calendar-class-meta { margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .calendar-class-actions { display: flex; align-items: flex-start; gap: 6px; }
+    .calendar-class-actions button, .calendar-edit-actions button { min-height: 34px; padding: 6px 9px; font-size: 11px; }
+    .calendar-class-edit { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; padding-top: 9px; border-top: 1px solid var(--line); }
+    .calendar-class-edit[hidden] { display: none; }
+    .calendar-edit-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 8px; }
+    .calendar-add-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .calendar-add-form h3 { grid-column: 1 / -1; margin: 0; font-size: 13px; }
+    .calendar-add-form .field-label { min-width: 0; font-size: 11px; }
+    .calendar-add-form .text-field, .calendar-add-form .select-field { width: 100%; min-width: 0; min-height: 40px; font-size: 13px; }
+    .calendar-add-actions { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .calendar-storage-note { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: 10px; }
+    @media (max-width: 1050px) { .attendance-layout { grid-template-columns: minmax(0, 1fr); } .attendance-sidecar { position: static; max-height: none; overflow: visible; } .timetable-card { max-width: none; } }
+    @media (max-width: 760px) { .attendance-layout { gap: 12px; } .attendance-planner { margin-bottom: 0 !important; } .attendance-calendar-header { align-items: flex-start; flex-wrap: wrap; padding: 13px 12px 8px; } .attendance-calendar-title { font-size: 16px; } .attendance-calendar-controls { margin-left: auto; } .attendance-day { min-height: 53px; padding: 4px 3px; } .attendance-day-label { font-size: 6.5px; } .attendance-calendar-highlights { gap: 4px; padding-inline: 10px; } .attendance-highlight { font-size: 8px; } .attendance-calendar-legend { gap: 6px; font-size: 8px; } .calendar-dialog-header { padding: 13px; } .calendar-dialog-content { padding: 12px 13px 16px; } .calendar-class-row { grid-template-columns: minmax(0, 1fr); } .calendar-class-actions { justify-content: flex-start; } .calendar-class-edit, .calendar-add-form { grid-template-columns: minmax(0, 1fr); } .calendar-class-edit > *, .calendar-add-form > * { grid-column: 1; } .calendar-edit-actions, .calendar-add-actions { grid-column: 1; } .timetable-dialog { width: calc(100vw - 16px); height: calc(100dvh - 24px); border-radius: 12px; } .timetable-dialog-header { min-height: 56px; padding: 8px 10px; } }
       .notification-slide { position: fixed; z-index: 30; top: max(16px, calc(env(safe-area-inset-top) + 10px)); right: max(16px, calc(env(safe-area-inset-right) + 10px)); display: grid; grid-template-columns: 40px minmax(0, 1fr) 34px; gap: 12px; align-items: start; width: min(390px, calc(100vw - 32px)); padding: 14px; border: 1px solid color-mix(in srgb, var(--blue) 30%, var(--line)); border-radius: 15px; background: color-mix(in srgb, var(--surface) 93%, transparent); color: var(--text); box-shadow: 0 16px 50px #10243b35, inset 0 1px #ffffff40; backdrop-filter: blur(18px) saturate(145%); -webkit-backdrop-filter: blur(18px) saturate(145%); transform: translateX(calc(100% + 32px)); opacity: 0; pointer-events: none; transition: transform .38s cubic-bezier(.2,.8,.2,1), opacity .25s ease; }
     .notification-slide[hidden] { display: none !important; }
     .notification-slide.is-visible { transform: translateX(0); opacity: 1; pointer-events: auto; }
@@ -935,13 +995,39 @@
             <div class="subject-attendance" data-subject-card data-subject-name="Soft Skills"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Soft Skills</div><div class="subject-attendance-count"><span data-attended>0</span> of <span data-held>0</span> classes attended</div></div><div class="subject-attendance-percent" data-percent>—</div></div><div class="progress"><span style="--percent:0%"></span></div><form class="subject-calculator"><label class="field-label">Classes held so far<input class="text-field subject-held" type="number" min="0" value="0" required></label><label class="field-label">Attended so far<input class="text-field subject-attended" type="number" min="0" value="0" required></label><button class="secondary-button" type="submit">Update record</button></form><div class="planner-label">Plan upcoming classes <span class="attendance-hint">· 75% target</span></div><div class="planner-inputs"><label class="field-label">Upcoming classes<input class="text-field future-held" type="number" min="0" value="0" inputmode="numeric"></label><label class="field-label">Plan to attend<input class="text-field future-attend" type="number" min="0" value="0" inputmode="numeric"></label></div><div class="planner-results"><div class="planner-result"><div class="planner-result-label">Projected attendance</div><div class="planner-result-value" data-projected>—</div></div><div class="planner-result"><div class="planner-result-label">Safe classes to miss</div><div class="planner-result-value" data-safe-misses>—</div></div><div class="planner-result"><div class="planner-result-label">Attend in a row to recover</div><div class="planner-result-value" data-recovery>—</div></div></div><div class="planner-guidance" data-guidance>Enter upcoming classes to see your plan.</div></div>
             <div class="subject-attendance" data-subject-card data-subject-name="Artificial Intelligence"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Artificial Intelligence (AI)</div><div class="subject-attendance-count"><span data-attended>0</span> of <span data-held>0</span> classes attended</div></div><div class="subject-attendance-percent" data-percent>—</div></div><div class="progress"><span style="--percent:0%"></span></div><form class="subject-calculator"><label class="field-label">Classes held so far<input class="text-field subject-held" type="number" min="0" value="0" required></label><label class="field-label">Attended so far<input class="text-field subject-attended" type="number" min="0" value="0" required></label><button class="secondary-button" type="submit">Update record</button></form><div class="planner-label">Plan upcoming classes <span class="attendance-hint">· 75% target</span></div><div class="planner-inputs"><label class="field-label">Upcoming classes<input class="text-field future-held" type="number" min="0" value="0" inputmode="numeric"></label><label class="field-label">Plan to attend<input class="text-field future-attend" type="number" min="0" value="0" inputmode="numeric"></label></div><div class="planner-results"><div class="planner-result"><div class="planner-result-label">Projected attendance</div><div class="planner-result-value" data-projected>—</div></div><div class="planner-result"><div class="planner-result-label">Safe classes to miss</div><div class="planner-result-value" data-safe-misses>—</div></div><div class="planner-result"><div class="planner-result-label">Attend in a row to recover</div><div class="planner-result-value" data-recovery>—</div></div></div><div class="planner-guidance" data-guidance>Enter upcoming classes to see your plan.</div></div>
           </article>
-          <article class="panel timetable-card">
-            <div class="panel-header timetable-card-header"><div><div class="eyebrow">Your week</div><div class="panel-title">Class timetable</div><div class="panel-sub">CSE · III · AI &amp; Analytics - A</div></div></div>
-            <button class="timetable-preview-button" id="viewTimetableButton" type="button" aria-label="View timetable">
-              <img src="./class-timetable-odd-semester-2026.png" alt="Class timetable for CSE III AI and Analytics A, July to December 2026" loading="lazy">
-              <span class="timetable-preview-action">View timetable <span aria-hidden="true">→</span></span>
-            </button>
-          </article>
+          <aside class="attendance-sidecar" aria-label="Academic calendar and timetable">
+            <article class="panel attendance-calendar">
+              <div class="attendance-calendar-header">
+                <div class="attendance-calendar-title" id="attendanceCalendarMonthTitle">October 2026</div>
+                <div class="attendance-calendar-controls">
+                  <label class="sr-only" for="attendanceCalendarBatch">Lab batch</label>
+                  <select class="select-field" id="attendanceCalendarBatch" aria-label="Lab batch"><option value="A1">A1</option><option value="A2">A2</option></select>
+                  <div class="attendance-month-switch" role="group" aria-label="Calendar month">
+                    <button type="button" data-calendar-month="9" aria-pressed="true">October</button>
+                    <button type="button" data-calendar-month="10" aria-pressed="false">November</button>
+                  </div>
+                </div>
+              </div>
+              <div class="attendance-calendar-highlights" aria-label="Upcoming dates">
+                <span class="attendance-highlight">Next holiday: Deepawali · Mon, 2 Nov</span>
+                <span class="attendance-highlight exam">Next exam: MST-II · Mon, 16 Nov</span>
+                <span class="attendance-highlight term">End of teaching: Fri, 27 Nov</span>
+              </div>
+              <div class="attendance-weekdays" aria-hidden="true"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+              <div class="attendance-calendar-grid" id="attendanceCalendarGrid" role="grid" aria-label="Monthly class calendar"></div>
+              <div class="attendance-calendar-legend" aria-label="Calendar legend">
+                <span><i class="attendance-legend-dot"></i>Class day</span><span><i class="attendance-legend-dot holiday"></i>Holiday</span><span><i class="attendance-legend-dot exam"></i>MST or exam</span><span><i class="attendance-legend-dot event"></i>Event</span><span>Blue dot: edited day</span>
+              </div>
+              <p class="attendance-calendar-note">Select any date to view and adjust its classes.</p>
+            </article>
+            <article class="panel timetable-card">
+              <div class="panel-header timetable-card-header"><div><div class="eyebrow">Your week</div><div class="panel-title">Class timetable</div><div class="panel-sub">CSE · III · AI &amp; Analytics - A</div></div></div>
+              <button class="timetable-preview-button" id="viewTimetableButton" type="button" aria-label="View timetable">
+                <img src="./class-timetable-odd-semester-2026.png" alt="Class timetable for CSE III AI and Analytics A, July to December 2026" loading="lazy">
+                <span class="timetable-preview-action">View timetable <span aria-hidden="true">→</span></span>
+              </button>
+            </article>
+          </aside>
         </div>
           <article class="panel attendance-issue-panel" style="max-width:640px"><div class="panel-header"><div><div class="panel-title">Tell your CR about an attendance issue</div><div class="panel-sub">Only you, your assigned CR, and class admins can see this message.</div></div></div><form class="attendance-form" id="issueForm"><label class="field-label">Subject<select class="select-field" name="subject" required><option>Loading subjects…</option></select></label><label class="field-label">Class date<input class="text-field" type="date" name="date" required></label><label class="field-label" style="grid-column:1/-1">What happened?<textarea class="text-area" name="message" placeholder="For example, I attended this class but my record shows absent." maxlength="2500" required></textarea></label><button class="primary-button" type="submit">Send to my CR</button></form><div id="studentCaseList"><div class="list-row"><div class="list-main">Your submitted concerns will appear here.</div></div></div></article>
         </section>
@@ -1059,6 +1145,28 @@
         <button class="icon-button" id="closeTimetableDialog" type="button" aria-label="Close timetable preview" title="Close preview"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       </div>
       <div class="timetable-dialog-content"><img class="timetable-dialog-image" src="./class-timetable-odd-semester-2026.png" alt="Full class timetable for CSE III AI and Analytics A, July to December 2026"></div>
+    </div>
+  </dialog>
+  <dialog class="calendar-day-dialog" id="calendarDayDialog" aria-labelledby="calendarDialogDate">
+    <div class="calendar-dialog-shell">
+      <div class="calendar-dialog-header">
+        <div><div class="calendar-dialog-date" id="calendarDialogDate"></div><div class="calendar-dialog-sub" id="calendarDialogSub"></div></div>
+        <div class="calendar-class-actions"><button class="secondary-button" id="resetCalendarDay" type="button">Reset this day</button><button class="icon-button" id="closeCalendarDialog" type="button" aria-label="Close day details">×</button></div>
+      </div>
+      <div class="calendar-dialog-content">
+        <div class="calendar-class-list" id="calendarClassList"></div>
+        <form class="calendar-add-form" id="calendarAddForm">
+          <h3>Add a class</h3>
+          <label class="field-label">Subject<select class="select-field" name="subject" required></select></label>
+          <label class="field-label">Type<select class="select-field" name="kind"><option value="lecture">Lecture</option><option value="lab">Lab</option></select></label>
+          <label class="field-label" data-calendar-add-batch hidden>Lab batch<select class="select-field" name="batch"><option value="A1">A1</option><option value="A2">A2</option></select></label>
+          <label class="field-label">Start time<input class="text-field" name="start" type="time" required></label>
+          <label class="field-label">End time<input class="text-field" name="end" type="time" required></label>
+          <label class="field-label">Room<input class="text-field" name="room" type="text" maxlength="60" placeholder="Optional"></label>
+          <div class="calendar-add-actions"><span></span><button class="primary-button" type="submit">Add class</button></div>
+          <p class="calendar-storage-note">Your personal date changes are saved in this browser and do not change the official class log.</p>
+        </form>
+      </div>
     </div>
   </dialog>
   <dialog class="app-dialog" id="appDialog"><div class="dialog-content" id="dialogContent"></div></dialog>
@@ -1625,6 +1733,7 @@
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="./attendance-calendar.js"></script>
   <script>
     (() => {
       const slide = document.getElementById('notificationSlide');
