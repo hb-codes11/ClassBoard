@@ -272,6 +272,20 @@
       joinLink.textContent = update.isReminder ? 'Join session ↗' : 'Open link ↗';
     }
     copy.append(time);
+    if (update.attachment_path) {
+            const attachmentActions = document.createElement('div');
+            attachmentActions.className = 'update-attachment-actions';
+            const preview = document.createElement('button');
+            preview.type = 'button';
+            preview.className = 'update-attachment-button';
+            preview.dataset.previewPdf = 'true';
+            preview.setAttribute('aria-label', `Preview attached PDF: ${update.attachment_name || 'Update attachment'}`);
+            preview.innerHTML = '<svg viewBox="0 0 24 24"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg><span>Preview PDF</span>';
+            attachmentActions.append(preview);
+            card.dataset.resourcePath = update.attachment_path;
+            card.dataset.resourceTitle = update.attachment_name || 'Update attachment';
+            copy.append(attachmentActions);
+    }
     card.append(dateTile, icon, copy);
     if (joinLink) card.append(joinLink);
     card.append(makeDeleteButton(update.isReminder ? 'Delete reminder' : 'Delete update', true));
@@ -420,12 +434,16 @@
     const [classResult, subjectResult, updateResult, sessionResult, resourceResult, reminderResult] = await Promise.all([
       client.from('classes').select('id,code,name,semester').eq('id', classId).single(),
       client.from('subjects').select('id,slug,name,short_name,display_order').eq('class_id', classId).eq('is_active', true).order('display_order'),
-      client.from('updates').select('id,title,body,category,importance,created_at,published_at,expires_at').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20),
+      client.from('updates').select('id,title,body,category,importance,created_at,published_at,expires_at,attachment_path,attachment_name').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20),
       client.from('class_sessions').select('id,subject_id,class_number,kind,batch,state,starts_at,room,topic,subjects(name,short_name)').eq('class_id', classId).order('starts_at', { ascending: false }).limit(50),
       client.from('resources').select('id,title,kind,unit_label,storage_path,created_at,published_at,subjects(name)').eq('class_id', classId).not('published_at', 'is', null).is('deleted_at', null).order('published_at', { ascending: false }).limit(50),
       client.from('reminders').select('id,title,body,due_at,created_at').eq('class_id', classId).eq('is_active', true).gte('due_at', new Date().toISOString()).order('due_at').limit(20)
     ]);
 
+    if (updateResult.error && /attachment_(?:path|name)|column .*does not exist|schema cache/i.test(updateResult.error.message || '')) {
+      const legacyUpdates = await client.from('updates').select('id,title,body,category,importance,created_at,published_at,expires_at').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20);
+      if (!legacyUpdates.error) updateResult.data = legacyUpdates.data;
+    }
     const failed = [classResult, subjectResult, updateResult, sessionResult, resourceResult, reminderResult].find((result) => result.error);
     if (failed) throw failed.error;
     const classInfo = classResult.data;
@@ -1180,6 +1198,13 @@
           const removed = await client.storage.from('class-resources').remove([found.data.storage_path]);
           if (removed.error) cleanupWarning = ` The resource record is deleted; PDF cleanup needs attention: ${removed.error.message}`;
         }
+      } else if (row.dataset.contentType === 'updates' && row.dataset.resourcePath) {
+        const deleted = await client.from('updates').delete().eq('id', row.dataset.contentId).eq('class_id', context.classId).select('id');
+        error = deleted.error || (!deleted.data?.length ? new Error('No row was deleted. Apply the content-management migration and try again.') : null);
+        if (!error) {
+          const removed = await client.storage.from('class-resources').remove([row.dataset.resourcePath]);
+          if (removed.error) cleanupWarning = ` Update deleted; PDF cleanup needs attention: ${removed.error.message}`;
+        }
       } else {
         const deleted = await client.from(row.dataset.contentType).delete().eq('id', row.dataset.contentId).eq('class_id', context.classId).select('id');
         error = deleted.error || (!deleted.data?.length ? new Error('No row was deleted. Apply the content-management migration and try again.') : null);
@@ -1281,7 +1306,7 @@
       button.disabled = true;
       const title = card.dataset.resourceTitle || 'Class resource';
       const extension = card.dataset.resourcePath.split('.').pop().toLowerCase();
-      const filename = `${title.replace(/[/\\?%*:|"<>]/g, '-').trim() || 'class-resource'}.${['pdf', 'docx', 'pptx'].includes(extension) ? extension : 'pdf'}`;
+      const filename = `${title.replace(/\.(?:pdf|docx|pptx)$/i, '').replace(/[/\\?%*:|"<>]/g, '-').trim() || 'class-resource'}.${['pdf', 'docx', 'pptx'].includes(extension) ? extension : 'pdf'}`;
       if (button.dataset.previewPdf) {
         const viewUrl = await signedResourceUrl(card.dataset.resourcePath);
         button.disabled = false;
@@ -1426,23 +1451,59 @@
       const context = window.classboardContext;
       if (!context?.roles.includes('cr')) { notifyApp('Only an assigned CR can publish class updates.', true); return; }
       const values = new FormData(updatesForm);
+      const attachment = updatesForm.elements.namedItem('attachment')?.files?.[0] || null;
+      if (attachment && (attachment.size > 10 * 1024 * 1024 || (!/\.pdf$/i.test(attachment.name) || (attachment.type && attachment.type !== 'application/pdf')))) {
+        notifyApp('Choose a PDF file under 10 MB.', true);
+        return;
+      }
       const category = String(values.get('category'));
       const expiresAt = category === 'Deadline' ? new Date(String(values.get('deadline'))).toISOString() : null;
-      const { error } = await window.classboardSupabase.from('updates').insert({
-        class_id: context.classId,
-        title: String(values.get('title')).trim(),
-        body: String(values.get('message')).trim(),
-        category: category.toLowerCase(),
-        importance: category === 'Important' ? 'important' : 'normal',
-        expires_at: expiresAt,
-        created_by: context.userId,
-        published_at: new Date().toISOString()
-      });
-      if (error) { notifyApp(`Update did not save: ${error.message}`, true); return; }
+      const submitButton = updatesForm.querySelector('[type="submit"]');
+      submitButton.disabled = true;
+      let storagePath = null;
+      let updateSaved = false;
+      try {
+        if (attachment) {
+          const safeFilename = attachment.name.replace(/[^a-zA-Z0-9._-]/g, '-').replace(/-+/g, '-').slice(-180) || 'update.pdf';
+          const attachmentId = window.crypto?.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+          storagePath = `${context.classId}/updates/${attachmentId}/${safeFilename}`;
+          const uploaded = await window.classboardSupabase.storage.from('class-resources').upload(storagePath, attachment, {
+            cacheControl: '3600', contentType: 'application/pdf', upsert: false
+          });
+          if (uploaded.error) throw new Error(`PDF upload failed: ${uploaded.error.message}`);
+        }
+        const update = {
+          class_id: context.classId,
+          title: String(values.get('title')).trim(),
+          body: String(values.get('message')).trim(),
+          category: category.toLowerCase(),
+          importance: category === 'Important' ? 'important' : 'normal',
+          expires_at: expiresAt,
+          created_by: context.userId,
+          published_at: new Date().toISOString()
+        };
+        if (attachment) {
+          update.attachment_path = storagePath;
+          update.attachment_name = attachment.name;
+        }
+        const inserted = await window.classboardSupabase.from('updates').insert(update);
+        if (inserted.error) throw new Error(`Update did not save: ${inserted.error.message}`);
+        updateSaved = true;
+      } catch (error) {
+        if (storagePath && !updateSaved) await window.classboardSupabase.storage.from('class-resources').remove([storagePath]);
+        notifyApp(error.message || 'Update could not be published. Please try again.', true);
+        submitButton.disabled = false;
+        return;
+      }
       updatesForm.reset();
       syncDeadlineField();
-      await loadLiveClassData(context.classId);
-      notifyApp('Update published for the class.');
+      submitButton.disabled = false;
+      try {
+        await loadLiveClassData(context.classId);
+        notifyApp('Update published for the class.');
+      } catch (error) {
+        notifyApp('Update was published, but the feed could not refresh. Reload the page to see it.', true);
+      }
     }, true);
 
     const classLogForm = document.getElementById('crClassForm');
