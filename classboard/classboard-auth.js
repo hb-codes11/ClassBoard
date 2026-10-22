@@ -520,23 +520,11 @@
         const heading = document.createElement('h2'); heading.className = 'class-log-day-heading';
         heading.innerHTML = '<span class="class-log-day-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg></span>';
         const dateLabel = document.createElement('span'); dateLabel.textContent = date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        heading.append(dateLabel); group.append(heading); classLogList.append(group); dayGroups.set(key, { group, categories: new Map() });
+        const grid = document.createElement('div'); grid.className = 'class-log-session-grid';
+        heading.append(dateLabel); group.append(heading, grid); classLogList.append(group); dayGroups.set(key, { group, grid });
       }
       const day = dayGroups.get(key);
-      const category = session.kind === 'lab' ? 'lab' : 'lecture';
-      if (!day.categories.has(category)) {
-        const kindGroup = document.createElement('section'); kindGroup.className = 'class-log-kind-group'; kindGroup.dataset.classLogKind = category;
-        const kindHeading = document.createElement('div'); kindHeading.className = 'class-log-kind-heading';
-        kindHeading.textContent = category === 'lab' ? 'Labs' : 'Lectures';
-        const count = document.createElement('span'); count.textContent = String(chronologicalSessions.filter((item) => {
-          const itemDate = new Date(item.starts_at);
-          return itemDate.getFullYear() === date.getFullYear() && itemDate.getMonth() === date.getMonth() && itemDate.getDate() === date.getDate() && (item.kind === 'lab' ? 'lab' : 'lecture') === category;
-        }).length);
-        kindHeading.append(count);
-        const grid = document.createElement('div'); grid.className = 'class-log-session-grid';
-        kindGroup.append(kindHeading, grid); day.group.append(kindGroup); day.categories.set(category, grid);
-      }
-      day.categories.get(category).append(addSessionRow(session));
+      day.grid.append(addSessionRow(session));
     });
     const homeClassList = document.getElementById('homeClassList');
     homeClassList.replaceChildren();
