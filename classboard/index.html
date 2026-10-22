@@ -97,6 +97,19 @@
     .profile-menu button:hover { color: var(--blue); background: var(--blue-soft); }
     .profile-wrap { position: relative; margin-top: auto; }
     .main { margin-left: 236px; min-height: 100vh; }
+    .app.sidebar-collapsed .sidebar { display: none; }
+    .app.sidebar-collapsed .main { margin-left: 0; }
+    .sidebar-toggle { flex: none; width: 36px; height: 36px; }
+    .sidebar-backdrop { display: none; }
+    .sidebar-backdrop[hidden] { display: none; }
+    @media (max-width: 760px) {
+      .app.sidebar-collapsed .sidebar { display: none; }
+      .app.sidebar-open .sidebar { display: flex; position: fixed; inset: 0 auto 0 0; z-index: 8; width: min(300px, calc(100vw - 52px)); padding: max(18px, env(safe-area-inset-top)) 15px max(18px, env(safe-area-inset-bottom)); overflow-y: auto; box-shadow: 16px 0 40px #10243b30; }
+      .app.sidebar-open .sidebar-backdrop { display: block; position: fixed; inset: 0; z-index: 7; width: 100%; height: 100%; padding: 0; border: 0; background: #10243b66; }
+      [data-theme="dark"] .app.sidebar-open .sidebar-backdrop { background: #000000a8; }
+      .app.sidebar-open { overflow: hidden; }
+      .sidebar-toggle { width: 44px; height: 44px; border-radius: 13px; }
+    }
     .topbar { height: 68px; position: sticky; top: 0; z-index: 4; display: flex; align-items: center; justify-content: space-between; padding: 0 38px; background: color-mix(in srgb, var(--surface) 72%, transparent); backdrop-filter: blur(18px) saturate(145%); -webkit-backdrop-filter: blur(18px) saturate(145%); border-bottom: 1px solid color-mix(in srgb, var(--line) 72%, transparent); }
     .topbar-start { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
     .page-back-button { flex: none; width: 36px; height: 36px; }
@@ -900,7 +913,7 @@
     </div>
   </section>
   <div class="app" hidden>
-    <aside class="sidebar">
+    <aside class="sidebar" id="appSidebar">
       <div class="brand">
         <div class="brand-mark"><img src="./classboard-logo.svg" alt="Classboard logo" /></div>
         <div class="brand-copy"><div class="brand-name">Classboard</div><div class="brand-sub">INTEL CLASS PORTAL</div><div class="brand-term">3rd Semester</div></div>
@@ -924,9 +937,11 @@
       </div>
     </aside>
 
+    <button class="sidebar-backdrop" id="sidebarBackdrop" type="button" aria-label="Close sidebar" hidden></button>
     <main class="main">
       <header class="topbar">
         <div class="topbar-start">
+          <button class="icon-button sidebar-toggle" id="sidebarToggle" type="button" aria-label="Open sidebar" title="Open sidebar" aria-controls="appSidebar" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
           <button class="icon-button page-back-button" id="pageBackButton" type="button" aria-label="Go back" title="Go back" disabled><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
           <div class="mobile-brand"><img src="./classboard-logo.svg" alt="" /> <span>Classboard</span></div>
           <div class="crumb">Workspace <span style="padding:0 7px;color:var(--line)">/</span> <strong id="crumbPage">Home</strong></div>
@@ -1383,7 +1398,45 @@
       }
       document.querySelectorAll('.page-view').forEach((section) => section.classList.toggle('active', section.id === `page-${pageId}`));
       document.querySelectorAll('.nav-item, .mobile-nav button').forEach((button) => button.classList.toggle('active', button.dataset.view === activeName || (activeName === 'Notes & Syllabus' && button.textContent.trim() === 'Learn')));
-      const mobileMoreButton = document.querySelector('[data-mobile-more]');
+      const appShell = document.querySelector('.app');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    const isMobileSidebar = () => window.matchMedia('(max-width: 760px)').matches;
+    const setSidebarOpen = (open) => {
+      if (isMobileSidebar()) {
+        appShell.classList.toggle('sidebar-open', open);
+        appShell.classList.remove('sidebar-collapsed');
+        sidebarBackdrop.hidden = !open;
+      } else {
+        appShell.classList.remove('sidebar-open');
+        appShell.classList.toggle('sidebar-collapsed', !open);
+        sidebarBackdrop.hidden = true;
+      }
+      sidebarToggle.setAttribute('aria-expanded', String(open));
+      sidebarToggle.setAttribute('aria-label', open ? 'Close sidebar' : 'Open sidebar');
+      sidebarToggle.title = open ? 'Close sidebar' : 'Open sidebar';
+    };
+    sidebarToggle.addEventListener('click', () => {
+      const isOpen = isMobileSidebar()
+        ? appShell.classList.contains('sidebar-open')
+        : !appShell.classList.contains('sidebar-collapsed');
+      setSidebarOpen(!isOpen);
+    });
+    sidebarBackdrop.addEventListener('click', () => setSidebarOpen(false));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && appShell.classList.contains('sidebar-open')) setSidebarOpen(false);
+    });
+    document.querySelectorAll('.sidebar [data-view]').forEach((item) => item.addEventListener('click', () => {
+      if (isMobileSidebar()) setSidebarOpen(false);
+    }));
+    window.addEventListener('resize', () => {
+      if (!isMobileSidebar()) setSidebarOpen(!appShell.classList.contains('sidebar-collapsed'));
+      else {
+        appShell.classList.remove('sidebar-collapsed');
+        setSidebarOpen(appShell.classList.contains('sidebar-open'));
+      }
+    });
+    const mobileMoreButton = document.querySelector('[data-mobile-more]');
       const mobileMoreMenu = document.getElementById('mobileMoreMenu');
       if (mobileMoreButton && mobileMoreMenu) {
         const primaryMobileViews = ['Home', 'Notes & Syllabus', 'Updates'];
