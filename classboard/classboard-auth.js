@@ -273,18 +273,18 @@
     }
     copy.append(time);
     if (update.attachment_path) {
-            const attachmentActions = document.createElement('div');
-            attachmentActions.className = 'update-attachment-actions';
-            const preview = document.createElement('button');
-            preview.type = 'button';
-            preview.className = 'update-attachment-button';
-            preview.dataset.previewPdf = 'true';
-            preview.setAttribute('aria-label', `Preview attached PDF: ${update.attachment_name || 'Update attachment'}`);
-            preview.innerHTML = '<svg viewBox="0 0 24 24"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg><span>Preview PDF</span>';
-            attachmentActions.append(preview);
-            card.dataset.resourcePath = update.attachment_path;
-            card.dataset.resourceTitle = update.attachment_name || 'Update attachment';
-            copy.append(attachmentActions);
+      const attachmentActions = document.createElement('div');
+      attachmentActions.className = 'update-attachment-actions';
+      const preview = document.createElement('button');
+      preview.type = 'button';
+      preview.className = 'update-attachment-button';
+      preview.dataset.previewPdf = 'true';
+      preview.setAttribute('aria-label', `Preview attached PDF: ${update.attachment_name || 'Update attachment'}`);
+      preview.innerHTML = '<svg viewBox="0 0 24 24"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg><span>Preview PDF</span>';
+      attachmentActions.append(preview);
+      card.dataset.resourcePath = update.attachment_path;
+      card.dataset.resourceTitle = update.attachment_name || 'Update attachment';
+      copy.append(attachmentActions);
     }
     card.append(dateTile, icon, copy);
     if (joinLink) card.append(joinLink);
@@ -431,7 +431,7 @@
 
   async function loadLiveClassData(classId) {
     const client = window.classboardSupabase;
-    const [classResult, subjectResult, updateResult, sessionResult, resourceResult, reminderResult] = await Promise.all([
+    const [classResult, subjectResult, attachmentUpdateResult, sessionResult, resourceResult, reminderResult] = await Promise.all([
       client.from('classes').select('id,code,name,semester').eq('id', classId).single(),
       client.from('subjects').select('id,slug,name,short_name,display_order').eq('class_id', classId).eq('is_active', true).order('display_order'),
       client.from('updates').select('id,title,body,category,importance,created_at,published_at,expires_at,attachment_path,attachment_name').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20),
@@ -440,9 +440,10 @@
       client.from('reminders').select('id,title,body,due_at,created_at').eq('class_id', classId).eq('is_active', true).gte('due_at', new Date().toISOString()).order('due_at').limit(20)
     ]);
 
+    let updateResult = attachmentUpdateResult;
     if (updateResult.error && /attachment_(?:path|name)|column .*does not exist|schema cache/i.test(updateResult.error.message || '')) {
       const legacyUpdates = await client.from('updates').select('id,title,body,category,importance,created_at,published_at,expires_at').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20);
-      if (!legacyUpdates.error) updateResult.data = legacyUpdates.data;
+      if (!legacyUpdates.error) updateResult = legacyUpdates;
     }
     const failed = [classResult, subjectResult, updateResult, sessionResult, resourceResult, reminderResult].find((result) => result.error);
     if (failed) throw failed.error;
