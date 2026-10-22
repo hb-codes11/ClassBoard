@@ -342,23 +342,26 @@
     .list-main { min-width: 0; flex: 1; }
     .list-title { font-size: 11px; font-weight: 680; }
     .list-detail { color: var(--muted); font-size: 10px; margin-top: 4px; }
-    .profile-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
+    .profile-layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: 16px; align-items: start; }
     .profile-side-stack { display: grid; gap: 14px; }
     .profile-panel { max-width: none !important; margin: 0 !important; }
-    .profile-account { padding: 18px; }
-    .profile-identity { display: flex; align-items: center; gap: 14px; padding: 2px 4px 17px; border-bottom: 1px solid var(--line); }
-    .profile-identity .avatar { width: 50px; height: 50px; font-size: 15px; }
-    .profile-identity .list-title { font-size: 17px; letter-spacing: -.02em; }
+    .profile-account { padding: 0; overflow: hidden; }
+    .profile-identity { display: flex; align-items: center; gap: 14px; min-width: 0; padding: 20px; border-bottom: 1px solid var(--line); background: linear-gradient(130deg, var(--blue-soft), var(--surface) 72%); }
+    .profile-identity .avatar { width: 58px; height: 58px; font-size: 17px; box-shadow: 0 0 0 4px var(--surface); }
+    .profile-identity .list-title { font-size: 18px; letter-spacing: -.025em; }
     .profile-identity .list-detail { font-size: 12px; }
+    .profile-identity-copy { min-width: 0; flex: 1; }
+    .profile-class-badge { display: inline-flex; max-width: 100%; margin-top: 8px; padding: 5px 9px; border: 1px solid color-mix(in srgb, var(--blue) 14%, var(--line)); border-radius: 999px; background: var(--surface); color: var(--blue); font-size: 10px; font-weight: 700; line-height: 1.3; }
+    .profile-identity .secondary-button { flex: none; }
     .profile-details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 7px; }
-    .profile-detail-row { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 12px 10px; }
-    .profile-detail-row:nth-child(odd) { padding-left: 4px; padding-right: 16px; border-right: 1px solid var(--line); }
-    .profile-detail-row:nth-child(even) { padding-left: 16px; }
+    .profile-detail-row { display: flex; align-items: center; gap: 11px; min-width: 0; padding: 14px 12px; }
+    .profile-detail-row:nth-child(odd) { padding-left: 20px; padding-right: 14px; border-right: 1px solid var(--line); }
+    .profile-detail-row:nth-child(even) { padding-left: 16px; padding-right: 20px; }
     .profile-detail-row:nth-child(n+3) { border-top: 1px solid var(--line); }
     .profile-detail-icon { display: grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 10px; background: var(--blue-soft); color: var(--blue); }
     .profile-detail-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-    .profile-detail-row .list-title { font-size: 12px; }
-    .profile-detail-row .list-detail { font-size: 12px; line-height: 1.5; }
+    .profile-detail-row .list-title { font-size: 11px; }
+    .profile-detail-row .list-detail { font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
     .profile-detail-row .secondary-button { flex: none; }
     .profile-section-heading { display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); }
     .profile-section-heading .panel-title { font-size: 14px; }
@@ -368,20 +371,21 @@
     .profile-side-stack .list-row { gap: 12px; padding: 10px 18px; }
     .profile-side-stack .list-row .list-title { font-size: 12px; }
     .profile-side-stack .list-row .list-detail { font-size: 11px; margin-top: 3px; }
+    .profile-side-stack .list-row > button { flex: none; }
+    @media (max-width: 1050px) { .profile-layout { grid-template-columns: minmax(0, 1fr); } .profile-side-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; } }
     @media (max-width: 760px) {
       .profile-details-grid { grid-template-columns: minmax(0, 1fr); }
-      .profile-layout, .profile-side-stack { gap: 14px; }
-      .profile-account { padding: 15px; }
-      .profile-detail-row:nth-child(odd), .profile-detail-row:nth-child(even) { padding: 12px 4px; border-right: 0; }
+      .profile-layout, .profile-side-stack { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+      .profile-detail-row:nth-child(odd), .profile-detail-row:nth-child(even) { padding: 12px 16px; border-right: 0; }
       .profile-detail-row:nth-child(n+2) { border-top: 1px solid var(--line); }
       .profile-section-heading { padding: 12px 14px; }
       .profile-side-stack .list-row { padding: 10px 14px; }
     }
     @media (max-width: 480px) {
-      .profile-account { padding: 14px; }
-      .profile-identity { gap: 12px; padding: 2px 2px 14px; }
-      .profile-identity .avatar { width: 44px; height: 44px; }
+      .profile-identity { gap: 12px; padding: 16px 14px; flex-wrap: wrap; }
+      .profile-identity .avatar { width: 46px; height: 46px; }
       .profile-identity .list-title { font-size: 15px; }
+      .profile-identity .secondary-button { width: 100%; }
       .profile-detail-row { gap: 10px; }
       .profile-detail-icon, .profile-row-icon { width: 34px; height: 34px; border-radius: 8px; }
       .profile-detail-icon svg, .profile-row-icon svg { width: 16px; height: 16px; }
@@ -1082,12 +1086,12 @@
           <div class="page-heading"><div><div class="eyebrow">Account settings</div><h1>Profile</h1><div class="page-description">Your class account and a few useful settings.</div></div></div>
           <div class="profile-layout">
             <article class="panel profile-panel profile-account">
-              <div class="profile-identity"><div class="avatar" id="profileAvatar">CB</div><div class="list-main"><div class="list-title" id="profileName">Your account</div><div class="list-detail" id="profileRole">Class member</div></div></div>
+              <div class="profile-identity"><div class="avatar" id="profileAvatar">CB</div><div class="profile-identity-copy"><div class="list-title" id="profileName">Your account</div><div class="list-detail" id="profileRole">Class member</div><span class="profile-class-badge">AI &amp; Analytics - A (INTEL-1)</span></div><button class="secondary-button" type="button" data-toast="Ask your class admin to update your name, serial number or access role">Edit profile</button></div>
               <div class="profile-details-grid">
                 <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg></span><div class="list-main"><div class="list-title">College email</div><div class="list-detail" id="profileEmail">Sign in to see your account email</div></div></div>
-                <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M10 3 8 21m8-18-2 18"></path></svg></span><div class="list-main"><div class="list-title">Roll number &amp; lab batch</div><div class="list-detail">Roll <span id="profileRoll">Not assigned</span> · <span id="profileBatch">Roll number needed</span></div></div></div>
+                <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M10 3 8 21m8-18-2 18"></path></svg></span><div class="list-main"><div class="list-title">Serial number</div><div class="list-detail"><span id="profileRoll">Not assigned</span></div></div></div>
+                <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M8 8h8m-8 4h8m-8 4h4"></path></svg></span><div class="list-main"><div class="list-title">Lab batch</div><div class="list-detail" id="profileBatch">Not assigned</div></div></div>
                 <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><div class="list-main"><div class="list-title">Class</div><div class="list-detail">AI &amp; Analytics - A (INTEL-1)</div></div></div>
-                <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span><div class="list-main"><div class="list-title">Sign-in details</div><div class="list-detail">Password and account access</div></div><button class="secondary-button" data-toast="Choose Forgot password on the sign-in screen to reset your password">Manage</button></div>
               </div>
             </article>
             <div class="profile-side-stack">
@@ -1095,6 +1099,7 @@
                 <div class="profile-section-heading"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.7 2.94-.09-.03a1.7 1.7 0 0 0-1.83.51l-.06.07h-3.4l-.02-.1a1.7 1.7 0 0 0-1.25-1.31l-.1-.02-1.7-2.94.07-.07A1.7 1.7 0 0 0 10 14.2v-.1l-1.7-2.94.06-.08a1.7 1.7 0 0 0 .34-1.87l-.04-.09 1.7-2.94.1.03a1.7 1.7 0 0 0 1.82-.51l.06-.07h3.4l.03.1a1.7 1.7 0 0 0 1.24 1.31l.1.02 1.7 2.94-.07.07a1.7 1.7 0 0 0-.34 1.88v.1l1.7 2.94-.06.08a1.7 1.7 0 0 0-.34 1.87z"></path></svg></span><div><div class="panel-title">Preferences</div><div class="panel-sub">Set up Classboard the way you like.</div></div></div>
                 <div class="list-row"><span class="profile-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg></span><div class="list-main"><div class="list-title">Appearance</div><div class="list-detail">Switch between light and dark mode.</div></div><button class="secondary-button" id="profileThemeButton">Change theme</button></div>
                 <div class="list-row"><span class="profile-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12a2 2 0 0 0 4 0"></path></svg></span><div class="list-main"><div class="list-title">Notifications</div><div class="list-detail">Class updates, new notes and replies.</div></div><button class="text-link" data-page="notifications">View notifications →</button></div>
+                <div class="list-row"><span class="profile-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span><div class="list-main"><div class="list-title">Sign-in &amp; security</div><div class="list-detail">Password and account access.</div></div><button class="secondary-button" type="button" data-toast="Choose Forgot password on the sign-in screen to reset your password">Manage</button></div>
               </article>
               <article class="panel profile-panel">
                 <div class="profile-section-heading"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"></path></svg></span><div><div class="panel-title">Privacy &amp; help</div><div class="panel-sub">A few things to know about your account.</div></div></div>
@@ -1220,7 +1225,7 @@
     function updateStudentBatch() {
       const batch = batchForRoll(currentStudentRoll);
       document.getElementById('profileRoll').textContent = currentStudentRoll ? String(currentStudentRoll) : 'Not assigned';
-      document.getElementById('profileBatch').textContent = batch ? `${batch} batch` : 'Roll number needed';
+      document.getElementById('profileBatch').textContent = batch ? `${batch} batch` : 'Not assigned';
       renderNextClass();
     }
     window.setClassboardRoll = (roll) => {
