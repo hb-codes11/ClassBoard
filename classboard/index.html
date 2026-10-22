@@ -447,7 +447,7 @@
     .subject-attendance { padding: 15px 17px; border-top: 1px solid var(--line); }
     .subject-attendance:first-child { border-top: 0; }
     .attendance-subject-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 14px 16px; }
-    .attendance-subject-grid > .subject-attendance { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .attendance-subject-grid > .subject-attendance { min-width: 0; container: attendance-card / inline-size; padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
     .attendance-mode-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; padding: 6px 16px 0; }
     .attendance-mode-control { display: grid; gap: 6px; width: min(calc(100% - 32px), 280px); margin: 6px 16px 0; }
     .subject-attendance-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
@@ -457,8 +457,8 @@
     .subject-attendance .progress { margin-top: 11px; }
     .subject-attendance .progress span { width: var(--percent); }
     .subject-calculator { display: grid; grid-template-columns: 1fr 1fr auto; align-items: end; gap: 10px; margin-top: 13px; padding-top: 12px; border-top: 1px dashed var(--line); }
-    .subject-calculator .field-label { min-width: 0; }
-    .subject-calculator .text-field { min-height: 34px; }
+    .subject-calculator .field-label { min-width: 0; line-height: 1.35; overflow-wrap: normal; }
+    .subject-calculator .text-field { width: 100%; min-width: 0; min-height: 34px; }
     .subject-calculator .subject-held[readonly] { background: var(--surface-2); color: var(--muted); cursor: not-allowed; }
     .subject-calculator .secondary-button { min-height: 34px; white-space: nowrap; }
     .planner-label { margin: 14px 0 7px; color: var(--muted); font-size: 13px; font-weight: 650; }
@@ -466,7 +466,13 @@
     .planner-results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin-top: 12px; }
     .planner-result { padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft, var(--surface)); }
     .planner-result-label { color: var(--muted); font-size: 12px; }
-    .planner-result-value { margin-top: 3px; font-size: 17px; font-weight: 720; }
+    .planner-result-value { min-width: 0; margin-top: 3px; font-size: 17px; font-weight: 720; overflow-wrap: anywhere; }
+    @container attendance-card (max-width: 520px) {
+      .subject-calculator { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .subject-calculator .secondary-button { grid-column: 1 / -1; width: 100%; }
+      .planner-results { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .planner-result:last-child { grid-column: 1 / -1; }
+    }
     .planner-guidance { margin-top: 10px; color: var(--muted); font-size: 13px; }
     .medical-planner { margin: 12px 0 0; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft, var(--surface)); }
     .medical-planner[hidden] { display: none !important; }
