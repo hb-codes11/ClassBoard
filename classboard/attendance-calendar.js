@@ -68,7 +68,7 @@
     '2026-11-14': { label: 'Soft skill course', kind: 'event' },
     ...Object.fromEntries([16, 17, 18, 19, 20].map((day) => [`2026-11-${String(day).padStart(2, '0')}`, { label: 'MST-II', kind: 'exam' }])),
     '2026-11-24': { label: 'Guru Nanak Jayanti', kind: 'holiday' },
-    '2026-11-27': { label: 'End of teaching', kind: 'event' },
+    '2026-11-27': { label: 'End of teaching', kind: 'term' },
     '2026-11-29': { label: 'Convocation', kind: 'convocation' }
   };
   let activeMonth = 9;
@@ -134,6 +134,7 @@
       calendarLabels(date, classes).forEach((label) => {
         const eventLabel = label === event?.label;
         const line = document.createElement('span'); line.className = 'attendance-day-label'; line.textContent = label;
+        if (eventLabel && event?.kind === 'term') line.dataset.eventKind = 'term';
         const short = label.split(' ')[0];
         const color = { AI: 'ai', JAVA: 'java', COM: 'com', SE: 'se', SA: 'sa' }[short];
         if (!eventLabel && color) line.dataset.color = color;

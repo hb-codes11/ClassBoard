@@ -772,7 +772,7 @@
     .attendance-calendar-highlights { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 14px 8px; }
     .attendance-highlight { max-width: 100%; padding: 4px 7px; border-radius: 99px; color: #8e3c39; background: #fff0ed; font-size: 9px; line-height: 1.35; }
     .attendance-highlight.exam { color: #815c13; background: #fff5d8; }
-    .attendance-highlight.term { color: #285da3; background: #eaf2ff; }
+    .attendance-highlight.term { color: #6941a5; background: #f0e8ff; }
     .attendance-weekdays, .attendance-calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; padding-inline: 10px; }
     .attendance-weekdays { padding-bottom: 4px; color: var(--muted); text-align: center; font-size: 9px; font-weight: 650; }
     .attendance-calendar-grid { padding-bottom: 8px; }
@@ -780,9 +780,10 @@
     .attendance-day:hover, .attendance-day:focus-visible { border-color: var(--blue); outline: none; }
     .attendance-day.empty { visibility: hidden; pointer-events: none; }
     .attendance-day.weekend { background: var(--surface-2); }
-    .attendance-day.holiday { border-color: #f4dddd; background: #fff4f3; }
-    .attendance-day.exam { border-color: #f2e6c5; background: #fff9e9; }
-    .attendance-day.event { border-color: #dce9ff; background: #f1f6ff; }
+    .attendance-day.holiday { border-color: #efc5c2; background: #ffebe9; }
+    .attendance-day.exam { border-color: #ead49c; background: #fff3d1; }
+    .attendance-day.event { border-color: #c5d9f5; background: #e7f1ff; }
+    .attendance-day.term { border-color: #d8c5f3; background: #f0e8ff; }
     .attendance-day.selected { outline: 2px solid var(--blue); outline-offset: -2px; }
     .attendance-day-number { color: var(--text); font-size: 10px; font-weight: 750; line-height: 1; }
     .attendance-day-label { display: -webkit-box; overflow: hidden; max-width: 100%; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: var(--muted); font-size: 7px; line-height: 1.15; overflow-wrap: anywhere; }
@@ -793,10 +794,13 @@
     .attendance-day-label[data-color="sa"] { color: #19845d; }
     .attendance-day.holiday .attendance-day-label { color: #ad5a58; }
     .attendance-day.modified::after { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: #0877d1; content: ""; }
-    [data-theme="dark"] .attendance-day.holiday { border-color: #583536; background: #2b191a; }
-    [data-theme="dark"] .attendance-day.exam { border-color: #514326; background: #292316; }
-    [data-theme="dark"] .attendance-day.event { border-color: #294361; background: #17283b; }
+    [data-theme="dark"] .attendance-day.holiday { border-color: #704041; background: #3b2021; }
+    [data-theme="dark"] .attendance-day.exam { border-color: #66542c; background: #3b301a; }
+    [data-theme="dark"] .attendance-day.event { border-color: #36577c; background: #1d344c; }
+    [data-theme="dark"] .attendance-day.term { border-color: #634c87; background: #302342; }
     [data-theme="dark"] .attendance-day.holiday .attendance-day-label { color: #ef9a94; }
+    .attendance-day-label[data-event-kind="term"] { color: #8050c8; }
+    [data-theme="dark"] .attendance-day-label[data-event-kind="term"] { color: #c5a5ff; }
     [data-theme="dark"] .attendance-day-label[data-color="ai"] { color: #ff777f; }
     [data-theme="dark"] .attendance-day-label[data-color="java"] { color: #ffae57; }
     [data-theme="dark"] .attendance-day-label[data-color="com"] { color: #f2cc58; }
