@@ -356,14 +356,16 @@
     .profile-content-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: 14px; align-items: start; }
     .profile-side-stack { display: grid; gap: 14px; }
     .profile-panel { max-width: none !important; margin: 0 !important; }
-    .profile-details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .profile-detail-row { display: flex; align-items: center; gap: 11px; min-width: 0; padding: 14px 16px; }
-    .profile-detail-row:nth-child(odd) { border-right: 1px solid var(--line); }
-    .profile-detail-row:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .profile-details-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+    .profile-detail-row { display: flex; align-items: center; gap: 11px; min-width: 0; min-height: 68px; padding: 10px 16px; }
+    .profile-detail-row + .profile-detail-row { border-top: 1px solid var(--line); }
     .profile-detail-icon { display: grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 10px; background: var(--blue-soft); color: var(--blue); }
     .profile-detail-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .profile-detail-row .list-title { font-size: 11px; }
     .profile-detail-row .list-detail { font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
+    .profile-detail-action { display: grid; place-items: center; width: 30px; height: 34px; flex: none; padding: 0; border: 0; border-radius: 7px; background: transparent; color: var(--muted); cursor: pointer; }
+    .profile-detail-action:hover { background: var(--blue-soft); color: var(--blue); }
+    .profile-detail-action svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .profile-section-heading { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid var(--line); }
     .profile-section-heading .panel-title { font-size: 14px; }
     .profile-section-heading .panel-sub { font-size: 11px; margin-top: 3px; }
@@ -381,9 +383,6 @@
     @media (max-width: 850px) { .profile-side-stack { grid-template-columns: minmax(0, 1fr); } }
     @media (max-width: 760px) {
       .profile-content-grid, .profile-side-stack { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-      .profile-details-grid { grid-template-columns: minmax(0, 1fr); }
-      .profile-detail-row:nth-child(odd) { border-right: 0; }
-      .profile-detail-row:nth-child(n+2) { border-top: 1px solid var(--line); }
     }
     @media (max-width: 480px) {
       .profile-hero { gap: 12px; padding: 15px; flex-wrap: wrap; }
@@ -1098,10 +1097,10 @@
               <article class="panel profile-panel">
                 <div class="profile-section-heading"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><div><div class="panel-title">Account</div><div class="panel-sub">Your class and academic information.</div></div></div>
                 <div class="profile-details-grid">
-                  <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg></span><div class="list-main"><div class="list-title">College email</div><div class="list-detail" id="profileEmail">Sign in to see your account email</div></div></div>
-                  <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M10 3 8 21m8-18-2 18"></path></svg></span><div class="list-main"><div class="list-title">Serial number</div><div class="list-detail" data-profile-roll>Not assigned</div></div></div>
-                  <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M8 8h8m-8 4h8m-8 4h4"></path></svg></span><div class="list-main"><div class="list-title">Lab batch</div><div class="list-detail" data-profile-batch>Not assigned</div></div></div>
-                  <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><div class="list-main"><div class="list-title">Class</div><div class="list-detail">AI &amp; Analytics - A (INTEL-1)</div></div></div>
+                  <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg></span><div class="list-main"><div class="list-title">College email</div><div class="list-detail" id="profileEmail">Sign in to see your account email</div></div><button class="profile-detail-action" type="button" aria-label="College email help" data-toast="Your college email is linked to your sign-in. Contact your class admin if it needs to be updated."><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button></div>
+                  <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M10 3 8 21m8-18-2 18"></path></svg></span><div class="list-main"><div class="list-title">Serial number</div><div class="list-detail" data-profile-roll>Not assigned</div></div><button class="profile-detail-action" type="button" aria-label="Serial number help" data-toast="Ask your class admin to update your serial number."><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button></div>
+                  <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M8 8h8m-8 4h8m-8 4h4"></path></svg></span><div class="list-main"><div class="list-title">Lab batch</div><div class="list-detail" data-profile-batch>Not assigned</div></div><button class="profile-detail-action" type="button" aria-label="Lab batch help" data-toast="Your lab batch is based on your serial number. Contact your class admin if it looks incorrect."><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button></div>
+                  <div class="profile-detail-row"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><div class="list-main"><div class="list-title">Class</div><div class="list-detail">AI &amp; Analytics - A (INTEL-1)</div></div><button class="profile-detail-action" type="button" aria-label="Class information" data-toast="This portal is set up for AI &amp; Analytics - A (INTEL-1)."><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button></div>
                 </div>
               </article>
               <div class="profile-side-stack">
