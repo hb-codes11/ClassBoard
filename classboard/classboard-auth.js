@@ -73,6 +73,7 @@
     const labels = { student: 'Student view', cr: 'Class representatives', admin: 'Admin workspace' };
     // Show every active membership so staff accounts can also use Student view.
     const orderedRoles = ['student', 'cr', 'admin'].filter((role) => roles.includes(role));
+    switcher.hidden = !roles.includes('cr') && !roles.includes('admin');
     switcher.replaceChildren(...orderedRoles.map((role) => {
       const option = document.createElement('option');
       option.value = role;
