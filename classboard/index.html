@@ -796,23 +796,40 @@
       .mobile-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .mobile-nav button { font-size: 10px; }
     }
-    .auth-gate { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--page); }
-    .auth-card { width: min(100%, 430px); padding: 30px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow); }
-    .auth-brand { display: flex; align-items: center; gap: 9px; color: var(--blue); font-size: 13px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
-    .auth-brand img { width: 32px; height: 32px; }
-    .auth-card h1 { margin-top: 10px; font-size: 26px; }
-    .auth-copy { color: var(--muted); font-size: 13px; margin: 9px 0 22px; }
-    .auth-field { display: grid; gap: 6px; margin: 13px 0; font-size: 12px; font-weight: 650; }
-    .auth-field input { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-2); color: var(--text); }
+    .auth-gate { min-height: 100vh; min-height: 100svh; display: grid; place-items: center; padding: 24px; background: var(--page); }
+    .auth-card { width: min(100%, 500px); padding: clamp(24px, 5vw, 40px); border: 1px solid var(--line); border-radius: 22px; background: var(--surface); box-shadow: var(--shadow); }
+    [data-theme="dark"] .auth-card { border-color: #ffffff24; box-shadow: 0 22px 60px #00000045, inset 0 1px #ffffff08; }
+    .auth-brand { display: flex; align-items: center; gap: 11px; color: var(--blue); font-size: 13px; font-weight: 750; letter-spacing: .075em; text-transform: uppercase; }
+    .auth-brand img { width: 36px; height: 36px; }
+    .auth-card h1 { margin: 22px 0 0; font-size: clamp(30px, 6vw, 38px); line-height: 1.12; letter-spacing: -.045em; }
+    .auth-copy { max-width: 38ch; color: var(--muted); font-size: 15px; margin: 10px 0 26px; }
+    .auth-field { display: grid; gap: 8px; margin: 16px 0; font-size: 13px; font-weight: 650; }
+    .auth-field input { width: 100%; min-height: 54px; padding: 12px 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); color: var(--text); }
+    .auth-field input:focus { border-color: var(--blue); outline: 3px solid color-mix(in srgb, var(--blue) 16%, transparent); }
     .password-entry { position: relative; }
-    .password-entry input { padding-right: 66px; }
+    .password-entry input { padding-right: 72px; }
     .password-visibility { position: absolute; inset: 0 5px 0 auto; min-width: 48px; padding: 0 7px; border: 0; background: transparent; color: var(--blue); font-size: 12px; font-weight: 700; cursor: pointer; }
     .password-visibility:focus-visible { outline: 2px solid var(--blue); outline-offset: -3px; border-radius: 7px; }
-    .auth-action { width: 100%; padding: 11px 14px; margin-top: 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--text); font-weight: 650; cursor: pointer; }
-    .auth-action.primary { border-color: var(--blue); background: var(--blue); color: #fff; }
+    .auth-action { width: 100%; min-height: 52px; padding: 12px 14px; margin-top: 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--text); font-weight: 650; cursor: pointer; transition: border-color .16s ease, background .16s ease, transform .16s ease; }
+    .auth-action:hover { border-color: color-mix(in srgb, var(--blue) 48%, var(--line)); background: var(--surface-2); }
+    .auth-action:active { transform: scale(.99); }
+    .auth-action.primary { border-color: var(--blue); background: var(--blue); color: #fff; box-shadow: 0 8px 18px color-mix(in srgb, var(--blue) 20%, transparent); }
+    .auth-action.primary:hover { border-color: var(--blue-deep); background: var(--blue-deep); }
+    .auth-divider { display: flex; align-items: center; gap: 12px; margin: 18px 0 4px; color: var(--muted); font-size: 12px; font-weight: 600; }
+    .auth-divider::before, .auth-divider::after { content: ""; height: 1px; flex: 1; background: var(--line); }
+    .auth-google { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .auth-google-mark { width: 19px; height: 19px; }
+    .auth-link { display: block; margin: 14px auto 0; padding: 8px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--blue); font-size: 13px; font-weight: 650; cursor: pointer; }
+    .auth-link:hover { background: var(--blue-soft); }
     .auth-action:disabled { opacity: .6; cursor: wait; }
     .auth-message { min-height: 22px; margin-top: 12px; color: var(--muted); font-size: 12px; }
     .auth-message.error { color: #c0392b; }
+    @media (max-width: 760px) {
+      .auth-gate { padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+      .auth-card { padding: 26px 22px; border-radius: 19px; }
+      .auth-action { min-height: 50px; font-size: 15px; }
+    }
+    @media (max-width: 390px) { .auth-card { padding: 22px 18px; } }
     [hidden] { display: none !important; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
     .attendance-layout { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(390px, .92fr); gap: 16px; align-items: start; }
@@ -931,8 +948,8 @@
   <section class="auth-gate" id="authGate" aria-labelledby="authTitle">
     <div class="auth-card">
       <div class="auth-brand"><img src="./classboard-logo.svg" alt="" />Classboard · INTEL-1</div>
-      <h1 id="authTitle">Sign in to your class</h1>
-      <p class="auth-copy">Use your Medicaps college email ending in <strong>@medicaps.ac.in</strong>.</p>
+      <h1 id="authTitle">Welcome back</h1>
+      <p class="auth-copy">Sign in with your Medicaps college email ending in <strong>@medicaps.ac.in</strong>.</p>
       <form id="authForm">
         <label class="auth-field">College email
           <input id="authEmail" name="email" type="email" autocomplete="email" required placeholder="you@medicaps.ac.in" />
@@ -946,9 +963,10 @@
         </div>
         <button class="auth-action primary" id="signInButton" type="submit">Sign in</button>
       </form>
+      <div class="auth-divider" aria-hidden="true">or</div>
       <button class="auth-action" id="signUpButton" type="button">Create account with email</button>
-      <button class="auth-action" id="googleSignInButton" type="button">Continue with Google</button>
-      <button class="auth-action" id="resetPasswordButton" type="button">Forgot password? Send reset link</button>
+      <button class="auth-action auth-google" id="googleSignInButton" type="button"><svg class="auth-google-mark" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.8 6.1-15z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.6-5.1c-1.8 1.2-4.1 2-6.9 2-5.3 0-9.8-3.6-11.4-8.4H5.8v5.3A20 20 0 0 0 24 44z"/><path fill="#FBBC05" d="M12.6 27.6a12 12 0 0 1 0-7.2v-5.3H5.8a20 20 0 0 0 0 17.8z"/><path fill="#EA4335" d="M24 11.9c3 0 5.7 1 7.8 3.1l5.8-5.8C34.1 5.8 29.5 4 24 4A20 20 0 0 0 5.8 15.1l6.8 5.3c1.6-4.9 6.1-8.5 11.4-8.5z"/></svg>Continue with Google</button>
+      <button class="auth-link" id="resetPasswordButton" type="button">Forgot password? Send reset link</button>
       <div class="auth-message" id="authMessage" role="status" aria-live="polite"></div>
     </div>
   </section>
