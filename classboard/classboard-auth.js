@@ -538,15 +538,19 @@
       }
       day.categories.get(category).append(addSessionRow(session));
     });
-    const sessionContainers = [
-      [document.getElementById('homeClassList'), sessions.slice(0, 3)],
-      [document.getElementById('crRecentClasses'), sessions.slice(0, 5)]
-    ];
-    sessionContainers.forEach(([container, rows, compact]) => {
-      container.replaceChildren();
-      if (!rows.length) { addEmptyNote(container, 'No class sessions have been added yet.'); return; }
-      rows.forEach((session) => container.append(addSessionRow(session, true)));
+    const homeClassList = document.getElementById('homeClassList');
+    homeClassList.replaceChildren();
+    if (!sessions.length) addEmptyNote(homeClassList, 'No class sessions have been added yet.');
+    sessions.slice(0, 3).forEach((session) => {
+      const row = addSessionRow(session);
+      row.querySelector('.class-log-actions')?.remove();
+      homeClassList.append(row);
     });
+    const crRecentClasses = document.getElementById('crRecentClasses');
+    crRecentClasses.replaceChildren();
+    const recentRows = sessions.slice(0, 5);
+    if (!recentRows.length) addEmptyNote(crRecentClasses, 'No class sessions have been added yet.');
+    else recentRows.forEach((session) => crRecentClasses.append(addSessionRow(session, true)));
     const reminderContainer = document.getElementById('homeReminderList');
     reminderContainer.replaceChildren();
     (reminderResult.data || []).forEach((reminder) => reminderContainer.append(addReminderCard(reminder)));

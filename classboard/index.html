@@ -298,6 +298,7 @@
     .notification-read { opacity: .76; background: var(--surface); }
     .notification-read .notification-unread { visibility: hidden; }
     #classLogList { display: grid; gap: 14px; padding: 14px; }
+    #homeClassList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; padding: 14px; }
     .class-log-day-group { min-width: 0; }
     .class-log-day-heading { display: flex; align-items: center; gap: 10px; margin: 1px 2px 12px; font-size: 16px; font-weight: 730; }
     .class-log-day-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--blue-soft); color: var(--blue); }
@@ -555,7 +556,7 @@
       .grid, .workspace-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
       .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .stats .stat-card:first-child { grid-column: 1 / -1; }
-      .resource-grid, .class-log-session-grid, .attendance-subject-grid { grid-template-columns: minmax(0, 1fr); }
+      .resource-grid, .class-log-session-grid, .attendance-subject-grid, #homeClassList { grid-template-columns: minmax(0, 1fr); }
       .panel-header { flex-wrap: wrap; align-items: flex-start; gap: 10px; }
       .panel-header > button { flex: none; white-space: nowrap; }
       .stat-note { flex: none; }
@@ -703,6 +704,7 @@
       #classLogList { gap: 12px; padding: 10px; }
       .class-log-day-heading { font-size: 14px; }
       .class-log-session-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+      #homeClassList { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 10px; }
       .class-log-session { grid-template-columns: 62px minmax(0, 1fr); gap: 7px 9px; padding: 10px; }
       .class-log-time { grid-column: 1; grid-row: 1; font-size: 10px; }
       .class-log-session .list-main { grid-column: 2; grid-row: 1; }
@@ -935,7 +937,6 @@
         <button class="nav-item" data-view="Academic Calendar"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M14 14h2M8 17h3"/></svg>Academic Calendar</button>
         <button class="nav-item" data-view="Class Log"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M8 17h7"/></svg>Class Log</button>
         <button class="nav-item" data-view="Attendance"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/><path d="M16 6h4v4"/></svg>Attendance</button>
-        <button class="nav-item" data-view="Notifications"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>Notifications</button>
         <button class="nav-item" data-view="Class representatives" id="crWorkspaceNav" hidden><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h4"/></svg>Class representatives</button>
       </nav>
       <div class="sidebar-bottom">
@@ -1178,7 +1179,6 @@
         <button data-view="Academic Calendar"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Academic calendar</button>
         <button data-view="Class Log"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Class log</button>
         <button data-view="Attendance"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/></svg>Attendance</button>
-        <button data-view="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>Notifications</button>
         <button data-view="Class representatives" id="mobileCrWorkspaceNav" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h4"/></svg>Class representatives</button>
         <button data-view="Profile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
         <span class="mobile-more-divider" aria-hidden="true"></span>
@@ -1617,7 +1617,9 @@
       const report = document.createElement('button'); report.className = 'text-link'; report.dataset.page = 'attendance'; report.textContent = 'Report an issue';
       actions.append(report); publicRow.append(actions);
       document.getElementById('classLogList').prepend(publicRow);
-      document.getElementById('homeClassList').prepend(row.cloneNode(true));
+      const homeRow = publicRow.cloneNode(true);
+      homeRow.querySelector('.class-log-actions')?.remove();
+      document.getElementById('homeClassList').prepend(homeRow);
       filterClassLog();
       event.currentTarget.reset();
       showToast('Class log saved in this preview');
@@ -1866,7 +1868,7 @@
       document.getElementById('notificationSlideClose').addEventListener('click', dismissNotificationSlide);
       openButton.addEventListener('click', () => {
         dismissNotificationSlide();
-        document.querySelector('[data-view="Notifications"]')?.click();
+        document.querySelector('.top-actions [aria-label="Notifications"]')?.click();
       });
     })();
   </script>
