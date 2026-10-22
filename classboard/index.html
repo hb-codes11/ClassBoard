@@ -1398,6 +1398,26 @@
       }
       document.querySelectorAll('.page-view').forEach((section) => section.classList.toggle('active', section.id === `page-${pageId}`));
       document.querySelectorAll('.nav-item, .mobile-nav button').forEach((button) => button.classList.toggle('active', button.dataset.view === activeName || (activeName === 'Notes & Syllabus' && button.textContent.trim() === 'Learn')));
+    const mobileMoreButton = document.querySelector('[data-mobile-more]');
+      const mobileMoreMenu = document.getElementById('mobileMoreMenu');
+      if (mobileMoreButton && mobileMoreMenu) {
+        const primaryMobileViews = ['Home', 'Notes & Syllabus', 'Updates'];
+        mobileMoreButton.classList.toggle('active', !primaryMobileViews.includes(activeName));
+        mobileMoreMenu.hidden = true;
+        mobileMoreButton.setAttribute('aria-expanded', 'false');
+      }
+      document.getElementById('crumbPage').textContent = activeName || 'Home';
+      syncPageBackButton();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    document.getElementById('pageBackButton').addEventListener('click', () => {
+      const previousPage = pageHistory.pop();
+      if (previousPage) openPage(previousPage.pageId, previousPage.activeName, { recordHistory: false });
+    });
+    window.openClassboardPage = (pageId) => {
+      const activeName = Object.keys(pageMap).find((name) => pageMap[name] === pageId);
+      if (activeName) openPage(pageId, activeName);
+    };
       const appShell = document.querySelector('.app');
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebarBackdrop = document.getElementById('sidebarBackdrop');
@@ -1436,26 +1456,6 @@
         setSidebarOpen(appShell.classList.contains('sidebar-open'));
       }
     });
-    const mobileMoreButton = document.querySelector('[data-mobile-more]');
-      const mobileMoreMenu = document.getElementById('mobileMoreMenu');
-      if (mobileMoreButton && mobileMoreMenu) {
-        const primaryMobileViews = ['Home', 'Notes & Syllabus', 'Updates'];
-        mobileMoreButton.classList.toggle('active', !primaryMobileViews.includes(activeName));
-        mobileMoreMenu.hidden = true;
-        mobileMoreButton.setAttribute('aria-expanded', 'false');
-      }
-      document.getElementById('crumbPage').textContent = activeName || 'Home';
-      syncPageBackButton();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    document.getElementById('pageBackButton').addEventListener('click', () => {
-      const previousPage = pageHistory.pop();
-      if (previousPage) openPage(previousPage.pageId, previousPage.activeName, { recordHistory: false });
-    });
-    window.openClassboardPage = (pageId) => {
-      const activeName = Object.keys(pageMap).find((name) => pageMap[name] === pageId);
-      if (activeName) openPage(pageId, activeName);
-    };
     const mobileMoreButton = document.querySelector('[data-mobile-more]');
     const mobileMoreMenu = document.getElementById('mobileMoreMenu');
     mobileMoreButton.addEventListener('click', () => {
