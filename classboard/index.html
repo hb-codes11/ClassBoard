@@ -786,6 +786,11 @@
     .attendance-day.selected { outline: 2px solid var(--blue); outline-offset: -2px; }
     .attendance-day-number { font-size: 10px; font-weight: 750; line-height: 1; }
     .attendance-day-label { display: -webkit-box; overflow: hidden; max-width: 100%; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: var(--muted); font-size: 7px; line-height: 1.15; overflow-wrap: anywhere; }
+    .attendance-day-label[data-color="ai"] { color: #d9444f; }
+    .attendance-day-label[data-color="java"] { color: #d97718; }
+    .attendance-day-label[data-color="com"] { color: #a77a00; }
+    .attendance-day-label[data-color="se"] { color: #8050c8; }
+    .attendance-day-label[data-color="sa"] { color: #19845d; }
     .attendance-day.holiday .attendance-day-label { color: #ad5a58; }
     .attendance-day.modified::after { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: #0877d1; content: ""; }
     .attendance-calendar-legend { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 13px 12px; color: var(--muted); font-size: 9px; }
@@ -1018,7 +1023,7 @@
               <div class="attendance-calendar-legend" aria-label="Calendar legend">
                 <span><i class="attendance-legend-dot"></i>Class day</span><span><i class="attendance-legend-dot holiday"></i>Holiday</span><span><i class="attendance-legend-dot exam"></i>MST or exam</span><span><i class="attendance-legend-dot event"></i>Event</span><span>Blue dot: edited day</span>
               </div>
-              <p class="attendance-calendar-note">Select any date to view and adjust its classes.</p>
+              <p class="attendance-calendar-note" id="attendanceCalendarNote">Select any date to view its classes.</p>
             </article>
             <article class="panel timetable-card">
               <div class="panel-header timetable-card-header"><div><div class="eyebrow">Your week</div><div class="panel-title">Class timetable</div><div class="panel-sub">CSE · III · AI &amp; Analytics - A</div></div></div>
@@ -1164,7 +1169,7 @@
           <label class="field-label">End time<input class="text-field" name="end" type="time" required></label>
           <label class="field-label">Room<input class="text-field" name="room" type="text" maxlength="60" placeholder="Optional"></label>
           <div class="calendar-add-actions"><span></span><button class="primary-button" type="submit">Add class</button></div>
-          <p class="calendar-storage-note">Your personal date changes are saved in this browser and do not change the official class log.</p>
+          <p class="calendar-storage-note">Only CRs and admins can edit. Changes are saved in this browser and do not change the official class log.</p>
         </form>
       </div>
     </div>

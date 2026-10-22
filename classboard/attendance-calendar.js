@@ -10,6 +10,7 @@
   const dialogSub = document.getElementById('calendarDialogSub');
   const resetButton = document.getElementById('resetCalendarDay');
   const addForm = document.getElementById('calendarAddForm');
+  const calendarNote = document.getElementById('attendanceCalendarNote');
   const monthButtons = [...document.querySelectorAll('[data-calendar-month]')];
   const months = [9, 10];
   const subjects = [
@@ -84,6 +85,7 @@
   };
   const writeOverrides = (overrides) => localStorage.setItem(contextKey(), JSON.stringify(overrides));
   const subjectInfo = (name) => subjects.find((subject) => subject.name === name) || { name, short: name.slice(0, 6).toUpperCase() };
+  const canEditCalendar = () => window.classboardContext?.roles?.some((role) => role === 'cr' || role === 'admin') || false;
   const createClass = ([subject, kind, batch, start, end, room], id) => ({ id, subject, kind, batch, start, end, room });
   const defaultClasses = (date) => {
     const key = dateKey(date);
@@ -132,6 +134,9 @@
       calendarLabels(date, classes).forEach((label) => {
         const eventLabel = label === event?.label;
         const line = document.createElement('span'); line.className = 'attendance-day-label'; line.textContent = label;
+        const short = label.split(' ')[0];
+        const color = { AI: 'ai', JAVA: 'java', COM: 'com', SE: 'se', SA: 'sa' }[short];
+        if (!eventLabel && color) line.dataset.color = color;
         if (!eventLabel && classes.length) line.title = label;
         button.append(line);
       });
@@ -151,6 +156,7 @@
   }
 
   function persistClasses(classes) {
+    if (!canEditCalendar()) return;
     const overrides = readOverrides();
     overrides[activeDateKey] = classes;
     writeOverrides(overrides);
@@ -162,8 +168,11 @@
   function renderDayDialog(date) {
     const classes = visibleClasses(classesForDate(date));
     const event = eventMap[activeDateKey];
+    const editable = canEditCalendar();
     dialogDate.textContent = date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     dialogSub.textContent = [event?.label, `${classes.length} ${classes.length === 1 ? 'class' : 'classes'} for ${batchSelect.value}`].filter(Boolean).join(' · ');
+    resetButton.hidden = !editable;
+    addForm.hidden = !editable;
     resetButton.disabled = !Object.hasOwn(readOverrides(), activeDateKey);
     classList.replaceChildren();
     if (!classes.length) {
@@ -176,6 +185,7 @@
       const meta = document.createElement('div'); meta.className = 'calendar-class-meta';
       meta.textContent = `${session.start}–${session.end} · ${session.kind === 'lab' ? `Lab · ${session.batch}` : 'Lecture'}${session.room ? ` · ${session.room}` : ''}`;
       main.append(title, meta);
+      if (!editable) { row.append(main); classList.append(row); return; }
       const actions = document.createElement('div'); actions.className = 'calendar-class-actions';
       const replaceButton = document.createElement('button'); replaceButton.type = 'button'; replaceButton.className = 'secondary-button'; replaceButton.textContent = 'Replace';
       const removeButton = document.createElement('button'); removeButton.type = 'button'; removeButton.className = 'secondary-button'; removeButton.textContent = 'Remove';
@@ -222,7 +232,7 @@
   addKindSelect.addEventListener('change', () => { addBatchLabel.hidden = addKindSelect.value !== 'lab'; });
   addForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    if (!activeDateKey) return;
+    if (!activeDateKey || !canEditCalendar()) return;
     const values = new FormData(addForm);
     const start = String(values.get('start'));
     const end = String(values.get('end'));
@@ -244,13 +254,20 @@
     if (dialog.open && activeDateKey) renderDayDialog(new Date(`${activeDateKey}T12:00:00`));
   });
   resetButton.addEventListener('click', () => {
+    if (!canEditCalendar()) return;
     const overrides = readOverrides(); delete overrides[activeDateKey]; writeOverrides(overrides);
     renderCalendar(); renderDayDialog(new Date(`${activeDateKey}T12:00:00`));
   });
   document.getElementById('closeCalendarDialog').addEventListener('click', () => dialog.close());
   dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
   window.addEventListener('classboard:attendance-calendar-context', renderCalendar);
+  window.addEventListener('classboard:attendance-calendar-context', () => {
+    const studentRoll = Number(window.classboardContext?.rollNumber);
+    if (studentRoll >= 1 && studentRoll <= 66) batchSelect.value = studentRoll <= 32 ? 'A1' : 'A2';
+    calendarNote.textContent = canEditCalendar() ? 'Select any date to view and edit its classes.' : 'Select any date to view its classes.';
+  });
   const studentBatch = Number(window.classboardContext?.rollNumber);
   if (studentBatch >= 1 && studentBatch <= 66) batchSelect.value = studentBatch <= 32 ? 'A1' : 'A2';
+  calendarNote.textContent = canEditCalendar() ? 'Select any date to view and edit its classes.' : 'Select any date to view its classes.';
   renderCalendar();
 })();
