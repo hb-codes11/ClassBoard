@@ -5,7 +5,7 @@
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f4f8fc",
-  "theme_color": "#0868bd",
+  "theme_color": "#006BFF",
   "icons": [
     {
       "src": "./classboard-pwa-icon.svg",
