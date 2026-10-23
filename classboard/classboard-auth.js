@@ -210,7 +210,7 @@
     card.className = `update update-card update-${cardType}`;
     card.dataset.contentId = update.id;
     card.dataset.contentType = update.isReminder ? 'reminders' : 'updates';
-    card.dataset.category = update.isReminder ? 'Deadline' : category === 'deadline' ? 'Deadline' : category === 'important' ? 'Important' : 'General';
+    card.dataset.category = update.isReminder ? 'Reminder' : category === 'deadline' ? 'Deadline' : category === 'important' || update.importance === 'important' ? 'Important' : 'General';
     const displayDate = update.isReminder ? update.due_at : cardType === 'deadline' && update.expires_at ? update.expires_at : update.published_at || update.created_at;
     const date = new Date(displayDate);
     const dateTile = document.createElement('div'); dateTile.className = 'update-date';
@@ -281,7 +281,8 @@
       preview.className = 'update-attachment-button';
       preview.dataset.previewPdf = 'true';
       preview.setAttribute('aria-label', `Preview attached PDF: ${update.attachment_name || 'Update attachment'}`);
-      preview.innerHTML = '<svg viewBox="0 0 24 24"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg><span>Preview PDF</span>';
+      preview.innerHTML = '<svg viewBox="0 0 24 24"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg><span></span>';
+      preview.querySelector('span').textContent = `PDF · ${update.attachment_name || 'View attachment'}`;
       attachmentActions.append(preview);
       card.dataset.resourcePath = update.attachment_path;
       card.dataset.resourceTitle = update.attachment_name || 'Update attachment';
@@ -478,6 +479,8 @@
     if (failed) throw failed.error;
     const classInfo = classResult.data;
     document.querySelectorAll('.brand-term').forEach((el) => { el.textContent = classInfo.semester ? `${classInfo.semester}${classInfo.semester === 1 ? 'st' : classInfo.semester === 2 ? 'nd' : classInfo.semester === 3 ? 'rd' : 'th'} Semester` : classInfo.code; });
+    const updatesAddButton = document.getElementById('updatesAddButton');
+    if (updatesAddButton) updatesAddButton.hidden = !window.classboardContext?.roles?.includes('cr');
     document.querySelectorAll('.page-heading .eyebrow').forEach((el) => {
       if (el.textContent.includes('INTEL-1')) el.textContent = `${classInfo.name} (${classInfo.code})`;
     });
@@ -503,7 +506,10 @@
     const updateFeed = [
       ...(updateResult.data || []).map((item) => ({ ...item, isReminder: false })),
       ...(reminderResult.data || []).map((item) => ({ ...item, category: 'deadline', importance: 'normal', isReminder: true }))
-    ].sort((a, b) => new Date(b.isReminder ? b.created_at : b.published_at || b.created_at) - new Date(a.isReminder ? a.created_at : a.published_at || a.created_at));
+    ].sort((a, b) => {
+      const dateFor = (item) => item.isReminder ? item.due_at : String(item.category).toLowerCase() === 'deadline' && item.expires_at ? item.expires_at : item.published_at || item.created_at;
+      return new Date(dateFor(a)) - new Date(dateFor(b));
+    });
     const updateContainers = [document.getElementById('updateList'), document.getElementById('homeUpdateList')];
     updateContainers.forEach((container, index) => {
       container.querySelectorAll('.update, .live-empty').forEach((node) => node.remove());

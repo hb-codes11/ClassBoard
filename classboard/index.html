@@ -170,21 +170,22 @@
     .text-link { border: 0; padding: 0; background: none; color: var(--blue); font-size: 10px; font-weight: 670; cursor: pointer; }
     .update { display: flex; gap: 12px; padding: 12px 18px; border-top: 1px solid var(--line); }
     .update:first-of-type { border-top: 0; }
-    .update-card { --update-accent: var(--blue); display: grid; grid-template-columns: 56px 42px minmax(0, 1fr) auto auto; align-items: center; gap: 13px; margin: 10px 12px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--update-accent) 42%, var(--line)); border-left: 4px solid var(--update-accent); border-radius: 12px; background: linear-gradient(105deg, color-mix(in srgb, var(--update-accent) 9%, var(--surface)), var(--surface) 76%); }
+    .update-card { --update-accent: var(--blue); display: grid; grid-template-columns: 56px 42px minmax(0, 1fr) auto auto; align-items: center; gap: 13px; min-height: 90px; margin: 10px 12px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--update-accent) 24%, var(--line)); border-left: 4px solid var(--update-accent); border-radius: 13px; background: var(--surface); box-shadow: 0 4px 14px rgba(26, 54, 84, .035); }
     .update-card.update-important { --update-accent: #258be5; }
     .update-card.update-deadline { --update-accent: #e6535e; }
     .update-card.update-reminder { --update-accent: #e8a52b; }
-    .update-date { display: grid; justify-items: center; align-content: center; min-height: 54px; border-radius: 9px; background: color-mix(in srgb, var(--update-accent) 12%, var(--surface)); color: var(--update-accent); }
+    .update-date { display: grid; justify-items: center; align-content: center; min-height: 62px; border-radius: 10px; background: color-mix(in srgb, var(--update-accent) 9%, var(--surface)); color: var(--update-accent); }
     .update-date-month { font-size: 9px; font-weight: 760; letter-spacing: .06em; text-transform: uppercase; }
     .update-date-day { font-size: 20px; line-height: 1.1; font-weight: 780; }
-    .update-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; color: var(--update-accent); background: color-mix(in srgb, var(--update-accent) 15%, var(--surface)); }
+    .update-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; color: var(--update-accent); background: color-mix(in srgb, var(--update-accent) 11%, var(--surface)); }
     .update-icon svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .update-copy { min-width: 0; }
     .update-card .update-title { font-size: 13px; line-height: 1.4; font-weight: 730; }
     .update-card .update-body { font-size: 11px; line-height: 1.45; margin-top: 4px; }
     .update-card .update-time { font-size: 10px; margin-top: 5px; }
     .update-attachment-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 9px; }
-    .update-attachment-button { display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 0 11px; border: 1px solid color-mix(in srgb, var(--update-accent) 36%, var(--line)); border-radius: 8px; background: color-mix(in srgb, var(--update-accent) 8%, var(--surface)); color: var(--update-accent); font-size: 10px; font-weight: 700; cursor: pointer; }
+    .update-attachment-button { display: inline-flex; align-items: center; gap: 7px; max-width: 100%; min-height: 34px; padding: 0 11px; border: 1px solid color-mix(in srgb, var(--update-accent) 36%, var(--line)); border-radius: 8px; background: color-mix(in srgb, var(--update-accent) 8%, var(--surface)); color: var(--update-accent); font-size: 10px; font-weight: 700; cursor: pointer; }
+    .update-attachment-button span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .update-attachment-button:hover { background: color-mix(in srgb, var(--update-accent) 15%, var(--surface)); }
     .update-attachment-button:focus-visible { outline: 2px solid var(--update-accent); outline-offset: 2px; }
     .update-attachment-button svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -195,6 +196,13 @@
     .update-urgent { display: inline-flex; align-items: center; gap: 5px; margin-right: 7px; padding: 4px 8px; border-radius: 20px; background: #e6535e20; color: #e6535e; font-size: 9px; font-weight: 780; text-transform: uppercase; }
     .update-delete { grid-column: 5; grid-row: 1; display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border-radius: 9px; }
     .update-delete svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .updates-toolbar { gap: 8px; margin: 0 0 20px; }
+    .updates-toolbar .filter-chip { min-height: 40px; display: inline-flex; align-items: center; gap: 8px; padding: 0 15px; border-radius: 22px; font-size: 12px; }
+    .updates-toolbar .filter-chip.active { background: var(--blue-soft); }
+    .update-list-heading { display: flex; align-items: center; gap: 12px; margin: 0 0 10px; font-size: 17px; font-weight: 740; letter-spacing: -.025em; }
+    .update-list-heading::after { content: ""; height: 1px; flex: 1; background: var(--line); }
+    .updates-add-button { flex: none; }
+    [data-theme="dark"] .update-card { border-color: color-mix(in srgb, var(--update-accent) 32%, var(--line)); border-left-color: var(--update-accent); box-shadow: inset 0 1px #ffffff08; }
     [data-theme="dark"] .update-card.update-reminder { --update-accent: #f3b73f; }
     [data-theme="dark"] .update-card.update-deadline { --update-accent: #ff626b; }
     .update-mark { width: 36px; height: 36px; display: grid; place-items: center; flex: none; border-radius: 11px; background: var(--amber-soft); color: var(--amber); font-weight: 750; font-size: 12px; }
@@ -1064,8 +1072,9 @@
         </section>
 
         <section class="page-view" id="page-updates">
-          <div class="page-heading"><div><div class="eyebrow">AI &amp; Analytics - A (INTEL-1)</div><h1>Updates</h1><div class="page-description">Deadlines, class changes and reminders from your class.</div></div></div>
-          <div class="toolbar"><button class="filter-chip active" data-update-filter="all">All updates</button><button class="filter-chip" data-update-filter="Important">Important</button><button class="filter-chip" data-update-filter="Deadline">Deadlines</button></div>
+          <div class="page-heading"><div><div class="eyebrow">AI &amp; Analytics - A (INTEL-1)</div><h1>Updates</h1><div class="page-description">Important updates, deadlines and reminders from your class.</div></div><button class="primary-button updates-add-button" id="updatesAddButton" type="button" hidden><span aria-hidden="true">＋</span> Add update</button></div>
+          <div class="toolbar updates-toolbar" role="group" aria-label="Filter updates"><button class="filter-chip" data-update-filter="Important" aria-pressed="false">Important updates</button><button class="filter-chip" data-update-filter="Deadline" aria-pressed="false">Deadlines</button><button class="filter-chip" data-update-filter="Reminder" aria-pressed="false">Reminders</button></div>
+          <h2 class="update-list-heading">All updates</h2>
           <article class="panel" id="updateList"></article>
         </section>
 
@@ -1487,6 +1496,15 @@
       const activeName = Object.keys(pageMap).find((name) => pageMap[name] === pageId);
       if (activeName) openPage(pageId, activeName);
     };
+    document.getElementById('updatesAddButton').addEventListener('click', () => {
+      const roleSwitcher = document.getElementById('roleSwitcher');
+      if ([...roleSwitcher.options].some((option) => option.value === 'cr')) {
+        roleSwitcher.value = 'cr';
+        roleSwitcher.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      document.querySelector('#crUpdateForm [name="title"]')?.focus({ preventScroll: true });
+      document.getElementById('crUpdateForm')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
       const appShell = document.querySelector('.app');
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebarBackdrop = document.getElementById('sidebarBackdrop');
@@ -1786,8 +1804,16 @@
     document.getElementById('classSubjectFilter').addEventListener('change', filterClassLog);
     document.getElementById('classMonthFilter').addEventListener('change', filterClassLog);
     document.querySelectorAll('[data-update-filter]').forEach((button) => button.addEventListener('click', () => {
-      document.querySelectorAll('[data-update-filter]').forEach((chip) => chip.classList.toggle('active', chip === button));
-      document.querySelectorAll('#updateList .update').forEach((row) => row.style.display = button.dataset.updateFilter === 'all' || row.dataset.category === button.dataset.updateFilter ? '' : 'none');
+      const clearFilter = button.classList.contains('active');
+      document.querySelectorAll('[data-update-filter]').forEach((chip) => {
+        const active = chip === button && !clearFilter;
+        chip.classList.toggle('active', active);
+        chip.setAttribute('aria-pressed', String(active));
+      });
+      const selectedCategory = clearFilter ? null : button.dataset.updateFilter;
+      document.querySelectorAll('#updateList .update').forEach((row) => {
+        row.style.display = !selectedCategory || row.dataset.category === selectedCategory ? '' : 'none';
+      });
     }));
     const attendanceCards = [...document.querySelectorAll('#page-attendance [data-subject-card]')];
     const attendanceGrid = document.createElement('div');
