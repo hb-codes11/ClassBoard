@@ -178,6 +178,10 @@
     .update { display: flex; gap: 12px; padding: 12px 18px; border-top: 1px solid var(--line); }
     .update:first-of-type { border-top: 0; }
     .update-card { --update-accent: var(--blue); position: relative; display: grid; grid-template-columns: 56px 42px minmax(0, 1fr) auto auto; align-items: center; gap: 13px; min-height: 90px; margin: 10px 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); box-shadow: 0 4px 14px rgba(26, 54, 84, .035); }
+    [data-home-navigation-page] { cursor: pointer; }
+    [data-home-navigation-page]:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+    .update-card[data-home-navigation-page]:hover, .resource-card[data-home-navigation-page]:hover { border-color: color-mix(in srgb, var(--blue) 38%, var(--line)); }
+    .home-panel-link { cursor: pointer; border-radius: 6px; }
     #homeUpdateList > .update-card { margin-inline: 14px; }
     #homeReminderList > .update-card { margin-inline: 14px; }
     #homeReminderList { container-type: inline-size; }
@@ -1168,14 +1172,14 @@
 
         <section class="grid home-dashboard-grid">
           <div class="stack">
-            <article class="panel" id="homeUpdateList"><div class="panel-header"><div><div class="panel-title">Latest updates</div><div class="panel-sub">Notes from your class representatives and teachers</div></div><button class="text-link" data-page="updates">View all →</button></div></article>
-            <article class="panel" id="homeResourceList"><div class="panel-header"><div><div class="panel-title">New notes</div><div class="panel-sub">Recently added to your class</div></div><button class="text-link" data-page="resources">See notes →</button></div><div id="homeResourceGrid"></div></article>
+            <article class="panel" id="homeUpdateList"><div class="panel-header"><div class="home-panel-link" data-home-navigation-page="updates" tabindex="0" role="link" aria-label="Open updates"><div class="panel-title">Latest updates</div><div class="panel-sub">Notes from your class representatives and teachers</div></div><button class="text-link" data-page="updates">View all →</button></div></article>
+            <article class="panel" id="homeResourceList"><div class="panel-header"><div class="home-panel-link" data-home-navigation-page="resources" tabindex="0" role="link" aria-label="Open Notes and Syllabus"><div class="panel-title">New notes</div><div class="panel-sub">Recently added to your class</div></div><button class="text-link" data-page="resources">See notes →</button></div><div id="homeResourceGrid"></div></article>
           </div>
 
           <div class="stack">
-            <article class="panel home-attendance-panel"><div class="panel-header"><div><div class="panel-title">Attendance planner</div><div class="panel-sub">Top attendance · lectures and labs.</div></div><button class="text-link" data-page="attendance">See planner →</button></div><div class="home-attendance-list" id="homeAttendanceSummary" aria-live="polite"></div></article>
+            <article class="panel home-attendance-panel"><div class="panel-header"><div class="home-panel-link" data-home-navigation-page="attendance" tabindex="0" role="link" aria-label="Open attendance planner"><div class="panel-title">Attendance planner</div><div class="panel-sub">Top attendance · lectures and labs.</div></div><button class="text-link" data-page="attendance">See planner →</button></div><div class="home-attendance-list" id="homeAttendanceSummary" aria-live="polite"></div></article>
             <article class="panel">
-              <div class="panel-header"><div><div class="panel-title">Coming up</div><div class="panel-sub">Dates to remember</div></div><button class="text-link" data-page="updates">See all →</button></div>
+              <div class="panel-header"><div class="home-panel-link" data-home-navigation-page="updates" tabindex="0" role="link" aria-label="Open reminders and updates"><div class="panel-title">Coming up</div><div class="panel-sub">Dates to remember</div></div><button class="text-link" data-page="updates">See all →</button></div>
               <div id="homeReminderList"></div>
             </article>
           </div>
@@ -2031,7 +2035,7 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=13"></script>
+  <script src="classboard-auth.js?v=14"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>

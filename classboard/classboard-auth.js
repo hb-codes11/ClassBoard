@@ -204,11 +204,17 @@
     }
   }
 
-  function addUpdateCard(update) {
+  function addUpdateCard(update, homePage = '') {
     const card = document.createElement('div');
     const category = update.category.toLowerCase();
     const cardType = update.isReminder ? 'reminder' : category === 'deadline' ? 'deadline' : category === 'important' || update.importance === 'important' ? 'important' : 'general';
     card.className = `update update-card update-${cardType}`;
+    if (homePage) {
+      card.dataset.homeNavigationPage = homePage;
+      card.tabIndex = 0;
+      card.setAttribute('role', 'link');
+      card.setAttribute('aria-label', `Open ${update.isReminder ? 'reminders' : 'updates'}: ${update.title}`);
+    }
     card.dataset.contentId = update.id;
     card.dataset.contentType = update.isReminder ? 'reminders' : 'updates';
     card.dataset.category = update.isReminder ? 'Reminder' : category === 'deadline' ? 'Deadline' : category === 'important' || update.importance === 'important' ? 'Important' : 'General';
@@ -438,6 +444,12 @@
     const kind = resourceKindLabel(resource.kind);
     const card = document.createElement(compact ? 'div' : 'article');
     card.className = compact ? 'resource-card home-resource-card' : 'resource-card';
+    if (compact) {
+      card.dataset.homeNavigationPage = 'resources';
+      card.tabIndex = 0;
+      card.setAttribute('role', 'link');
+      card.setAttribute('aria-label', `Open notes and syllabus: ${resource.title}`);
+    }
     card.dataset.contentId = resource.id;
     card.dataset.contentType = 'resources';
     card.dataset.subject = subject?.name || '';
@@ -539,7 +551,7 @@
     updateContainers.forEach((container, index) => {
       container.querySelectorAll('.update, .live-empty').forEach((node) => node.remove());
       if (!updateFeed.length) { addEmptyNote(container, 'No class updates or reminders have been published yet.'); return; }
-      updateFeed.slice(0, index === 0 ? 40 : 2).forEach((item) => container.append(addUpdateCard(item)));
+      updateFeed.slice(0, index === 0 ? 40 : 2).forEach((item) => container.append(addUpdateCard(item, index === 1 ? 'updates' : '')));
     });
 
     const resourceGrid = document.getElementById('resourceGrid');
@@ -849,8 +861,24 @@
   }
 
   function addReminderCard(reminder) {
-    return addUpdateCard({ ...reminder, category: 'reminder', isReminder: true });
+    return addUpdateCard({ ...reminder, category: 'reminder', isReminder: true }, 'updates');
   }
+
+  const homeCardInteractiveSelector = 'a, button, input, select, textarea, summary, [contenteditable="true"]';
+  document.addEventListener('click', (event) => {
+    const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+    const card = target?.closest('[data-home-navigation-page]');
+    if (!card || target.closest(homeCardInteractiveSelector)) return;
+    window.openClassboardPage?.(card.dataset.homeNavigationPage);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+    const card = target?.closest('[data-home-navigation-page]');
+    if (!card || target !== card || target.closest(homeCardInteractiveSelector)) return;
+    event.preventDefault();
+    window.openClassboardPage?.(card.dataset.homeNavigationPage);
+  });
 
   async function loadNotifications(classId) {
     const client = window.classboardSupabase;
