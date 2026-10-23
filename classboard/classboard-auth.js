@@ -270,7 +270,9 @@
       joinLink.href = sessionUrl;
       joinLink.target = '_blank';
       joinLink.rel = 'noopener noreferrer';
-      joinLink.textContent = update.isReminder ? 'Join session ↗' : 'Open link ↗';
+      if (update.isReminder) {
+        joinLink.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"></rect><path d="m16 10 5-3v10l-5-3"></path></svg><span>Join session</span>';
+      } else joinLink.textContent = 'Open link ↗';
     }
     copy.append(time);
     if (update.attachment_path) {

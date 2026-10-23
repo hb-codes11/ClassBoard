@@ -189,7 +189,8 @@
     .update-attachment-button:hover { background: color-mix(in srgb, var(--update-accent) 15%, var(--surface)); }
     .update-attachment-button:focus-visible { outline: 2px solid var(--update-accent); outline-offset: 2px; }
     .update-attachment-button svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-    .update-join-link { grid-column: 4; grid-row: 1; justify-self: end; display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 11px; border-radius: 8px; background: var(--blue); color: #fff; font-size: 10px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+    .update-join-link { grid-column: 4; grid-row: 1; justify-self: end; display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 13px; border-radius: 9px; background: var(--blue); color: #fff; font-size: 10px; font-weight: 700; text-decoration: none; white-space: nowrap; box-shadow: 0 2px 5px color-mix(in srgb, var(--blue) 20%, transparent); }
+    .update-join-link svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .update-join-link:hover { background: color-mix(in srgb, var(--blue) 85%, #000); }
     .update-join-link:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
     .update-tag { display: inline-flex; align-items: center; padding: 4px 8px; margin-left: 7px; border-radius: 20px; background: color-mix(in srgb, var(--update-accent) 18%, var(--surface)); color: var(--update-accent); font-size: 9px; font-weight: 780; letter-spacing: .02em; text-transform: uppercase; vertical-align: 1px; }
@@ -1078,7 +1079,7 @@
 
         <section class="page-view" id="page-updates">
           <div class="page-heading"><div><div class="eyebrow">AI &amp; Analytics - A (INTEL-1)</div><h1>Updates</h1><div class="page-description">Important updates, deadlines and reminders from your class.</div></div><button class="primary-button updates-add-button" id="updatesAddButton" type="button" hidden><span aria-hidden="true">＋</span> Add update</button></div>
-          <div class="toolbar updates-toolbar" role="group" aria-label="Filter updates"><button class="filter-chip" data-update-filter="Important" aria-pressed="false">Important updates</button><button class="filter-chip" data-update-filter="Deadline" aria-pressed="false">Deadlines</button><button class="filter-chip" data-update-filter="Reminder" aria-pressed="false">Reminders</button></div>
+          <div class="toolbar updates-toolbar" role="group" aria-label="Filter updates"><button class="filter-chip active" data-update-filter="all" aria-pressed="true">All updates</button><button class="filter-chip" data-update-filter="Important" aria-pressed="false">Important updates</button><button class="filter-chip" data-update-filter="Deadline" aria-pressed="false">Deadlines</button><button class="filter-chip" data-update-filter="Reminder" aria-pressed="false">Reminders</button></div>
           <h2 class="update-list-heading">All updates</h2>
           <div id="updateList"></div>
         </section>
@@ -1809,13 +1810,14 @@
     document.getElementById('classSubjectFilter').addEventListener('change', filterClassLog);
     document.getElementById('classMonthFilter').addEventListener('change', filterClassLog);
     document.querySelectorAll('[data-update-filter]').forEach((button) => button.addEventListener('click', () => {
-      const clearFilter = button.classList.contains('active');
+      const clearFilter = button.dataset.updateFilter !== 'all' && button.classList.contains('active');
+      const showAll = clearFilter || button.dataset.updateFilter === 'all';
       document.querySelectorAll('[data-update-filter]').forEach((chip) => {
-        const active = chip === button && !clearFilter;
+        const active = showAll ? chip.dataset.updateFilter === 'all' : chip === button;
         chip.classList.toggle('active', active);
         chip.setAttribute('aria-pressed', String(active));
       });
-      const selectedCategory = clearFilter ? null : button.dataset.updateFilter;
+      const selectedCategory = showAll ? null : button.dataset.updateFilter;
       document.querySelectorAll('#updateList .update').forEach((row) => {
         row.style.display = !selectedCategory || row.dataset.category === selectedCategory ? '' : 'none';
       });
