@@ -282,6 +282,12 @@
     .filter-chip { min-height: 34px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 22px; padding: 0 12px; font-size: 10px; cursor: pointer; }
     .filter-chip.active { border-color: var(--blue); background: var(--blue-soft); color: var(--blue); font-weight: 650; }
     .resource-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    #homeResourceList { container-type: inline-size; }
+    #homeResourceGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 0 14px 14px; }
+    #homeResourceGrid > .home-resource-card { min-width: 0; margin: 0; }
+    @container (max-width: 660px) {
+      #homeResourceGrid { grid-template-columns: minmax(0, 1fr); }
+    }
     .resource-card { --resource-accent: var(--blue); display: flex; align-items: center; gap: 11px; padding: 12px; min-height: 80px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); transition: border-color .16s, background-color .16s, transform .16s; }
     .resource-card:hover { border-color: color-mix(in srgb, var(--resource-accent) 32%, var(--line)); transform: translateY(-1px); }
     .resource-card[data-subject-color="se"] { --resource-accent: #8050c8; }
@@ -661,6 +667,7 @@
       .stat-value { font-size: 19px; }
       .stat-note { display: none; }
       .grid { grid-template-columns: 1fr; gap: 14px; }
+      #homeResourceGrid { grid-template-columns: minmax(0, 1fr); }
       .workspace-grid { grid-template-columns: 1fr; gap: 13px; }
       .workspace-stack { gap: 13px; }
       .workspace-form { padding: 14px; }
@@ -1072,7 +1079,7 @@
         <section class="grid">
           <div class="stack">
             <article class="panel" id="homeUpdateList"><div class="panel-header"><div><div class="panel-title">Latest updates</div><div class="panel-sub">Notes from your class representatives and teachers</div></div><button class="text-link" data-page="updates">View all →</button></div></article>
-            <article class="panel" id="homeResourceList"><div class="panel-header"><div><div class="panel-title">New notes</div><div class="panel-sub">Recently added to your class</div></div><button class="text-link" data-page="resources">See notes →</button></div></article>
+            <article class="panel" id="homeResourceList"><div class="panel-header"><div><div class="panel-title">New notes</div><div class="panel-sub">Recently added to your class</div></div><button class="text-link" data-page="resources">See notes →</button></div><div id="homeResourceGrid"></div></article>
             <article class="panel">
               <div class="panel-header"><div><div class="panel-title">Recent classes</div><div class="panel-sub">What your class has covered</div></div><button class="text-link" data-page="classes">Open class log →</button></div>
               <div id="homeClassList"></div>

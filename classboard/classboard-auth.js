@@ -437,7 +437,7 @@
     const subject = Array.isArray(resource.subjects) ? resource.subjects[0] : resource.subjects;
     const kind = resourceKindLabel(resource.kind);
     const card = document.createElement(compact ? 'div' : 'article');
-    card.className = compact ? 'resource' : 'resource-card';
+    card.className = compact ? 'resource-card home-resource-card' : 'resource-card';
     card.dataset.contentId = resource.id;
     card.dataset.contentType = 'resources';
     card.dataset.subject = subject?.name || '';
@@ -545,8 +545,8 @@
     const resourceGrid = document.getElementById('resourceGrid');
     resourceGrid.replaceChildren();
     const resourceEmpty = document.getElementById('resourceEmpty');
-    const homeResources = document.getElementById('homeResourceList');
-    homeResources.querySelectorAll('.resource, .live-empty').forEach((node) => node.remove());
+    const homeResources = document.getElementById('homeResourceGrid');
+    homeResources.querySelectorAll('.home-resource-card, .live-empty').forEach((node) => node.remove());
     const resources = resourceResult.data || [];
     await showPublishedCalendar(resources);
     if (!resources.length) {
