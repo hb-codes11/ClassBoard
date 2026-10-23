@@ -1600,29 +1600,59 @@
     });
 
     const issueForm = document.getElementById('issueForm');
+    const issueDateList = document.getElementById('issueDateList');
+    const addIssueDate = document.getElementById('addIssueDate');
+    const maxIssueDates = 10;
+    const syncIssueDateControls = () => {
+      if (!issueDateList || !addIssueDate) return;
+      const dateRows = [...issueDateList.querySelectorAll('.attendance-date-row')];
+      addIssueDate.disabled = dateRows.length >= maxIssueDates;
+      dateRows.slice(1).forEach((row, index) => {
+        const remove = row.querySelector('.attendance-date-remove');
+        if (remove) remove.setAttribute('aria-label', `Remove class date ${index + 2}`);
+      });
+    };
+    addIssueDate?.addEventListener('click', () => {
+      if (!issueDateList || issueDateList.querySelectorAll('.attendance-date-row').length >= maxIssueDates) return;
+      const dateNumber = issueDateList.querySelectorAll('.attendance-date-row').length + 1;
+      const row = document.createElement('div'); row.className = 'attendance-date-row';
+      const input = document.createElement('input'); input.className = 'text-field'; input.type = 'date'; input.name = 'date'; input.setAttribute('aria-label', `Class date ${dateNumber}`);
+      const remove = document.createElement('button'); remove.className = 'secondary-button attendance-date-remove'; remove.type = 'button'; remove.textContent = '×'; remove.setAttribute('aria-label', `Remove class date ${dateNumber}`);
+      remove.addEventListener('click', () => { row.remove(); syncIssueDateControls(); });
+      row.append(input, remove); issueDateList.append(row); syncIssueDateControls();
+    });
+    syncIssueDateControls();
     issueForm?.addEventListener('submit', async (event) => {
       event.preventDefault(); event.stopImmediatePropagation();
       const context = window.classboardContext;
       if (!context?.roles.includes('student')) { notifyApp('Only a student account can submit an attendance concern.', true); return; }
       const values = new FormData(issueForm);
       const subjectName = String(values.get('subject'));
-      const classDate = String(values.get('date'));
+      const classDates = [...new Set([...issueForm.querySelectorAll('input[name="date"]')].map((input) => input.value).filter(Boolean))].sort();
       const report = String(values.get('message')).trim();
+      if (!classDates.length) { notifyApp('Choose at least one class date.', true); return; }
       if (!report) { notifyApp('Describe the attendance concern before sending it.', true); return; }
       const subjectResult = await window.classboardSupabase.from('subjects').select('id,name').eq('class_id', context.classId).eq('name', subjectName).single();
       if (subjectResult.error) { notifyApp(`Could not find that subject: ${subjectResult.error.message}`, true); return; }
-      const dayStart = new Date(`${classDate}T00:00:00+05:30`).toISOString();
-      const nextDay = new Date(new Date(`${classDate}T00:00:00+05:30`).getTime() + 86400000).toISOString();
-      const sessionResult = await window.classboardSupabase.from('class_sessions').select('id').eq('class_id', context.classId).eq('subject_id', subjectResult.data.id).gte('starts_at', dayStart).lt('starts_at', nextDay).limit(1);
-      if (sessionResult.error) { notifyApp(`Could not check the class session: ${sessionResult.error.message}`, true); return; }
+      let sessionId = null;
+      if (classDates.length === 1) {
+        const dayStart = new Date(`${classDates[0]}T00:00:00+05:30`).toISOString();
+        const nextDay = new Date(new Date(`${classDates[0]}T00:00:00+05:30`).getTime() + 86400000).toISOString();
+        const sessionResult = await window.classboardSupabase.from('class_sessions').select('id').eq('class_id', context.classId).eq('subject_id', subjectResult.data.id).gte('starts_at', dayStart).lt('starts_at', nextDay).limit(1);
+        if (sessionResult.error) { notifyApp(`Could not check the class session: ${sessionResult.error.message}`, true); return; }
+        sessionId = sessionResult.data?.[0]?.id || null;
+      }
       const { error } = await window.classboardSupabase.from('attendance_issues').insert({
-        class_id: context.classId, student_id: context.userId, session_id: sessionResult.data?.[0]?.id || null,
-        message: `Subject: ${subjectName} · Class date: ${classDate}\n\n${report}`
+        class_id: context.classId, student_id: context.userId, session_id: sessionId,
+        message: `Subject: ${subjectName} · Class dates: ${classDates.join(', ')}\n\n${report}`
       });
       if (error) { notifyApp(`Concern did not send: ${error.message}`, true); return; }
       issueForm.reset();
+      issueDateList?.querySelectorAll('.attendance-date-row:not(:first-child)').forEach((row) => row.remove());
       const localDate = new Date();
-      issueForm.elements.date.value = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, '0')}-${String(localDate.getDate()).padStart(2, '0')}`;
+      const firstIssueDate = issueDateList?.querySelector('input[name="date"]');
+      if (firstIssueDate) firstIssueDate.value = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, '0')}-${String(localDate.getDate()).padStart(2, '0')}`;
+      syncIssueDateControls();
       await loadAttendanceIssues(context.classId);
       notifyApp('Your attendance concern was sent privately to the class team.');
     }, true);

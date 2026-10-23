@@ -510,6 +510,12 @@
     .attendance-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; padding: 18px; }
     .attendance-form > .field-label { min-width: 0; }
     .attendance-form .select-field, .attendance-form .text-field, .attendance-form .text-area { width: 100%; min-width: 0; max-width: 100%; }
+    .attendance-date-field { display: grid; align-content: start; gap: 6px; min-width: 0; }
+    .attendance-date-list { display: grid; gap: 7px; }
+    .attendance-date-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px; min-width: 0; }
+    .attendance-date-row .text-field { min-width: 0; }
+    .attendance-date-remove { min-width: 38px; min-height: 38px; padding: 0 10px; }
+    .attendance-date-add { justify-self: start; min-height: 34px; padding: 5px 10px; font-size: 11px; }
     .field-label { display: grid; gap: 6px; color: var(--muted); font-size: 10px; }
     .field-label[hidden] { display: none; }
     .text-field { width: 100%; }
@@ -1202,7 +1208,7 @@
               </button>
             </article>
           </aside>
-          <article class="panel attendance-issue-panel"><div class="panel-header"><div><div class="panel-title">Tell your CR about an attendance issue</div><div class="panel-sub">Only you, your assigned CR, and class admins can see this message.</div></div></div><form class="attendance-form" id="issueForm"><label class="field-label">Subject<select class="select-field" name="subject" required><option>Loading subjects…</option></select></label><label class="field-label">Class date<input class="text-field" type="date" name="date" required></label><label class="field-label" style="grid-column:1/-1">What happened?<textarea class="text-area" name="message" placeholder="For example, I attended this class but my record shows absent." maxlength="2500" required></textarea></label><button class="primary-button" type="submit">Send to my CR</button></form><div id="studentCaseList"><div class="list-row"><div class="list-main">Your submitted concerns will appear here.</div></div></div></article>
+          <article class="panel attendance-issue-panel"><div class="panel-header"><div><div class="panel-title">Tell your CR about an attendance issue</div><div class="panel-sub">Only you, your assigned CR, and class admins can see this message.</div></div></div><form class="attendance-form" id="issueForm"><label class="field-label">Subject<select class="select-field" name="subject" required><option>Loading subjects…</option></select></label><div class="attendance-date-field"><label class="field-label" for="issueDate1">Class dates</label><div class="attendance-date-list" id="issueDateList"><div class="attendance-date-row"><input class="text-field" id="issueDate1" type="date" name="date" aria-label="Class date 1" required></div></div><button class="secondary-button attendance-date-add" id="addIssueDate" type="button">+ Add another date</button></div><label class="field-label" style="grid-column:1/-1">What happened?<textarea class="text-area" name="message" placeholder="For example, I attended these classes but my record shows absent." maxlength="2500" required></textarea></label><button class="primary-button" type="submit">Send to my CR</button></form><div id="studentCaseList"><div class="list-row"><div class="list-main">Your submitted concerns will appear here.</div></div></div></article>
         </div>
         </section>
 
