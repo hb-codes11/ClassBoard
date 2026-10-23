@@ -124,12 +124,13 @@
     document.querySelectorAll('.profile-name').forEach((el) => { el.textContent = displayName; });
     document.querySelectorAll('.profile .avatar').forEach((el) => { el.textContent = initials; });
     const displayedRoles = isStaffAccount ? roles.filter((role) => role !== 'student') : roles;
-    const roleLabel = `${displayedRoles.map((role) => role.toUpperCase()).join(' + ')} · AI & Analytics - A (INTEL-1)`;
+    const roleLabel = displayedRoles.map((role) => role.toUpperCase()).join(' + ');
+    const profileDetail = `${roleLabel} · AI & Analytics - A (INTEL-1)`;
     document.querySelector('.profile-role').textContent = roleLabel;
     document.getElementById('profileAvatar').textContent = initials;
     document.getElementById('topbarAvatar').textContent = initials;
     document.getElementById('profileName').textContent = displayName;
-    document.getElementById('profileRole').textContent = roleLabel;
+    document.getElementById('profileRole').textContent = profileDetail;
     document.getElementById('profileEmail').textContent = user.email || 'Email unavailable';
     const greeting = document.getElementById('homeGreeting');
     if (greeting) greeting.textContent = `Hello, ${displayName.toLocaleUpperCase('en-IN')}`;
