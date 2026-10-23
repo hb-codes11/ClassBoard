@@ -1668,6 +1668,17 @@
       mobileMoreMenu.hidden = !open;
       mobileMoreButton.setAttribute('aria-expanded', String(open));
     });
+    document.addEventListener('click', (event) => {
+      if (mobileMoreMenu.hidden || mobileMoreMenu.contains(event.target) || mobileMoreButton.contains(event.target)) return;
+      mobileMoreMenu.hidden = true;
+      mobileMoreButton.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || mobileMoreMenu.hidden) return;
+      mobileMoreMenu.hidden = true;
+      mobileMoreButton.setAttribute('aria-expanded', 'false');
+      mobileMoreButton.focus();
+    });
     document.getElementById('mobileThemeToggle').addEventListener('click', () => document.getElementById('themeToggle').click());
     document.querySelectorAll('[data-view]').forEach((item) => item.addEventListener('click', () => {
       if (item.dataset.view === 'Class representatives') {
