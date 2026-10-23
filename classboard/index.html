@@ -166,6 +166,9 @@
     .stat-note { margin-left: auto; color: var(--green); background: var(--green-soft); padding: 4px 7px; border-radius: 20px; font-size: 9px; font-weight: 700; white-space: nowrap; }
     .grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(245px, .9fr); gap: 18px; align-items: start; }
     .stack { display: grid; gap: 18px; }
+    .home-dashboard-grid { align-items: stretch; }
+    .home-dashboard-grid > .stack:first-child { display: flex; flex-direction: column; }
+    .home-dashboard-grid > .stack:first-child > #homeResourceList { flex: 1 1 auto; }
     .panel { border: 1px solid color-mix(in srgb, var(--line) 78%, white 22%); border-radius: 12px; background: color-mix(in srgb, var(--surface) 84%, transparent); box-shadow: var(--shadow), inset 0 1px color-mix(in srgb, white 36%, transparent); backdrop-filter: blur(14px) saturate(125%); -webkit-backdrop-filter: blur(14px) saturate(125%); overflow: hidden; }
     .panel-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px 12px; }
     .panel-title { font-size: 12px; font-weight: 700; letter-spacing: -.01em; }
@@ -363,7 +366,6 @@
     .notification-read { opacity: .76; background: var(--surface); }
     .notification-read .notification-unread { visibility: hidden; }
     #classLogList { display: grid; gap: 14px; padding: 14px; }
-    #homeClassList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; padding: 14px; }
     .class-log-day-group { min-width: 0; }
     .class-log-day-heading { display: flex; align-items: center; gap: 10px; margin: 1px 2px 12px; font-size: 16px; font-weight: 730; }
     .class-log-day-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--blue-soft); color: var(--blue); }
@@ -381,7 +383,6 @@
     .class-log-session[data-subject-color="orange"] { --class-accent: #ed8a22; }
     .class-log-session[data-subject-color="yellow"] { --class-accent: #d8a20b; }
     .class-log-session[data-subject-color="rose"] { --class-accent: #d35d87; }
-    #homeClassList > .class-log-session:first-child { border-top: 3px solid var(--class-accent); }
     .class-log-time { display: grid; place-items: center; min-height: 38px; padding: 4px 6px; border-radius: 8px; background: var(--blue-soft); color: var(--blue); font-size: 11px; font-weight: 750; text-align: center; }
     .class-log-session .list-main { grid-column: 2; grid-row: 1; }
     .class-log-session .list-title { font-size: 13px; line-height: 1.3; }
@@ -622,7 +623,7 @@
       .grid, .workspace-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
       .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .stats .stat-card:first-child { grid-column: 1 / -1; }
-      .resource-grid, .class-log-session-grid, .attendance-subject-grid, #homeClassList { grid-template-columns: minmax(0, 1fr); }
+      .resource-grid, .class-log-session-grid, .attendance-subject-grid { grid-template-columns: minmax(0, 1fr); }
       .panel-header { flex-wrap: wrap; align-items: flex-start; gap: 10px; }
       .panel-header > button { flex: none; white-space: nowrap; }
       .stat-note { flex: none; }
@@ -773,7 +774,6 @@
       #classLogList { gap: 12px; padding: 10px; }
       .class-log-day-heading { font-size: 14px; }
       .class-log-session-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-      #homeClassList { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 10px; }
       .class-log-session { grid-template-columns: 62px minmax(0, 1fr); gap: 7px 9px; padding: 10px; }
       .class-log-time { grid-column: 1; grid-row: 1; font-size: 10px; }
       .class-log-session .list-main { grid-column: 2; grid-row: 1; }
@@ -1076,14 +1076,10 @@
           </a>
         </section>
 
-        <section class="grid">
+        <section class="grid home-dashboard-grid">
           <div class="stack">
             <article class="panel" id="homeUpdateList"><div class="panel-header"><div><div class="panel-title">Latest updates</div><div class="panel-sub">Notes from your class representatives and teachers</div></div><button class="text-link" data-page="updates">View all →</button></div></article>
             <article class="panel" id="homeResourceList"><div class="panel-header"><div><div class="panel-title">New notes</div><div class="panel-sub">Recently added to your class</div></div><button class="text-link" data-page="resources">See notes →</button></div><div id="homeResourceGrid"></div></article>
-            <article class="panel">
-              <div class="panel-header"><div><div class="panel-title">Recent classes</div><div class="panel-sub">What your class has covered</div></div><button class="text-link" data-page="classes">Open class log →</button></div>
-              <div id="homeClassList"></div>
-            </article>
           </div>
 
           <div class="stack">
@@ -1714,9 +1710,6 @@
       const report = document.createElement('button'); report.className = 'text-link'; report.dataset.page = 'attendance'; report.textContent = 'Report an issue';
       actions.append(report); publicRow.append(actions);
       document.getElementById('classLogList').prepend(publicRow);
-      const homeRow = publicRow.cloneNode(true);
-      homeRow.querySelector('.class-log-actions')?.remove();
-      document.getElementById('homeClassList').prepend(homeRow);
       filterClassLog();
       event.currentTarget.reset();
       showToast('Class log saved in this preview');
