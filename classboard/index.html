@@ -186,6 +186,7 @@
     .update-attachment-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 9px; }
     .update-attachment-button { display: inline-flex; align-items: center; gap: 7px; max-width: 100%; min-height: 34px; padding: 0 11px; border: 1px solid color-mix(in srgb, var(--update-accent) 36%, var(--line)); border-radius: 8px; background: color-mix(in srgb, var(--update-accent) 8%, var(--surface)); color: var(--update-accent); font-size: 10px; font-weight: 700; cursor: pointer; }
     .update-attachment-button span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .update-attachment-file-icon { display: grid; place-items: center; flex: none; width: 18px; height: 20px; overflow: visible !important; border-radius: 4px; background: #e5484d; color: #fff; font-size: 6px; font-weight: 800; letter-spacing: -.04em; }
     .update-attachment-button:hover { background: color-mix(in srgb, var(--update-accent) 15%, var(--surface)); }
     .update-attachment-button:focus-visible { outline: 2px solid var(--update-accent); outline-offset: 2px; }
     .update-attachment-button svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -205,8 +206,6 @@
     .updates-toolbar { gap: 8px; margin: 0 0 20px; }
     .updates-toolbar .filter-chip { min-height: 40px; display: inline-flex; align-items: center; gap: 8px; padding: 0 15px; border-radius: 22px; font-size: 12px; }
     .updates-toolbar .filter-chip.active { background: var(--blue-soft); }
-    .update-list-heading { display: flex; align-items: center; gap: 12px; margin: 0 0 10px; font-size: 17px; font-weight: 740; letter-spacing: -.025em; }
-    .update-list-heading::after { content: ""; height: 1px; flex: 1; background: var(--line); }
     .updates-add-button { flex: none; }
     [data-theme="dark"] .update-card { border-color: var(--line); box-shadow: inset 0 1px #ffffff08; }
     [data-theme="dark"] .update-card.update-reminder { --update-accent: #f3b73f; }
@@ -1080,7 +1079,6 @@
         <section class="page-view" id="page-updates">
           <div class="page-heading"><div><div class="eyebrow">AI &amp; Analytics - A (INTEL-1)</div><h1>Updates</h1><div class="page-description">Important updates, deadlines and reminders from your class.</div></div><button class="primary-button updates-add-button" id="updatesAddButton" type="button" hidden><span aria-hidden="true">＋</span> Add update</button></div>
           <div class="toolbar updates-toolbar" role="group" aria-label="Filter updates"><button class="filter-chip active" data-update-filter="all" aria-pressed="true">All updates</button><button class="filter-chip" data-update-filter="Important" aria-pressed="false">Important updates</button><button class="filter-chip" data-update-filter="Deadline" aria-pressed="false">Deadlines</button><button class="filter-chip" data-update-filter="Reminder" aria-pressed="false">Reminders</button></div>
-          <h2 class="update-list-heading">All updates</h2>
           <div id="updateList"></div>
         </section>
 

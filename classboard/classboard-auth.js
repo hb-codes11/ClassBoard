@@ -283,8 +283,8 @@
       preview.className = 'update-attachment-button';
       preview.dataset.previewPdf = 'true';
       preview.setAttribute('aria-label', `Preview attached PDF: ${update.attachment_name || 'Update attachment'}`);
-      preview.innerHTML = '<svg viewBox="0 0 24 24"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg><span></span>';
-      preview.querySelector('span').textContent = `PDF · ${update.attachment_name || 'View attachment'}`;
+      preview.innerHTML = '<span class="update-attachment-file-icon" aria-hidden="true">PDF</span><span class="update-attachment-name"></span>';
+      preview.querySelector('.update-attachment-name').textContent = `PDF · ${update.attachment_name || 'View attachment'}`;
       attachmentActions.append(preview);
       card.dataset.resourcePath = update.attachment_path;
       card.dataset.resourceTitle = update.attachment_name || 'Update attachment';
