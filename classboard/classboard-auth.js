@@ -290,7 +290,29 @@
     }
     card.append(dateTile, icon, copy);
     if (joinLink) card.append(joinLink);
-    card.append(makeDeleteButton(update.isReminder ? 'Delete reminder' : 'Delete update', true));
+    const canManageUpdates = window.classboardContext?.roles.some((role) => role === 'cr' || role === 'admin');
+    const menuTrigger = document.createElement('button');
+    menuTrigger.type = 'button';
+    menuTrigger.className = 'update-menu-trigger';
+    menuTrigger.dataset.updateMenuTrigger = 'true';
+    menuTrigger.setAttribute('aria-label', 'More update actions');
+    menuTrigger.setAttribute('aria-haspopup', 'menu');
+    menuTrigger.setAttribute('aria-expanded', 'false');
+    menuTrigger.hidden = !canManageUpdates;
+    menuTrigger.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg>';
+    const menu = document.createElement('div');
+    menu.className = 'update-card-menu';
+    menu.role = 'menu';
+    menu.hidden = true;
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'update-menu-delete';
+    deleteButton.dataset.deleteContent = 'true';
+    deleteButton.setAttribute('role', 'menuitem');
+    deleteButton.textContent = update.isReminder ? 'Delete reminder' : 'Delete update';
+    deleteButton.hidden = !canManageUpdates;
+    menu.append(deleteButton);
+    card.append(menuTrigger, menu);
     return card;
   }
 
@@ -1210,6 +1232,32 @@
       if (!uploadPanel.hidden) uploadPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
     document.getElementById('cancelResourceUpload')?.addEventListener('click', closeUpload);
+
+    const closeUpdateMenus = (restoreFocus = false) => {
+      document.querySelectorAll('.update-card-menu:not([hidden])').forEach((menu) => {
+        menu.hidden = true;
+        const trigger = menu.parentElement?.querySelector('[data-update-menu-trigger]');
+        trigger?.setAttribute('aria-expanded', 'false');
+        if (restoreFocus) trigger?.focus();
+      });
+    };
+    document.addEventListener('click', (event) => {
+      const trigger = event.target.closest('[data-update-menu-trigger]');
+      if (trigger) {
+        const menu = trigger.parentElement.querySelector('.update-card-menu');
+        const willOpen = menu.hidden;
+        closeUpdateMenus();
+        menu.hidden = !willOpen;
+        trigger.setAttribute('aria-expanded', String(willOpen));
+        if (willOpen) menu.querySelector('[role="menuitem"]')?.focus();
+        return;
+      }
+      if (event.target.closest('[data-delete-content]') && event.target.closest('.update-card-menu')) closeUpdateMenus();
+      else if (!event.target.closest('.update-card-menu')) closeUpdateMenus();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && document.querySelector('.update-card-menu:not([hidden])')) closeUpdateMenus(true);
+    });
 
     document.addEventListener('click', async (event) => {
       const button = event.target.closest('[data-delete-content]');

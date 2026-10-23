@@ -170,7 +170,7 @@
     .text-link { border: 0; padding: 0; background: none; color: var(--blue); font-size: 10px; font-weight: 670; cursor: pointer; }
     .update { display: flex; gap: 12px; padding: 12px 18px; border-top: 1px solid var(--line); }
     .update:first-of-type { border-top: 0; }
-    .update-card { --update-accent: var(--blue); display: grid; grid-template-columns: 56px 42px minmax(0, 1fr) auto auto; align-items: center; gap: 13px; min-height: 90px; margin: 10px 12px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--update-accent) 24%, var(--line)); border-left: 4px solid var(--update-accent); border-radius: 13px; background: var(--surface); box-shadow: 0 4px 14px rgba(26, 54, 84, .035); }
+    .update-card { --update-accent: var(--blue); position: relative; display: grid; grid-template-columns: 56px 42px minmax(0, 1fr) auto auto; align-items: center; gap: 13px; min-height: 90px; margin: 10px 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); box-shadow: 0 4px 14px rgba(26, 54, 84, .035); }
     .update-card.update-important { --update-accent: #258be5; }
     .update-card.update-deadline { --update-accent: #e6535e; }
     .update-card.update-reminder { --update-accent: #e8a52b; }
@@ -194,15 +194,20 @@
     .update-join-link:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
     .update-tag { display: inline-flex; align-items: center; padding: 4px 8px; margin-left: 7px; border-radius: 20px; background: color-mix(in srgb, var(--update-accent) 18%, var(--surface)); color: var(--update-accent); font-size: 9px; font-weight: 780; letter-spacing: .02em; text-transform: uppercase; vertical-align: 1px; }
     .update-urgent { display: inline-flex; align-items: center; gap: 5px; margin-right: 7px; padding: 4px 8px; border-radius: 20px; background: #e6535e20; color: #e6535e; font-size: 9px; font-weight: 780; text-transform: uppercase; }
-    .update-delete { grid-column: 5; grid-row: 1; display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border-radius: 9px; }
-    .update-delete svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .update-menu-trigger { grid-column: 5; grid-row: 1; display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--text); cursor: pointer; }
+    .update-menu-trigger:hover, .update-menu-trigger[aria-expanded="true"] { border-color: var(--blue); color: var(--blue); }
+    .update-menu-trigger svg { width: 19px; height: 19px; fill: currentColor; }
+    .update-menu-trigger[hidden], .update-card-menu[hidden] { display: none; }
+    .update-card-menu { position: absolute; z-index: 3; top: calc(100% - 3px); right: 14px; min-width: 150px; padding: 5px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); box-shadow: 0 10px 28px rgba(26, 54, 84, .16); }
+    .update-menu-delete { width: 100%; min-height: 36px; padding: 0 10px; border: 0; border-radius: 7px; background: transparent; color: #c0392b; text-align: left; font: inherit; font-size: 12px; cursor: pointer; }
+    .update-menu-delete:hover, .update-menu-delete:focus-visible { background: color-mix(in srgb, #e6535e 10%, var(--surface)); outline: none; }
     .updates-toolbar { gap: 8px; margin: 0 0 20px; }
     .updates-toolbar .filter-chip { min-height: 40px; display: inline-flex; align-items: center; gap: 8px; padding: 0 15px; border-radius: 22px; font-size: 12px; }
     .updates-toolbar .filter-chip.active { background: var(--blue-soft); }
     .update-list-heading { display: flex; align-items: center; gap: 12px; margin: 0 0 10px; font-size: 17px; font-weight: 740; letter-spacing: -.025em; }
     .update-list-heading::after { content: ""; height: 1px; flex: 1; background: var(--line); }
     .updates-add-button { flex: none; }
-    [data-theme="dark"] .update-card { border-color: color-mix(in srgb, var(--update-accent) 32%, var(--line)); border-left-color: var(--update-accent); box-shadow: inset 0 1px #ffffff08; }
+    [data-theme="dark"] .update-card { border-color: var(--line); box-shadow: inset 0 1px #ffffff08; }
     [data-theme="dark"] .update-card.update-reminder { --update-accent: #f3b73f; }
     [data-theme="dark"] .update-card.update-deadline { --update-accent: #ff626b; }
     .update-mark { width: 36px; height: 36px; display: grid; place-items: center; flex: none; border-radius: 11px; background: var(--amber-soft); color: var(--amber); font-weight: 750; font-size: 12px; }
@@ -648,9 +653,9 @@
       .subject-calculator .secondary-button { grid-column: 1 / -1; }
       .panel-header { padding: 14px 15px 10px; }
       .update { padding-inline: 15px; }
-      .update-card { grid-template-columns: 43px 34px minmax(0, 1fr) auto; gap: 8px; margin: 8px; padding: 10px; }
+      .update-card { grid-template-columns: 43px 34px minmax(0, 1fr) auto; gap: 8px; margin: 8px 0; padding: 10px; }
       .update-card .update-join-link { grid-column: 3; grid-row: 2; justify-self: start; min-height: 30px; }
-      .update-card .update-delete { grid-column: 4; grid-row: 1; }
+      .update-card .update-menu-trigger { grid-column: 4; grid-row: 1; }
       .update-date { min-height: 46px; }
       .update-date-day { font-size: 17px; }
       .update-icon { width: 34px; height: 34px; }
@@ -659,7 +664,7 @@
       .update-card .update-body { font-size: 10px; }
       .update-card .update-time { font-size: 9px; }
       .update-tag, .update-urgent { font-size: 8px; padding: 3px 6px; }
-      .update-delete { width: 32px; height: 32px; }
+      .update-menu-trigger { width: 32px; height: 32px; }
       .quick-actions { margin-top: 14px; gap: 7px; }
       .quick-action { display: grid; justify-items: start; gap: 7px; min-height: 78px; padding: 10px; }
       .quick-action-sub { display: none; }
@@ -1075,7 +1080,7 @@
           <div class="page-heading"><div><div class="eyebrow">AI &amp; Analytics - A (INTEL-1)</div><h1>Updates</h1><div class="page-description">Important updates, deadlines and reminders from your class.</div></div><button class="primary-button updates-add-button" id="updatesAddButton" type="button" hidden><span aria-hidden="true">＋</span> Add update</button></div>
           <div class="toolbar updates-toolbar" role="group" aria-label="Filter updates"><button class="filter-chip" data-update-filter="Important" aria-pressed="false">Important updates</button><button class="filter-chip" data-update-filter="Deadline" aria-pressed="false">Deadlines</button><button class="filter-chip" data-update-filter="Reminder" aria-pressed="false">Reminders</button></div>
           <h2 class="update-list-heading">All updates</h2>
-          <article class="panel" id="updateList"></article>
+          <div id="updateList"></div>
         </section>
 
         <section class="page-view" id="page-calendar">
