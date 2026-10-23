@@ -1,6 +1,6 @@
 {
-  "name": "Classboard — INTEL-1",
-  "short_name": "Classboard",
+  "name": "ClassBoard — INTEL-1",
+  "short_name": "ClassBoard",
   "description": "Class portal for AI & Analytics - A (INTEL-1)",
   "start_url": "./",
   "display": "standalone",

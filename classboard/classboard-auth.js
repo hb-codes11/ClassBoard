@@ -70,7 +70,7 @@
 
   function setRoleOptions(roles) {
     const switcher = document.getElementById('roleSwitcher');
-    const labels = { student: 'Student view', cr: 'Class representatives', admin: 'Admin workspace' };
+    const labels = { student: 'Student View', cr: 'Class Representatives', admin: 'Admin Workspace' };
     // Show every active membership so staff accounts can also use Student view.
     const orderedRoles = ['student', 'cr', 'admin'].filter((role) => roles.includes(role));
     switcher.hidden = !roles.includes('cr') && !roles.includes('admin');
@@ -106,7 +106,7 @@
     if (!roles.length) {
       app.hidden = true;
       gate.hidden = false;
-      showMessage('You are signed in, but this account has no active INTEL-1 class role yet. Ask a Classboard admin to add your account.', true);
+      showMessage('You are signed in, but this account has no active INTEL-1 class role yet. Ask a ClassBoard admin to add your account.', true);
       return;
     }
 
@@ -1199,10 +1199,10 @@
       });
       const remove = document.createElement('button'); remove.className = 'account-remove-button'; remove.type = 'button'; remove.textContent = 'Remove access';
       remove.disabled = user.userId === window.classboardContext?.userId;
-      remove.title = remove.disabled ? 'You cannot remove your own access here.' : 'Remove this account from the Classboard class';
+      remove.title = remove.disabled ? 'You cannot remove your own access here.' : 'Remove this account from the ClassBoard class';
       remove.addEventListener('click', async () => {
         if (user.userId === window.classboardContext?.userId) return;
-        const confirmed = window.confirm(`Remove ${user.name} from this Classboard class? They will lose access to its resources and workspaces. Their Google account will not be deleted.`);
+        const confirmed = window.confirm(`Remove ${user.name} from this ClassBoard class? They will lose access to its resources and workspaces. Their Google account will not be deleted.`);
         if (!confirmed) return;
         remove.disabled = true;
         const { error } = await client.rpc('remove_class_member_access', {
@@ -1210,7 +1210,7 @@
         });
         if (error) { remove.disabled = false; notifyApp(`Could not remove class access: ${error.message}`, true); return; }
         await loadAdminAccounts(classId);
-        notifyApp(`Removed ${user.name} from this Classboard class.`);
+        notifyApp(`Removed ${user.name} from this ClassBoard class.`);
       });
       controls.append(roleGroup, rollLabel, save, remove); row.append(avatar, main, controls); container.append(row);
     });
@@ -1898,10 +1898,10 @@
         created_by: context.userId,
         updated_by: context.userId
       });
-      if (error) { notifyApp(`Class log did not save: ${error.message}`, true); return; }
+      if (error) { notifyApp(`Class Log did not save: ${error.message}`, true); return; }
       classLogForm.reset();
       await loadLiveClassData(context.classId);
-      notifyApp('Class log saved to Supabase.');
+      notifyApp('Class Log saved to Supabase.');
     }, true);
 
     const scheduleForm = document.getElementById('crScheduleForm');
