@@ -74,18 +74,22 @@
   let activeMonth = 9;
   let activeDateKey = '';
   let selectedClassId = '';
+  let calendarOverrides = {};
+  let calendarClassId = null;
+  let calendarLoadId = 0;
+  let sharedCalendarReady = false;
+  let calendarChannel = null;
 
   const dateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   const contextKey = () => {
     const context = window.classboardContext;
     return `classboard-personal-calendar:${context?.classId || 'class'}:${context?.userId || 'guest'}`;
   };
-  const readOverrides = () => {
+  const readLegacyOverrides = () => {
     try { return JSON.parse(localStorage.getItem(contextKey()) || '{}') || {}; } catch { return {}; }
   };
-  const writeOverrides = (overrides) => localStorage.setItem(contextKey(), JSON.stringify(overrides));
   const subjectInfo = (name) => subjects.find((subject) => subject.name === name) || { name, short: name.slice(0, 6).toUpperCase() };
-  const canEditCalendar = () => window.classboardContext?.roles?.some((role) => role === 'cr' || role === 'admin') || false;
+  const canEditCalendar = () => sharedCalendarReady && (window.classboardContext?.roles?.some((role) => role === 'cr' || role === 'admin') || false);
   const createClass = ([subject, kind, batch, start, end, room], id) => ({ id, subject, kind, batch, start, end, room });
   const defaultClasses = (date) => {
     const key = dateKey(date);
@@ -93,7 +97,7 @@
     if (event?.kind === 'holiday' || event?.kind === 'exam' || event?.kind === 'convocation') return [];
     return (weekdaySchedule[date.getDay()] || []).map((item, index) => createClass(item, `base-${date.getDay()}-${index}`));
   };
-  const classesForDate = (date, overrides = readOverrides()) => Object.hasOwn(overrides, dateKey(date)) ? overrides[dateKey(date)] : defaultClasses(date);
+  const classesForDate = (date, overrides = calendarOverrides) => Object.hasOwn(overrides, dateKey(date)) ? overrides[dateKey(date)] : defaultClasses(date);
   const visibleClasses = (classes) => classes.filter((item) => item.kind !== 'lab' || item.batch === batchSelect.value);
   const calendarLabels = (date, classes) => {
     const event = eventMap[dateKey(date)];
@@ -113,7 +117,7 @@
     const month = activeMonth;
     const firstWeekday = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const overrides = readOverrides();
+    const overrides = calendarOverrides;
     monthTitle.textContent = new Date(year, month, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
     monthButtons.forEach((button) => button.setAttribute('aria-pressed', String(Number(button.dataset.calendarMonth) === month)));
     grid.replaceChildren();
@@ -156,11 +160,96 @@
     return select;
   }
 
-  function persistClasses(classes) {
+  async function loadSharedCalendar() {
+    const context = window.classboardContext;
+    const client = window.classboardSupabase;
+    const requestId = ++calendarLoadId;
+    calendarClassId = context?.classId || null;
+    sharedCalendarReady = false;
+    calendarOverrides = {};
+    if (calendarChannel && client) {
+      client.removeChannel(calendarChannel);
+      calendarChannel = null;
+    }
+    renderCalendar();
+    if (!context?.classId || !client) {
+      calendarNote.textContent = 'Sign in to view the shared class schedule.';
+      return;
+    }
+
+    calendarNote.textContent = 'Loading the shared class calendar…';
+    const { data, error } = await client.from('class_calendar_overrides')
+      .select('calendar_date,classes').eq('class_id', context.classId);
+    if (requestId !== calendarLoadId) return;
+    if (error) {
+      calendarNote.textContent = 'Shared calendar is unavailable. Apply Supabase migration 025 to enable class-wide edits.';
+      return;
+    }
+
+    const localOverrides = readLegacyOverrides();
+    const sharedDates = new Set((data || []).map((row) => row.calendar_date));
+    const missingLocalRows = Object.entries(localOverrides)
+      .filter(([calendarDate]) => !sharedDates.has(calendarDate))
+      .map(([calendarDate, classes]) => ({
+        class_id: context.classId,
+        calendar_date: calendarDate,
+        classes,
+        updated_by: context.userId
+      }));
+    if (missingLocalRows.length) {
+      const { error: syncError } = await client.from('class_calendar_overrides')
+        .upsert(missingLocalRows, { onConflict: 'class_id,calendar_date', ignoreDuplicates: true });
+      if (requestId !== calendarLoadId) return;
+      if (syncError) {
+        calendarNote.textContent = 'Could not publish your saved calendar edits. Apply Supabase migration 025, then reload.';
+        return;
+      }
+    }
+    if (requestId !== calendarLoadId) return;
+    if (Object.keys(localOverrides).length) localStorage.removeItem(contextKey());
+    const { data: currentRows, error: refreshError } = await client.from('class_calendar_overrides')
+      .select('calendar_date,classes').eq('class_id', context.classId);
+    if (requestId !== calendarLoadId) return;
+    if (refreshError) {
+      calendarNote.textContent = 'Could not refresh the shared calendar. Please reload the page.';
+      return;
+    }
+    calendarOverrides = Object.fromEntries((currentRows || []).map((row) => [row.calendar_date, row.classes]));
+    sharedCalendarReady = true;
+    calendarNote.textContent = canEditCalendar()
+      ? 'Calendar changes are shared with your class.'
+      : 'Select any date to view its shared class schedule.';
+    renderCalendar();
+    if (dialog.open && activeDateKey) renderDayDialog(new Date(`${activeDateKey}T12:00:00`));
+
+    calendarChannel = client.channel(`class-calendar-${context.classId}`)
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'class_calendar_overrides', filter: `class_id=eq.${context.classId}`
+      }, (change) => {
+        const changedDate = change.new?.calendar_date || change.old?.calendar_date;
+        if (!changedDate) return;
+        if (change.eventType === 'DELETE') delete calendarOverrides[changedDate];
+        else calendarOverrides[changedDate] = change.new.classes;
+        renderCalendar();
+        if (dialog.open && activeDateKey === changedDate) renderDayDialog(new Date(`${activeDateKey}T12:00:00`));
+      }).subscribe();
+  }
+
+  async function persistClasses(classes) {
     if (!canEditCalendar()) return;
-    const overrides = readOverrides();
-    overrides[activeDateKey] = classes;
-    writeOverrides(overrides);
+    const context = window.classboardContext;
+    const { error } = await window.classboardSupabase.from('class_calendar_overrides').upsert({
+      class_id: context.classId,
+      calendar_date: activeDateKey,
+      classes,
+      updated_by: context.userId
+    }, { onConflict: 'class_id,calendar_date' });
+    if (error) {
+      calendarNote.textContent = `Calendar change was not saved: ${error.message}`;
+      return;
+    }
+    calendarOverrides[activeDateKey] = classes;
+    calendarNote.textContent = 'Calendar changes are shared with your class.';
     renderCalendar();
     const date = new Date(`${activeDateKey}T12:00:00`);
     renderDayDialog(date);
@@ -174,7 +263,7 @@
     dialogSub.textContent = [event?.label, `${classes.length} ${classes.length === 1 ? 'class' : 'classes'} for ${batchSelect.value}`].filter(Boolean).join(' · ');
     resetButton.hidden = !editable;
     addForm.hidden = !editable;
-    resetButton.disabled = !Object.hasOwn(readOverrides(), activeDateKey);
+    resetButton.disabled = !Object.hasOwn(calendarOverrides, activeDateKey);
     classList.replaceChildren();
     if (!classes.length) {
       const empty = document.createElement('div'); empty.className = 'list-row'; empty.textContent = event?.kind === 'holiday' ? `${event.label} · No scheduled classes. Add a makeup class below if needed.` : 'No classes scheduled. Add a class below if needed.'; classList.append(empty);
@@ -205,12 +294,12 @@
       kindSelect.addEventListener('change', () => { batchLabel.hidden = kindSelect.value !== 'lab'; });
       replaceButton.addEventListener('click', () => { selectedClassId = session.id; editForm.hidden = !editForm.hidden; });
       cancel.addEventListener('click', () => { editForm.hidden = true; });
-      removeButton.addEventListener('click', () => persistClasses(classesForDate(date).filter((item) => item.id !== session.id)));
+      removeButton.addEventListener('click', () => { void persistClasses(classesForDate(date).filter((item) => item.id !== session.id)); });
       editForm.addEventListener('submit', (eventObject) => {
         eventObject.preventDefault();
         if (selectedClassId !== session.id) return;
         const updated = { ...session, subject: subjectSelect.value, kind: kindSelect.value, batch: kindSelect.value === 'lab' ? batchSelectEdit.value : 'all' };
-        persistClasses(classesForDate(date).map((item) => item.id === session.id ? updated : item));
+        void persistClasses(classesForDate(date).map((item) => item.id === session.id ? updated : item));
       });
       row.append(main, actions, editForm); classList.append(row);
     });
@@ -243,7 +332,7 @@
     const currentClasses = classesForDate(date);
     currentClasses.push({ id: `added-${Date.now()}`, subject: String(values.get('subject')), kind: String(values.get('kind')), batch: values.get('kind') === 'lab' ? String(values.get('batch')) : 'all', start, end, room: String(values.get('room') || '').trim() });
     addForm.reset(); addBatchLabel.hidden = true;
-    persistClasses(currentClasses);
+    void persistClasses(currentClasses);
   });
 
   monthButtons.forEach((button) => button.addEventListener('click', () => {
@@ -256,19 +345,28 @@
   });
   resetButton.addEventListener('click', () => {
     if (!canEditCalendar()) return;
-    const overrides = readOverrides(); delete overrides[activeDateKey]; writeOverrides(overrides);
-    renderCalendar(); renderDayDialog(new Date(`${activeDateKey}T12:00:00`));
+    const dateToReset = activeDateKey;
+    window.classboardSupabase.from('class_calendar_overrides').delete()
+      .eq('class_id', calendarClassId).eq('calendar_date', dateToReset).then(({ error }) => {
+        if (error) {
+          calendarNote.textContent = `Calendar day was not reset: ${error.message}`;
+          return;
+        }
+        delete calendarOverrides[dateToReset];
+        calendarNote.textContent = 'Calendar day reset to the default schedule for your class.';
+        renderCalendar();
+        renderDayDialog(new Date(`${dateToReset}T12:00:00`));
+      });
   });
   document.getElementById('closeCalendarDialog').addEventListener('click', () => dialog.close());
   dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
-  window.addEventListener('classboard:attendance-calendar-context', renderCalendar);
   window.addEventListener('classboard:attendance-calendar-context', () => {
     const studentRoll = Number(window.classboardContext?.rollNumber);
     if (studentRoll >= 1 && studentRoll <= 66) batchSelect.value = studentRoll <= 32 ? 'A1' : 'A2';
-    calendarNote.textContent = canEditCalendar() ? 'Select any date to view and edit its classes.' : 'Select any date to view its classes.';
+    void loadSharedCalendar();
   });
   const studentBatch = Number(window.classboardContext?.rollNumber);
   if (studentBatch >= 1 && studentBatch <= 66) batchSelect.value = studentBatch <= 32 ? 'A1' : 'A2';
-  calendarNote.textContent = canEditCalendar() ? 'Select any date to view and edit its classes.' : 'Select any date to view its classes.';
   renderCalendar();
+  if (window.classboardContext?.classId) void loadSharedCalendar();
 })();

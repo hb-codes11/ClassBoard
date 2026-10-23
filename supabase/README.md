@@ -8,6 +8,7 @@ This folder contains the database schema and follow-up migrations for the INTEL-
 - RLS protects all app tables. The frontend must never be the authority for a user's class, roll number, or role.
 - Roll number is stored only on a Student membership. A1/A2 are derived from it (1–32 = A1, 33–66 = A2); timetable records use `all`, `A1`, or `A2`.
 - Shared lecture and lab classes-held totals are maintained by CRs/admins. Each student can save only their own attended-class count; these planner figures do not change official college attendance.
+- Class calendar overrides are shared by class. CRs/admins can edit a date, while every active class member can read the live schedule.
 - PDFs, DOCX documents, and PPTX presentations live in a private `class-resources` bucket, with a maximum 10 MB per object.
 - New college accounts and existing Medicaps auth accounts are enrolled as Students. Admins assign only the additional CR and Admin permissions from the portal. Account disabling is not available in the portal yet.
 
@@ -51,10 +52,11 @@ select 'FRIEND_USER_UUID'::uuid, id, 'cr'::public.class_role from target_class;
 ```
 
 24. Confirm the two owners can sign in and that each new college account appears as a Student. Assign CR/Admin access from Admin workspace; only a CR can publish class updates, class logs, timetables, and reminders. Admins manage roles, review attendance concerns, and can upload or remove shared content.
+25. Apply `migrations/025_shared_class_calendar.sql` to publish calendar edits class-wide with real-time updates. Existing browser-local calendar overrides are copied into the shared calendar on the first successful staff load.
 
 ## Before sharing with the class
 
-- Apply all migrations through `023_class_update_pdf_attachments.sql` to the Supabase project used by the deployed site.
+- Apply all migrations through `025_shared_class_calendar.sql` to the Supabase project used by the deployed site.
 - Keep the Supabase service-role key out of frontend code and Vercel's public variables. The browser only needs the project URL and publishable key.
 - Keep the college email allowlist, Google OAuth redirect URLs, and Supabase site/redirect URLs pointed at the deployed Classboard domain.
 - Review college approval, account onboarding, data retention, backups, and who should receive CR/Admin permissions before sharing the sign-in link broadly.
