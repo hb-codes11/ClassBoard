@@ -418,6 +418,30 @@
     .account-roll-label { display: grid; gap: 3px; color: var(--muted); font-size: 10px; }
     .account-roll-label input { width: 100px; padding: 7px 9px; }
     @media (max-width: 760px) { .account-controls { width: 100%; margin-left: 48px; } }
+    .admin-account-toolbar { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(150px, 190px) auto; align-items: center; gap: 9px; padding: 0 14px 12px; }
+    .admin-account-toolbar .search-field, .admin-account-toolbar .select-field { width: 100%; min-width: 0; min-height: 38px; }
+    .admin-account-count { padding: 7px 10px; border-radius: 20px; background: var(--blue-soft); color: var(--blue); font-size: 11px; font-weight: 700; white-space: nowrap; }
+    #accountList { display: grid; gap: 8px; padding: 0 14px 14px; }
+    #accountList > .account-row { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 8px 11px; min-width: 0; margin: 0; padding: 12px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); }
+    #accountList .account-row > .avatar { grid-column: 1; grid-row: 1; }
+    #accountList .account-row > .list-main { grid-column: 2; grid-row: 1; align-self: center; }
+    #accountList .account-controls { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(190px, 1fr) 120px auto auto; align-items: end; gap: 8px; width: 100%; margin: 4px 0 0; }
+    #accountList .account-role-options { min-width: 0; }
+    #accountList .account-roll-label input { width: 100%; }
+    #accountList .account-controls > button { white-space: nowrap; }
+    .admin-account-no-results { padding: 16px; color: var(--muted); text-align: center; font-size: 12px; }
+    @media (min-width: 761px) and (max-width: 1200px) {
+      #accountList .account-controls { grid-template-columns: minmax(0, 1fr) 120px auto; }
+      #accountList .account-role-options { grid-column: 1 / -1; }
+    }
+    @media (max-width: 760px) {
+      .admin-account-toolbar { grid-template-columns: minmax(0, 1fr) minmax(120px, .7fr); }
+      .admin-account-count { grid-column: 1 / -1; justify-self: start; }
+      #accountList .account-controls { grid-template-columns: minmax(0, 1fr) minmax(90px, .7fr); }
+      #accountList .account-role-options { grid-column: 1 / -1; }
+      #accountList .account-controls > .secondary-button { grid-column: 1; }
+      #accountList .account-controls > .account-remove-button { grid-column: 2; }
+    }
     .list-main { min-width: 0; flex: 1; }
     .list-title { font-size: 11px; font-weight: 680; }
     .list-detail { color: var(--muted); font-size: 10px; margin-top: 4px; }
@@ -1254,7 +1278,7 @@
           <section class="stats"><div class="stat-card"><div><div class="stat-value" id="adminStudentCount">—</div><div class="stat-label">Roll numbers assigned</div></div></div><div class="stat-card"><div><div class="stat-value" id="adminCrCount">—</div><div class="stat-label">Class representatives</div></div></div><div class="stat-card"><div><div class="stat-value" id="adminMemberCount">—</div><div class="stat-label">Class accounts</div></div></div></section>
           <div class="workspace-grid">
             <div class="workspace-stack">
-              <article class="panel"><div class="panel-header"><div><div class="panel-title">Access &amp; roles</div><div class="panel-sub">Every account has Student access by default. Add CR or Admin access, then save.</div></div></div><div class="workspace-table" id="accountList"><div class="list-row">Run the latest access-control migration to load class accounts.</div></div></article>
+              <article class="panel"><div class="panel-header"><div><div class="panel-title">Access &amp; roles</div><div class="panel-sub">Every account has Student access by default. Add CR or Admin access, then save.</div></div></div><div class="admin-account-toolbar"><input class="search-field" id="adminAccountSearch" type="search" placeholder="Search name, email or roll number" aria-label="Search class accounts"><select class="select-field" id="adminAccountFilter" aria-label="Filter accounts by role"><option value="all">All accounts</option><option value="student">Students</option><option value="cr">Class representatives</option><option value="admin">Admins</option></select><span class="admin-account-count" id="adminAccountResultCount" aria-live="polite">Loading accounts</span></div><div class="workspace-table" id="accountList"><div class="list-row">Run the latest access-control migration to load class accounts.</div></div><div class="admin-account-no-results" id="adminAccountNoResults" hidden>No accounts match those filters.</div></article>
               <article class="panel"><div class="panel-header"><div><div class="panel-title">Portal details</div><div class="panel-sub">Current class configuration.</div></div></div><div class="workspace-table"><div class="list-row"><div class="list-main"><div class="list-title">Class name</div><div class="list-detail" data-config-value="class">AI &amp; Analytics - A (INTEL-1)</div></div></div><div class="list-row"><div class="list-main"><div class="list-title">Semester</div><div class="list-detail" data-config-value="semester">3rd Semester · Odd Semester 2026</div></div></div><div class="list-row"><div class="list-main"><div class="list-title">Attendance visibility</div><div class="list-detail">Private concern messages visible to assigned CRs and admins.</div></div><span class="status">Enabled</span></div></div></article>
             </div>
             <div class="workspace-stack">

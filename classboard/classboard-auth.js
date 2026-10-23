@@ -1091,6 +1091,8 @@
     if (!userRows.length) addEmptyNote(container, 'No class accounts yet. New college sign-ins will appear here as students.');
     userRows.forEach((user) => {
       const row = document.createElement('div'); row.className = 'list-row account-row'; row.dataset.userId = user.userId;
+      row.dataset.search = `${user.name} ${user.email} ${user.rollNumber ?? ''}`.toLowerCase();
+      row.dataset.roles = [...user.roles].join(' ');
       const avatar = document.createElement('div'); avatar.className = 'avatar';
       avatar.textContent = user.name.split(/[\s._-]+/).filter(Boolean).slice(0, 2).map((part) => part[0].toUpperCase()).join('') || 'CB';
       const main = document.createElement('div'); main.className = 'list-main';
@@ -1141,6 +1143,28 @@
       });
       controls.append(roleGroup, rollLabel, save, remove); row.append(avatar, main, controls); container.append(row);
     });
+    const accountSearch = document.getElementById('adminAccountSearch');
+    const accountFilter = document.getElementById('adminAccountFilter');
+    const accountCount = document.getElementById('adminAccountResultCount');
+    const accountNoResults = document.getElementById('adminAccountNoResults');
+    const applyAccountFilters = () => {
+      const query = accountSearch.value.trim().toLowerCase();
+      const role = accountFilter.value;
+      let visibleCount = 0;
+      container.querySelectorAll('.account-row').forEach((row) => {
+        const matches = row.dataset.search.includes(query) && (role === 'all' || row.dataset.roles.split(' ').includes(role));
+        row.hidden = !matches;
+        if (matches) visibleCount += 1;
+      });
+      accountCount.textContent = visibleCount === userRows.length ? `${userRows.length} accounts` : `${visibleCount} of ${userRows.length} accounts`;
+      accountNoResults.hidden = visibleCount > 0 || userRows.length === 0;
+    };
+    if (!accountSearch.dataset.filterConnected) {
+      accountSearch.addEventListener('input', applyAccountFilters);
+      accountFilter.addEventListener('change', applyAccountFilters);
+      accountSearch.dataset.filterConnected = 'true';
+    }
+    applyAccountFilters();
     document.getElementById('adminMemberCount').textContent = String(userRows.length);
     document.getElementById('adminStudentCount').textContent = String(userRows.filter((user) => user.roles.has('student') && user.rollNumber !== null).length);
     document.getElementById('adminCrCount').textContent = String(userRows.filter((user) => user.roles.has('cr')).length);
