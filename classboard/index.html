@@ -418,29 +418,35 @@
     .account-roll-label { display: grid; gap: 3px; color: var(--muted); font-size: 10px; }
     .account-roll-label input { width: 100px; padding: 7px 9px; }
     @media (max-width: 760px) { .account-controls { width: 100%; margin-left: 48px; } }
-    .admin-account-toolbar { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(150px, 190px) auto; align-items: center; gap: 9px; padding: 0 14px 12px; }
+    .admin-account-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(140px, 190px) auto; align-items: center; gap: 9px; padding: 0 14px 12px; }
     .admin-account-toolbar .search-field, .admin-account-toolbar .select-field { width: 100%; min-width: 0; min-height: 38px; }
     .admin-account-count { padding: 7px 10px; border-radius: 20px; background: var(--blue-soft); color: var(--blue); font-size: 11px; font-weight: 700; white-space: nowrap; }
     #accountList { display: grid; gap: 8px; padding: 0 14px 14px; }
     #accountList > .account-row { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 8px 11px; min-width: 0; margin: 0; padding: 12px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); }
     #accountList .account-row > .avatar { grid-column: 1; grid-row: 1; }
     #accountList .account-row > .list-main { grid-column: 2; grid-row: 1; align-self: center; }
-    #accountList .account-controls { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(190px, 1fr) 120px auto auto; align-items: end; gap: 8px; width: 100%; margin: 4px 0 0; }
-    #accountList .account-role-options { min-width: 0; }
+    #accountList .account-controls { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(110px, 150px); align-items: end; gap: 8px 12px; width: 100%; min-width: 0; margin: 4px 0 0; }
+    #accountList .account-role-options { grid-column: 1; grid-row: 1; min-width: 0; }
+    #accountList .account-roll-label { grid-column: 2; grid-row: 1; min-width: 0; }
     #accountList .account-roll-label input { width: 100%; }
-    #accountList .account-controls > button { white-space: nowrap; }
+    #accountList .account-controls > button { min-width: 0; white-space: nowrap; }
+    #accountList .account-controls > .secondary-button { grid-column: 1; grid-row: 2; justify-self: start; }
+    #accountList .account-controls > .account-remove-button { grid-column: 2; grid-row: 2; justify-self: end; }
+    #accountList .account-row .list-detail { overflow-wrap: anywhere; }
     .admin-account-no-results { padding: 16px; color: var(--muted); text-align: center; font-size: 12px; }
-    @media (min-width: 761px) and (max-width: 1200px) {
-      #accountList .account-controls { grid-template-columns: minmax(0, 1fr) 120px auto; }
-      #accountList .account-role-options { grid-column: 1 / -1; }
-    }
     @media (max-width: 760px) {
       .admin-account-toolbar { grid-template-columns: minmax(0, 1fr) minmax(120px, .7fr); }
       .admin-account-count { grid-column: 1 / -1; justify-self: start; }
-      #accountList .account-controls { grid-template-columns: minmax(0, 1fr) minmax(90px, .7fr); }
-      #accountList .account-role-options { grid-column: 1 / -1; }
-      #accountList .account-controls > .secondary-button { grid-column: 1; }
-      #accountList .account-controls > .account-remove-button { grid-column: 2; }
+      #accountList .account-controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+      #accountList .account-role-options { grid-column: 1 / -1; grid-row: 1; }
+      #accountList .account-roll-label { grid-column: 1; grid-row: 2; }
+      #accountList .account-controls > .secondary-button { grid-column: 2; grid-row: 2; justify-self: end; }
+      #accountList .account-controls > .account-remove-button { grid-column: 1 / -1; grid-row: 3; justify-self: start; }
+    }
+    @media (max-width: 480px) {
+      .admin-account-toolbar { grid-template-columns: minmax(0, 1fr); }
+      .admin-account-count { grid-column: 1; }
+      .admin-account-toolbar .search-field { font-size: 16px; }
     }
     .list-main { min-width: 0; flex: 1; }
     .list-title { font-size: 11px; font-weight: 680; }
