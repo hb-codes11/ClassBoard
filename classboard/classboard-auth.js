@@ -885,15 +885,16 @@
       updatesBadge.closest('.nav-item')?.setAttribute('aria-label', updateCount ? `Updates, ${updateCount} unread` : 'Updates');
     }
     const ids = (type) => notifications.filter((item) => item.source_type === type).map((item) => item.source_id);
-    const [updates, reminders, resources, sessions] = await Promise.all([
+    const [updates, reminders, resources, sessions, reviewedConcerns] = await Promise.all([
       ids('update').length ? client.from('updates').select('id,title,body,category,importance').in('id', ids('update')) : Promise.resolve({ data: [], error: null }),
       ids('reminder').length ? client.from('reminders').select('id,title,body,due_at').in('id', ids('reminder')) : Promise.resolve({ data: [], error: null }),
       ids('resource').length ? client.from('resources').select('id,title,kind,subjects(name)').in('id', ids('resource')) : Promise.resolve({ data: [], error: null }),
-      ids('class_session').length ? client.from('class_sessions').select('id,class_number,kind,batch,starts_at,room,subjects(name)').in('id', ids('class_session')) : Promise.resolve({ data: [], error: null })
+      ids('class_session').length ? client.from('class_sessions').select('id,class_number,kind,batch,starts_at,room,subjects(name)').in('id', ids('class_session')) : Promise.resolve({ data: [], error: null }),
+      ids('attendance_issue').length ? client.from('attendance_issues').select('id,message,state').in('id', ids('attendance_issue')) : Promise.resolve({ data: [], error: null })
     ]);
-    const failed = [updates, reminders, resources, sessions].find((request) => request.error);
+    const failed = [updates, reminders, resources, sessions, reviewedConcerns].find((request) => request.error);
     if (failed) { notifyApp(`Could not load notification details: ${failed.error.message}`, true); return; }
-    const sources = new Map([updates, reminders, resources, sessions].flatMap((request) => (request.data || []).map((source) => [source.id, source])));
+    const sources = new Map([updates, reminders, resources, sessions, reviewedConcerns].flatMap((request) => (request.data || []).map((source) => [source.id, source])));
     const seenByUser = window.classboardNotificationSeenByUser || (window.classboardNotificationSeenByUser = new Map());
     const seenKey = `${classId}:${userId}`;
     const seenIds = seenByUser.get(seenKey);
@@ -912,7 +913,11 @@
       const subject = Array.isArray(source.subjects) ? source.subjects[0] : source.subjects;
       let title = source.title;
       let detail = '';
-      if (notification.source_type === 'update') detail = [source.category === 'deadline' ? 'Deadline' : source.category === 'important' ? 'Important' : 'Update', source.body || ''].filter(Boolean).join(' · ');
+      if (notification.source_type === 'attendance_issue') {
+        title = 'Attendance concern reviewed';
+        detail = 'Your CR or a class admin reviewed your concern.';
+      }
+      else if (notification.source_type === 'update') detail = [source.category === 'deadline' ? 'Deadline' : source.category === 'important' ? 'Important' : 'Update', source.body || ''].filter(Boolean).join(' · ');
       else if (notification.source_type === 'reminder') detail = [source.body, `Due ${new Date(source.due_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`].filter(Boolean).join(' · ');
       else if (notification.source_type === 'resource') detail = [subject?.name, resourceKindLabel(source.kind)].filter(Boolean).join(' · ');
       else {
@@ -931,12 +936,12 @@
         label.textContent = notificationDay.getTime() === today.getTime() ? 'Today' : notificationDay.getTime() === yesterday.getTime() ? 'Yesterday' : createdAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
         group.append(label); list.append(group);
       }
-      let type = notification.source_type === 'reminder' ? 'reminder' : notification.source_type === 'resource' ? 'resource' : notification.source_type === 'class_session' ? 'class' : source.category === 'deadline' ? 'deadline' : source.category === 'important' ? 'important' : 'update';
-      const labels = { update: 'Class update', important: 'Important notice', deadline: 'Deadline', reminder: 'Reminder', resource: 'New resource', class: 'Class schedule' };
+      let type = notification.source_type === 'attendance_issue' ? 'attendance-issue' : notification.source_type === 'reminder' ? 'reminder' : notification.source_type === 'resource' ? 'resource' : notification.source_type === 'class_session' ? 'class' : source.category === 'deadline' ? 'deadline' : source.category === 'important' ? 'important' : 'update';
+      const labels = { update: 'Class update', important: 'Important notice', deadline: 'Deadline', reminder: 'Reminder', resource: 'New resource', class: 'Class schedule', 'attendance-issue': 'Attendance concern' };
       renderedNotificationDetails.push({ id: String(notification.id), title, message: detail, label: labels[type] });
       const row = document.createElement('article'); row.className = `notification-item notification-${type}`; row.dataset.notificationId = notification.id;
       if (notification.read_at) row.classList.add('notification-read');
-      const mark = document.createElement('div'); mark.className = 'notification-icon'; mark.textContent = notification.source_type === 'resource' ? resourceKindLabel(source.kind).split(' ')[0].toUpperCase() : notification.source_type === 'reminder' ? 'REM' : notification.source_type === 'class_session' ? 'CLASS' : type === 'deadline' ? 'DUE' : type === 'important' ? '!' : 'INFO';
+      const mark = document.createElement('div'); mark.className = 'notification-icon'; mark.textContent = notification.source_type === 'attendance_issue' ? '✓' : notification.source_type === 'resource' ? resourceKindLabel(source.kind).split(' ')[0].toUpperCase() : notification.source_type === 'reminder' ? 'REM' : notification.source_type === 'class_session' ? 'CLASS' : type === 'deadline' ? 'DUE' : type === 'important' ? '!' : 'INFO';
       const main = document.createElement('div'); main.className = 'notification-main';
       const typeLabel = document.createElement('div'); typeLabel.className = 'notification-type'; typeLabel.textContent = labels[type];
       const heading = document.createElement('div'); heading.className = 'list-title'; heading.textContent = title;
@@ -952,6 +957,7 @@
       if (!button.querySelector('.unread')) { const dot = document.createElement('span'); dot.className = 'unread'; button.append(dot); }
     });
     const freshDetails = renderedNotificationDetails.filter((item) => newNotificationIds.has(item.id));
+    if (notifications.some((item) => item.source_type === 'attendance_issue' && newNotificationIds.has(String(item.id)))) await loadAttendanceIssues(classId);
     if (freshDetails.length) {
       window.dispatchEvent(new CustomEvent('classboard:new-notification', { detail: { ...freshDetails[0], count: freshDetails.length } }));
     } else if (firstNotificationLoad && unreadTotal === 0) {
@@ -1004,14 +1010,45 @@
     const studentList = document.getElementById('studentCaseList');
     studentList.replaceChildren();
     (issues || []).filter((issue) => issue.student_id === context.userId).forEach((issue) => {
-      const row = document.createElement('div'); row.className = 'list-row';
-      const main = document.createElement('div'); main.className = 'list-main';
-      const title = document.createElement('div'); title.className = 'list-title'; title.textContent = `Attendance concern · ${issue.state.replaceAll('_', ' ')}`;
-      const detail = document.createElement('div'); detail.className = 'list-detail'; detail.textContent = issue.message;
-      main.append(title, detail); row.append(main);
+      const row = document.createElement('article'); row.className = 'attendance-concern-card';
+      const [header, ...messageParts] = issue.message.split(/\r?\n\r?\n/);
+      const parsedHeader = header.match(/^Subject:\s*(.*?)\s*·\s*Class dates?:\s*(.*)$/);
+      const top = document.createElement('div'); top.className = 'attendance-concern-top';
+      const title = document.createElement('div'); title.className = 'attendance-concern-title'; title.textContent = 'Attendance concern';
+      const stateLabels = { new: 'Sent', reviewing: 'Under review', reviewed: 'Reviewed', referred: 'Referred', resolved: 'Resolved' };
+      const status = document.createElement('span'); status.className = `attendance-concern-status attendance-concern-${issue.state}`; status.textContent = stateLabels[issue.state] || issue.state.replaceAll('_', ' ');
+      top.append(title, status); row.append(top);
+      if (parsedHeader) {
+        const metadata = document.createElement('div'); metadata.className = 'attendance-concern-metadata';
+        const subject = document.createElement('div'); subject.className = 'attendance-concern-meta-row';
+        const subjectLabel = document.createElement('span'); subjectLabel.className = 'attendance-concern-meta-label'; subjectLabel.textContent = 'Subject';
+        const subjectValue = document.createElement('span'); subjectValue.className = 'attendance-concern-meta-value'; subjectValue.textContent = parsedHeader[1];
+        subject.append(subjectLabel, subjectValue); metadata.append(subject);
+        if (parsedHeader[2]) {
+          const dates = document.createElement('div'); dates.className = 'attendance-concern-meta-row';
+          const datesLabel = document.createElement('span'); datesLabel.className = 'attendance-concern-meta-label'; datesLabel.textContent = 'Class dates';
+          const datesValue = document.createElement('span'); datesValue.className = 'attendance-concern-meta-value';
+          datesValue.textContent = parsedHeader[2].split(',').map((date) => {
+            const parsedDate = new Date(`${date.trim()}T00:00:00`);
+            return Number.isNaN(parsedDate.getTime()) ? date.trim() : parsedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+          }).join(' · ');
+          dates.append(datesLabel, datesValue); metadata.append(dates);
+        }
+        row.append(metadata);
+      }
+      const reportText = parsedHeader ? messageParts.join('\n\n').trim() : issue.message;
+      if (reportText) {
+        const report = document.createElement('div'); report.className = 'attendance-concern-section';
+        const reportLabel = document.createElement('div'); reportLabel.className = 'attendance-concern-section-label'; reportLabel.textContent = 'Your message';
+        const reportBody = document.createElement('div'); reportBody.className = 'attendance-concern-copy'; reportBody.textContent = reportText;
+        report.append(reportLabel, reportBody); row.append(report);
+      }
       const latestReply = (replies.get(issue.id) || []).at(-1);
       if (latestReply) {
-        const response = document.createElement('div'); response.className = 'list-detail'; response.textContent = `CR/Admin reply: ${latestReply.body}`; main.append(response);
+        const response = document.createElement('div'); response.className = 'attendance-concern-section attendance-concern-reply';
+        const replyLabel = document.createElement('div'); replyLabel.className = 'attendance-concern-section-label'; replyLabel.textContent = 'CR/Admin reply';
+        const replyBody = document.createElement('div'); replyBody.className = 'attendance-concern-copy'; replyBody.textContent = latestReply.body;
+        response.append(replyLabel, replyBody); row.append(response);
       }
       studentList.append(row);
     });

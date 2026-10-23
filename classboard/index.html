@@ -367,6 +367,7 @@
     .notification-item.notification-reminder { --notification-accent: #078b86; }
     .notification-item.notification-resource { --notification-accent: #1474c8; }
     .notification-item.notification-class { --notification-accent: var(--blue); }
+    .notification-item.notification-attendance-issue { --notification-accent: var(--blue); }
     .notification-icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; background: color-mix(in srgb, var(--notification-accent) 12%, var(--surface)); color: var(--notification-accent); font-size: 11px; font-weight: 800; }
     .notification-main { min-width: 0; }
     .notification-type { margin-bottom: 3px; color: var(--notification-accent); font-size: 10px; line-height: 1.25; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
@@ -923,6 +924,21 @@
     .attendance-layout { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(390px, .92fr); gap: 16px; align-items: start; }
     .attendance-planner { min-width: 0; max-width: none !important; margin: 0 0 16px !important; }
     .attendance-issue-panel { grid-column: 1; width: 100%; min-width: 0; max-width: none; }
+    #studentCaseList { display: grid; gap: 10px; padding: 0 18px 18px; }
+    .attendance-concern-card { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .attendance-concern-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .attendance-concern-title { color: var(--text); font-size: 14px; font-weight: 740; }
+    .attendance-concern-status { display: inline-flex; flex: none; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 99px; background: var(--blue-soft); color: var(--blue); font-size: 10px; font-weight: 750; }
+    .attendance-concern-reviewed, .attendance-concern-resolved { background: var(--green-soft); color: var(--green); }
+    .attendance-concern-referred { background: var(--amber-soft); color: var(--amber); }
+    .attendance-concern-metadata { display: grid; gap: 6px; margin-top: 12px; }
+    .attendance-concern-meta-row { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 10px; font-size: 12px; line-height: 1.5; }
+    .attendance-concern-meta-label, .attendance-concern-section-label { color: var(--muted); font-size: 11px; font-weight: 680; }
+    .attendance-concern-meta-value { min-width: 0; color: var(--text); overflow-wrap: anywhere; }
+    .attendance-concern-section { display: grid; gap: 5px; margin-top: 13px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .attendance-concern-copy { color: var(--muted); font-size: 12px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .attendance-concern-reply { padding: 12px; border: 0; border-radius: 9px; background: var(--blue-soft); }
+    [data-theme="dark"] .attendance-concern-reply { background: color-mix(in srgb, var(--blue) 12%, var(--surface)); }
     .attendance-sidecar { position: sticky; top: 84px; display: grid; gap: 12px; align-self: start; min-width: 0; max-height: calc(100dvh - 84px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
     .attendance-calendar { overflow: hidden; }
     .attendance-calendar-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 15px 8px; }
