@@ -857,18 +857,7 @@
   }
 
   function addReminderCard(reminder) {
-    const date = new Date(reminder.due_at);
-    const row = document.createElement('div'); row.className = 'reminder';
-    row.dataset.contentId = reminder.id; row.dataset.contentType = 'reminders';
-    const dateBox = document.createElement('div'); dateBox.className = 'reminder-date';
-    const day = document.createElement('b'); day.textContent = String(date.getDate());
-    const month = document.createElement('span'); month.textContent = date.toLocaleString('en-IN', { month: 'short' });
-    dateBox.append(day, month);
-    const detail = document.createElement('div');
-    const title = document.createElement('div'); title.className = 'reminder-title'; title.textContent = reminder.title;
-    const body = document.createElement('div'); body.className = 'reminder-detail'; body.textContent = reminder.body || date.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
-    detail.append(title, body); row.append(dateBox, detail, makeDeleteButton('Delete reminder'));
-    return row;
+    return addUpdateCard({ ...reminder, category: 'reminder', isReminder: true });
   }
 
   async function loadNotifications(classId) {

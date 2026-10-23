@@ -176,6 +176,7 @@
     .update:first-of-type { border-top: 0; }
     .update-card { --update-accent: var(--blue); position: relative; display: grid; grid-template-columns: 56px 42px minmax(0, 1fr) auto auto; align-items: center; gap: 13px; min-height: 90px; margin: 10px 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); box-shadow: 0 4px 14px rgba(26, 54, 84, .035); }
     #homeUpdateList > .update-card { margin-inline: 14px; }
+    #homeReminderList > .update-card { margin-inline: 14px; }
     .update-card.update-important { --update-accent: var(--blue); }
     .update-card.update-deadline { --update-accent: #e6535e; }
     .update-card.update-reminder { --update-accent: #e8a52b; }
@@ -660,6 +661,7 @@
       .update { padding-inline: 15px; }
       .update-card { grid-template-columns: 43px 34px minmax(0, 1fr) auto; gap: 8px; margin: 8px 0; padding: 10px; }
       #homeUpdateList > .update-card { margin-inline: 10px; }
+      #homeReminderList > .update-card { margin-inline: 10px; }
       .update-card .update-join-link { grid-column: 3; grid-row: 2; justify-self: start; min-height: 30px; }
       .update-card .update-menu-trigger { grid-column: 4; grid-row: 1; }
       .update-date { min-height: 46px; }
