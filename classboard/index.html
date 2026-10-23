@@ -406,6 +406,27 @@
     .class-log-actions .class-log-edit-button { min-height: 30px; padding: 4px 9px; font-size: 11px; }
     .class-log-actions .text-link { font-size: 11px; }
     .case-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+    #crCaseList { display: grid; gap: 10px; padding: 0 14px 14px; }
+    .cr-concern-card { display: grid; gap: 11px; min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .cr-concern-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-width: 0; }
+    .cr-concern-identity { min-width: 0; }
+    .cr-concern-title { color: var(--text); font-size: 13px; font-weight: 740; }
+    .cr-concern-student { margin-top: 3px; color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
+    .cr-concern-status { display: inline-flex; flex: none; align-items: center; padding: 5px 9px; border-radius: 99px; background: var(--blue-soft); color: var(--blue); font-size: 10px; line-height: 1.2; font-weight: 740; }
+    .cr-concern-status.state-reviewed, .cr-concern-status.state-resolved { background: var(--green-soft); color: var(--green); }
+    .cr-concern-status.state-referred { background: var(--amber-soft); color: var(--amber); }
+    .cr-concern-metadata { display: grid; gap: 5px; }
+    .cr-concern-meta-row { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 9px; color: var(--text); font-size: 11px; line-height: 1.45; }
+    .cr-concern-meta-label, .cr-concern-section-label { color: var(--muted); font-size: 10px; font-weight: 680; }
+    .cr-concern-meta-value { min-width: 0; overflow-wrap: anywhere; }
+    .cr-concern-section { display: grid; gap: 4px; padding-top: 10px; border-top: 1px solid var(--line); }
+    .cr-concern-copy { color: var(--muted); font-size: 11px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .cr-concern-reply { padding: 10px; border: 0; border-radius: 9px; background: var(--blue-soft); }
+    [data-theme="dark"] .cr-concern-reply { background: color-mix(in srgb, var(--blue) 12%, var(--surface)); }
+    .cr-concern-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 9px; padding-top: 10px; border-top: 1px solid var(--line); }
+    .cr-concern-created { color: var(--muted); font-size: 10px; }
+    .cr-concern-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 7px; }
+    .cr-concern-actions button { min-height: 34px; padding: 5px 10px; font-size: 11px; }
     .account-row { align-items: flex-start; flex-wrap: wrap; }
     .account-row .list-main { min-width: 170px; }
     .account-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-left: auto; }
@@ -831,6 +852,12 @@
       .class-log-tag { font-size: 9px; }
       .case-actions { width: 100%; }
       .case-actions button { min-height: 44px; }
+      #crCaseList { padding-inline: 10px; }
+      .cr-concern-card { gap: 9px; padding: 12px; }
+      .cr-concern-top { gap: 8px; }
+      .cr-concern-footer { align-items: flex-start; flex-direction: column; }
+      .cr-concern-actions { width: 100%; }
+      .cr-concern-actions button { min-height: 40px; flex: 1 1 auto; }
       .account-controls { margin-left: 0; gap: 10px; }
       .account-role-options { width: 100%; }
       .account-roll-label { flex: 1; }

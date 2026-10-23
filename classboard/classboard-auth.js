@@ -1059,14 +1059,44 @@
     const canReview = context.roles.some((role) => role === 'cr' || role === 'admin');
     const staffIssues = canReview ? issues || [] : [];
     staffIssues.forEach((issue) => {
-      const row = document.createElement('div'); row.className = 'list-row'; row.dataset.caseId = issue.id;
-      const main = document.createElement('div'); main.className = 'list-main';
-      const title = document.createElement('div'); title.className = 'list-title'; title.textContent = `Attendance concern · ${names.get(issue.student_id) || 'Student'}`;
-      const detail = document.createElement('div'); detail.className = 'list-detail'; detail.textContent = `${issue.message} · ${new Date(issue.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`;
+      const row = document.createElement('article'); row.className = 'cr-concern-card'; row.dataset.caseId = issue.id;
+      const [header, ...messageParts] = issue.message.split(/\r?\n\r?\n/);
+      const parsedHeader = header.match(/^Subject:\s*(.*?)\s*·\s*Class dates?:\s*(.*)$/);
+      const top = document.createElement('div'); top.className = 'cr-concern-top';
+      const identity = document.createElement('div'); identity.className = 'cr-concern-identity';
+      const title = document.createElement('div'); title.className = 'cr-concern-title'; title.textContent = 'Attendance concern';
+      const student = document.createElement('div'); student.className = 'cr-concern-student'; student.textContent = names.get(issue.student_id) || 'Student';
+      identity.append(title, student);
       const stateLabels = { new: 'New', reviewing: 'Reviewing', reviewed: 'Reviewed', referred: 'Referred to faculty', resolved: 'Resolved' };
-      const status = document.createElement('span'); status.className = `status${issue.state === 'resolved' ? '' : ' pending'}`; status.textContent = stateLabels[issue.state] || issue.state.replaceAll('_', ' ');
+      const status = document.createElement('span'); status.className = `cr-concern-status state-${issue.state}`; status.textContent = stateLabels[issue.state] || issue.state.replaceAll('_', ' ');
+      top.append(identity, status); row.append(top);
+      if (parsedHeader) {
+        const metadata = document.createElement('div'); metadata.className = 'cr-concern-metadata';
+        const subject = document.createElement('div'); subject.className = 'cr-concern-meta-row';
+        const subjectLabel = document.createElement('span'); subjectLabel.className = 'cr-concern-meta-label'; subjectLabel.textContent = 'Subject';
+        const subjectValue = document.createElement('span'); subjectValue.className = 'cr-concern-meta-value'; subjectValue.textContent = parsedHeader[1];
+        subject.append(subjectLabel, subjectValue); metadata.append(subject);
+        if (parsedHeader[2]) {
+          const dates = document.createElement('div'); dates.className = 'cr-concern-meta-row';
+          const datesLabel = document.createElement('span'); datesLabel.className = 'cr-concern-meta-label'; datesLabel.textContent = 'Class dates';
+          const datesValue = document.createElement('span'); datesValue.className = 'cr-concern-meta-value';
+          datesValue.textContent = parsedHeader[2].split(',').map((date) => {
+            const parsedDate = new Date(`${date.trim()}T00:00:00`);
+            return Number.isNaN(parsedDate.getTime()) ? date.trim() : parsedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+          }).join(' · ');
+          dates.append(datesLabel, datesValue); metadata.append(dates);
+        }
+        row.append(metadata);
+      }
+      const reportText = parsedHeader ? messageParts.join('\n\n').trim() : issue.message;
+      if (reportText) {
+        const report = document.createElement('div'); report.className = 'cr-concern-section';
+        const reportLabel = document.createElement('div'); reportLabel.className = 'cr-concern-section-label'; reportLabel.textContent = 'Student message';
+        const reportBody = document.createElement('div'); reportBody.className = 'cr-concern-copy'; reportBody.textContent = reportText;
+        report.append(reportLabel, reportBody); row.append(report);
+      }
       const review = document.createElement('button'); review.type = 'button'; review.className = 'secondary-button case-open'; review.textContent = 'Review';
-      const actions = document.createElement('div'); actions.className = 'case-actions';
+      const actions = document.createElement('div'); actions.className = 'cr-concern-actions';
       actions.append(review);
       if (issue.state !== 'resolved') {
         const close = document.createElement('button'); close.type = 'button'; close.className = 'secondary-button case-close'; close.textContent = 'Close issue';
@@ -1077,11 +1107,15 @@
         remove.setAttribute('aria-label', `Remove reviewed attendance concern from ${names.get(issue.student_id) || 'student'}`);
         actions.append(remove);
       }
-      main.append(title, detail);
       (replies.get(issue.id) || []).forEach((reply) => {
-        const replyDetail = document.createElement('div'); replyDetail.className = 'list-detail'; replyDetail.textContent = `Reply: ${reply.body}`; main.append(replyDetail);
+        const response = document.createElement('div'); response.className = 'cr-concern-section cr-concern-reply';
+        const replyLabel = document.createElement('div'); replyLabel.className = 'cr-concern-section-label'; replyLabel.textContent = 'CR/Admin reply';
+        const replyBody = document.createElement('div'); replyBody.className = 'cr-concern-copy'; replyBody.textContent = reply.body;
+        response.append(replyLabel, replyBody); row.append(response);
       });
-      row.append(main, status, actions); crList.append(row);
+      const footer = document.createElement('div'); footer.className = 'cr-concern-footer';
+      const created = document.createElement('div'); created.className = 'cr-concern-created'; created.textContent = `Submitted ${new Date(issue.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`;
+      footer.append(created, actions); row.append(footer); crList.append(row);
     });
     if (!crList.children.length) addEmptyNote(crList, 'No attendance concerns have been submitted.');
     const openCount = staffIssues.filter((issue) => issue.state !== 'resolved').length;
