@@ -96,7 +96,7 @@
   const defaultClasses = (date) => {
     const key = dateKey(date);
     const event = eventMap[key];
-    if (event?.kind === 'holiday' || event?.kind === 'exam' || event?.kind === 'convocation') return [];
+    if (event?.kind === 'holiday' || event?.kind === 'convocation') return [];
     return (weekdaySchedule[date.getDay()] || []).map((item, index) => createClass(item, `base-${date.getDay()}-${index}`));
   };
   const classesForDate = (date, overrides = calendarOverrides) => Object.hasOwn(overrides, dateKey(date)) ? overrides[dateKey(date)] : defaultClasses(date);
