@@ -64,10 +64,12 @@
     '2026-10-03': { label: 'MST-I', kind: 'exam' },
     '2026-10-05': { label: 'SVAR test', kind: 'event' },
     '2026-10-20': { label: 'Vijayadashami', kind: 'holiday' },
-    ...Object.fromEntries([2, 3, 4, 5, 6, 7].map((day) => [`2026-11-${String(day).padStart(2, '0')}`, { label: 'Deepawali break', kind: 'holiday' }])),
-    '2026-11-14': { label: 'Soft skill course', kind: 'event' },
+    ...Object.fromEntries([6, 7, 8, 9, 10, 11].map((day) => [`2026-11-${String(day).padStart(2, '0')}`, { label: 'Deepawali break', kind: 'holiday' }])),
+    '2026-11-14': { label: 'Compilation of Unit-3 & Unit-4 B1 soft skill online course', kind: 'event' },
     ...Object.fromEntries([16, 17, 18, 19, 20].map((day) => [`2026-11-${String(day).padStart(2, '0')}`, { label: 'MST-II', kind: 'exam' }])),
+    '2026-11-21': { label: 'SHLAMCAT: AI mock interview', kind: 'event' },
     '2026-11-24': { label: 'Guru Nanak Jayanti', kind: 'holiday' },
+    '2026-11-26': { label: 'Compilation of Unit-5 & B1 soft skill online course', kind: 'event' },
     '2026-11-27': { label: 'End of teaching', kind: 'term' },
     '2026-11-29': { label: 'Convocation', kind: 'convocation' }
   };
@@ -142,7 +144,7 @@
         const short = label.split(' ')[0];
         const color = { AI: 'ai', JAVA: 'java', COM: 'com', SE: 'se', SA: 'sa' }[short];
         if (!eventLabel && color) line.dataset.color = color;
-        if (!eventLabel && classes.length) line.title = label;
+        if (eventLabel || classes.length) line.title = label;
         button.append(line);
       });
       button.addEventListener('click', () => openDay(date));
