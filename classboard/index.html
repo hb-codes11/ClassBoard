@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="ClassBoard" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>ClassBoard — AI &amp; Analytics - A (INTEL-1)</title>
+  <title>ClassBoard — Class Portal</title>
   <link rel="icon" type="image/svg+xml" href="./classboard-logo.svg" />
   <link rel="shortcut icon" href="./classboard-logo.svg" />
   <link rel="manifest" href="./site.webmanifest" />
@@ -294,7 +294,7 @@
     .secondary-button:hover { border-color: var(--blue); color: var(--blue); }
     .toolbar { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
     .search-field, .select-field, .text-field, .text-area { min-height: 38px; border: 1px solid var(--line); background-color: var(--surface); border-radius: 8px; color: var(--text); padding: 0 11px; outline: none; }
-    .select-field, .role-switcher { -webkit-appearance: none; appearance: none; padding-right: 38px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23738196' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 14px; text-overflow: ellipsis; }
+    .select-field, .role-switcher, .class-switcher { -webkit-appearance: none; appearance: none; padding-right: 38px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23738196' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 14px; text-overflow: ellipsis; }
     .search-field { flex: 1; min-width: 190px; }
     .search-field:focus, .select-field:focus, .text-field:focus, .text-area:focus { border-color: var(--blue); box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 15%, transparent); }
     .filter-chip { min-height: 34px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 22px; padding: 0 12px; font-size: 10px; cursor: pointer; }
@@ -445,6 +445,10 @@
     .account-roll-label input { width: 100px; padding: 7px 9px; }
     @media (max-width: 760px) { .account-controls { width: 100%; margin-left: 48px; } }
     .admin-account-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(140px, 190px) auto; align-items: center; gap: 9px; padding: 0 14px 12px; }
+    .admin-add-member-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(110px, 140px) auto; align-items: end; gap: 8px; padding: 0 14px 12px; }
+    .admin-add-member-form .field-label { min-width: 0; margin: 0; font-size: 10px; }
+    .admin-add-member-form .text-field { width: 100%; min-width: 0; }
+    .admin-add-member-note { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: 10px; }
     .admin-account-toolbar .search-field, .admin-account-toolbar .select-field { width: 100%; min-width: 0; min-height: 38px; }
     .admin-account-count { padding: 7px 10px; border-radius: 20px; background: var(--blue-soft); color: var(--blue); font-size: 11px; font-weight: 700; white-space: nowrap; }
     #accountList { display: grid; gap: 8px; padding: 0 14px 14px; }
@@ -462,6 +466,8 @@
     .admin-account-no-results { padding: 16px; color: var(--muted); text-align: center; font-size: 12px; }
     @media (max-width: 760px) {
       .admin-account-toolbar { grid-template-columns: minmax(0, 1fr) minmax(120px, .7fr); }
+      .admin-add-member-form { grid-template-columns: minmax(0, 1fr) minmax(100px, 120px); }
+      .admin-add-member-form > button, .admin-add-member-note { grid-column: 1 / -1; }
       .admin-account-count { grid-column: 1 / -1; justify-self: start; }
       #accountList .account-controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
       #accountList .account-role-options { grid-column: 1 / -1; grid-row: 1; }
@@ -471,6 +477,8 @@
     }
     @media (max-width: 480px) {
       .admin-account-toolbar { grid-template-columns: minmax(0, 1fr); }
+      .admin-add-member-form { grid-template-columns: minmax(0, 1fr); }
+      .admin-add-member-form > button, .admin-add-member-note { grid-column: 1; }
       .admin-account-count { grid-column: 1; }
       .admin-account-toolbar .search-field { font-size: 16px; }
     }
@@ -573,7 +581,7 @@
     .footer-credit { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
     .footer-wordmark { color: var(--text); font-weight: 800; letter-spacing: .015em; }
     .footer-web-emoji { display: inline-block; margin-left: -5px; color: var(--text); font-size: 15px; font-weight: 800; filter: grayscale(1) brightness(.35); }
-    .role-switcher { height: 36px; max-width: 170px; padding: 0 38px 0 12px; border: 1px solid var(--line); border-radius: 9px; background-color: var(--surface); color: var(--text); font: inherit; font-size: 12px; cursor: pointer; }
+    .role-switcher, .class-switcher { height: 36px; max-width: 170px; padding: 0 38px 0 12px; border: 1px solid var(--line); border-radius: 9px; background-color: var(--surface); color: var(--text); font: inherit; font-size: 12px; cursor: pointer; }
     .panel, .stat-card, .action-tile, .resource-card, .list-row, .panel-header, .page-heading { min-width: 0; }
     .panel-title, .panel-sub, .page-description, .update-title, .update-body, .update-time, .resource-title, .resource-meta, .reminder-title, .reminder-detail, .list-title, .list-detail, .class-name, .class-room, .stat-note, .profile-name, .profile-role { min-width: 0; overflow-wrap: break-word; word-break: normal; }
     .panel-header > div, .update > div, .resource-card > div, .reminder > div, .action-tile > div { min-width: 0; }
@@ -723,7 +731,7 @@
       .icon-button { width: 38px; height: 38px; }
       .content { padding: 24px 17px 26px; }
       .content { min-height: calc(100vh - 126px); }
-      .role-switcher { width: 130px; max-width: 130px; padding: 0 30px 0 9px; background-position: right 8px center; font-size: 10px; }
+      .role-switcher, .class-switcher { width: 130px; max-width: 130px; padding: 0 30px 0 9px; background-position: right 8px center; font-size: 10px; }
       .select-field { padding-right: 32px; background-position: right 9px center; }
       .live-empty { padding: 13px 15px; }
       .welcome-row { margin-bottom: 18px; }
@@ -797,7 +805,10 @@
       .top-actions [aria-label="Academic calendar"], .top-actions #themeToggle { display: none; }
       .top-actions > .icon-button[aria-label="Notifications"] { grid-column: 3; grid-row: 1; }
       .top-actions > .icon-button[aria-label="Profile"] { grid-column: 4; grid-row: 1; }
-      .role-switcher { grid-column: 1 / -1; grid-row: 2; width: 100%; max-width: none; min-height: 44px; padding-left: 40px; border-radius: 12px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23738196' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='8' width='18' height='12' rx='2'/%3E%3Cpath d='M8 8V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3M3 13h18m-11 0v2h4v-2'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23738196' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 12px center, right 12px center; background-size: 18px, 14px; font-size: 14px; }
+      .role-switcher, .class-switcher { grid-column: 1 / -1; grid-row: 2; width: 100%; max-width: none; min-height: 44px; padding-left: 40px; border-radius: 12px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23738196' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='8' width='18' height='12' rx='2'/%3E%3Cpath d='M8 8V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3M3 13h18m-11 0v2h4v-2'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23738196' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 12px center, right 12px center; background-size: 18px, 14px; font-size: 14px; }
+      body[data-multiple-classes="true"][data-has-role-switcher="true"] .topbar { min-height: calc(172px + env(safe-area-inset-top)); grid-template-rows: 44px 44px 44px; }
+      body[data-multiple-classes="true"] .class-switcher { grid-row: 2; }
+      body[data-multiple-classes="true"][data-has-role-switcher="true"] .role-switcher { grid-row: 3; }
       .icon-button { width: 44px; height: 44px; border-radius: 13px; }
       .content { min-height: calc(100svh - 124px); padding: 20px max(14px, env(safe-area-inset-right)) 22px max(14px, env(safe-area-inset-left)); }
       .text-field, .select-field, .search-field, .text-area, .auth-field input { min-height: 44px; font-size: 16px; }
@@ -892,7 +903,7 @@
     @media (max-width: 390px) {
       .content { padding-top: 17px; }
       .topbar { padding-inline: 10px; }
-      .role-switcher { width: min(32vw, 112px); font-size: 11px; }
+      .role-switcher, .class-switcher { width: 100%; max-width: none; font-size: 11px; }
       .top-actions { gap: 4px; }
       .icon-button { width: 40px; height: 40px; }
       .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -912,7 +923,7 @@
     }
     @media (max-width: 350px) {
       .crumb { font-size: 12px; }
-      .role-switcher { width: 104px; }
+      .role-switcher, .class-switcher { width: 100%; max-width: none; }
       .mobile-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .mobile-nav button { font-size: 10px; }
     }
@@ -924,8 +935,8 @@
     .auth-card h1 { margin: 22px 0 0; font-size: clamp(30px, 6vw, 38px); line-height: 1.12; letter-spacing: -.045em; }
     .auth-copy { max-width: 38ch; color: var(--muted); font-size: 15px; margin: 10px 0 26px; }
     .auth-field { display: grid; gap: 8px; margin: 16px 0; font-size: 13px; font-weight: 650; }
-    .auth-field input { width: 100%; min-height: 54px; padding: 12px 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); color: var(--text); }
-    .auth-field input:focus { border-color: var(--blue); outline: 3px solid color-mix(in srgb, var(--blue) 16%, transparent); }
+    .auth-field input, .auth-field select { width: 100%; min-height: 54px; padding: 12px 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); color: var(--text); }
+    .auth-field input:focus, .auth-field select:focus { border-color: var(--blue); outline: 3px solid color-mix(in srgb, var(--blue) 16%, transparent); }
     .password-entry { position: relative; }
     .password-entry input { padding-right: 72px; }
     .password-visibility { position: absolute; inset: 0 5px 0 auto; min-width: 48px; padding: 0 7px; border: 0; background: transparent; color: var(--blue); font-size: 12px; font-weight: 700; cursor: pointer; }
@@ -1082,10 +1093,13 @@
 <body data-role="student">
   <section class="auth-gate" id="authGate" aria-labelledby="authTitle">
     <div class="auth-card">
-      <div class="auth-brand"><img src="./classboard-logo.svg" alt="" />ClassBoard · INTEL-1</div>
+      <div class="auth-brand"><img src="./classboard-logo.svg" alt="" />ClassBoard · Class Portal</div>
       <h1 id="authTitle">Welcome Back</h1>
       <p class="auth-copy">Sign in with your Medicaps college email ending in <strong>@medicaps.ac.in</strong>.</p>
       <form id="authForm">
+        <label class="auth-field">Choose your section
+          <select id="loginClassSelector" name="section"><option value="INTEL-1">INTEL-1 · Section A</option><option value="INTEL-2">INTEL-2 · Section B</option></select>
+        </label>
         <label class="auth-field">College email
           <input id="authEmail" name="email" type="email" autocomplete="email" required placeholder="you@medicaps.ac.in" />
         </label>
@@ -1139,6 +1153,7 @@
           <div class="crumb">Workspace <span style="padding:0 7px;color:var(--line)">/</span> <strong id="crumbPage">Home</strong></div>
         </div>
         <div class="top-actions">
+          <select class="class-switcher" id="classSwitcher" aria-label="Your class section" title="Switch between class sections" hidden></select>
           <select class="role-switcher" id="roleSwitcher" aria-label="Your workspace" title="Switch between roles assigned to your account"><option value="student">Student View</option><option value="cr">Class Representatives</option><option value="admin">Admin Workspace</option></select>
           <button class="icon-button" aria-label="Academic calendar" title="Academic calendar" data-page="calendar"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M14 14h2M8 17h3"/></svg></button>
           <button class="icon-button" id="themeToggle" aria-label="Switch theme" title="Switch light/dark theme"><svg viewBox="0 0 24 24"><path d="M20.9 13A8.5 8.5 0 0 1 11 3.1 8.5 8.5 0 1 0 20.9 13Z"/></svg></button>
@@ -1337,7 +1352,7 @@
           <section class="stats"><div class="stat-card"><div><div class="stat-value" id="adminStudentCount">—</div><div class="stat-label">Roll numbers assigned</div></div></div><div class="stat-card"><div><div class="stat-value" id="adminCrCount">—</div><div class="stat-label">Class Representatives</div></div></div><div class="stat-card"><div><div class="stat-value" id="adminMemberCount">—</div><div class="stat-label">Class accounts</div></div></div></section>
           <div class="workspace-grid">
             <div class="workspace-stack">
-              <article class="panel"><div class="panel-header"><div><div class="panel-title">Access &amp; roles</div><div class="panel-sub">Every account has Student access by default. Add CR or Admin access, then save.</div></div></div><div class="admin-account-toolbar"><input class="search-field" id="adminAccountSearch" type="search" placeholder="Search name, email or roll number" aria-label="Search class accounts"><select class="select-field" id="adminAccountFilter" aria-label="Filter accounts by role"><option value="all">All accounts</option><option value="student">Students</option><option value="cr">Class representatives</option><option value="admin">Admins</option></select><span class="admin-account-count" id="adminAccountResultCount" aria-live="polite">Loading accounts</span></div><div class="workspace-table" id="accountList"><div class="list-row">Run the latest access-control migration to load class accounts.</div></div><div class="admin-account-no-results" id="adminAccountNoResults" hidden>No accounts match those filters.</div></article>
+              <article class="panel"><div class="panel-header"><div><div class="panel-title">Access &amp; roles</div><div class="panel-sub">Grant student access to this section, then add CR or Admin access as needed.</div></div></div><form class="admin-add-member-form" id="adminAddMemberForm"><label class="field-label">College email<input class="text-field" type="email" name="email" required placeholder="student@medicaps.ac.in"></label><label class="field-label">Roll number <span>(optional)</span><input class="text-field" type="number" name="rollNumber" min="1" max="66" placeholder="1–66"></label><button class="primary-button" type="submit">Grant section access</button><p class="admin-add-member-note">The student must create a ClassBoard account first. Access is granted only to the selected section.</p></form><div class="admin-account-toolbar"><input class="search-field" id="adminAccountSearch" type="search" placeholder="Search name, email or roll number" aria-label="Search class accounts"><select class="select-field" id="adminAccountFilter" aria-label="Filter accounts by role"><option value="all">All accounts</option><option value="student">Students</option><option value="cr">Class representatives</option><option value="admin">Admins</option></select><span class="admin-account-count" id="adminAccountResultCount" aria-live="polite">Loading accounts</span></div><div class="workspace-table" id="accountList"><div class="list-row">Run the latest access-control migration to load class accounts.</div></div><div class="admin-account-no-results" id="adminAccountNoResults" hidden>No accounts match those filters.</div></article>
               <article class="panel"><div class="panel-header"><div><div class="panel-title">Portal details</div><div class="panel-sub">Current class configuration.</div></div></div><div class="workspace-table"><div class="list-row"><div class="list-main"><div class="list-title">Class name</div><div class="list-detail" data-config-value="class">AI &amp; Analytics - A (INTEL-1)</div></div></div><div class="list-row"><div class="list-main"><div class="list-title">Semester</div><div class="list-detail" data-config-value="semester">3rd Semester · Odd Semester 2026</div></div></div><div class="list-row"><div class="list-main"><div class="list-title">Attendance visibility</div><div class="list-detail">Private concern messages visible to assigned CRs and admins.</div></div><span class="status">Enabled</span></div></div></article>
             </div>
             <div class="workspace-stack">
@@ -1410,7 +1425,11 @@
   </div>
   <script>
     const root = document.documentElement;
-    const batchForRoll = (roll) => roll >= 1 && roll <= 32 ? 'A1' : roll >= 33 && roll <= 66 ? 'A2' : null;
+    const classBatchCodes = () => window.classboardContext?.classCode === 'INTEL-2' ? ['B1', 'B2'] : ['A1', 'A2'];
+    const batchForRoll = (roll) => {
+      const sectionBatches = classBatchCodes();
+      return roll >= 1 && roll <= 32 ? sectionBatches[0] : roll >= 33 && roll <= 66 ? sectionBatches[1] : null;
+    };
     let currentStudentRoll = null;
     const classSchedule = [];
     function updateStudentBatch() {
@@ -1769,7 +1788,7 @@
       const isLab = typeSelect.value === 'Lab';
       batchField.hidden = !isLab;
       if (!isLab) batchSelect.value = 'All students';
-      else if (!['A1', 'A2'].includes(batchSelect.value)) batchSelect.value = 'A1';
+      else if (!classBatchCodes().includes(batchSelect.value)) batchSelect.value = classBatchCodes()[0];
     }
     ['crClassForm', 'crScheduleForm'].forEach((formId) => {
       const form = document.getElementById(formId);
@@ -1780,7 +1799,7 @@
     document.getElementById('crClassForm').addEventListener('submit', (event) => {
       event.preventDefault();
       const data = new FormData(event.currentTarget);
-      if (data.get('sessionType') === 'Lab' && data.get('batch') === 'All students') { showToast('Choose A1 or A2 for a lab'); return; }
+      if (data.get('sessionType') === 'Lab' && data.get('batch') === 'All students') { showToast(`Choose ${classBatchCodes().join(' or ')} for a lab`); return; }
       const row = document.createElement('div');
       row.className = 'list-row';
       const sessionType = String(data.get('sessionType'));
@@ -1826,7 +1845,7 @@
       const data = new FormData(form);
       const sessionType = String(data.get('sessionType'));
       const sessionBatch = sessionType === 'Lab' ? String(data.get('batch')) : 'All students';
-      if (sessionType === 'Lab' && sessionBatch === 'All students') { showToast('Choose A1 or A2 for a lab'); return; }
+      if (sessionType === 'Lab' && sessionBatch === 'All students') { showToast(`Choose ${classBatchCodes().join(' or ')} for a lab`); return; }
       const session = { subject: String(data.get('subject')), sessionType, batch: sessionBatch, date: String(data.get('date')), time: String(data.get('time')), room: String(data.get('room')) };
       classSchedule.push(session);
       const list = document.getElementById('crScheduleList');
@@ -2035,12 +2054,12 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=14"></script>
+  <script src="classboard-auth.js?v=16"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
-  <script src="./attendance-calendar.js?v=4"></script>
+  <script src="./attendance-calendar.js?v=6"></script>
   <script>
     (() => {
       const slide = document.getElementById('notificationSlide');

@@ -24,7 +24,8 @@
   ];
   const times = {
     first: ['08:30', '09:20'], second: ['09:20', '10:10'], third: ['10:20', '11:10'],
-    fourth: ['11:10', '12:00'], sixth: ['12:50', '13:40'], seventh: ['13:40', '14:20']
+    fourth: ['11:10', '12:00'], sixth: ['12:50', '13:40'], seventh: ['13:40', '14:20'],
+    morningLab: ['08:30', '10:10'], afternoonLab: ['12:50', '14:20']
   };
   const weekdaySchedule = {
     1: [
@@ -58,6 +59,47 @@
       ['Software Engineering', 'lab', 'A1', ...times.seventh, 'L.V203'], ['Artificial Intelligence', 'lab', 'A2', ...times.seventh, 'L.V002']
     ]
   };
+  const intel2WeekdaySchedule = {
+    1: [
+      ['Computer Organisation & Microprocessors', 'lab', 'B1', ...times.morningLab, 'B207'],
+      ['Artificial Intelligence', 'lab', 'B2', ...times.morningLab, 'L.V203'],
+      ['Java Programming', 'lecture', 'all', ...times.third, 'V307'],
+      ['Mentoring-III', 'lecture', 'all', ...times.fourth, ''],
+      ['Software Engineering', 'lecture', 'all', ...times.seventh, 'V228']
+    ],
+    2: [
+      ['Artificial Intelligence', 'lecture', 'all', ...times.first, 'V307'],
+      ['Software Engineering', 'lecture', 'all', ...times.second, 'V307'],
+      ['Java Programming', 'lecture', 'all', ...times.third, 'V307'],
+      ['Statistical Analysis', 'lecture', 'all', ...times.fourth, 'V307'],
+      ['Artificial Intelligence', 'lab', 'B1', ...times.afternoonLab, 'L.V203'],
+      ['Computer Organisation & Microprocessors', 'lab', 'B2', ...times.afternoonLab, 'B207']
+    ],
+    3: [
+      ['Computer Organisation & Microprocessors', 'lecture', 'all', ...times.first, 'V307'],
+      ['Statistical Analysis', 'lecture', 'all', ...times.second, 'V307'],
+      ['Software Engineering', 'lecture', 'all', ...times.third, 'V307'],
+      ['Artificial Intelligence', 'lecture', 'all', ...times.fourth, 'V307'],
+      ['Statistical Analysis', 'lab', 'B1', ...times.afternoonLab, 'L.V015'],
+      ['Software Engineering', 'lab', 'B2', ...times.afternoonLab, 'L.V003']
+    ],
+    4: [
+      ['Computer Organisation & Microprocessors', 'lecture', 'all', ...times.first, 'V307'],
+      ['Statistical Analysis', 'lecture', 'all', ...times.second, 'V307'],
+      ['Soft Skills-I', 'lecture', 'all', ...times.third, 'V307'],
+      ['Soft Skills-I', 'lecture', 'all', ...times.fourth, 'V307'],
+      ['Statistical Analysis', 'lab', 'B2', ...times.afternoonLab, 'L.V002'],
+      ['Java Programming', 'lab', 'B1', ...times.afternoonLab, 'L.V102']
+    ],
+    5: [
+      ['Java Programming', 'lecture', 'all', ...times.first, 'V307'],
+      ['Statistical Analysis', 'lecture', 'all', ...times.second, 'V307'],
+      ['Computer Organisation & Microprocessors', 'lecture', 'all', ...times.third, 'V307'],
+      ['Software Engineering', 'lecture', 'all', ...times.fourth, 'V307'],
+      ['Java Programming', 'lab', 'B2', ...times.afternoonLab, 'L.V102'],
+      ['Software Engineering', 'lab', 'B1', ...times.afternoonLab, 'L.V015']
+    ]
+  };
   const eventMap = {
     '2026-10-01': { label: 'MST-I', kind: 'exam' },
     '2026-10-02': { label: 'Gandhi Jayanti', kind: 'holiday' },
@@ -83,6 +125,26 @@
   let calendarChannel = null;
 
   const dateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  const eventForDate = (date) => {
+    const event = eventMap[dateKey(date)];
+    if (window.classboardContext?.classCode !== 'INTEL-2' || ['holiday', 'convocation', 'exam', 'term'].includes(event?.kind)) return event || null;
+    return null;
+  };
+  const batchCodes = () => window.classboardContext?.classCode === 'INTEL-2' ? ['B1', 'B2'] : ['A1', 'A2'];
+  const setBatchOptions = (select) => {
+    if (!select) return;
+    const current = select.value;
+    const batches = batchCodes();
+    const options = batches.map((batch) => {
+      const option = document.createElement('option'); option.value = batch; option.textContent = batch; return option;
+    });
+    select.replaceChildren(...options);
+    select.value = batches.includes(current) ? current : batches[0];
+  };
+  const batchForRoll = (roll) => {
+    const [first, second] = batchCodes();
+    return roll >= 1 && roll <= 32 ? first : roll >= 33 && roll <= 66 ? second : null;
+  };
   const contextKey = () => {
     const context = window.classboardContext;
     return `classboard-personal-calendar:${context?.classId || 'class'}:${context?.userId || 'guest'}`;
@@ -94,15 +156,15 @@
   const canEditCalendar = () => sharedCalendarReady && (window.classboardContext?.roles?.some((role) => role === 'cr' || role === 'admin') || false);
   const createClass = ([subject, kind, batch, start, end, room], id) => ({ id, subject, kind, batch, start, end, room });
   const defaultClasses = (date) => {
-    const key = dateKey(date);
-    const event = eventMap[key];
-    if (event?.kind === 'holiday' || event?.kind === 'convocation') return [];
-    return (weekdaySchedule[date.getDay()] || []).map((item, index) => createClass(item, `base-${date.getDay()}-${index}`));
+    const event = eventForDate(date);
+    if (['holiday', 'convocation', 'exam'].includes(event?.kind)) return [];
+    const schedule = window.classboardContext?.classCode === 'INTEL-2' ? intel2WeekdaySchedule : weekdaySchedule;
+    return (schedule[date.getDay()] || []).map((item, index) => createClass(item, `base-${date.getDay()}-${index}`));
   };
   const classesForDate = (date, overrides = calendarOverrides) => Object.hasOwn(overrides, dateKey(date)) ? overrides[dateKey(date)] : defaultClasses(date);
   const visibleClasses = (classes) => classes.filter((item) => item.kind !== 'lab' || item.batch === batchSelect.value);
   const calendarLabels = (date, classes) => {
-    const event = eventMap[dateKey(date)];
+    const event = eventForDate(date);
     const labels = [];
     if (event) labels.push(event.label);
     const unique = new Set();
@@ -129,7 +191,7 @@
     for (let day = 1; day <= daysInMonth; day += 1) {
       const date = new Date(year, month, day);
       const key = dateKey(date);
-      const event = eventMap[key];
+      const event = eventForDate(date);
       const classes = classesForDate(date, overrides);
       const button = document.createElement('button');
       button.type = 'button';
@@ -259,7 +321,7 @@
 
   function renderDayDialog(date) {
     const classes = visibleClasses(classesForDate(date));
-    const event = eventMap[activeDateKey];
+    const event = eventForDate(date);
     const editable = canEditCalendar();
     dialogDate.textContent = date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     dialogSub.textContent = [event?.label, `${classes.length} ${classes.length === 1 ? 'class' : 'classes'} for ${batchSelect.value}`].filter(Boolean).join(' · ');
@@ -285,7 +347,7 @@
       const editForm = document.createElement('form'); editForm.className = 'calendar-class-edit'; editForm.hidden = true;
       const subjectSelect = buildSelect(subjects.map((item) => [item.name, item.name]), session.subject);
       const kindSelect = buildSelect([['lecture', 'Lecture'], ['lab', 'Lab']], session.kind);
-      const batchSelectEdit = buildSelect([['A1', 'Lab batch A1'], ['A2', 'Lab batch A2']], session.batch === 'all' ? batchSelect.value : session.batch);
+      const batchSelectEdit = buildSelect(batchCodes().map((batch) => [batch, `Lab batch ${batch}`]), session.batch === 'all' ? batchSelect.value : session.batch);
       const subjectLabel = document.createElement('label'); subjectLabel.className = 'field-label'; subjectLabel.textContent = 'Subject'; subjectLabel.append(subjectSelect);
       const kindLabel = document.createElement('label'); kindLabel.className = 'field-label'; kindLabel.textContent = 'Type'; kindLabel.append(kindSelect);
       const batchLabel = document.createElement('label'); batchLabel.className = 'field-label'; batchLabel.textContent = 'Lab batch'; batchLabel.append(batchSelectEdit); batchLabel.hidden = kindSelect.value !== 'lab';
@@ -321,6 +383,8 @@
   }));
   const addKindSelect = addForm.elements.kind;
   const addBatchLabel = addForm.querySelector('[data-calendar-add-batch]');
+  setBatchOptions(batchSelect);
+  setBatchOptions(addForm.elements.batch);
   addKindSelect.addEventListener('change', () => { addBatchLabel.hidden = addKindSelect.value !== 'lab'; });
   addForm.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -364,11 +428,15 @@
   dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
   window.addEventListener('classboard:attendance-calendar-context', () => {
     const studentRoll = Number(window.classboardContext?.rollNumber);
-    if (studentRoll >= 1 && studentRoll <= 66) batchSelect.value = studentRoll <= 32 ? 'A1' : 'A2';
+    setBatchOptions(batchSelect);
+    setBatchOptions(addForm.elements.batch);
+    if (studentRoll >= 1 && studentRoll <= 66) batchSelect.value = batchForRoll(studentRoll);
     void loadSharedCalendar();
   });
   const studentBatch = Number(window.classboardContext?.rollNumber);
-  if (studentBatch >= 1 && studentBatch <= 66) batchSelect.value = studentBatch <= 32 ? 'A1' : 'A2';
+  setBatchOptions(batchSelect);
+  setBatchOptions(addForm.elements.batch);
+  if (studentBatch >= 1 && studentBatch <= 66) batchSelect.value = batchForRoll(studentBatch);
   renderCalendar();
   if (window.classboardContext?.classId) void loadSharedCalendar();
 })();

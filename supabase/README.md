@@ -1,12 +1,13 @@
-# Classboard Supabase setup
+# ClassBoard Supabase setup
 
-This folder contains the database schema and follow-up migrations for the INTEL-1 Classboard portal.
+This folder contains the database schema and follow-up migrations for the ClassBoard portal, with separate class records for INTEL-1 and INTEL-2.
 
 ## Decisions encoded here
 
-- A class membership stores one role. Every active class account has Student access by default; CR and Admin are additional permissions stored in separate membership rows.
+- A class membership stores one role. Student, CR, and Admin memberships are granted separately for each class; new accounts are automatically enrolled only in INTEL-1 until a class admin grants access elsewhere.
 - RLS protects all app tables. The frontend must never be the authority for a user's class, roll number, or role.
-- Roll number is stored only on a Student membership. A1/A2 are derived from it (1–32 = A1, 33–66 = A2); timetable records use `all`, `A1`, or `A2`.
+- INTEL-1 and INTEL-2 are separate rows in `classes`. Content, subjects, timetable entries, attendance, and permissions are scoped to the selected class ID.
+- Roll number is stored only on a Student membership. Batch labels are section-specific: INTEL-1 uses A1/A2 and INTEL-2 uses B1/B2; in each section, rolls 1–32 are the first batch and 33–66 the second. Timetable records use `all` for lectures and the section's batch code for labs.
 - Shared lecture and lab classes-held totals are maintained by CRs/admins. Each student can save only their own attended-class count; these planner figures do not change official college attendance.
 - Class calendar overrides are shared by class. CRs/admins can edit a date, while every active class member can read the live schedule.
 - PDFs, DOCX documents, and PPTX presentations live in a private `class-resources` bucket, with a maximum 10 MB per object.
@@ -53,10 +54,26 @@ select 'FRIEND_USER_UUID'::uuid, id, 'cr'::public.class_role from target_class;
 
 24. Confirm the two owners can sign in and that each new college account appears as a Student. Assign CR/Admin access from Admin workspace; only a CR can publish class updates, class logs, timetables, and reminders. Admins manage roles, review attendance concerns, and can upload or remove shared content.
 25. Apply `migrations/025_shared_class_calendar.sql` to publish calendar edits class-wide with real-time updates. Existing browser-local calendar overrides are copied into the shared calendar on the first successful staff load.
+26. Apply `migrations/026_add_intel2_section.sql` to create INTEL-2, copy the subject list, enable B1/B2 batch records, and update student batch setup for that section. The INTEL-2 weekly timetable is loaded from its own section-specific defaults in the app. Dated class-log entries, calendar overrides, notes, updates, attendance records, and memberships remain separate by `class_id` and start empty.
+
+## Start INTEL-2 access
+
+After applying migration 026, create the first INTEL-2 admin membership in the SQL Editor. Replace the placeholder with the admin's Auth user UUID:
+
+```sql
+insert into public.class_memberships (user_id, class_id, role)
+select 'INTEL2_ADMIN_USER_UUID'::uuid, id, role
+from public.classes
+cross join (values ('student'::public.class_role), ('admin'::public.class_role)) as roles(role)
+where code = 'INTEL-2'
+on conflict (user_id, class_id, role) do update set is_active = true;
+```
+
+That admin can then use INTEL-2 Admin Workspace to add other section accounts and assign their INTEL-2 roles. An account can have access to one section or both; each section's role is assigned independently.
 
 ## Before sharing with the class
 
-- Apply all migrations through `025_shared_class_calendar.sql` to the Supabase project used by the deployed site.
+- Apply all migrations through `026_add_intel2_section.sql` to the Supabase project used by the deployed site.
 - Keep the Supabase service-role key out of frontend code and Vercel's public variables. The browser only needs the project URL and publishable key.
 - Keep the college email allowlist, Google OAuth redirect URLs, and Supabase site/redirect URLs pointed at the deployed Classboard domain.
 - Review college approval, account onboarding, data retention, backups, and who should receive CR/Admin permissions before sharing the sign-in link broadly.

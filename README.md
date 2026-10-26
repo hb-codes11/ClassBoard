@@ -1,17 +1,17 @@
-# 🎓 Classboard
+# 🎓 ClassBoard
 
 <p align="center">
-  <strong>A private class portal for Medi-Caps University’s INTEL-1</strong><br>
+  <strong>A private class portal for Medi-Caps University sections INTEL-1 and INTEL-2</strong><br>
   Study resources, class updates, schedules, and attendance planning — all in one place.
 </p>
 
 <p align="center">
   <a href="https://classboard-omega.vercel.app"><img alt="Live on Vercel" src="https://img.shields.io/badge/Live%20site-Classboard-2563EB?style=for-the-badge&logo=vercel&logoColor=white"></a>
   <img alt="Supabase" src="https://img.shields.io/badge/Powered%20by-Supabase-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white">
-  <img alt="Built for Medi-Caps INTEL-1" src="https://img.shields.io/badge/For-Medi--Caps%20INTEL--1-7C3AED?style=for-the-badge">
+  <img alt="Built for Medi-Caps INTEL-1 and INTEL-2" src="https://img.shields.io/badge/For-Medi--Caps%20INTEL--1%20%7C%20INTEL--2-7C3AED?style=for-the-badge">
 </p>
 
-Classboard gives students and their class representatives one shared place to find class materials and stay up to date. College accounts sign in to a role-aware portal, while CRs and admins manage the class information they are responsible for.
+ClassBoard gives students and their class representatives one shared place to find class materials and stay up to date. College accounts choose an assigned section at sign-in, while each section's CRs and admins manage their own class information.
 
 ---
 
@@ -97,6 +97,6 @@ Keep the Supabase service-role key private. The browser should only receive the 
 ---
 
 <p align="center">
-  <strong>Made for the INTEL-1 class community 💙</strong><br>
+  <strong>Made for the INTEL-1 and INTEL-2 class communities 💙</strong><br>
   <sub>Built to keep class resources, updates, schedules, and coordination together.</sub>
 </p>

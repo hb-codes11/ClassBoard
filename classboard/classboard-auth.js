@@ -25,7 +25,45 @@
   const buttons = ['signInButton', 'signUpButton', 'googleSignInButton', 'resetPasswordButton']
     .map((id) => document.getElementById(id));
   const emailPattern = /^[^@\s]+@medicaps[.]ac[.]in$/i;
+  const batchCodesForClass = (classCode = window.classboardContext?.classCode) => classCode === 'INTEL-2' ? ['B1', 'B2'] : ['A1', 'A2'];
+  const batchForRoll = (roll, classCode = window.classboardContext?.classCode) => {
+    const [first, second] = batchCodesForClass(classCode);
+    return Number(roll) >= 1 && Number(roll) <= 32 ? first : Number(roll) >= 33 && Number(roll) <= 66 ? second : null;
+  };
+  const setBatchSelectOptions = (select, classCode, includeAll = false) => {
+    if (!select) return;
+    const batches = batchCodesForClass(classCode);
+    const current = select.value;
+    const options = includeAll ? [['All students', 'All students'], ...batches.map((batch) => [batch, batch])] : batches.map((batch) => [batch, batch]);
+    select.replaceChildren(...options.map(([value, label]) => {
+      const option = document.createElement('option'); option.value = value; option.textContent = label; return option;
+    }));
+    select.value = options.some(([value]) => value === current) ? current : options[0][0];
+  };
+  const updateClassBatchControls = (classCode) => {
+    setBatchSelectOptions(document.getElementById('attendanceLabBatch'), classCode);
+    setBatchSelectOptions(document.getElementById('attendanceCalendarBatch'), classCode);
+    setBatchSelectOptions(document.querySelector('#calendarAddForm [name="batch"]'), classCode);
+    setBatchSelectOptions(document.querySelector('#crClassForm [name="batch"]'), classCode, true);
+    setBatchSelectOptions(document.querySelector('#crScheduleForm [name="batch"]'), classCode, true);
+    document.querySelectorAll('.private-note').forEach((note) => {
+      note.textContent = note.textContent.replace(/Rolls 1–32 are [A-Z]\d and 33–66 are [A-Z]\d\./, `Rolls 1–32 are ${batchCodesForClass(classCode)[0]} and 33–66 are ${batchCodesForClass(classCode)[1]}.`);
+    });
+    document.querySelectorAll('#crClassForm, #crScheduleForm').forEach((form) => {
+      const sub = form.closest('article')?.querySelector('.panel-sub');
+      if (sub) sub.textContent = `Lectures are for everyone. Record labs separately for ${batchCodesForClass(classCode).join(' or ')}.`;
+    });
+  };
   const roleSwitcher = document.getElementById('roleSwitcher');
+  const loginClassSelector = document.getElementById('loginClassSelector');
+  const classSwitcher = document.getElementById('classSwitcher');
+  const savedClassCode = () => localStorage.getItem('classboard-selected-class') || loginClassSelector.value || 'INTEL-1';
+  loginClassSelector.value = savedClassCode();
+  loginClassSelector.addEventListener('change', () => localStorage.setItem('classboard-selected-class', loginClassSelector.value));
+  classSwitcher.addEventListener('change', () => {
+    localStorage.setItem('classboard-selected-class', classSwitcher.value);
+    window.location.reload();
+  });
   roleSwitcher.addEventListener('change', () => {
     const issuePanel = document.getElementById('issueForm')?.closest('article');
     if (issuePanel) issuePanel.hidden = roleSwitcher.value !== 'student';
@@ -74,6 +112,7 @@
     // Show every active membership so staff accounts can also use Student view.
     const orderedRoles = ['student', 'cr', 'admin'].filter((role) => roles.includes(role));
     switcher.hidden = !roles.includes('cr') && !roles.includes('admin');
+    document.body.dataset.hasRoleSwitcher = String(!switcher.hidden);
     switcher.replaceChildren(...orderedRoles.map((role) => {
       const option = document.createElement('option');
       option.value = role;
@@ -96,19 +135,68 @@
   async function enterClass(user) {
     const { data, error } = await window.classboardSupabase
       .from('class_memberships')
-      .select('class_id, role, roll_number, classes!inner(code, name)')
+      .select('class_id, role, roll_number, classes!inner(code, name, semester, is_active)')
       .eq('user_id', user.id)
-      .eq('classes.code', 'INTEL-1')
       .eq('is_active', true);
 
     if (error) throw error;
-    const roles = [...new Set((data || []).map((row) => row.role))];
-    if (!roles.length) {
+    const memberships = data || [];
+    const activeClasses = [...new Map(memberships.filter((row) => row.classes?.is_active).map((row) => [row.class_id, row.classes])).entries()]
+      .map(([id, info]) => ({ id, ...info })).sort((a, b) => a.code.localeCompare(b.code));
+    const classCode = savedClassCode();
+    const classInfo = activeClasses.find((item) => item.code === classCode);
+    if (!classInfo) {
       app.hidden = true;
       gate.hidden = false;
-      showMessage('You are signed in, but this account has no active INTEL-1 class role yet. Ask a ClassBoard admin to add your account.', true);
+      showMessage(`This account does not have active access to ${classCode}. Ask that section’s ClassBoard admin to grant access, then sign in again.`, true);
       return;
     }
+    const classMemberships = memberships.filter((row) => row.class_id === classInfo.id);
+    const roles = [...new Set(classMemberships.map((row) => row.role))];
+    updateClassBatchControls(classInfo.code);
+    const classLabel = `${classInfo.name} (${classInfo.code})`;
+    document.title = `ClassBoard · ${classLabel}`;
+    const sideClass = document.getElementById('sidebarProfileClass');
+    if (sideClass) sideClass.textContent = classLabel;
+    const profileBadge = document.querySelector('.profile-class-badge');
+    if (profileBadge?.lastChild) profileBadge.lastChild.textContent = classLabel;
+    document.querySelectorAll('.page-heading .eyebrow').forEach((el) => {
+      if (/INTEL-[12]/.test(el.textContent)) el.textContent = classLabel;
+    });
+    const homeSubtitle = document.querySelector('#page-home .subtitle');
+    if (homeSubtitle) homeSubtitle.textContent = `Here’s what’s happening in ${classLabel} today.`;
+    const timetableSubtitle = document.querySelector('.timetable-card-header .panel-sub');
+    if (timetableSubtitle) timetableSubtitle.textContent = `CSE · III · ${classLabel}`;
+    document.querySelectorAll('[data-config-value="class"]').forEach((el) => { el.textContent = classLabel; });
+    const profileClassDetail = [...document.querySelectorAll('.profile-detail-row')].find((row) => row.querySelector('.list-title')?.textContent === 'Class');
+    if (profileClassDetail) {
+      profileClassDetail.querySelector('.list-detail').textContent = classLabel;
+      profileClassDetail.querySelector('[data-toast]').dataset.toast = `This portal is set up for ${classLabel}.`;
+    }
+    const footerLabel = document.querySelector('.site-footer > span:first-child');
+    if (footerLabel) footerLabel.textContent = `About ClassBoard · ${classLabel}, ${classInfo.semester ? `${classInfo.semester}${classInfo.semester === 1 ? 'st' : classInfo.semester === 2 ? 'nd' : classInfo.semester === 3 ? 'rd' : 'th'} Semester` : ''}`;
+    document.querySelectorAll('[data-config-value="semester"]').forEach((el) => {
+      const suffix = el.textContent.match(/·\s*(.*)$/)?.[1] || '';
+      const ordinal = classInfo.semester ? `${classInfo.semester}${classInfo.semester === 1 ? 'st' : classInfo.semester === 2 ? 'nd' : classInfo.semester === 3 ? 'rd' : 'th'} Semester` : '';
+      el.textContent = [ordinal, suffix].filter(Boolean).join(' · ');
+    });
+    document.querySelectorAll('.panel-sub').forEach((el) => {
+      if (el.textContent.includes('Visible to students in AI & Analytics - A.')) el.textContent = `Visible to students in ${classInfo.name}.`;
+    });
+    const calendarHighlights = document.querySelector('.attendance-calendar-highlights');
+    if (calendarHighlights) calendarHighlights.hidden = classInfo.code !== 'INTEL-1';
+    const calendarSource = document.getElementById('calendarSource');
+    if (calendarSource) calendarSource.textContent = `Academic calendar and events for ${classLabel}.`;
+    loginClassSelector.value = classCode;
+    classSwitcher.replaceChildren(...activeClasses.map((item) => {
+      const option = document.createElement('option');
+      option.value = item.code;
+      option.textContent = `${item.code} · ${item.name}`;
+      return option;
+    }));
+    classSwitcher.value = classCode;
+    classSwitcher.hidden = activeClasses.length < 2;
+    document.body.dataset.multipleClasses = String(activeClasses.length > 1);
 
     const displayName = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.custom_claims?.name || user.email.split('@')[0];
     document.getElementById('crWorkspaceNav').hidden = !(roles.includes('cr') || roles.includes('admin'));
@@ -125,7 +213,7 @@
     document.querySelectorAll('.profile .avatar').forEach((el) => { el.textContent = initials; });
     const displayedRoles = isStaffAccount ? roles.filter((role) => role !== 'student') : roles;
     const roleLabel = displayedRoles.map((role) => role.toUpperCase()).join(' + ');
-    const profileDetail = `${roleLabel} · AI & Analytics - A (INTEL-1)`;
+    const profileDetail = `${roleLabel} · ${classLabel}`;
     document.querySelector('.profile-role').textContent = roleLabel;
     document.getElementById('profileAvatar').textContent = initials;
     document.getElementById('topbarAvatar').textContent = initials;
@@ -137,9 +225,9 @@
     const homeDate = document.getElementById('homeDate');
     if (homeDate) homeDate.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric' });
     setRoleOptions(roles);
-    const studentMembership = data.find((row) => row.role === 'student');
-    const classId = data[0].class_id;
-    window.classboardContext = { classId, userId: user.id, roles, rollNumber: studentMembership?.roll_number ?? null };
+    const studentMembership = classMemberships.find((row) => row.role === 'student');
+    const classId = classInfo.id;
+    window.classboardContext = { classId, classCode: classInfo.code, className: classInfo.name, userId: user.id, roles, rollNumber: studentMembership?.roll_number ?? null };
     window.dispatchEvent(new Event('classboard:attendance-calendar-context'));
     if (studentMembership && window.setClassboardRoll) window.setClassboardRoll(studentMembership.roll_number);
     const issueDate = document.querySelector('#issueForm input[name="date"]');
@@ -159,7 +247,7 @@
         title: 'Set up your student details',
         description: 'Enter your lab batch and serial roll number. Your roll number and batch must match the class list.',
         fields: [
-          { name: 'batch', label: 'Lab batch', options: [{ label: 'Choose your batch', value: '' }, 'A1', 'A2'] },
+          { name: 'batch', label: 'Lab batch', options: [{ label: 'Choose your batch', value: '' }, ...batchCodesForClass(classInfo.code)] },
           { name: 'rollNumber', label: 'Serial roll number', type: 'number', placeholder: '1–66' }
         ],
         submitLabel: 'Save and join class',
@@ -167,7 +255,7 @@
         onSubmit: async ({ batch, rollNumber }) => {
           const roll = Number(rollNumber);
           if (!Number.isInteger(roll) || roll < 1 || roll > 66) return 'Enter your serial roll number from 1 to 66.';
-          const expectedBatch = roll <= 32 ? 'A1' : 'A2';
+          const expectedBatch = batchForRoll(roll, classInfo.code);
           if (batch !== expectedBatch) return `Roll number ${roll} belongs to batch ${expectedBatch}. Check your details and try again.`;
           const { error } = await window.classboardSupabase.rpc('set_own_student_setup', {
             p_class_id: classId,
@@ -420,13 +508,24 @@
 
   async function showPublishedCalendar(resources) {
     const calendar = resources.find((resource) => resource.kind === 'calendar' && resource.storage_path);
-    if (!calendar) return;
+    const context = window.classboardContext;
+    if (!calendar) {
+      if (context?.classCode !== 'INTEL-1') {
+        document.getElementById('calendarFrame').src = 'about:blank';
+        document.getElementById('calendarSource').textContent = `No academic calendar has been published for ${context?.className || 'this section'} (${context?.classCode || ''}) yet.`;
+        document.getElementById('calendarOpen').hidden = true;
+        document.getElementById('calendarDownload').hidden = true;
+      }
+      return;
+    }
     const url = await signedResourceUrl(calendar.storage_path);
     if (!url) return;
     document.getElementById('calendarFrame').src = `${url}#view=FitH`;
     document.getElementById('calendarOpen').href = url;
     document.getElementById('calendarDownload').href = url;
-    document.getElementById('calendarSource').textContent = `${calendar.title} · Published for AI & Analytics - A (INTEL-1).`;
+    document.getElementById('calendarOpen').hidden = false;
+    document.getElementById('calendarDownload').hidden = false;
+    document.getElementById('calendarSource').textContent = `${calendar.title} · Published for ${context?.className || 'class'} (${context?.classCode || ''}).`;
   }
 
   function resourceSubjectColor(name = '') {
@@ -638,7 +737,7 @@
       else addEmptyNote(scheduleList, 'No upcoming class sessions have been scheduled yet.');
     }
     const studentRoll = Number(window.classboardContext?.rollNumber);
-    const studentBatch = studentRoll >= 1 && studentRoll <= 32 ? 'A1' : studentRoll >= 33 && studentRoll <= 66 ? 'A2' : null;
+    const studentBatch = batchForRoll(studentRoll);
     const nextOptions = studentBatch
       ? upcoming.filter((session) => session.batch === 'all' || session.batch === 'Both batches' || session.batch === studentBatch)
       : upcoming;
@@ -671,7 +770,7 @@
       Number(row.classes_held) || 0
     ]));
     const roll = Number(rollNumber);
-    const studentBatch = roll >= 1 && roll <= 32 ? 'A1' : roll >= 33 && roll <= 66 ? 'A2' : null;
+    const studentBatch = batchForRoll(roll);
     const entries = (personalRows || []).reduce((items, row) => {
       const subject = subjectById.get(row.subject_id);
       if (!subject || !['lecture', 'lab'].includes(row.kind)) return items;
@@ -728,7 +827,7 @@
     const cards = [...document.querySelectorAll('#page-attendance [data-subject-card]')];
     const subjectByName = new Map((window.classboardSubjects || []).map((subject) => [subject.name, subject]));
     const isStaff = roles.includes('cr') || roles.includes('admin');
-    const batchFromRoll = Number(rollNumber) >= 1 && Number(rollNumber) <= 32 ? 'A1' : Number(rollNumber) >= 33 && Number(rollNumber) <= 66 ? 'A2' : null;
+    const batchFromRoll = batchForRoll(rollNumber);
     const batchPickerWrap = document.getElementById('attendanceLabBatchWrap');
     const batchPicker = document.getElementById('attendanceLabBatch');
     if (batchPickerWrap) batchPickerWrap.hidden = !isStaff;
@@ -737,7 +836,7 @@
       card.querySelector('.subject-held').readOnly = !isStaff;
       card.querySelector('.subject-attended').readOnly = !roles.includes('student');
     });
-    const activeBatch = isStaff ? batchPicker?.value || 'A1' : batchFromRoll || 'A1';
+    const activeBatch = isStaff ? batchPicker?.value || batchCodesForClass()[0] : batchFromRoll || batchCodesForClass()[0];
     const [countsResult, progressResult] = await Promise.all([
       client.from('attendance_class_counts').select('subject_id,kind,batch,classes_held').eq('class_id', classId),
       client.from('student_attendance_progress').select('subject_id,kind,batch,attended_classes').eq('class_id', classId).eq('user_id', userId)
@@ -811,7 +910,7 @@
             return;
           }
           const activeKind = card.dataset.attendanceMode === 'lab' ? 'lab' : 'lecture';
-          const activeBatch = activeKind === 'lab' ? (activeStaff ? document.getElementById('attendanceLabBatch')?.value || 'A1' : batchFromRoll || 'A1') : 'all';
+          const activeBatch = activeKind === 'lab' ? (activeStaff ? document.getElementById('attendanceLabBatch')?.value || batchCodesForClass()[0] : batchFromRoll || batchCodesForClass()[0]) : 'all';
           const button = card.querySelector('.subject-calculator button[type="submit"]');
           button.disabled = true;
           try {
@@ -1330,6 +1429,29 @@
   }
 
   function connectCrForms() {
+    const addMemberForm = document.getElementById('adminAddMemberForm');
+    addMemberForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const context = window.classboardContext;
+      if (!context?.roles.includes('admin')) { notifyApp('Only an admin of the selected section can grant access.', true); return; }
+      const values = new FormData(addMemberForm);
+      const email = String(values.get('email') || '').trim().toLowerCase();
+      const rollText = String(values.get('rollNumber') || '').trim();
+      const rollNumber = rollText ? Number(rollText) : null;
+      if (!emailPattern.test(email)) { notifyApp('Enter a college email ending in @medicaps.ac.in.', true); return; }
+      if (rollNumber !== null && (!Number.isInteger(rollNumber) || rollNumber < 1 || rollNumber > 66)) { notifyApp('Enter a roll number from 1 to 66 or leave it blank.', true); return; }
+      const submit = addMemberForm.querySelector('button[type="submit"]');
+      submit.disabled = true;
+      const { error } = await window.classboardSupabase.rpc('grant_class_student_by_email', {
+        p_class_id: context.classId, p_email: email, p_roll_number: rollNumber
+      });
+      submit.disabled = false;
+      if (error) { notifyApp(error.message, true); return; }
+      addMemberForm.reset();
+      await loadAdminAccounts(context.classId);
+      notifyApp('Student access was granted to this section.');
+    });
+
     const uploadToggle = document.getElementById('openResourceUpload');
     const uploadPanel = document.getElementById('resourceUploadPanel');
     const closeUpload = () => { uploadPanel.hidden = true; uploadToggle.setAttribute('aria-expanded', 'false'); };
@@ -1425,7 +1547,7 @@
         fields: [
           { name: 'subjectId', label: 'Subject', value: session.subject_id, options: subjects.map((item) => ({ value: item.id, label: item.short_name ? `${item.name} (${item.short_name})` : item.name })) },
           { name: 'sessionType', label: 'Class type', value: session.kind, options: [{ value: 'lecture', label: 'Lecture' }, { value: 'lab', label: 'Lab' }] },
-          { name: 'batch', label: 'Lab batch', value: session.batch === 'all' ? 'A1' : session.batch, options: ['A1', 'A2'] },
+          { name: 'batch', label: 'Lab batch', value: session.batch === 'all' ? batchCodesForClass()[0] : session.batch, options: batchCodesForClass() },
           { name: 'date', label: 'Class date', type: 'date', value: `${classDate.year}-${classDate.month}-${classDate.day}` },
           { name: 'classNumber', label: 'Class number', type: 'number', required: false, value: session.class_number == null ? '' : String(session.class_number), placeholder: 'Optional' },
           { name: 'status', label: 'Status', value: session.state, options: [{ value: 'held', label: 'Held' }, { value: 'no_class', label: 'No class' }] },
@@ -1437,7 +1559,7 @@
           if (!date) return 'Choose the class date.';
           const kind = String(sessionType);
           if (!['lecture', 'lab'].includes(kind)) return 'Choose Lecture or Lab.';
-          if (kind === 'lab' && !['A1', 'A2'].includes(batch)) return 'Choose A1 or A2 for the lab.';
+          if (kind === 'lab' && !batchCodesForClass().includes(batch)) return `Choose ${batchCodesForClass().join(' or ')} for the lab.`;
           const numberText = String(classNumber || '').trim();
           const number = numberText ? Number(numberText) : null;
           if (number !== null && (!Number.isInteger(number) || number < 1)) return 'Class number must be a positive whole number.';
@@ -1913,7 +2035,7 @@
       const subject = subjectResult.data.find((item) => item.name === values.get('subject'));
       const kind = String(values.get('sessionType')).toLowerCase();
       const batchValue = String(values.get('batch'));
-      if (kind === 'lab' && !['A1', 'A2'].includes(batchValue)) { notifyApp('Choose A1 or A2 for the lab.', true); return; }
+      if (kind === 'lab' && !batchCodesForClass().includes(batchValue)) { notifyApp(`Choose ${batchCodesForClass().join(' or ')} for the lab.`, true); return; }
       const { error } = await window.classboardSupabase.from('class_sessions').insert({
         class_id: context.classId,
         subject_id: subject?.id,
@@ -1944,7 +2066,7 @@
       const subject = subjectResult.data.find((item) => item.name === values.get('subject'));
       const kind = String(values.get('sessionType')).toLowerCase();
       const batchValue = String(values.get('batch'));
-      if (kind === 'lab' && !['A1', 'A2'].includes(batchValue)) { notifyApp('Choose A1 or A2 for the lab.', true); return; }
+      if (kind === 'lab' && !batchCodesForClass().includes(batchValue)) { notifyApp(`Choose ${batchCodesForClass().join(' or ')} for the lab.`, true); return; }
       const startsAt = new Date(`${values.get('date')}T${values.get('time')}:00+05:30`).toISOString();
       const { error } = await window.classboardSupabase.from('class_sessions').insert({
         class_id: context.classId,
