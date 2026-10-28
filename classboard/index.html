@@ -175,6 +175,10 @@
     #page-attendance > .panel:first-of-type > .panel-header .panel-title { font-size: 16px; text-transform: uppercase; letter-spacing: .035em; }
     .panel-sub { color: var(--muted); font-size: 10px; margin-top: 3px; }
     .text-link { border: 0; padding: 0; background: none; color: var(--blue); font-size: 10px; font-weight: 670; cursor: pointer; }
+    #page-home .home-action-link { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 28px; padding: 0 9px; border: 1px solid color-mix(in srgb, var(--blue) 28%, var(--line)); border-radius: 999px; background: color-mix(in srgb, var(--blue) 7%, var(--surface)); color: var(--blue); font-size: 9px; font-weight: 680; line-height: 1; white-space: nowrap; transition: background-color .16s ease, border-color .16s ease, transform .16s ease; }
+    #page-home .home-action-link:hover { border-color: color-mix(in srgb, var(--blue) 58%, var(--line)); background: color-mix(in srgb, var(--blue) 13%, var(--surface)); transform: translateY(-1px); }
+    #page-home .home-action-link:active { transform: translateY(0); }
+    #page-home .home-action-link:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
     .update { display: flex; gap: 12px; padding: 12px 18px; border-top: 1px solid var(--line); }
     .update:first-of-type { border-top: 0; }
     .update-card { --update-accent: var(--blue); position: relative; display: grid; grid-template-columns: 56px 42px minmax(0, 1fr) auto auto; align-items: center; gap: 13px; min-height: 90px; margin: 10px 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); box-shadow: 0 4px 14px rgba(26, 54, 84, .035); }
@@ -1241,14 +1245,14 @@
 
         <section class="grid home-dashboard-grid">
           <div class="stack">
-            <article class="panel" id="homeUpdateList"><div class="panel-header"><div class="home-panel-link" data-home-navigation-page="updates" tabindex="0" role="link" aria-label="Open updates"><div class="panel-title">Latest updates</div><div class="panel-sub">Notes from your class representatives and teachers</div></div><button class="text-link" data-page="updates">View all →</button></div></article>
-            <article class="panel" id="homeResourceList"><div class="panel-header"><div class="home-panel-link" data-home-navigation-page="resources" tabindex="0" role="link" aria-label="Open Notes and Syllabus"><div class="panel-title">New notes</div><div class="panel-sub">Recently added to your class</div></div><button class="text-link" data-page="resources">See notes →</button></div><div id="homeResourceGrid"></div></article>
+            <article class="panel" id="homeUpdateList"><div class="panel-header"><div class="home-panel-link" data-home-navigation-page="updates" tabindex="0" role="link" aria-label="Open updates"><div class="panel-title">Latest updates</div><div class="panel-sub">Notes from your class representatives and teachers</div></div><button class="text-link home-action-link" data-page="updates">View all →</button></div></article>
+            <article class="panel" id="homeResourceList"><div class="panel-header"><div class="home-panel-link" data-home-navigation-page="resources" tabindex="0" role="link" aria-label="Open Notes and Syllabus"><div class="panel-title">New notes</div><div class="panel-sub">Recently added to your class</div></div><button class="text-link home-action-link" data-page="resources">See notes →</button></div><div id="homeResourceGrid"></div></article>
           </div>
 
           <div class="stack">
-            <article class="panel home-attendance-panel"><div class="panel-header"><div class="home-panel-link" data-home-navigation-page="attendance" tabindex="0" role="link" aria-label="Open attendance planner"><div class="panel-title">Attendance planner</div><div class="panel-sub">Top attendance · lectures and labs.</div></div><button class="text-link" data-page="attendance">See planner →</button></div><div class="home-attendance-list" id="homeAttendanceSummary" aria-live="polite"></div></article>
+            <article class="panel home-attendance-panel"><div class="panel-header"><div class="home-panel-link" data-home-navigation-page="attendance" tabindex="0" role="link" aria-label="Open attendance planner"><div class="panel-title">Attendance planner</div><div class="panel-sub">Top attendance · lectures and labs.</div></div><button class="text-link home-action-link" data-page="attendance">See planner →</button></div><div class="home-attendance-list" id="homeAttendanceSummary" aria-live="polite"></div></article>
             <article class="panel">
-              <div class="panel-header"><div class="home-panel-link" data-home-navigation-page="updates" tabindex="0" role="link" aria-label="Open reminders and updates"><div class="panel-title">Coming up</div><div class="panel-sub">Dates to remember</div></div><button class="text-link" data-page="updates">See all →</button></div>
+              <div class="panel-header"><div class="home-panel-link" data-home-navigation-page="updates" tabindex="0" role="link" aria-label="Open reminders and updates"><div class="panel-title">Coming up</div><div class="panel-sub">Dates to remember</div></div><button class="text-link home-action-link" data-page="updates">See all →</button></div>
               <div id="homeReminderList"></div>
             </article>
           </div>
