@@ -25,7 +25,7 @@
   const times = {
     first: ['08:30', '09:20'], second: ['09:20', '10:10'], third: ['10:20', '11:10'],
     fourth: ['11:10', '12:00'], sixth: ['12:50', '13:40'], seventh: ['13:40', '14:20'],
-    morningLab: ['08:30', '10:10'], afternoonLab: ['12:50', '14:20']
+    morningLab: ['08:30', '10:10'], afternoonLab: ['12:50', '14:20'], afternoonTheory: ['13:40', '15:10']
   };
   const weekdaySchedule = {
     1: [
@@ -65,7 +65,7 @@
       ['Artificial Intelligence', 'lab', 'B2', ...times.morningLab, 'L.V203'],
       ['Java Programming', 'lecture', 'all', ...times.third, 'V307'],
       ['Mentoring-III', 'lecture', 'all', ...times.fourth, ''],
-      ['Software Engineering', 'lecture', 'all', ...times.seventh, 'V228']
+      ['Software Engineering', 'lecture', 'all', ...times.afternoonTheory, 'V228']
     ],
     2: [
       ['Artificial Intelligence', 'lecture', 'all', ...times.first, 'V307'],
@@ -106,7 +106,7 @@
     '2026-10-03': { label: 'MST-I', kind: 'exam' },
     '2026-10-05': { label: 'SVAR test', kind: 'event' },
     '2026-10-20': { label: 'Vijayadashami', kind: 'holiday' },
-    ...Object.fromEntries([6, 7, 8, 9, 10, 11].map((day) => [`2026-11-${String(day).padStart(2, '0')}`, { label: 'Deepawali break', kind: 'holiday' }])),
+    ...Object.fromEntries([6, 7, 8, 9, 10].map((day) => [`2026-11-${String(day).padStart(2, '0')}`, { label: 'Deepawali break', kind: 'holiday' }])),
     '2026-11-14': { label: 'Compilation of Unit-3 & Unit-4 B1 soft skill online course', kind: 'event' },
     ...Object.fromEntries([16, 17, 18, 19, 20].map((day) => [`2026-11-${String(day).padStart(2, '0')}`, { label: 'MST-II', kind: 'exam' }])),
     '2026-11-21': { label: 'SHLAMCAT: AI mock interview', kind: 'event' },
@@ -126,9 +126,7 @@
 
   const dateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   const eventForDate = (date) => {
-    const event = eventMap[dateKey(date)];
-    if (window.classboardContext?.classCode !== 'INTEL-2' || ['holiday', 'convocation', 'exam', 'term'].includes(event?.kind)) return event || null;
-    return null;
+    return eventMap[dateKey(date)] || null;
   };
   const batchCodes = () => window.classboardContext?.classCode === 'INTEL-2' ? ['B1', 'B2'] : ['A1', 'A2'];
   const setBatchOptions = (select) => {

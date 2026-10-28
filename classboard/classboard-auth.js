@@ -167,6 +167,13 @@
     if (homeSubtitle) homeSubtitle.textContent = `Here’s what’s happening in ${classLabel} today.`;
     const timetableSubtitle = document.querySelector('.timetable-card-header .panel-sub');
     if (timetableSubtitle) timetableSubtitle.textContent = `CSE · III · ${classLabel}`;
+    const timetableImage = classInfo.code === 'INTEL-2' ? './class-timetable-intel2-odd-semester-2026.png' : './class-timetable-odd-semester-2026.png';
+    document.querySelectorAll('.timetable-preview-button img, .timetable-dialog-image').forEach((image) => {
+      image.src = timetableImage;
+      image.alt = `Class timetable for CSE III ${classInfo.name}, July to December 2026`;
+    });
+    const timetableDialogSubtitle = document.querySelector('#classTimetableDialog .panel-sub');
+    if (timetableDialogSubtitle) timetableDialogSubtitle.textContent = `CSE · III · ${classLabel} · July–December 2026`;
     document.querySelectorAll('[data-config-value="class"]').forEach((el) => { el.textContent = classLabel; });
     const profileClassDetail = [...document.querySelectorAll('.profile-detail-row')].find((row) => row.querySelector('.list-title')?.textContent === 'Class');
     if (profileClassDetail) {
@@ -184,7 +191,7 @@
       if (el.textContent.includes('Visible to students in AI & Analytics - A.')) el.textContent = `Visible to students in ${classInfo.name}.`;
     });
     const calendarHighlights = document.querySelector('.attendance-calendar-highlights');
-    if (calendarHighlights) calendarHighlights.hidden = classInfo.code !== 'INTEL-1';
+    if (calendarHighlights) calendarHighlights.hidden = false;
     const calendarSource = document.getElementById('calendarSource');
     if (calendarSource) calendarSource.textContent = `Academic calendar and events for ${classLabel}.`;
     loginClassSelector.value = classCode;
