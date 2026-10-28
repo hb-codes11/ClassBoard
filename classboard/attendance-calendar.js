@@ -201,6 +201,7 @@
         const eventLabel = label === event?.label;
         const line = document.createElement('span'); line.className = 'attendance-day-label'; line.textContent = label;
         if (eventLabel && event?.kind === 'term') line.dataset.eventKind = 'term';
+        if (!eventLabel) line.dataset.classType = label.endsWith(' (P)') ? 'practical' : 'lecture';
         const short = label.split(' ')[0];
         const color = { AI: 'ai', JAVA: 'java', COM: 'com', SE: 'se', SA: 'sa' }[short];
         if (!eventLabel && color) line.dataset.color = color;
