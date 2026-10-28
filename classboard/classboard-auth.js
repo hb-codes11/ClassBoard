@@ -516,17 +516,26 @@
   async function showPublishedCalendar(resources) {
     const calendar = resources.find((resource) => resource.kind === 'calendar' && resource.storage_path);
     const context = window.classboardContext;
+    const sharedCalendarUrl = './academic-calendar-odd-semester-jul-dec-2026.pdf';
     if (!calendar) {
-      if (context?.classCode !== 'INTEL-1') {
-        document.getElementById('calendarFrame').src = 'about:blank';
-        document.getElementById('calendarSource').textContent = `No academic calendar has been published for ${context?.className || 'this section'} (${context?.classCode || ''}) yet.`;
-        document.getElementById('calendarOpen').hidden = true;
-        document.getElementById('calendarDownload').hidden = true;
-      }
+      document.getElementById('calendarFrame').src = `${sharedCalendarUrl}#view=FitH`;
+      document.getElementById('calendarOpen').href = sharedCalendarUrl;
+      document.getElementById('calendarDownload').href = sharedCalendarUrl;
+      document.getElementById('calendarOpen').hidden = false;
+      document.getElementById('calendarDownload').hidden = false;
+      document.getElementById('calendarSource').textContent = `Official academic calendar · Shared by all sections · ${context?.className || 'ClassBoard'} (${context?.classCode || ''}).`;
       return;
     }
     const url = await signedResourceUrl(calendar.storage_path);
-    if (!url) return;
+    if (!url) {
+      document.getElementById('calendarFrame').src = `${sharedCalendarUrl}#view=FitH`;
+      document.getElementById('calendarOpen').href = sharedCalendarUrl;
+      document.getElementById('calendarDownload').href = sharedCalendarUrl;
+      document.getElementById('calendarOpen').hidden = false;
+      document.getElementById('calendarDownload').hidden = false;
+      document.getElementById('calendarSource').textContent = `Official academic calendar · Shared by all sections · ${context?.className || 'ClassBoard'} (${context?.classCode || ''}).`;
+      return;
+    }
     document.getElementById('calendarFrame').src = `${url}#view=FitH`;
     document.getElementById('calendarOpen').href = url;
     document.getElementById('calendarDownload').href = url;
