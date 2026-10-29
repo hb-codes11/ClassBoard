@@ -106,7 +106,7 @@
     '2026-10-03': { label: 'MST-I', kind: 'exam' },
     '2026-10-05': { label: 'SVAR test', kind: 'event' },
     '2026-10-20': { label: 'Vijayadashami', kind: 'holiday' },
-    ...Object.fromEntries([6, 7, 8, 9, 10].map((day) => [`2026-11-${String(day).padStart(2, '0')}`, { label: 'Deepawali break', kind: 'holiday' }])),
+    ...Object.fromEntries([6, 7, 8, 9, 10, 11].map((day) => [`2026-11-${String(day).padStart(2, '0')}`, { label: 'Deepawali break', kind: 'holiday' }])),
     '2026-11-14': { label: 'Compilation of Unit-3 & Unit-4 B1 soft skill online course', kind: 'event' },
     ...Object.fromEntries([16, 17, 18, 19, 20].map((day) => [`2026-11-${String(day).padStart(2, '0')}`, { label: 'MST-II', kind: 'exam' }])),
     '2026-11-21': { label: 'SHLAMCAT: AI mock interview', kind: 'event' },
@@ -159,7 +159,11 @@
     const schedule = window.classboardContext?.classCode === 'INTEL-2' ? intel2WeekdaySchedule : weekdaySchedule;
     return (schedule[date.getDay()] || []).map((item, index) => createClass(item, `base-${date.getDay()}-${index}`));
   };
-  const classesForDate = (date, overrides = calendarOverrides) => Object.hasOwn(overrides, dateKey(date)) ? overrides[dateKey(date)] : defaultClasses(date);
+  const classesForDate = (date, overrides = calendarOverrides) => {
+    const event = eventForDate(date);
+    if (['holiday', 'convocation', 'exam'].includes(event?.kind)) return [];
+    return Object.hasOwn(overrides, dateKey(date)) ? overrides[dateKey(date)] : defaultClasses(date);
+  };
   const visibleClasses = (classes) => classes.filter((item) => item.kind !== 'lab' || item.batch === batchSelect.value);
   const calendarLabels = (date, classes) => {
     const event = eventForDate(date);
@@ -193,9 +197,10 @@
       const classes = classesForDate(date, overrides);
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = `attendance-day${date.getDay() === 0 || date.getDay() === 6 ? ' weekend' : ''}${event ? ` ${event.kind}` : ''}${Object.hasOwn(overrides, key) ? ' modified' : ''}${activeDateKey === key ? ' selected' : ''}`;
+      const hasVisibleOverride = Object.hasOwn(overrides, key) && !['holiday', 'convocation', 'exam'].includes(event?.kind);
+      button.className = `attendance-day${date.getDay() === 0 || date.getDay() === 6 ? ' weekend' : ''}${event ? ` ${event.kind}` : ''}${hasVisibleOverride ? ' modified' : ''}${activeDateKey === key ? ' selected' : ''}`;
       button.setAttribute('role', 'gridcell');
-      button.setAttribute('aria-label', `${date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}${Object.hasOwn(overrides, key) ? ', edited' : ''}`);
+      button.setAttribute('aria-label', `${date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}${hasVisibleOverride ? ', edited' : ''}`);
       const number = document.createElement('span'); number.className = 'attendance-day-number'; number.textContent = String(day); button.append(number);
       calendarLabels(date, classes).forEach((label) => {
         const eventLabel = label === event?.label;
