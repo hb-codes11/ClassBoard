@@ -749,8 +749,8 @@
         .filter((exam) => exam.startsAt >= now)
         .map((exam) => ({ date: exam.startsAt, card: addMstExamCard(exam) })),
     ].sort((a, b) => a.date - b.date);
-    upcomingItems.forEach(({ card }) => reminderContainer.append(card));
-    if (!upcomingItems.length) addEmptyNote(reminderContainer, 'No upcoming reminders or MST exams.');
+    if (upcomingItems.length) reminderContainer.append(upcomingItems[0].card);
+    else addEmptyNote(reminderContainer, 'No upcoming reminders or MST exams.');
     await loadNotifications(classId);
     await loadAttendanceIssues(classId);
     document.getElementById('classSubjectFilter')?.dispatchEvent(new Event('change', { bubbles: true }));
