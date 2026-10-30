@@ -1098,7 +1098,9 @@
     .timetable-card-header { padding-bottom: 10px; }
     .timetable-card-header .eyebrow { margin-bottom: 4px; }
     .timetable-preview-button { display: block; width: calc(100% - 24px); margin: 0 12px 12px; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); color: var(--text); text-align: left; cursor: pointer; }
-    .timetable-preview-button img { display: block; width: 100%; height: auto; }
+    .timetable-image-wrap { position: relative; display: block; width: 100%; aspect-ratio: 2302 / 1624; overflow: hidden; background: #fff; }
+    .timetable-image-wrap img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
+    .timetable-free-period-mask { position: absolute; left: 32.6%; top: 63.6%; width: 5.7%; height: 9.5%; background: #fff; pointer-events: none; }
     .timetable-preview-action { display: flex; align-items: center; justify-content: space-between; min-height: 42px; padding: 0 13px; border-top: 1px solid var(--line); color: var(--blue); font-size: 14px; font-weight: 680; }
     .timetable-preview-button:hover { border-color: var(--blue); box-shadow: 0 5px 18px color-mix(in srgb, var(--blue) 16%, transparent); }
     .timetable-preview-button:focus-visible { outline: 3px solid color-mix(in srgb, var(--blue) 42%, transparent); outline-offset: 2px; }
@@ -1106,7 +1108,6 @@
     .timetable-dialog::backdrop { background: #07111fb8; backdrop-filter: blur(7px); }
     .timetable-dialog-shell { display: flex; flex-direction: column; width: 100%; height: 100%; }
     .timetable-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 62px; padding: 10px 14px; border-bottom: 1px solid var(--line); }
-    .timetable-dialog-image { display: block; width: 100%; height: 100%; min-height: 0; object-fit: contain; background: var(--surface-2); }
     .timetable-dialog-content { flex: 1; min-height: 0; overflow: auto; }
     .calendar-day-dialog { width: min(620px, calc(100vw - 28px)); max-width: none; max-height: min(88dvh, 820px); padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); color: var(--text); box-shadow: 0 24px 80px #0005; }
     .calendar-day-dialog::backdrop { background: #07111fb8; backdrop-filter: blur(6px); }
@@ -1324,7 +1325,7 @@
             <article class="panel timetable-card">
               <div class="panel-header timetable-card-header"><div><div class="eyebrow">Your week</div><div class="panel-title">Class timetable</div><div class="panel-sub">CSE · III · AI &amp; Analytics - A</div></div></div>
               <button class="timetable-preview-button" id="viewTimetableButton" type="button" aria-label="View timetable">
-                <img src="./class-timetable-odd-semester-2026.png" alt="Class timetable for CSE III AI and Analytics A, July to December 2026" loading="lazy">
+                <span class="timetable-image-wrap"><img src="./class-timetable-odd-semester-2026.png" alt="Class timetable for CSE III AI and Analytics A, July to December 2026" loading="lazy"><span class="timetable-free-period-mask" aria-hidden="true"></span></span>
                 <span class="timetable-preview-action">View timetable <span aria-hidden="true">→</span></span>
               </button>
             </article>
@@ -1455,7 +1456,7 @@
         <div><div class="panel-title" id="classTimetableDialogTitle">Class timetable</div><div class="panel-sub">CSE · III · AI &amp; Analytics - A · July–December 2026</div></div>
         <button class="icon-button" id="closeTimetableDialog" type="button" aria-label="Close timetable preview" title="Close preview"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       </div>
-      <div class="timetable-dialog-content"><img class="timetable-dialog-image" src="./class-timetable-odd-semester-2026.png" alt="Full class timetable for CSE III AI and Analytics A, July to December 2026"></div>
+      <div class="timetable-dialog-content"><span class="timetable-image-wrap"><img src="./class-timetable-odd-semester-2026.png" alt="Full class timetable for CSE III AI and Analytics A, July to December 2026"><span class="timetable-free-period-mask" aria-hidden="true"></span></span></div>
     </div>
   </dialog>
   <dialog class="calendar-day-dialog" id="calendarDayDialog" aria-labelledby="calendarDialogDate">

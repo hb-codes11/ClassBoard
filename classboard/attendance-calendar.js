@@ -54,7 +54,7 @@
     ],
     5: [
       ['Java Programming', 'lecture', 'all', ...times.first, 'V306'], ['Statistical Analysis', 'lecture', 'all', ...times.second, 'V306'],
-      ['Software Engineering', 'lecture', 'all', ...times.third, 'V306'], ['Statistical Analysis', 'lecture', 'all', ...times.fourth, 'V306'],
+      ['Software Engineering', 'lecture', 'all', ...times.third, 'V306'],
       ['Software Engineering', 'lab', 'A1', ...times.sixth, 'L.V203'], ['Artificial Intelligence', 'lab', 'A2', ...times.sixth, 'L.V002'],
       ['Software Engineering', 'lab', 'A1', ...times.seventh, 'L.V203'], ['Artificial Intelligence', 'lab', 'A2', ...times.seventh, 'L.V002']
     ]
