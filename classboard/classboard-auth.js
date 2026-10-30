@@ -739,8 +739,18 @@
     else recentRows.forEach((session) => crRecentClasses.append(addSessionRow(session, true)));
     const reminderContainer = document.getElementById('homeReminderList');
     reminderContainer.replaceChildren();
-    (reminderResult.data || []).forEach((reminder) => reminderContainer.append(addReminderCard(reminder)));
-    if (!(reminderResult.data || []).length) addEmptyNote(reminderContainer, 'No upcoming reminders.');
+    const now = new Date();
+    const upcomingItems = [
+      ...(reminderResult.data || []).map((reminder) => ({
+        date: new Date(reminder.due_at),
+        card: addReminderCard(reminder),
+      })),
+      ...mstIIExams
+        .filter((exam) => exam.startsAt >= now)
+        .map((exam) => ({ date: exam.startsAt, card: addMstExamCard(exam) })),
+    ].sort((a, b) => a.date - b.date);
+    upcomingItems.forEach(({ card }) => reminderContainer.append(card));
+    if (!upcomingItems.length) addEmptyNote(reminderContainer, 'No upcoming reminders or MST exams.');
     await loadNotifications(classId);
     await loadAttendanceIssues(classId);
     document.getElementById('classSubjectFilter')?.dispatchEvent(new Event('change', { bubbles: true }));
@@ -979,12 +989,42 @@
     return addUpdateCard({ ...reminder, category: 'reminder', isReminder: true }, 'updates');
   }
 
+  const mstIIExams = [
+    { id: 'mst-ii-java-2026-11-16', title: 'Java Programming', code: 'CS3024T', startsAt: new Date(2026, 10, 16, 9, 30) },
+    { id: 'mst-ii-ai-2026-11-17', title: 'Artificial Intelligence', code: 'CS3023T', startsAt: new Date(2026, 10, 17, 9, 30) },
+    { id: 'mst-ii-com-2026-11-18', title: 'Computer Organization & Microprocessors', code: 'CS3005T', startsAt: new Date(2026, 10, 18, 9, 30) },
+    { id: 'mst-ii-se-2026-11-19', title: 'Software Engineering', code: 'CS3021T', startsAt: new Date(2026, 10, 19, 9, 30) },
+    { id: 'mst-ii-sa-2026-11-20', title: 'Statistical Analysis', code: 'CS3020T', startsAt: new Date(2026, 10, 20, 9, 30) },
+  ];
+
+  function addMstExamCard(exam) {
+    const card = addUpdateCard({
+      id: exam.id,
+      title: exam.title,
+      body: `${exam.code} · Theory exam`,
+      due_at: exam.startsAt.toISOString(),
+      category: 'reminder',
+      isReminder: true,
+    }, 'updates');
+    card.classList.add('update-mst');
+    card.dataset.openAcademicsTab = 'mst';
+    card.setAttribute('aria-label', `Open MST timetable: ${exam.title}, ${exam.startsAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`);
+    const tag = card.querySelector('.update-tag');
+    if (tag) tag.textContent = 'MST-II';
+    const time = card.querySelector('.update-time');
+    if (time) time.textContent = '9:30–10:00 am';
+    card.querySelector('.update-menu-trigger')?.remove();
+    card.querySelector('.update-card-menu')?.remove();
+    return card;
+  }
+
   const homeCardInteractiveSelector = 'a, button, input, select, textarea, summary, [contenteditable="true"]';
   document.addEventListener('click', (event) => {
     const target = event.target instanceof Element ? event.target : event.target?.parentElement;
     const card = target?.closest('[data-home-navigation-page]');
     if (!card || target.closest(homeCardInteractiveSelector)) return;
-    window.openClassboardPage?.(card.dataset.homeNavigationPage);
+    if (card.dataset.openAcademicsTab) window.openClassboardAcademicsTab?.(card.dataset.openAcademicsTab);
+    else window.openClassboardPage?.(card.dataset.homeNavigationPage);
   });
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
@@ -992,7 +1032,8 @@
     const card = target?.closest('[data-home-navigation-page]');
     if (!card || target !== card || target.closest(homeCardInteractiveSelector)) return;
     event.preventDefault();
-    window.openClassboardPage?.(card.dataset.homeNavigationPage);
+    if (card.dataset.openAcademicsTab) window.openClassboardAcademicsTab?.(card.dataset.openAcademicsTab);
+    else window.openClassboardPage?.(card.dataset.homeNavigationPage);
   });
 
   async function loadNotifications(classId) {

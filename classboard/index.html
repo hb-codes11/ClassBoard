@@ -189,6 +189,7 @@
     #homeUpdateList > .update-card { margin-inline: 14px; }
     #homeReminderList > .update-card { margin-inline: 14px; }
     #homeReminderList { container-type: inline-size; }
+    #homeReminderList > .update-card.update-mst { grid-template-columns: 56px 42px minmax(0, 1fr); }
     @container (max-width: 540px) {
       #homeReminderList > .update-card { grid-template-columns: 42px 32px minmax(0, 1fr) auto 30px; grid-template-rows: auto; align-items: center; gap: 7px; min-height: 68px; padding: 8px; }
       #homeReminderList > .update-card .update-date { grid-column: 1; grid-row: 1; min-height: 46px; }
@@ -203,6 +204,12 @@
       #homeReminderList > .update-card .update-join-link { grid-column: 4; grid-row: 1; min-height: 30px; gap: 5px; padding-inline: 8px; font-size: 9px; }
       #homeReminderList > .update-card .update-join-link svg { width: 13px; height: 13px; }
       #homeReminderList > .update-card .update-menu-trigger { grid-column: 5; grid-row: 1; width: 30px; height: 30px; }
+      #homeReminderList > .update-card.update-mst { grid-template-columns: 42px 32px minmax(0, 1fr); }
+      #homeReminderList > .update-card.update-mst .update-date { grid-column: 1; grid-row: 1; }
+      #homeReminderList > .update-card.update-mst .update-icon { grid-column: 2; grid-row: 1; }
+      #homeReminderList > .update-card.update-mst .update-copy { grid-column: 3; grid-row: 1; }
+      #homeReminderList > .update-card.update-mst .update-title { font-size: 10px; }
+      #homeReminderList > .update-card.update-mst .update-time { white-space: nowrap; }
     }
     @container (max-width: 410px) {
       #homeReminderList > .update-card { grid-template-columns: 38px 30px minmax(0, 1fr) 30px; grid-template-rows: auto auto; gap: 6px; min-height: 0; padding: 8px; }
@@ -211,10 +218,16 @@
       #homeReminderList > .update-card .update-copy { grid-column: 3; grid-row: 1; }
       #homeReminderList > .update-card .update-join-link { grid-column: 3; grid-row: 2; justify-self: start; min-height: 28px; }
       #homeReminderList > .update-card .update-menu-trigger { grid-column: 4; grid-row: 1; width: 30px; height: 30px; }
+      #homeReminderList > .update-card.update-mst { grid-template-columns: 38px 30px minmax(0, 1fr); grid-template-rows: auto; }
+      #homeReminderList > .update-card.update-mst .update-date { grid-column: 1; grid-row: 1; }
+      #homeReminderList > .update-card.update-mst .update-icon { grid-column: 2; grid-row: 1; }
+      #homeReminderList > .update-card.update-mst .update-copy { grid-column: 3; grid-row: 1; }
     }
     .update-card.update-important { --update-accent: var(--blue); }
     .update-card.update-deadline { --update-accent: #e6535e; }
     .update-card.update-reminder { --update-accent: #e8a52b; }
+    .update-card.update-mst { --update-accent: var(--blue); }
+    .update-card.update-mst .update-tag { background: color-mix(in srgb, var(--blue) 15%, var(--surface)); color: var(--blue); }
     .update-date { display: grid; justify-items: center; align-content: center; min-height: 62px; border-radius: 10px; background: color-mix(in srgb, var(--update-accent) 9%, var(--surface)); color: var(--update-accent); }
     .update-date-month { font-size: 9px; font-weight: 760; letter-spacing: .06em; text-transform: uppercase; }
     .update-date-day { font-size: 20px; line-height: 1.1; font-weight: 780; }
@@ -251,6 +264,7 @@
     [data-theme="dark"] .update-card { border-color: var(--line); box-shadow: inset 0 1px #ffffff08; }
     [data-theme="dark"] .update-card.update-reminder { --update-accent: #f3b73f; }
     [data-theme="dark"] .update-card.update-deadline { --update-accent: #ff626b; }
+    [data-theme="dark"] .update-card.update-mst { --update-accent: #1684ff; }
     .update-mark { width: 36px; height: 36px; display: grid; place-items: center; flex: none; border-radius: 11px; background: var(--amber-soft); color: var(--amber); font-weight: 750; font-size: 12px; }
     .update-mark svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .update-mark.blue { background: var(--blue-soft); color: var(--blue); }
@@ -362,6 +376,20 @@
     .tabs { display: flex; gap: 18px; border-bottom: 1px solid var(--line); margin: 7px 0 16px; }
     .tab { padding: 0 1px 10px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; }
     .tab.active { border-bottom-color: var(--blue); color: var(--blue); font-weight: 670; }
+    .academics-tabs { display:flex; gap:8px; width:max-content; max-width:100%; margin:8px 0 16px; padding:5px; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+    .academics-tab { min-height:36px; padding:0 16px; border:0; border-radius:8px; background:transparent; color:var(--muted); font:inherit; font-size:12px; font-weight:650; cursor:pointer; }
+    .academics-tab[aria-selected="true"] { background:color-mix(in srgb,var(--blue) 11%,var(--surface)); color:var(--blue); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blue) 20%,transparent); }
+    .academics-panel[hidden] { display:none; }
+    .mst-exam-list { display:grid; gap:10px; padding:14px; }
+    .mst-exam-card { display:grid; grid-template-columns:58px minmax(0,1fr) auto; align-items:center; gap:14px; padding:14px 16px; border:1px solid var(--line); border-radius:13px; background:var(--surface); }
+    .mst-exam-date { display:grid; place-items:center; min-height:56px; border-radius:10px; background:color-mix(in srgb,var(--blue) 10%,var(--surface)); color:var(--blue); font-size:12px; font-weight:750; text-align:center; }
+    .mst-exam-date span { display:block; font-size:10px; text-transform:uppercase; letter-spacing:.06em; }
+    .mst-exam-name { font-weight:720; }
+    .mst-exam-meta { margin-top:4px; color:var(--muted); font-size:12px; line-height:1.45; }
+    .mst-exam-code { padding:5px 9px; border:1px solid var(--line); border-radius:8px; color:var(--muted); font-size:11px; white-space:nowrap; }
+    .mst-notice { margin:0 14px 14px; padding:11px 13px; border-radius:10px; background:color-mix(in srgb,var(--blue) 7%,var(--surface)); color:var(--muted); font-size:12px; }
+    .academics-panel .calendar-frame { height:min(72vh,850px); }
+    [data-theme="dark"] .academics-tab[aria-selected="true"] { background:color-mix(in srgb,var(--blue) 20%,var(--surface)); }
     .stat-card > div:not(.stat-icon) { min-width: 0; flex: 1 1 auto; }
     .stat-label { line-height: 1.35; overflow-wrap: break-word; word-break: normal; }
     .list-row { display: flex; align-items: center; gap: 14px; padding: 14px 17px; border-top: 1px solid var(--line); }
@@ -1321,7 +1349,7 @@
         <button class="nav-item active" data-view="Home"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></svg>Home</button>
         <button class="nav-item" data-view="Notes & Syllabus"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 1 4 17.5z"/><path d="M4 17.5A2.5 2.5 0 0 1 6.5 15H20M8 6h8M8 9h7"/></svg>Notes &amp; Syllabus</button>
         <button class="nav-item" data-view="Updates"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>Updates <span class="nav-count" id="updatesUnreadCount" hidden aria-live="polite">0</span></button>
-        <button class="nav-item" data-view="Academic Calendar"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M14 14h2M8 17h3"/></svg>Academic Calendar</button>
+        <button class="nav-item" data-view="Academics"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M14 14h2M8 17h3"/></svg>Academics</button>
         <button class="nav-item" data-view="Class Log"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M8 17h7"/></svg>Class Log</button>
         <button class="nav-item" data-view="Attendance"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/><path d="M16 6h4v4"/></svg>Attendance</button>
         <button class="nav-item" data-view="Class representatives" id="crWorkspaceNav" hidden><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h4"/></svg>Class Representatives</button>
@@ -1407,8 +1435,30 @@
         </section>
 
         <section class="page-view" id="page-calendar">
-          <div class="page-heading"><div><div class="eyebrow">Medi-Caps University · 3rd Semester</div><h1>Academic Calendar</h1><div class="page-description">Odd Semester · July–December 2026</div></div><div class="calendar-actions"><a class="secondary-button" id="calendarOpen" href="academic-calendar-odd-semester-jul-dec-2026.pdf" target="_blank" rel="noopener">Open PDF</a><a class="primary-button" id="calendarDownload" href="academic-calendar-odd-semester-jul-dec-2026.pdf" download>Download</a></div></div>
-          <article class="panel"><iframe class="calendar-frame" id="calendarFrame" src="academic-calendar-odd-semester-jul-dec-2026.pdf#view=FitH" title="Medi-Caps University Odd Semester Academic Calendar, July to December 2026"></iframe><div class="calendar-source" id="calendarSource">Official calendar provided for AI &amp; Analytics - A (INTEL-1) · 3rd Semester.</div></article>
+          <div class="page-heading"><div><div class="eyebrow">Medi-Caps University · 3rd Semester</div><h1>Academics</h1><div class="page-description">MST schedule, class timetable, and semester calendar.</div></div></div>
+          <div class="academics-tabs" role="tablist" aria-label="Academics sections">
+            <button class="academics-tab" id="academicsTabMst" type="button" role="tab" aria-selected="true" aria-controls="academicsPanelMst" data-academics-tab="mst">MST</button>
+            <button class="academics-tab" id="academicsTabTimetable" type="button" role="tab" aria-selected="false" aria-controls="academicsPanelTimetable" data-academics-tab="timetable">Time Table</button>
+            <button class="academics-tab" id="academicsTabCalendar" type="button" role="tab" aria-selected="false" aria-controls="academicsPanelCalendar" data-academics-tab="calendar">Calendar</button>
+          </div>
+          <div class="academics-panel" id="academicsPanelMst" role="tabpanel" aria-labelledby="academicsTabMst" data-academics-panel="mst">
+            <article class="panel"><div class="panel-heading"><div><div class="panel-title">Mid Semester Test II</div><div class="panel-sub">November 2026 · 3rd Semester</div></div><span class="update-tag" style="--update-accent:var(--blue)">MST-II</span></div>
+              <div class="mst-exam-list">
+                <article class="mst-exam-card" data-mst-exam="2026-11-16T09:30:00"><div class="mst-exam-date"><div><span>Nov</span>16</div></div><div><div class="mst-exam-name">Java Programming</div><div class="mst-exam-meta">Monday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3024T</span></article>
+                <article class="mst-exam-card" data-mst-exam="2026-11-17T09:30:00"><div class="mst-exam-date"><div><span>Nov</span>17</div></div><div><div class="mst-exam-name">Artificial Intelligence</div><div class="mst-exam-meta">Tuesday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3023T</span></article>
+                <article class="mst-exam-card" data-mst-exam="2026-11-18T09:30:00"><div class="mst-exam-date"><div><span>Nov</span>18</div></div><div><div class="mst-exam-name">Computer Organization &amp; Microprocessors</div><div class="mst-exam-meta">Wednesday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3005T</span></article>
+                <article class="mst-exam-card" data-mst-exam="2026-11-19T09:30:00"><div class="mst-exam-date"><div><span>Nov</span>19</div></div><div><div class="mst-exam-name">Software Engineering</div><div class="mst-exam-meta">Thursday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3021T</span></article>
+                <article class="mst-exam-card" data-mst-exam="2026-11-20T09:30:00"><div class="mst-exam-date"><div><span>Nov</span>20</div></div><div><div class="mst-exam-name">Statistical Analysis</div><div class="mst-exam-meta">Friday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3020T</span></article>
+              </div><div class="mst-notice">Exam schedule for 3rd semester. Theory papers are 30 minutes.</div>
+            </article>
+          </div>
+          <div class="academics-panel" id="academicsPanelTimetable" role="tabpanel" aria-labelledby="academicsTabTimetable" data-academics-panel="timetable" hidden>
+            <article class="panel"><div class="panel-heading"><div><div class="panel-title">Class timetable</div><div class="panel-sub">Weekly lectures and practicals · July–December 2026</div></div><button class="secondary-button" id="academicsTimetableButton" type="button">View full timetable</button></div><div class="calendar-source">Open the full timetable to check your day, time, and lab batch.</div></article>
+          </div>
+          <div class="academics-panel" id="academicsPanelCalendar" role="tabpanel" aria-labelledby="academicsTabCalendar" data-academics-panel="calendar" hidden>
+            <div class="page-heading academics-calendar-heading"><div><div class="eyebrow">Medi-Caps University · 3rd Semester</div><div class="page-description">Odd Semester · July–December 2026</div></div><div class="calendar-actions"><a class="secondary-button" id="calendarOpen" href="academic-calendar-odd-semester-jul-dec-2026.pdf" target="_blank" rel="noopener">Open PDF</a><a class="primary-button" id="calendarDownload" href="academic-calendar-odd-semester-jul-dec-2026.pdf" download>Download</a></div></div>
+            <article class="panel"><iframe class="calendar-frame" id="calendarFrame" src="academic-calendar-odd-semester-jul-dec-2026.pdf#view=FitH" title="Medi-Caps University Odd Semester Academic Calendar, July to December 2026"></iframe><div class="calendar-source" id="calendarSource">Official calendar provided for AI &amp; Analytics - A (INTEL-1) · 3rd Semester.</div></article>
+          </div>
         </section>
 
         <section class="page-view" id="page-classes">
@@ -1560,7 +1610,7 @@
       <button data-view="Updates"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>Updates</button>
       <button class="mobile-more-button" type="button" data-mobile-more aria-expanded="false" aria-controls="mobileMoreMenu"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>More</button>
       <div class="mobile-more-menu" id="mobileMoreMenu" hidden>
-        <button data-view="Academic Calendar"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Academic calendar</button>
+        <button data-view="Academics"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Academics</button>
         <button data-view="Class Log"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Class Log</button>
         <button data-view="Attendance"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/></svg>Attendance</button>
         <button data-view="Class representatives" id="mobileCrWorkspaceNav" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h4"/></svg>Class Representatives</button>
@@ -1786,7 +1836,7 @@
       showToast(item.dataset.toast);
     }));
     const pageMap = {
-      'Home': 'home', 'Notes & Syllabus': 'resources', 'Updates': 'updates', 'Academic Calendar': 'calendar',
+      'Home': 'home', 'Notes & Syllabus': 'resources', 'Updates': 'updates', 'Academics': 'calendar',
       'Class Log': 'classes', 'Attendance': 'attendance',
       'Notifications': 'notifications', 'Profile': 'profile', 'Class representatives': 'cr', 'Admin workspace': 'admin'
     };
@@ -1828,6 +1878,18 @@
       const activeName = Object.keys(pageMap).find((name) => pageMap[name] === pageId);
       if (activeName) openPage(pageId, activeName);
     };
+    function selectAcademicsTab(tabName) {
+      document.querySelectorAll('[data-academics-tab]').forEach((tab) => {
+        const selected = tab.dataset.academicsTab === tabName;
+        tab.setAttribute('aria-selected', String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+      });
+      document.querySelectorAll('[data-academics-panel]').forEach((panel) => { panel.hidden = panel.dataset.academicsPanel !== tabName; });
+      sessionStorage.setItem('classboard-academics-tab', tabName);
+    }
+    document.querySelectorAll('[data-academics-tab]').forEach((tab) => tab.addEventListener('click', () => selectAcademicsTab(tab.dataset.academicsTab)));
+    window.openClassboardAcademicsTab = (tabName = 'mst') => { selectAcademicsTab(tabName); openPage('calendar', 'Academics'); };
+    selectAcademicsTab(sessionStorage.getItem('classboard-academics-tab') || 'mst');
     document.getElementById('updatesAddButton').addEventListener('click', () => {
       const roleSwitcher = document.getElementById('roleSwitcher');
       if ([...roleSwitcher.options].some((option) => option.value === 'cr')) {
@@ -1924,6 +1986,7 @@
     }));
     const classTimetableDialog = document.getElementById('classTimetableDialog');
     document.getElementById('viewTimetableButton').addEventListener('click', () => classTimetableDialog.showModal());
+    document.getElementById('academicsTimetableButton').addEventListener('click', () => classTimetableDialog.showModal());
     document.getElementById('closeTimetableDialog').addEventListener('click', () => classTimetableDialog.close());
     classTimetableDialog.addEventListener('click', (event) => {
       if (event.target === classTimetableDialog) classTimetableDialog.close();
