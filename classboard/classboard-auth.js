@@ -739,18 +739,12 @@
     else recentRows.forEach((session) => crRecentClasses.append(addSessionRow(session, true)));
     const reminderContainer = document.getElementById('homeReminderList');
     reminderContainer.replaceChildren();
-    const now = new Date();
-    const upcomingItems = [
-      ...(reminderResult.data || []).map((reminder) => ({
-        date: new Date(reminder.due_at),
-        card: addReminderCard(reminder),
-      })),
-      ...mstIIExams
-        .filter((exam) => exam.startsAt >= now)
-        .map((exam) => ({ date: exam.startsAt, card: addMstExamCard(exam) })),
-    ].sort((a, b) => a.date - b.date);
+    const upcomingItems = (reminderResult.data || []).map((reminder) => ({
+      date: new Date(reminder.due_at),
+      card: addReminderCard(reminder),
+    })).sort((a, b) => a.date - b.date);
     if (upcomingItems.length) reminderContainer.append(upcomingItems[0].card);
-    else addEmptyNote(reminderContainer, 'No upcoming reminders or MST exams.');
+    else addEmptyNote(reminderContainer, 'No upcoming reminders.');
     await loadNotifications(classId);
     await loadAttendanceIssues(classId);
     document.getElementById('classSubjectFilter')?.dispatchEvent(new Event('change', { bubbles: true }));
