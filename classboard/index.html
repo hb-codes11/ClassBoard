@@ -1229,18 +1229,21 @@
     .auth-gate::before { opacity: .42; filter: blur(36px); animation-duration: 36s; }
     .auth-gate::after { opacity: .18; background-size: 64px 64px; }
     .auth-card {
-      width: min(100%, 576px);
-      padding: clamp(30px, 4.6vw, 48px);
+      width: min(100%, 490px);
+      padding: clamp(27px, 3.5vw, 40px);
       border-radius: 18px;
       background: color-mix(in srgb, var(--surface) 96%, transparent);
       box-shadow: 0 22px 58px rgba(30, 83, 142, .12), 0 4px 14px rgba(30, 83, 142, .05), inset 0 1px #fff;
     }
-    .auth-brand { justify-content: center; gap: 17px; color: var(--muted); font-size: 15px; font-weight: 650; letter-spacing: .045em; }
+    .auth-brand { justify-content: center; gap: 14px; color: var(--muted); font-size: 15px; font-weight: 650; letter-spacing: .045em; }
     .auth-brand img { width: 68px; height: 60px; object-fit: contain; }
-    .auth-card h1 { margin-top: 25px; text-align: center; font-size: clamp(32px, 4vw, 40px); letter-spacing: -.04em; }
-    .auth-copy { max-width: 40ch; margin: 8px auto 24px; text-align: center; font-size: 16px; line-height: 1.55; }
+    .auth-brand-copy { display: grid; gap: 3px; text-align: left; letter-spacing: 0; }
+    .auth-brand-name { color: var(--text); font-size: 20px; font-weight: 780; line-height: 1.05; letter-spacing: -.04em; }
+    .auth-brand-subtitle { color: var(--muted); font-size: 10px; font-weight: 650; letter-spacing: .09em; }
+    .auth-card h1 { margin-top: 18px; text-align: center; font-size: clamp(30px, 3.6vw, 36px); letter-spacing: -.04em; }
+    .auth-copy { max-width: 40ch; margin: 6px auto 18px; text-align: center; font-size: 15px; line-height: 1.5; }
     .auth-copy strong { white-space: nowrap; }
-    .auth-field { gap: 6px; margin: 14px 0; font-size: 13px; font-weight: 550; }
+    .auth-field { gap: 6px; margin: 11px 0; font-size: 13px; font-weight: 550; }
     .auth-field input, .auth-field select { min-height: 48px; padding: 10px 14px; border-radius: 8px; background: color-mix(in srgb, var(--surface) 92%, var(--blue-soft)); }
     .auth-field input:focus, .auth-field select:focus { background: var(--surface); }
     .auth-icon-field { position: relative; display: flex; align-items: center; }
@@ -1262,11 +1265,11 @@
     [data-theme="dark"] .auth-gate::after { opacity: .08; }
     [data-theme="dark"] .auth-card { background: color-mix(in srgb, #080a0e 96%, transparent); }
     @media (max-width: 760px) {
-      .auth-card { width: min(100%, 520px); padding: 30px 28px; }
+      .auth-card { width: min(100%, 490px); padding: 28px 26px; }
       .auth-brand img { width: 58px; height: 52px; }
     }
     @media (max-width: 390px) {
-      .auth-card { padding: 24px 19px; }
+      .auth-card { padding: 23px 19px; }
       .auth-brand { gap: 11px; font-size: 12px; }
       .auth-brand img { width: 46px; height: 42px; }
       .auth-card h1 { margin-top: 20px; font-size: 30px; }
@@ -1278,7 +1281,7 @@
 <body data-role="student">
   <section class="auth-gate" id="authGate" aria-labelledby="authTitle">
     <div class="auth-card">
-      <div class="auth-brand"><img src="./classboard-logo.svg" alt="" />INTEL Class Portal</div>
+      <div class="auth-brand"><img src="./classboard-logo.svg" alt="" /><span class="auth-brand-copy"><span class="auth-brand-name">ClassBoard</span><span class="auth-brand-subtitle">INTEL CLASS PORTAL</span></span></div>
       <h1 id="authTitle">Welcome back!</h1>
       <p class="auth-copy">Sign in to your Medicaps account to continue to ClassBoard.</p>
       <form id="authForm">
