@@ -186,6 +186,7 @@
     [data-home-navigation-page]:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
     .update-card[data-home-navigation-page]:hover, .resource-card[data-home-navigation-page]:hover { border-color: color-mix(in srgb, var(--blue) 38%, var(--line)); }
     .home-panel-link { cursor: pointer; border-radius: 6px; }
+    #homeUpdateList { overflow: visible; }
     #homeUpdateList > .update-card { margin-inline: 14px; }
     #homeReminderList > .update-card { margin-inline: 14px; }
     #homeReminderList { container-type: inline-size; }
@@ -255,8 +256,13 @@
     .update-menu-trigger svg { width: 19px; height: 19px; fill: currentColor; }
     .update-menu-trigger[hidden], .update-card-menu[hidden] { display: none; }
     .update-card-menu { position: absolute; z-index: 3; top: calc(100% - 3px); right: 14px; min-width: 150px; padding: 5px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); box-shadow: 0 10px 28px rgba(26, 54, 84, .16); }
-    .update-menu-delete { width: 100%; min-height: 36px; padding: 0 10px; border: 0; border-radius: 7px; background: transparent; color: #c0392b; text-align: left; font: inherit; font-size: 12px; cursor: pointer; }
+    .update-card-menu:not([hidden]) { display: flex; flex-direction: column; gap: 2px; }
+    .update-menu-pin, .update-menu-delete { width: 100%; min-height: 36px; padding: 0 10px; border: 0; border-radius: 7px; background: transparent; text-align: left; font: inherit; font-size: 12px; cursor: pointer; }
+    .update-menu-pin { color: var(--text); }
+    .update-menu-pin:hover, .update-menu-pin:focus-visible { background: color-mix(in srgb, var(--blue) 10%, var(--surface)); color: var(--blue); outline: none; }
+    .update-menu-delete { color: #c0392b; }
     .update-menu-delete:hover, .update-menu-delete:focus-visible { background: color-mix(in srgb, #e6535e 10%, var(--surface)); outline: none; }
+    .update-tag-pinned { background: color-mix(in srgb, var(--blue) 18%, var(--surface)); color: var(--blue); }
     .updates-toolbar { gap: 8px; margin: 0 0 20px; }
     .updates-toolbar .filter-chip { min-height: 40px; display: inline-flex; align-items: center; gap: 8px; padding: 0 15px; border-radius: 22px; font-size: 12px; }
     .updates-toolbar .filter-chip.active { background: var(--blue-soft); }
@@ -265,6 +271,7 @@
     [data-theme="dark"] .update-card.update-reminder { --update-accent: #f3b73f; }
     [data-theme="dark"] .update-card.update-deadline { --update-accent: #ff626b; }
     [data-theme="dark"] .update-card.update-mst { --update-accent: #1684ff; }
+    [data-theme="dark"] .update-tag-pinned { background: color-mix(in srgb, var(--blue) 25%, var(--surface)); color: #52a9ff; }
     .update-mark { width: 36px; height: 36px; display: grid; place-items: center; flex: none; border-radius: 11px; background: var(--amber-soft); color: var(--amber); font-weight: 750; font-size: 12px; }
     .update-mark svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .update-mark.blue { background: var(--blue-soft); color: var(--blue); }
@@ -805,7 +812,7 @@
       .update-card .update-title { font-size: 11px; }
       .update-card .update-body { font-size: 10px; }
       .update-card .update-time { font-size: 9px; }
-      .update-tag, .update-urgent { font-size: 8px; padding: 3px 6px; }
+      .update-tag, .update-urgent, .update-tag-pinned { font-size: 8px; padding: 3px 6px; }
       .update-menu-trigger { width: 32px; height: 32px; }
       .quick-actions { margin-top: 14px; gap: 7px; }
       .quick-action { display: grid; justify-items: start; gap: 7px; min-height: 78px; padding: 10px; }

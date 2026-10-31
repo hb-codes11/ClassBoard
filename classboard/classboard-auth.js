@@ -299,6 +299,75 @@
     }
   }
 
+  function getPinnedUpdatesStorageKey() {
+    const context = window.classboardContext;
+    const classId = context?.classId || 'class';
+    const userId = context?.userId || 'guest';
+    return `classboard-pinned-updates:${classId}:${userId}`;
+  }
+
+  function getPinnedUpdateIds() {
+    try {
+      const raw = localStorage.getItem(getPinnedUpdatesStorageKey());
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function setPinnedUpdateIds(ids) {
+    try {
+      localStorage.setItem(getPinnedUpdatesStorageKey(), JSON.stringify(ids));
+    } catch {}
+  }
+
+  function isUpdatePinned(item) {
+    if (!item) return false;
+    if (typeof item === 'object') {
+      if (item.is_pinned) return true;
+      return getPinnedUpdateIds().includes(String(item.id));
+    }
+    return getPinnedUpdateIds().includes(String(item));
+  }
+
+  function togglePinnedUpdate(updateId) {
+    if (!updateId) return false;
+    const strId = String(updateId);
+    const ids = getPinnedUpdateIds();
+    const exists = ids.includes(strId);
+    const next = exists ? ids.filter((id) => id !== strId) : [strId, ...ids];
+    setPinnedUpdateIds(next);
+    return !exists;
+  }
+
+  function isMstRelatedPost(item) {
+    if (!item) return false;
+    if (item.id && String(item.id).startsWith('mst-')) return true;
+    const content = `${item.title || ''} ${item.body || ''} ${item.attachment_name || ''} ${item.category || ''}`;
+    return /\b(?:mst[a-z0-9_-]*|mid[\s-]*semester)\b/i.test(content);
+  }
+
+  function renderHomeUpdates(feed = window.classboardUpdateFeed) {
+    const container = document.getElementById('homeUpdateList');
+    if (!container) return;
+    container.querySelectorAll('.update, .live-empty').forEach((node) => node.remove());
+    const validFeed = Array.isArray(feed) ? feed : [];
+    const homeUpdates = validFeed.filter((item) => !isMstRelatedPost(item));
+    if (!homeUpdates.length) {
+      addEmptyNote(container, 'No class updates or reminders have been published yet.');
+      return;
+    }
+    const sortedHomeUpdates = [...homeUpdates].sort((a, b) => {
+      const aPinned = !a.isReminder && String(a.category).toLowerCase() !== 'reminder' && isUpdatePinned(a);
+      const bPinned = !b.isReminder && String(b.category).toLowerCase() !== 'reminder' && isUpdatePinned(b);
+      if (aPinned === bPinned) return 0;
+      return aPinned ? -1 : 1;
+    });
+    sortedHomeUpdates.slice(0, 2).forEach((item) => container.append(addUpdateCard(item, 'updates')));
+  }
+
   function addUpdateCard(update, homePage = '') {
     const card = document.createElement('div');
     const category = update.category.toLowerCase();
@@ -335,6 +404,15 @@
       const pill = document.createElement('span'); pill.className = 'update-tag';
       pill.textContent = cardType === 'reminder' ? 'Reminder' : cardType === 'deadline' ? 'Deadline' : 'Important';
       title.append(' ', pill);
+    }
+    const isReminder = Boolean(update.isReminder || String(update.category).toLowerCase() === 'reminder');
+    const isPinned = Boolean(!isReminder && isUpdatePinned(update));
+    if (isPinned) {
+      const pinBadge = document.createElement('span');
+      pinBadge.className = 'update-tag update-tag-pinned';
+      pinBadge.textContent = 'Pinned';
+      title.append(' ', pinBadge);
+      card.classList.add('is-pinned');
     }
     const urgent = update.isReminder && /\burgent\b/i.test(update.body || '');
     if (urgent) {
@@ -395,6 +473,7 @@
     card.append(dateTile, icon, copy);
     if (joinLink) card.append(joinLink);
     const canManageUpdates = window.classboardContext?.roles.some((role) => role === 'cr' || role === 'admin');
+    const canPin = Boolean(homePage && !isReminder && canManageUpdates);
     const menuTrigger = document.createElement('button');
     menuTrigger.type = 'button';
     menuTrigger.className = 'update-menu-trigger';
@@ -408,6 +487,15 @@
     menu.className = 'update-card-menu';
     menu.role = 'menu';
     menu.hidden = true;
+    if (canPin) {
+      const pinButton = document.createElement('button');
+      pinButton.type = 'button';
+      pinButton.className = 'update-menu-pin';
+      pinButton.dataset.pinContent = 'true';
+      pinButton.setAttribute('role', 'menuitem');
+      pinButton.textContent = isPinned ? 'Unpin update' : 'Pin update';
+      menu.append(pinButton);
+    }
     const deleteButton = document.createElement('button');
     deleteButton.type = 'button';
     deleteButton.className = 'update-menu-delete';
@@ -616,14 +704,14 @@
     const [classResult, subjectResult, attachmentUpdateResult, sessionResult, resourceResult, reminderResult] = await Promise.all([
       client.from('classes').select('id,code,name,semester').eq('id', classId).single(),
       client.from('subjects').select('id,slug,name,short_name,display_order').eq('class_id', classId).eq('is_active', true).order('display_order'),
-      client.from('updates').select('id,title,body,category,importance,created_at,published_at,expires_at,attachment_path,attachment_name').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20),
+      client.from('updates').select('id,title,body,category,importance,is_pinned,created_at,published_at,expires_at,attachment_path,attachment_name').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20),
       client.from('class_sessions').select('id,subject_id,class_number,kind,batch,state,starts_at,room,topic,subjects(name,short_name)').eq('class_id', classId).order('starts_at', { ascending: false }).limit(50),
       client.from('resources').select('id,title,kind,unit_label,storage_path,created_at,published_at,subjects(name)').eq('class_id', classId).not('published_at', 'is', null).is('deleted_at', null).order('published_at', { ascending: false }).limit(50),
       client.from('reminders').select('id,title,body,due_at,created_at').eq('class_id', classId).eq('is_active', true).gte('due_at', new Date().toISOString()).order('due_at').limit(20)
     ]);
 
     let updateResult = attachmentUpdateResult;
-    if (updateResult.error && /attachment_(?:path|name)|column .*does not exist|schema cache/i.test(updateResult.error.message || '')) {
+    if (updateResult.error && /is_pinned|attachment_(?:path|name)|column .*does not exist|schema cache/i.test(updateResult.error.message || '')) {
       const legacyUpdates = await client.from('updates').select('id,title,body,category,importance,created_at,published_at,expires_at').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20);
       if (!legacyUpdates.error) updateResult = legacyUpdates;
     }
@@ -662,12 +750,17 @@
       const dateFor = (item) => item.isReminder ? item.due_at : String(item.category).toLowerCase() === 'deadline' && item.expires_at ? item.expires_at : item.published_at || item.created_at;
       return new Date(dateFor(a)) - new Date(dateFor(b));
     });
-    const updateContainers = [document.getElementById('updateList'), document.getElementById('homeUpdateList')];
-    updateContainers.forEach((container, index) => {
-      container.querySelectorAll('.update, .live-empty').forEach((node) => node.remove());
-      if (!updateFeed.length) { addEmptyNote(container, 'No class updates or reminders have been published yet.'); return; }
-      updateFeed.slice(0, index === 0 ? 40 : 2).forEach((item) => container.append(addUpdateCard(item, index === 1 ? 'updates' : '')));
-    });
+    window.classboardUpdateFeed = updateFeed;
+    const updateList = document.getElementById('updateList');
+    if (updateList) {
+      updateList.querySelectorAll('.update, .live-empty').forEach((node) => node.remove());
+      if (!updateFeed.length) {
+        addEmptyNote(updateList, 'No class updates or reminders have been published yet.');
+      } else {
+        updateFeed.slice(0, 40).forEach((item) => updateList.append(addUpdateCard(item, '')));
+      }
+    }
+    renderHomeUpdates(updateFeed);
 
     const resourceGrid = document.getElementById('resourceGrid');
     resourceGrid.replaceChildren();
@@ -1529,14 +1622,62 @@
         closeUpdateMenus();
         menu.hidden = !willOpen;
         trigger.setAttribute('aria-expanded', String(willOpen));
-        if (willOpen) menu.querySelector('[role="menuitem"]')?.focus();
+        if (willOpen) menu.querySelector('[role="menuitem"]:not([hidden])')?.focus();
         return;
       }
-      if (event.target.closest('[data-delete-content]') && event.target.closest('.update-card-menu')) closeUpdateMenus();
+      if (event.target.closest('[data-delete-content], [data-pin-content]') && event.target.closest('.update-card-menu')) closeUpdateMenus();
       else if (!event.target.closest('.update-card-menu')) closeUpdateMenus();
     });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && document.querySelector('.update-card-menu:not([hidden])')) closeUpdateMenus(true);
+    });
+
+    document.addEventListener('click', async (event) => {
+      const button = event.target.closest('[data-pin-content]');
+      if (!button) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const card = button.closest('[data-content-id]');
+      const updateId = card?.dataset.contentId;
+      const context = window.classboardContext;
+      if (!context?.roles.some((role) => role === 'cr' || role === 'admin')) {
+        notifyApp('Only class representatives and admins can pin updates for the class.', true);
+        return;
+      }
+      if (!updateId) return;
+      closeUpdateMenus();
+      const isCurrentlyPinned = card.classList.contains('is-pinned');
+      const nextPinned = !isCurrentlyPinned;
+      button.disabled = true;
+      const client = window.classboardSupabase;
+      let error = null;
+      try {
+        const result = await client
+          .from('updates')
+          .update({ is_pinned: nextPinned })
+          .eq('id', updateId)
+          .eq('class_id', context.classId)
+          .select('id, is_pinned');
+        if (result.error) {
+          if (/is_pinned|column .*does not exist/i.test(result.error.message || '')) {
+            togglePinnedUpdate(updateId);
+            renderHomeUpdates();
+            button.disabled = false;
+            notifyApp(`${nextPinned ? 'Pinned' : 'Unpinned'} in this browser. Apply Supabase migration 027 for class-wide sync.`, true);
+            return;
+          }
+          error = result.error;
+        }
+      } catch (err) {
+        error = err;
+      }
+      button.disabled = false;
+      if (error) {
+        notifyApp(`Could not update pin status: ${error.message}`, true);
+        return;
+      }
+      notifyApp(nextPinned ? 'Update pinned for the whole class.' : 'Update unpinned for the class.');
+      await loadLiveClassData(context.classId);
     });
 
     document.addEventListener('click', async (event) => {

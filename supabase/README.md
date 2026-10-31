@@ -37,7 +37,8 @@ This folder contains the database schema and follow-up migrations for the ClassB
 20. Apply `migrations/021_ignore_inactive_attendance_progress.sql` so deactivated accounts' old test attendance cannot block shared class totals. The guard still protects every active student's saved count.
 21. Apply `migrations/022_allow_staff_to_correct_class_totals.sql` to let CRs/admins set the authoritative shared classes-held total without a student's saved planner count blocking the correction. Students still cannot save an attended count above the current shared total; if a total is lowered below an existing personal count, that student must correct their own count.
 22. Apply `migrations/023_class_update_pdf_attachments.sql` to allow class updates to include private PDF attachments. CRs upload and publish the PDF with the update; active class members can preview it, and deleting the update removes its PDF.
-23. In Supabase Auth, create the owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and grant the initial elevated roles. Student access is already assigned automatically:
+23. Apply `migrations/027_add_class_update_pinning.sql` to add `is_pinned` support so CRs and admins can pin updates to the top of the Home preview for the whole class.
+24. In Supabase Auth, create the owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and grant the initial elevated roles. Student access is already assigned automatically:
 
 ```sql
 -- Replace both UUID placeholders with the two Auth user IDs.
