@@ -360,8 +360,8 @@
       return;
     }
     const sortedHomeUpdates = [...homeUpdates].sort((a, b) => {
-      const aPinned = !a.isReminder && String(a.category).toLowerCase() !== 'reminder' && isUpdatePinned(a);
-      const bPinned = !b.isReminder && String(b.category).toLowerCase() !== 'reminder' && isUpdatePinned(b);
+      const aPinned = isUpdatePinned(a);
+      const bPinned = isUpdatePinned(b);
       if (aPinned === bPinned) return 0;
       return aPinned ? -1 : 1;
     });
@@ -405,8 +405,7 @@
       pill.textContent = cardType === 'reminder' ? 'Reminder' : cardType === 'deadline' ? 'Deadline' : 'Important';
       title.append(' ', pill);
     }
-    const isReminder = Boolean(update.isReminder || String(update.category).toLowerCase() === 'reminder');
-    const isPinned = Boolean(!isReminder && isUpdatePinned(update));
+    const isPinned = Boolean(homePage && isUpdatePinned(update));
     if (isPinned) {
       const pinBadge = document.createElement('span');
       pinBadge.className = 'update-tag update-tag-pinned';
@@ -473,7 +472,7 @@
     card.append(dateTile, icon, copy);
     if (joinLink) card.append(joinLink);
     const canManageUpdates = window.classboardContext?.roles.some((role) => role === 'cr' || role === 'admin');
-    const canPin = Boolean(homePage && !isReminder && canManageUpdates);
+    const canPin = Boolean(homePage && canManageUpdates);
     const menuTrigger = document.createElement('button');
     menuTrigger.type = 'button';
     menuTrigger.className = 'update-menu-trigger';
@@ -493,7 +492,7 @@
       pinButton.className = 'update-menu-pin';
       pinButton.dataset.pinContent = 'true';
       pinButton.setAttribute('role', 'menuitem');
-      pinButton.textContent = isPinned ? 'Unpin update' : 'Pin update';
+      pinButton.textContent = isPinned ? (update.isReminder ? 'Unpin reminder' : 'Unpin update') : (update.isReminder ? 'Pin reminder' : 'Pin update');
       menu.append(pinButton);
     }
     const deleteButton = document.createElement('button');
@@ -701,19 +700,24 @@
 
   async function loadLiveClassData(classId) {
     const client = window.classboardSupabase;
-    const [classResult, subjectResult, attachmentUpdateResult, sessionResult, resourceResult, reminderResult] = await Promise.all([
+    const [classResult, subjectResult, attachmentUpdateResult, sessionResult, resourceResult, baseReminderResult] = await Promise.all([
       client.from('classes').select('id,code,name,semester').eq('id', classId).single(),
       client.from('subjects').select('id,slug,name,short_name,display_order').eq('class_id', classId).eq('is_active', true).order('display_order'),
       client.from('updates').select('id,title,body,category,importance,is_pinned,created_at,published_at,expires_at,attachment_path,attachment_name').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20),
       client.from('class_sessions').select('id,subject_id,class_number,kind,batch,state,starts_at,room,topic,subjects(name,short_name)').eq('class_id', classId).order('starts_at', { ascending: false }).limit(50),
       client.from('resources').select('id,title,kind,unit_label,storage_path,created_at,published_at,subjects(name)').eq('class_id', classId).not('published_at', 'is', null).is('deleted_at', null).order('published_at', { ascending: false }).limit(50),
-      client.from('reminders').select('id,title,body,due_at,created_at').eq('class_id', classId).eq('is_active', true).gte('due_at', new Date().toISOString()).order('due_at').limit(20)
+      client.from('reminders').select('id,title,body,due_at,is_pinned,created_at').eq('class_id', classId).eq('is_active', true).gte('due_at', new Date().toISOString()).order('due_at').limit(20)
     ]);
 
     let updateResult = attachmentUpdateResult;
     if (updateResult.error && /is_pinned|attachment_(?:path|name)|column .*does not exist|schema cache/i.test(updateResult.error.message || '')) {
       const legacyUpdates = await client.from('updates').select('id,title,body,category,importance,created_at,published_at,expires_at').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20);
       if (!legacyUpdates.error) updateResult = legacyUpdates;
+    }
+    let reminderResult = baseReminderResult;
+    if (reminderResult.error && /is_pinned|column .*does not exist|schema cache/i.test(reminderResult.error.message || '')) {
+      const legacyReminders = await client.from('reminders').select('id,title,body,due_at,created_at').eq('class_id', classId).eq('is_active', true).gte('due_at', new Date().toISOString()).order('due_at').limit(20);
+      if (!legacyReminders.error) reminderResult = legacyReminders;
     }
     const failed = [classResult, subjectResult, updateResult, sessionResult, resourceResult, reminderResult].find((result) => result.error);
     if (failed) throw failed.error;
@@ -1639,9 +1643,13 @@
       event.stopPropagation();
       const card = button.closest('[data-content-id]');
       const updateId = card?.dataset.contentId;
+      const contentType = card?.dataset.contentType || 'updates';
+      const isReminder = contentType === 'reminders';
+      const table = isReminder ? 'reminders' : 'updates';
+      const label = isReminder ? 'Reminder' : 'Update';
       const context = window.classboardContext;
       if (!context?.roles.some((role) => role === 'cr' || role === 'admin')) {
-        notifyApp('Only class representatives and admins can pin updates for the class.', true);
+        notifyApp('Only class representatives and admins can pin items for the class.', true);
         return;
       }
       if (!updateId) return;
@@ -1653,7 +1661,7 @@
       let error = null;
       try {
         const result = await client
-          .from('updates')
+          .from(table)
           .update({ is_pinned: nextPinned })
           .eq('id', updateId)
           .eq('class_id', context.classId)
@@ -1663,7 +1671,7 @@
             togglePinnedUpdate(updateId);
             renderHomeUpdates();
             button.disabled = false;
-            notifyApp(`${nextPinned ? 'Pinned' : 'Unpinned'} in this browser. Apply Supabase migration 027 for class-wide sync.`, true);
+            notifyApp(`${label} ${nextPinned ? 'pinned' : 'unpinned'} in this browser. Run migration on ${table} for class-wide sync.`, true);
             return;
           }
           error = result.error;
@@ -1676,7 +1684,7 @@
         notifyApp(`Could not update pin status: ${error.message}`, true);
         return;
       }
-      notifyApp(nextPinned ? 'Update pinned for the whole class.' : 'Update unpinned for the class.');
+      notifyApp(`${label} ${nextPinned ? 'pinned for the whole class.' : 'unpinned for the class.'}`);
       await loadLiveClassData(context.classId);
     });
 
