@@ -167,8 +167,10 @@
     if (homeSubtitle) homeSubtitle.textContent = `Here’s what’s happening in ${classLabel} today.`;
     const timetableSubtitle = document.querySelector('.timetable-card-header .panel-sub');
     if (timetableSubtitle) timetableSubtitle.textContent = `CSE · III · ${classLabel}`;
+    const academicsTimetableSubtitle = document.querySelector('#academicsPanelTimetable .panel-sub');
+    if (academicsTimetableSubtitle) academicsTimetableSubtitle.textContent = `Weekly lectures and practicals · ${classLabel} · July–December 2026`;
     const timetableImage = classInfo.code === 'INTEL-2' ? './class-timetable-intel2-odd-semester-2026.png' : './class-timetable-odd-semester-2026.png';
-    document.querySelectorAll('.timetable-preview-button img, .timetable-dialog-content img, .timetable-dialog-image').forEach((image) => {
+    document.querySelectorAll('.timetable-preview-button img, .timetable-dialog-content img, .timetable-dialog-image, #academicsTimetableImg').forEach((image) => {
       image.src = timetableImage;
       image.alt = `Class timetable for CSE III ${classInfo.name}, July to December 2026`;
     });

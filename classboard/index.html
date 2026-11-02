@@ -397,12 +397,60 @@
     .academics-panel .panel-sub { margin-top:4px; font-size:12px; color:var(--muted); line-height:1.45; overflow-wrap:break-word; }
     .academics-panel .calendar-source { padding:14px 22px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; line-height:1.5; overflow-wrap:break-word; }
     .academics-panel .calendar-frame { height:min(72vh,850px); }
+    .academics-timetable-body { padding:0 22px 20px; min-width:0; }
+    .academics-timetable-frame { display:block; position:relative; width:100%; margin:0; padding:0; border:1px solid var(--line); border-radius:12px; background:#ffffff; overflow:hidden; cursor:pointer; text-align:left; transition:border-color .18s ease, box-shadow .18s ease; }
+    .academics-timetable-frame:hover { border-color:var(--blue); box-shadow:0 8px 24px color-mix(in srgb,var(--blue) 14%,transparent); }
+    .academics-timetable-frame:focus-visible { outline:3px solid color-mix(in srgb,var(--blue) 40%,transparent); outline-offset:2px; }
+    .academics-timetable-frame img { display:block; width:100%; height:auto; max-width:100%; object-fit:contain; background:#ffffff; }
+    .academics-timetable-badge { position:absolute; bottom:12px; right:12px; display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px; background:color-mix(in srgb,#07111f 84%,transparent); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); color:#ffffff; font-size:11px; font-weight:650; letter-spacing:.01em; box-shadow:0 2px 8px rgba(0,0,0,.28); transition:background-color .18s ease; pointer-events:none; }
+    .academics-timetable-frame:hover .academics-timetable-badge { background:var(--blue); }
+    [data-theme="dark"] .academics-timetable-frame { background:#ffffff; border-color:rgba(255,255,255,.15); }
     .mst-exam-list { display:grid; gap:10px; padding:14px 22px; min-width:0; }
-    .mst-exam-card { display:grid; grid-template-columns:58px minmax(0,1fr) auto; align-items:center; gap:14px; padding:14px 16px; border:1px solid var(--line); border-radius:13px; background:var(--surface); min-width:0; }
-    .mst-exam-date { display:grid; place-items:center; min-height:56px; border-radius:10px; background:color-mix(in srgb,var(--blue) 10%,var(--surface)); color:var(--blue); font-size:12px; font-weight:750; text-align:center; }
-    .mst-exam-date span { display:block; font-size:10px; text-transform:uppercase; letter-spacing:.06em; }
-    .mst-exam-card > div:nth-child(2) { min-width:0; }
-    .mst-exam-name { font-weight:720; font-size:14px; line-height:1.35; overflow-wrap:break-word; }
+    .mst-exam-card {
+      --mst-accent: var(--blue);
+      display: grid;
+      grid-template-columns: 58px auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--surface);
+      min-width: 0;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .mst-exam-card:hover { border-color: color-mix(in srgb, var(--mst-accent) 30%, var(--line)); }
+    .mst-exam-card[data-subject-color="java"],
+    .mst-exam-card[data-subject-color="orange"] { --mst-accent: #ed8a22; }
+    .mst-exam-card[data-subject-color="ai"],
+    .mst-exam-card[data-subject-color="red"] { --mst-accent: #df4c55; }
+    .mst-exam-card[data-subject-color="com"],
+    .mst-exam-card[data-subject-color="yellow"] { --mst-accent: #d8a20b; }
+    .mst-exam-card[data-subject-color="se"],
+    .mst-exam-card[data-subject-color="purple"] { --mst-accent: #8957d8; }
+    .mst-exam-card[data-subject-color="sa"],
+    .mst-exam-card[data-subject-color="green"] { --mst-accent: #27a77a; }
+    .mst-exam-card[data-subject-color="rose"] { --mst-accent: #d35d87; }
+    .mst-exam-card[data-subject-color="default"] { --mst-accent: var(--blue); }
+
+    [data-theme="dark"] .mst-exam-card[data-subject-color="java"],
+    [data-theme="dark"] .mst-exam-card[data-subject-color="orange"] { --mst-accent: #ffad4d; }
+    [data-theme="dark"] .mst-exam-card[data-subject-color="ai"],
+    [data-theme="dark"] .mst-exam-card[data-subject-color="red"] { --mst-accent: #ff747e; }
+    [data-theme="dark"] .mst-exam-card[data-subject-color="com"],
+    [data-theme="dark"] .mst-exam-card[data-subject-color="yellow"] { --mst-accent: #ffdc55; }
+    [data-theme="dark"] .mst-exam-card[data-subject-color="se"],
+    [data-theme="dark"] .mst-exam-card[data-subject-color="purple"] { --mst-accent: #c9a5ff; }
+    [data-theme="dark"] .mst-exam-card[data-subject-color="sa"],
+    [data-theme="dark"] .mst-exam-card[data-subject-color="green"] { --mst-accent: #63e6a8; }
+    [data-theme="dark"] .mst-exam-card[data-subject-color="rose"] { --mst-accent: #ff85ad; }
+    [data-theme="dark"] .mst-exam-card[data-subject-color="default"] { --mst-accent: #60a5fa; }
+
+    .mst-exam-date { display:grid; place-items:center; min-height:56px; border-radius:10px; background:color-mix(in srgb,var(--mst-accent) 12%,var(--surface)); color:var(--mst-accent); font-size:13px; font-weight:750; text-align:center; transition:background-color .15s ease, color .15s ease; }
+    .mst-exam-date span { display:block; font-size:10px; text-transform:uppercase; letter-spacing:.06em; opacity:.9; }
+    .mst-exam-marker { display:block; width:3.5px; height:32px; border-radius:999px; background:var(--mst-accent); flex-shrink:0; transition:background-color .15s ease; }
+    .mst-exam-card > div:nth-child(3) { min-width:0; }
+    .mst-exam-name { font-weight:720; font-size:14px; line-height:1.35; overflow-wrap:break-word; color:var(--text); }
     .mst-exam-meta { margin-top:4px; color:var(--muted); font-size:12px; line-height:1.45; overflow-wrap:break-word; }
     .mst-exam-code { padding:5px 9px; border:1px solid var(--line); border-radius:8px; color:var(--muted); font-size:11px; white-space:nowrap; flex-shrink:0; }
     .mst-notice { margin:0 22px 16px; padding:11px 13px; border-radius:10px; background:color-mix(in srgb,var(--blue) 7%,var(--surface)); color:var(--muted); font-size:12px; line-height:1.45; overflow-wrap:break-word; }
@@ -1261,10 +1309,13 @@
       .academics-panel .panel-header { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px 18px 14px; }
       .academics-panel .panel-header button { width: 100%; text-align: center; justify-content: center; }
       .academics-panel .panel-header .update-tag { align-self: flex-start; }
+      .academics-timetable-body { padding: 0 18px 16px; }
+      .academics-timetable-badge { bottom: 8px; right: 8px; padding: 5px 10px; font-size: 10px; }
       .academics-panel .calendar-source { padding: 12px 18px; }
       .mst-exam-list { padding: 12px 18px; gap: 8px; }
-      .mst-exam-card { grid-template-columns: 50px minmax(0, 1fr); gap: 10px 12px; padding: 12px 14px; }
-      .mst-exam-code { grid-column: 2; justify-self: flex-start; }
+      .mst-exam-card { grid-template-columns: 50px auto minmax(0, 1fr); gap: 10px 12px; padding: 12px 14px; }
+      .mst-exam-marker { height: 28px; width: 3px; }
+      .mst-exam-code { grid-column: 3; justify-self: flex-start; }
       .mst-notice { margin: 0 18px 14px; }
       .academics-calendar-heading { flex-direction: column; align-items: stretch; gap: 12px; }
       .academics-calendar-heading .calendar-actions { width: 100%; }
@@ -1473,16 +1524,34 @@
           <div class="academics-panel" id="academicsPanelMst" role="tabpanel" aria-labelledby="academicsTabMst" data-academics-panel="mst">
             <article class="panel"><div class="panel-header"><div><div class="panel-title">Mid Semester Test II</div><div class="panel-sub">November 2026 · 3rd Semester</div></div><span class="update-tag" style="--update-accent:var(--blue)">MST-II</span></div>
               <div class="mst-exam-list">
-                <article class="mst-exam-card" data-mst-exam="2026-11-16T09:30:00"><div class="mst-exam-date"><div><span>Nov</span>16</div></div><div><div class="mst-exam-name">Java Programming</div><div class="mst-exam-meta">Monday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3024T</span></article>
-                <article class="mst-exam-card" data-mst-exam="2026-11-17T09:30:00"><div class="mst-exam-date"><div><span>Nov</span>17</div></div><div><div class="mst-exam-name">Artificial Intelligence</div><div class="mst-exam-meta">Tuesday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3023T</span></article>
-                <article class="mst-exam-card" data-mst-exam="2026-11-18T09:30:00"><div class="mst-exam-date"><div><span>Nov</span>18</div></div><div><div class="mst-exam-name">Computer Organization &amp; Microprocessors</div><div class="mst-exam-meta">Wednesday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3005T</span></article>
-                <article class="mst-exam-card" data-mst-exam="2026-11-19T09:30:00"><div class="mst-exam-date"><div><span>Nov</span>19</div></div><div><div class="mst-exam-name">Software Engineering</div><div class="mst-exam-meta">Thursday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3021T</span></article>
-                <article class="mst-exam-card" data-mst-exam="2026-11-20T09:30:00"><div class="mst-exam-date"><div><span>Nov</span>20</div></div><div><div class="mst-exam-name">Statistical Analysis</div><div class="mst-exam-meta">Friday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3020T</span></article>
+                <article class="mst-exam-card" data-mst-exam="2026-11-16T09:30:00" data-subject-color="java"><div class="mst-exam-date"><div><span>Nov</span>16</div></div><span class="mst-exam-marker" aria-hidden="true"></span><div><div class="mst-exam-name">Java Programming</div><div class="mst-exam-meta">Monday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3024T</span></article>
+                <article class="mst-exam-card" data-mst-exam="2026-11-17T09:30:00" data-subject-color="ai"><div class="mst-exam-date"><div><span>Nov</span>17</div></div><span class="mst-exam-marker" aria-hidden="true"></span><div><div class="mst-exam-name">Artificial Intelligence</div><div class="mst-exam-meta">Tuesday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3023T</span></article>
+                <article class="mst-exam-card" data-mst-exam="2026-11-18T09:30:00" data-subject-color="com"><div class="mst-exam-date"><div><span>Nov</span>18</div></div><span class="mst-exam-marker" aria-hidden="true"></span><div><div class="mst-exam-name">Computer Organization &amp; Microprocessors</div><div class="mst-exam-meta">Wednesday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3005T</span></article>
+                <article class="mst-exam-card" data-mst-exam="2026-11-19T09:30:00" data-subject-color="se"><div class="mst-exam-date"><div><span>Nov</span>19</div></div><span class="mst-exam-marker" aria-hidden="true"></span><div><div class="mst-exam-name">Software Engineering</div><div class="mst-exam-meta">Thursday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3021T</span></article>
+                <article class="mst-exam-card" data-mst-exam="2026-11-20T09:30:00" data-subject-color="sa"><div class="mst-exam-date"><div><span>Nov</span>20</div></div><span class="mst-exam-marker" aria-hidden="true"></span><div><div class="mst-exam-name">Statistical Analysis</div><div class="mst-exam-meta">Friday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3020T</span></article>
               </div><div class="mst-notice">Exam schedule for 3rd semester. Theory papers are 30 minutes.</div>
             </article>
           </div>
           <div class="academics-panel" id="academicsPanelTimetable" role="tabpanel" aria-labelledby="academicsTabTimetable" data-academics-panel="timetable" hidden>
-            <article class="panel"><div class="panel-header"><div><div class="panel-title">Class timetable</div><div class="panel-sub">Weekly lectures and practicals · July–December 2026</div></div><button class="secondary-button" id="academicsTimetableButton" type="button">View full timetable</button></div><div class="calendar-source">Open the full timetable to check your day, time, and lab batch.</div></article>
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <div class="panel-title">Class timetable</div>
+                  <div class="panel-sub">Weekly lectures and practicals · July–December 2026</div>
+                </div>
+                <button class="secondary-button" id="academicsTimetableButton" type="button">View full timetable</button>
+              </div>
+              <div class="academics-timetable-body">
+                <button class="academics-timetable-frame" id="academicsTimetableImageButton" type="button" aria-label="View full size class timetable" title="Click to view full-size timetable">
+                  <img class="timetable-dialog-image" id="academicsTimetableImg" src="./class-timetable-odd-semester-2026.png" alt="Class timetable for CSE III AI and Analytics A, July to December 2026" loading="lazy">
+                  <span class="academics-timetable-badge">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                    <span>Click to view full size</span>
+                  </span>
+                </button>
+              </div>
+              <div class="calendar-source">Open the full timetable to check your day, time, and lab batch.</div>
+            </article>
           </div>
           <div class="academics-panel" id="academicsPanelCalendar" role="tabpanel" aria-labelledby="academicsTabCalendar" data-academics-panel="calendar" hidden>
             <div class="page-heading academics-calendar-heading"><div><div class="eyebrow">Medi-Caps University · 3rd Semester</div><div class="page-description">Odd Semester · July–December 2026</div></div><div class="calendar-actions"><a class="secondary-button" id="calendarOpen" href="academic-calendar-odd-semester-jul-dec-2026.pdf" target="_blank" rel="noopener">Open PDF</a><a class="primary-button" id="calendarDownload" href="academic-calendar-odd-semester-jul-dec-2026.pdf" download>Download</a></div></div>
@@ -1918,6 +1987,20 @@
     }
     document.querySelectorAll('[data-academics-tab]').forEach((tab) => tab.addEventListener('click', () => selectAcademicsTab(tab.dataset.academicsTab)));
     window.openClassboardAcademicsTab = (tabName = 'mst') => { selectAcademicsTab(tabName); openPage('calendar', 'Academics'); };
+    function syncMstSubjectColors() {
+      document.querySelectorAll('.mst-exam-card').forEach((card) => {
+        if (!card.dataset.subjectColor) {
+          const name = card.querySelector('.mst-exam-name')?.textContent || '';
+          card.dataset.subjectColor = /software engineering/i.test(name) ? 'se' :
+            /statistical analysis/i.test(name) ? 'sa' :
+            /artificial intelligence/i.test(name) ? 'ai' :
+            /java programming/i.test(name) ? 'java' :
+            /computer organisation|computer organization/i.test(name) ? 'com' :
+            /soft skills/i.test(name) ? 'rose' : 'default';
+        }
+      });
+    }
+    syncMstSubjectColors();
     selectAcademicsTab(sessionStorage.getItem('classboard-academics-tab') || 'mst');
     document.getElementById('updatesAddButton').addEventListener('click', () => {
       const roleSwitcher = document.getElementById('roleSwitcher');
@@ -2016,6 +2099,10 @@
     const classTimetableDialog = document.getElementById('classTimetableDialog');
     document.getElementById('viewTimetableButton').addEventListener('click', () => classTimetableDialog.showModal());
     document.getElementById('academicsTimetableButton').addEventListener('click', () => classTimetableDialog.showModal());
+    const academicsTimetableImageButton = document.getElementById('academicsTimetableImageButton');
+    if (academicsTimetableImageButton) {
+      academicsTimetableImageButton.addEventListener('click', () => classTimetableDialog.showModal());
+    }
     document.getElementById('closeTimetableDialog').addEventListener('click', () => classTimetableDialog.close());
     classTimetableDialog.addEventListener('click', (event) => {
       if (event.target === classTimetableDialog) classTimetableDialog.close();
