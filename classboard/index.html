@@ -383,20 +383,31 @@
     .tabs { display: flex; gap: 18px; border-bottom: 1px solid var(--line); margin: 7px 0 16px; }
     .tab { padding: 0 1px 10px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; }
     .tab.active { border-bottom-color: var(--blue); color: var(--blue); font-weight: 670; }
-    .academics-tabs { display:flex; gap:8px; width:max-content; max-width:100%; margin:8px 0 16px; padding:5px; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
-    .academics-tab { min-height:36px; padding:0 16px; border:0; border-radius:8px; background:transparent; color:var(--muted); font:inherit; font-size:12px; font-weight:650; cursor:pointer; }
-    .academics-tab[aria-selected="true"] { background:color-mix(in srgb,var(--blue) 11%,var(--surface)); color:var(--blue); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blue) 20%,transparent); }
+    .academics-tabs { display:inline-flex; gap:6px; max-width:100%; margin:8px 0 18px; padding:4px; border:1px solid var(--line); border-radius:12px; background:var(--surface); overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+    .academics-tabs::-webkit-scrollbar { display:none; }
+    .academics-tab { min-height:36px; padding:0 16px; border:0; border-radius:8px; background:transparent; color:var(--muted); font:inherit; font-size:12px; font-weight:650; cursor:pointer; white-space:nowrap; flex-shrink:0; transition:background-color .15s ease, color .15s ease, box-shadow .15s ease; }
+    .academics-tab:hover { color:var(--text); }
+    .academics-tab[aria-selected="true"] { background:color-mix(in srgb,var(--blue) 12%,var(--surface)); color:var(--blue); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blue) 24%,transparent); font-weight:700; }
+    [data-theme="dark"] .academics-tab[aria-selected="true"] { background:color-mix(in srgb,var(--blue) 22%,var(--surface)); color:#60a5fa; box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blue) 35%,transparent); }
+    .academics-panel { min-width:0; }
     .academics-panel[hidden] { display:none; }
-    .mst-exam-list { display:grid; gap:10px; padding:14px; }
-    .mst-exam-card { display:grid; grid-template-columns:58px minmax(0,1fr) auto; align-items:center; gap:14px; padding:14px 16px; border:1px solid var(--line); border-radius:13px; background:var(--surface); }
+    .academics-panel .panel-header { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:20px 22px 16px; min-width:0; }
+    .academics-panel .panel-header > div:first-child { min-width:0; flex:1 1 auto; }
+    .academics-panel .panel-title { font-size:15px; font-weight:750; letter-spacing:-.01em; line-height:1.35; overflow-wrap:break-word; }
+    .academics-panel .panel-sub { margin-top:4px; font-size:12px; color:var(--muted); line-height:1.45; overflow-wrap:break-word; }
+    .academics-panel .calendar-source { padding:14px 22px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; line-height:1.5; overflow-wrap:break-word; }
+    .academics-panel .calendar-frame { height:min(72vh,850px); }
+    .mst-exam-list { display:grid; gap:10px; padding:14px 22px; min-width:0; }
+    .mst-exam-card { display:grid; grid-template-columns:58px minmax(0,1fr) auto; align-items:center; gap:14px; padding:14px 16px; border:1px solid var(--line); border-radius:13px; background:var(--surface); min-width:0; }
     .mst-exam-date { display:grid; place-items:center; min-height:56px; border-radius:10px; background:color-mix(in srgb,var(--blue) 10%,var(--surface)); color:var(--blue); font-size:12px; font-weight:750; text-align:center; }
     .mst-exam-date span { display:block; font-size:10px; text-transform:uppercase; letter-spacing:.06em; }
-    .mst-exam-name { font-weight:720; }
-    .mst-exam-meta { margin-top:4px; color:var(--muted); font-size:12px; line-height:1.45; }
-    .mst-exam-code { padding:5px 9px; border:1px solid var(--line); border-radius:8px; color:var(--muted); font-size:11px; white-space:nowrap; }
-    .mst-notice { margin:0 14px 14px; padding:11px 13px; border-radius:10px; background:color-mix(in srgb,var(--blue) 7%,var(--surface)); color:var(--muted); font-size:12px; }
-    .academics-panel .calendar-frame { height:min(72vh,850px); }
-    [data-theme="dark"] .academics-tab[aria-selected="true"] { background:color-mix(in srgb,var(--blue) 20%,var(--surface)); }
+    .mst-exam-card > div:nth-child(2) { min-width:0; }
+    .mst-exam-name { font-weight:720; font-size:14px; line-height:1.35; overflow-wrap:break-word; }
+    .mst-exam-meta { margin-top:4px; color:var(--muted); font-size:12px; line-height:1.45; overflow-wrap:break-word; }
+    .mst-exam-code { padding:5px 9px; border:1px solid var(--line); border-radius:8px; color:var(--muted); font-size:11px; white-space:nowrap; flex-shrink:0; }
+    .mst-notice { margin:0 22px 16px; padding:11px 13px; border-radius:10px; background:color-mix(in srgb,var(--blue) 7%,var(--surface)); color:var(--muted); font-size:12px; line-height:1.45; overflow-wrap:break-word; }
+    .academics-calendar-heading { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:16px; }
+    .academics-calendar-heading .calendar-actions { display:flex; align-items:center; gap:10px; flex-shrink:0; }
     .stat-card > div:not(.stat-icon) { min-width: 0; flex: 1 1 auto; }
     .stat-label { line-height: 1.35; overflow-wrap: break-word; word-break: normal; }
     .list-row { display: flex; align-items: center; gap: 14px; padding: 14px 17px; border-top: 1px solid var(--line); }
@@ -1247,6 +1258,17 @@
       .class-log-session { border-radius: 11px; }
       .attendance-subject-grid > .subject-attendance { border-radius: 12px; }
       .profile-hero { border-radius: 13px; }
+      .academics-panel .panel-header { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px 18px 14px; }
+      .academics-panel .panel-header button { width: 100%; text-align: center; justify-content: center; }
+      .academics-panel .panel-header .update-tag { align-self: flex-start; }
+      .academics-panel .calendar-source { padding: 12px 18px; }
+      .mst-exam-list { padding: 12px 18px; gap: 8px; }
+      .mst-exam-card { grid-template-columns: 50px minmax(0, 1fr); gap: 10px 12px; padding: 12px 14px; }
+      .mst-exam-code { grid-column: 2; justify-self: flex-start; }
+      .mst-notice { margin: 0 18px 14px; }
+      .academics-calendar-heading { flex-direction: column; align-items: stretch; gap: 12px; }
+      .academics-calendar-heading .calendar-actions { width: 100%; }
+      .academics-calendar-heading .calendar-actions > * { flex: 1 1 auto; text-align: center; justify-content: center; }
     }
     @media (max-width: 420px) {
       .content { padding-inline: 12px; }
@@ -1449,7 +1471,7 @@
             <button class="academics-tab" id="academicsTabCalendar" type="button" role="tab" aria-selected="false" aria-controls="academicsPanelCalendar" data-academics-tab="calendar">Calendar</button>
           </div>
           <div class="academics-panel" id="academicsPanelMst" role="tabpanel" aria-labelledby="academicsTabMst" data-academics-panel="mst">
-            <article class="panel"><div class="panel-heading"><div><div class="panel-title">Mid Semester Test II</div><div class="panel-sub">November 2026 · 3rd Semester</div></div><span class="update-tag" style="--update-accent:var(--blue)">MST-II</span></div>
+            <article class="panel"><div class="panel-header"><div><div class="panel-title">Mid Semester Test II</div><div class="panel-sub">November 2026 · 3rd Semester</div></div><span class="update-tag" style="--update-accent:var(--blue)">MST-II</span></div>
               <div class="mst-exam-list">
                 <article class="mst-exam-card" data-mst-exam="2026-11-16T09:30:00"><div class="mst-exam-date"><div><span>Nov</span>16</div></div><div><div class="mst-exam-name">Java Programming</div><div class="mst-exam-meta">Monday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3024T</span></article>
                 <article class="mst-exam-card" data-mst-exam="2026-11-17T09:30:00"><div class="mst-exam-date"><div><span>Nov</span>17</div></div><div><div class="mst-exam-name">Artificial Intelligence</div><div class="mst-exam-meta">Tuesday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3023T</span></article>
@@ -1460,7 +1482,7 @@
             </article>
           </div>
           <div class="academics-panel" id="academicsPanelTimetable" role="tabpanel" aria-labelledby="academicsTabTimetable" data-academics-panel="timetable" hidden>
-            <article class="panel"><div class="panel-heading"><div><div class="panel-title">Class timetable</div><div class="panel-sub">Weekly lectures and practicals · July–December 2026</div></div><button class="secondary-button" id="academicsTimetableButton" type="button">View full timetable</button></div><div class="calendar-source">Open the full timetable to check your day, time, and lab batch.</div></article>
+            <article class="panel"><div class="panel-header"><div><div class="panel-title">Class timetable</div><div class="panel-sub">Weekly lectures and practicals · July–December 2026</div></div><button class="secondary-button" id="academicsTimetableButton" type="button">View full timetable</button></div><div class="calendar-source">Open the full timetable to check your day, time, and lab batch.</div></article>
           </div>
           <div class="academics-panel" id="academicsPanelCalendar" role="tabpanel" aria-labelledby="academicsTabCalendar" data-academics-panel="calendar" hidden>
             <div class="page-heading academics-calendar-heading"><div><div class="eyebrow">Medi-Caps University · 3rd Semester</div><div class="page-description">Odd Semester · July–December 2026</div></div><div class="calendar-actions"><a class="secondary-button" id="calendarOpen" href="academic-calendar-odd-semester-jul-dec-2026.pdf" target="_blank" rel="noopener">Open PDF</a><a class="primary-button" id="calendarDownload" href="academic-calendar-odd-semester-jul-dec-2026.pdf" download>Download</a></div></div>
