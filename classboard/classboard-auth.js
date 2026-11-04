@@ -238,6 +238,7 @@
     const classId = classInfo.id;
     window.classboardContext = { classId, classCode: classInfo.code, className: classInfo.name, userId: user.id, roles, rollNumber: studentMembership?.roll_number ?? null };
     window.dispatchEvent(new Event('classboard:attendance-calendar-context'));
+    window.dispatchEvent(new Event('classboard:study-context'));
     if (studentMembership && window.setClassboardRoll) window.setClassboardRoll(studentMembership.roll_number);
     const issueDate = document.querySelector('#issueForm input[name="date"]');
     if (issueDate) {
@@ -1519,7 +1520,14 @@
   }
 
   async function handleSession(session) {
+    if (window.classboardContext && window.classboardContext.userId !== session?.user?.id) {
+      window.classboardContext = null;
+      window.dispatchEvent(new Event('classboard:study-context'));
+      app.hidden = true;
+    }
     if (!session?.user) {
+      window.classboardContext = null;
+      window.dispatchEvent(new Event('classboard:study-context'));
       app.hidden = true;
       gate.hidden = false;
       return;
@@ -1536,6 +1544,8 @@
     try {
       await enterClass(session.user);
     } catch (error) {
+      window.classboardContext = null;
+      window.dispatchEvent(new Event('classboard:study-context'));
       app.hidden = true;
       gate.hidden = false;
       showMessage(`Could not check class access: ${error.message}`, true);

@@ -80,3 +80,8 @@ That admin can then use INTEL-2 Admin Workspace to add other section accounts an
 - Review college approval, account onboarding, data retention, backups, and who should receive CR/Admin permissions before sharing the sign-in link broadly.
 
 The SQL migrations must be applied in the Supabase project before the matching role behavior is active in production.
+
+
+## Private Study Plan (028)
+
+Apply `migrations/028_private_study_plan.sql` after 027, then deploy the matching frontend. It creates private owner/class-scoped task, focus-session, and goal tables, with owner-only RLS and a server-managed timer RPC. CR/admin roles cannot read anyone else's study plan. No existing class, attendance, resource, or notification data is modified. See [rollout and verification](../docs/study-plan.md).

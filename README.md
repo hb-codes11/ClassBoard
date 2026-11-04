@@ -40,6 +40,14 @@ ClassBoard gives students and their class representatives one shared place to fi
 
 > The attendance planner is for personal planning and class coordination; it does not change official college attendance records.
 
+### 📝 Private Study Plan
+- Organize daily tasks, subject goals, and linked class notes in a dedicated Workspace page.
+- Record focus sessions with a timer that survives refresh, or log study time manually.
+- Review weekly progress and study streaks. Each account's plans stay private within its selected class, including for CRs/admins.
+- No planner notifications or changes to official class records.
+
+See [Study Plan rollout and checks](docs/study-plan.md). Apply migration **028** before deploying the matching frontend.
+
 ### 🛡️ Roles and access
 - Every active class account has Student access.
 - Admins manage account roles and shared content.

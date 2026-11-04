@@ -14,6 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./study-plan.css?v=1" />
   <style>
     :root {
       color-scheme: light;
@@ -1432,6 +1433,7 @@
         <button class="nav-item" data-view="Academics"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M14 14h2M8 17h3"/></svg>Academics</button>
         <button class="nav-item" data-view="Class Log"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M8 17h7"/></svg>Class Log</button>
         <button class="nav-item" data-view="Attendance"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/><path d="M16 6h4v4"/></svg>Attendance</button>
+        <button class="nav-item" data-view="Study Plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5H5v16h14V5h-4M9 3h6v4H9zM8 12l2 2 5-5M8 18h8"/></svg>Study Plan</button>
         <button class="nav-item" data-view="Class representatives" id="crWorkspaceNav" hidden><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h4"/></svg>Class Representatives</button>
       </nav>
       <div class="sidebar-bottom">
@@ -1699,6 +1701,25 @@
             </div>
           </div>
         </section>
+        <section class="page-view" id="page-study" aria-labelledby="studyTitle">
+          <div class="page-heading"><div><h1 id="studyTitle">Study Plan</h1><div class="page-description">Your own pace, your own plan. Private to you in <span id="studyClass"></span>.</div></div><button class="primary-button" id="studyAddTask" data-study-action="add" type="button" disabled>Add task</button></div>
+          <div class="study-status-row"><p id="studyStatus" role="status" aria-live="polite"></p><button class="study-quiet" data-study-action="retry" type="button">Refresh</button></div>
+          <div id="studyBody" hidden>
+            <div class="academics-tabs" role="tablist" aria-label="Study Plan sections">
+              <button class="academics-tab" type="button" role="tab" id="studyTabToday" data-study-tab="today" aria-selected="true" aria-controls="studyToday">Today</button>
+              <button class="academics-tab" type="button" role="tab" id="studyTabSubjects" data-study-tab="subjects" aria-selected="false" aria-controls="studySubjects" tabindex="-1">Subjects</button>
+              <button class="academics-tab" type="button" role="tab" id="studyTabInsights" data-study-tab="insights" aria-selected="false" aria-controls="studyInsights" tabindex="-1">Insights</button>
+            </div>
+            <div class="study-today-grid" id="studyToday" role="tabpanel" data-study-panel="today" aria-labelledby="studyTabToday">
+              <article class="panel study-exam" id="studyExam"></article>
+              <article class="panel study-focus"><div class="study-panel-heading"><h2>Focus session</h2><span class="study-private">Only you</span></div><div id="studyClock" class="study-clock" aria-label="Time remaining toward 25 minutes">25:00</div><p id="studyClockState" class="study-muted">Ready when you are</p><label>Subject<select class="select-field" id="studyTimerSubject"></select></label><label>Linked task (optional)<select class="select-field" id="studyTimerTask"></select></label><div id="studyTimerButtons" class="study-timer-buttons"></div><p class="study-muted" id="studyTimerHint"></p><button type="button" class="text-link" data-study-action="manual">Studied offline? Log time</button></article>
+              <article class="panel study-tasks"><div class="study-panel-heading"><h2>Your tasks</h2><label class="study-filter-label">Filter by subject<select class="select-field" id="studySubjectFilter"></select></label></div><div id="studyTaskGroups"></div></article>
+              <article class="panel study-progress"><h2>This week</h2><div id="studyWeekProgress" class="study-week-progress"></div><div id="studySubjectProgress"></div></article>
+            </div>
+            <div class="study-subject-grid" id="studySubjects" role="tabpanel" data-study-panel="subjects" aria-labelledby="studyTabSubjects" hidden></div>
+            <div id="studyInsights" role="tabpanel" data-study-panel="insights" aria-labelledby="studyTabInsights" hidden></div>
+          </div>
+        </section>
         <footer class="site-footer"><span>About ClassBoard · AI &amp; Analytics - A (INTEL-1), 3rd Semester</span><span class="footer-credit"><span>Developed by</span><span class="footer-wordmark">Hasnaat &amp; Harsh 🕸️✨</span></span></footer>
       </div>
     </main>
@@ -1712,6 +1733,7 @@
         <button data-view="Class Log"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Class Log</button>
         <button data-view="Attendance"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/></svg>Attendance</button>
         <button data-view="Class representatives" id="mobileCrWorkspaceNav" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h4"/></svg>Class Representatives</button>
+        <button data-view="Study Plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5H5v16h14V5h-4M9 3h6v4H9zM8 12l2 2 5-5M8 18h8"/></svg>Study Plan</button>
         <button data-view="Profile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
         <span class="mobile-more-divider" aria-hidden="true"></span>
         <button class="mobile-more-theme" type="button" id="mobileThemeToggle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.9 13A8.5 8.5 0 0 1 11 3.1 8.5 8.5 0 1 0 20.9 13Z"/></svg>Change appearance</button>
@@ -1723,6 +1745,7 @@
       <div class="notification-slide-copy"><div class="notification-slide-kicker" id="notificationSlideKicker">New notification</div><div class="notification-slide-title" id="notificationSlideTitle"></div><div class="notification-slide-body" id="notificationSlideBody"></div><button class="notification-slide-open" id="notificationSlideOpen" type="button">View notifications →</button></div>
       <button class="notification-slide-close" id="notificationSlideClose" type="button" aria-label="Dismiss notification" title="Dismiss">×</button>
     </aside>
+    <dialog id="studyDialog" class="study-dialog" aria-labelledby="studyDialogTitle"></dialog>
     <dialog class="resource-preview-dialog" id="pdfPreviewDialog" aria-label="Document preview">
       <div class="pdf-preview-shell">
         <div class="pdf-preview-toolbar"><div class="pdf-preview-file-icon" id="previewFileType">FILE</div><div class="pdf-preview-title" id="pdfPreviewTitle">Document preview</div><button class="pdf-preview-download" id="pdfPreviewDownload" type="button">Download</button><button class="pdf-preview-close" id="pdfPreviewClose" type="button" aria-label="Close preview">×</button></div>
@@ -1935,7 +1958,7 @@
     }));
     const pageMap = {
       'Home': 'home', 'Notes & Syllabus': 'resources', 'Updates': 'updates', 'Academics': 'calendar',
-      'Class Log': 'classes', 'Attendance': 'attendance',
+      'Class Log': 'classes', 'Attendance': 'attendance', 'Study Plan': 'study',
       'Notifications': 'notifications', 'Profile': 'profile', 'Class representatives': 'cr', 'Admin workspace': 'admin'
     };
     const pageHistory = [];
@@ -2424,12 +2447,13 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=16"></script>
+  <script src="classboard-auth.js?v=17"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
   <script src="./attendance-calendar.js?v=6"></script>
+  <script type="module" src="./study-plan.js?v=1"></script>
   <script>
     (() => {
       const slide = document.getElementById('notificationSlide');
