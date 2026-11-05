@@ -26,9 +26,11 @@
     .map((id) => document.getElementById(id));
   const emailPattern = /^[^@\s]+@medicaps[.]ac[.]in$/i;
   const batchCodesForClass = (classCode = window.classboardContext?.classCode) => classCode === 'INTEL-2' ? ['B1', 'B2'] : ['A1', 'A2'];
+  const maxRollForClass = (classCode = window.classboardContext?.classCode) => classCode === 'IBM-1' ? 67 : 66;
   const batchForRoll = (roll, classCode = window.classboardContext?.classCode) => {
     const [first, second] = batchCodesForClass(classCode);
-    return Number(roll) >= 1 && Number(roll) <= 32 ? first : Number(roll) >= 33 && Number(roll) <= 66 ? second : null;
+    const maxRoll = classCode === 'IBM-1' ? 67 : 66;
+    return Number(roll) >= 1 && Number(roll) <= 32 ? first : Number(roll) >= 33 && Number(roll) <= maxRoll ? second : null;
   };
   const setBatchSelectOptions = (select, classCode, includeAll = false) => {
     if (!select) return;
@@ -46,8 +48,10 @@
     setBatchSelectOptions(document.querySelector('#calendarAddForm [name="batch"]'), classCode);
     setBatchSelectOptions(document.querySelector('#crClassForm [name="batch"]'), classCode, true);
     setBatchSelectOptions(document.querySelector('#crScheduleForm [name="batch"]'), classCode, true);
+    const rollInput = document.querySelector('#adminAddMemberForm [name=rollNumber]');
+    if (rollInput) { rollInput.max = String(maxRollForClass(classCode)); rollInput.placeholder = `1–${maxRollForClass(classCode)}`; }
     document.querySelectorAll('.private-note').forEach((note) => {
-      note.textContent = note.textContent.replace(/Rolls 1–32 are [A-Z]\d and 33–66 are [A-Z]\d\./, `Rolls 1–32 are ${batchCodesForClass(classCode)[0]} and 33–66 are ${batchCodesForClass(classCode)[1]}.`);
+      note.textContent = note.textContent.replace(/Rolls 1–32 are [A-Z]\d and 33–(?:66|67) are [A-Z]\d\./, `Rolls 1–32 are ${batchCodesForClass(classCode)[0]} and 33–${maxRollForClass(classCode)} are ${batchCodesForClass(classCode)[1]}.`);
     });
     document.querySelectorAll('#crClassForm, #crScheduleForm').forEach((form) => {
       const sub = form.closest('article')?.querySelector('.panel-sub');
@@ -169,10 +173,32 @@
     if (timetableSubtitle) timetableSubtitle.textContent = `CSE · III · ${classLabel}`;
     const academicsTimetableSubtitle = document.querySelector('#academicsPanelTimetable .panel-sub');
     if (academicsTimetableSubtitle) academicsTimetableSubtitle.textContent = `Weekly lectures and practicals · ${classLabel} · July–December 2026`;
-    const timetableImage = classInfo.code === 'INTEL-2' ? './class-timetable-intel2-odd-semester-2026.png' : './class-timetable-odd-semester-2026.png';
+    const timetableImage = classInfo.code === 'IBM-1' ? './class-timetable-ibm1-odd-semester-2026.jpg' : classInfo.code === 'INTEL-2' ? './class-timetable-intel2-odd-semester-2026.png' : './class-timetable-odd-semester-2026.png';
     document.querySelectorAll('.timetable-preview-button img, .timetable-dialog-content img, .timetable-dialog-image, #academicsTimetableImg').forEach((image) => {
-      image.src = timetableImage;
-      image.alt = `Class timetable for CSE III ${classInfo.name}, July to December 2026`;
+      if (timetableImage) image.src = timetableImage;
+      else image.removeAttribute('src');
+      image.alt = timetableImage ? `Class timetable for CSE III ${classInfo.name}, July to December 2026` : 'IBM-1 timetable image is not available yet';
+    });
+    const examCards = [...document.querySelectorAll('#academicsPanelMst .mst-exam-card')];
+    const examsBySection = classInfo.code === 'IBM-1' ? [
+      ['Data Structures using C++', 'CS3010T', 'com'],
+      ['Machine Learning', 'CS3022T', 'ai'],
+      ['Object Oriented Programming using Java', 'CS3013T', 'java'],
+      ['Software Engineering', 'CS3021T', 'se'],
+      ['Statistical Analysis', 'CS3020T', 'sa']
+    ] : [
+      ['Java Programming', 'CS3024T', 'java'],
+      ['Artificial Intelligence', 'CS3023T', 'ai'],
+      ['Computer Organization & Microprocessors', 'CS3005T', 'com'],
+      ['Software Engineering', 'CS3021T', 'se'],
+      ['Statistical Analysis', 'CS3020T', 'sa']
+    ];
+    examCards.forEach((card, index) => {
+      const exam = examsBySection[index];
+      if (!exam) return;
+      card.querySelector('.mst-exam-name').textContent = exam[0];
+      card.querySelector('.mst-exam-code').textContent = exam[1];
+      card.dataset.subjectColor = exam[2];
     });
     const timetableDialogSubtitle = document.querySelector('#classTimetableDialog .panel-sub');
     if (timetableDialogSubtitle) timetableDialogSubtitle.textContent = `CSE · III · ${classLabel} · July–December 2026`;
@@ -207,7 +233,12 @@
     classSwitcher.hidden = activeClasses.length < 2;
     document.body.dataset.multipleClasses = String(activeClasses.length > 1);
 
-    const displayName = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.custom_claims?.name || user.email.split('@')[0];
+    let rosterName = '';
+    if (classInfo.code === 'IBM-1') {
+      const { data: profile } = await window.classboardSupabase.from('profiles').select('display_name').eq('user_id', user.id).maybeSingle();
+      rosterName = profile?.display_name || '';
+    }
+    const displayName = rosterName || user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.custom_claims?.name || user.email.split('@')[0];
     document.getElementById('crWorkspaceNav').hidden = !(roles.includes('cr') || roles.includes('admin'));
     document.getElementById('mobileCrWorkspaceNav').hidden = !(roles.includes('cr') || roles.includes('admin'));
     ['crUpdateForm', 'crClassForm', 'crScheduleForm', 'crReminderForm'].forEach((id) => {
@@ -257,13 +288,13 @@
         description: 'Enter your lab batch and serial roll number. Your roll number and batch must match the class list.',
         fields: [
           { name: 'batch', label: 'Lab batch', options: [{ label: 'Choose your batch', value: '' }, ...batchCodesForClass(classInfo.code)] },
-          { name: 'rollNumber', label: 'Serial roll number', type: 'number', placeholder: '1–66' }
+          { name: 'rollNumber', label: 'Serial roll number', type: 'number', placeholder: `1–${maxRollForClass(classInfo.code)}` }
         ],
         submitLabel: 'Save and join class',
         canCancel: false,
         onSubmit: async ({ batch, rollNumber }) => {
           const roll = Number(rollNumber);
-          if (!Number.isInteger(roll) || roll < 1 || roll > 66) return 'Enter your serial roll number from 1 to 66.';
+          if (!Number.isInteger(roll) || roll < 1 || roll > maxRollForClass(classInfo.code)) return `Enter your serial roll number from 1 to ${maxRollForClass(classInfo.code)}.`;
           const expectedBatch = batchForRoll(roll, classInfo.code);
           if (batch !== expectedBatch) return `Roll number ${roll} belongs to batch ${expectedBatch}. Check your details and try again.`;
           const { error } = await window.classboardSupabase.rpc('set_own_student_setup', {
@@ -536,10 +567,10 @@
     row.dataset.kind = session.kind === 'lab' ? 'lab' : 'lecture';
     const subjectName = (subject?.name || '').toLowerCase();
     if (!compact && /software engineering/.test(subjectName)) row.dataset.subjectColor = 'purple';
-    else if (!compact && /artificial intelligence/.test(subjectName)) row.dataset.subjectColor = 'red';
+    else if (!compact && /artificial intelligence|machine learning/.test(subjectName)) row.dataset.subjectColor = 'red';
     else if (!compact && /statistical analysis/.test(subjectName)) row.dataset.subjectColor = 'green';
-    else if (!compact && /computer organisation|computer organization/.test(subjectName)) row.dataset.subjectColor = 'yellow';
-    else if (!compact && /java programming/.test(subjectName)) row.dataset.subjectColor = 'orange';
+    else if (!compact && /computer organisation|computer organization|data structures/.test(subjectName)) row.dataset.subjectColor = 'yellow';
+    else if (!compact && /java/.test(subjectName)) row.dataset.subjectColor = 'orange';
     else if (!compact && /soft skills/.test(subjectName)) row.dataset.subjectColor = 'rose';
     const dateBox = document.createElement('div');
     if (compact) {
@@ -637,9 +668,9 @@
     const subjectName = name.toLowerCase();
     if (/software engineering/.test(subjectName)) return 'se';
     if (/statistical analysis/.test(subjectName)) return 'sa';
-    if (/artificial intelligence/.test(subjectName)) return 'ai';
-    if (/java programming/.test(subjectName)) return 'java';
-    if (/computer organisation|computer organization/.test(subjectName)) return 'com';
+    if (/artificial intelligence|machine learning/.test(subjectName)) return 'ai';
+    if (/java/.test(subjectName)) return 'java';
+    if (/computer organisation|computer organization|data structures/.test(subjectName)) return 'com';
     return 'default';
   }
 
@@ -1456,14 +1487,14 @@
         roleLabel.append(check, document.createTextNode(label)); roleGroup.append(roleLabel);
       });
       const rollLabel = document.createElement('label'); rollLabel.className = 'account-roll-label'; rollLabel.textContent = 'Student roll number';
-      const roll = document.createElement('input'); roll.className = 'text-field'; roll.type = 'number'; roll.min = '1'; roll.max = '66'; roll.placeholder = 'Optional'; roll.value = user.rollNumber ?? '';
+      const roll = document.createElement('input'); roll.className = 'text-field'; roll.type = 'number'; roll.min = '1'; roll.max = String(maxRollForClass()); roll.placeholder = 'Optional'; roll.value = user.rollNumber ?? '';
       rollLabel.append(roll);
       const save = document.createElement('button'); save.className = 'secondary-button'; save.type = 'button'; save.textContent = 'Save roles';
       save.addEventListener('click', async () => {
         const roles = ['student', ...[...roleGroup.querySelectorAll('input:checked')].map((input) => input.value)];
         const rollNumber = roll.value ? Number(roll.value) : null;
-        if (rollNumber !== null && (!Number.isInteger(rollNumber) || rollNumber < 1 || rollNumber > 66)) {
-          notifyApp('Student roll number must be between 1 and 66.', true); return;
+        if (rollNumber !== null && (!Number.isInteger(rollNumber) || rollNumber < 1 || rollNumber > maxRollForClass())) {
+          notifyApp(`Student roll number must be between 1 and ${maxRollForClass()}.`, true); return;
         }
         save.disabled = true;
         const { error } = await client.rpc('set_class_member_roles', {
@@ -1589,7 +1620,7 @@
       const rollText = String(values.get('rollNumber') || '').trim();
       const rollNumber = rollText ? Number(rollText) : null;
       if (!emailPattern.test(email)) { notifyApp('Enter a college email ending in @medicaps.ac.in.', true); return; }
-      if (rollNumber !== null && (!Number.isInteger(rollNumber) || rollNumber < 1 || rollNumber > 66)) { notifyApp('Enter a roll number from 1 to 66 or leave it blank.', true); return; }
+      if (rollNumber !== null && (!Number.isInteger(rollNumber) || rollNumber < 1 || rollNumber > maxRollForClass(context.classCode))) { notifyApp(`Enter a roll number from 1 to ${maxRollForClass(context.classCode)} or leave it blank.`, true); return; }
       const submit = addMemberForm.querySelector('button[type="submit"]');
       submit.disabled = true;
       const { error } = await window.classboardSupabase.rpc('grant_class_student_by_email', {

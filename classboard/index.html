@@ -1397,7 +1397,7 @@
       <p class="auth-copy">Sign in to your Medicaps account to continue to ClassBoard.</p>
       <form id="authForm">
         <label class="auth-field">Section
-          <select id="loginClassSelector" name="section"><option value="INTEL-1">INTEL-1 · Section A</option><option value="INTEL-2">INTEL-2 · Section B</option></select>
+          <select id="loginClassSelector" name="section"><option value="INTEL-1">INTEL-1 · Section A</option><option value="INTEL-2">INTEL-2 · Section B</option><option value="IBM-1">IBM-1 · Advanced AI - A</option></select>
         </label>
         <label class="auth-field">College email
           <span class="auth-icon-field"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg><input id="authEmail" name="email" type="email" autocomplete="email" required placeholder="you@medicaps.ac.in" /></span>
@@ -1765,9 +1765,10 @@
   <script>
     const root = document.documentElement;
     const classBatchCodes = () => window.classboardContext?.classCode === 'INTEL-2' ? ['B1', 'B2'] : ['A1', 'A2'];
+    const classMaxRoll = () => window.classboardContext?.classCode === 'IBM-1' ? 67 : 66;
     const batchForRoll = (roll) => {
       const sectionBatches = classBatchCodes();
-      return roll >= 1 && roll <= 32 ? sectionBatches[0] : roll >= 33 && roll <= 66 ? sectionBatches[1] : null;
+      return roll >= 1 && roll <= 32 ? sectionBatches[0] : roll >= 33 && roll <= classMaxRoll() ? sectionBatches[1] : null;
     };
     let currentStudentRoll = null;
     const classSchedule = [];
@@ -1781,7 +1782,7 @@
     }
     window.setClassboardRoll = (roll) => {
       const value = Number(roll);
-      currentStudentRoll = Number.isInteger(value) && value >= 1 && value <= 66 ? value : null;
+      currentStudentRoll = Number.isInteger(value) && value >= 1 && value <= classMaxRoll() ? value : null;
       updateStudentBatch();
     };
     function renderNextClass() {
@@ -1793,7 +1794,7 @@
       const room = document.getElementById('nextClassRoom');
       if (!batch) {
         name.textContent = 'Roll number needed';
-        detail.textContent = 'Your class admin must add your roll number (1–66).';
+        detail.textContent = `Your class admin must add your roll number (1–${classMaxRoll()}).`;
         timeLabel.textContent = '—'; context.textContent = 'Batch not assigned'; room.textContent = 'Ask your class admin';
         return;
       }
