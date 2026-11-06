@@ -110,11 +110,11 @@
     return true;
   }
 
-  function setRoleOptions(roles) {
+  function setRoleOptions(roles, isFounder = false) {
     const switcher = document.getElementById('roleSwitcher');
-    const labels = { student: 'Student View', cr: 'Class Representatives', admin: 'Admin Workspace' };
+    const labels = { student: 'Student View', cr: 'Class Representatives', admin: isFounder ? 'Founder Workspace' : 'Admin Workspace' };
     // Show every active membership so staff accounts can also use Student view.
-    const orderedRoles = ['student', 'cr', 'admin'].filter((role) => roles.includes(role));
+    const orderedRoles = ['student', 'cr', 'admin'].filter((role) => roles.includes(role) || (role === 'cr' && roles.includes('admin')));
     switcher.hidden = !roles.includes('cr') && !roles.includes('admin');
     document.body.dataset.hasRoleSwitcher = String(!switcher.hidden);
     switcher.replaceChildren(...orderedRoles.map((role) => {
@@ -124,7 +124,7 @@
       return option;
     }));
     const savedRole = sessionStorage.getItem('classboard-role');
-    switcher.value = roles.includes(savedRole) ? savedRole : roles.includes('admin') ? 'admin' : roles.includes('cr') ? 'cr' : 'student';
+    switcher.value = orderedRoles.includes(savedRole) ? savedRole : roles.includes('admin') ? 'admin' : roles.includes('cr') ? 'cr' : 'student';
     const savedPage = sessionStorage.getItem('classboard-page');
     switcher.dispatchEvent(new Event('change', { bubbles: true }));
     const roleForPage = switcher.value;
@@ -243,7 +243,7 @@
     document.getElementById('mobileCrWorkspaceNav').hidden = !(roles.includes('cr') || roles.includes('admin'));
     ['crUpdateForm', 'crClassForm', 'crScheduleForm', 'crReminderForm'].forEach((id) => {
       const form = document.getElementById(id);
-      if (form) form.closest('article').hidden = !roles.includes('cr');
+      if (form) form.closest('article').hidden = !(roles.includes('cr') || roles.includes('admin'));
     });
     const isStaffAccount = roles.includes('cr') || roles.includes('admin');
     const uploadButton = document.getElementById('openResourceUpload');
@@ -264,10 +264,12 @@
     if (greeting) greeting.textContent = `Hello, ${displayName.toLocaleUpperCase('en-IN')}`;
     const homeDate = document.getElementById('homeDate');
     if (homeDate) homeDate.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric' });
-    setRoleOptions(roles);
+    const { data: founderAccess, error: founderError } = await window.classboardSupabase.rpc('is_classboard_founder');
+    const isFounder = !founderError && founderAccess === true;
     const studentMembership = classMemberships.find((row) => row.role === 'student');
     const classId = classInfo.id;
-    window.classboardContext = { classId, classCode: classInfo.code, className: classInfo.name, userId: user.id, roles, rollNumber: studentMembership?.roll_number ?? null };
+    window.classboardContext = { classId, classCode: classInfo.code, className: classInfo.name, userId: user.id, roles, isFounder, rollNumber: studentMembership?.roll_number ?? null };
+    setRoleOptions(roles, isFounder);
     window.dispatchEvent(new Event('classboard:attendance-calendar-context'));
     if (studentMembership && window.setClassboardRoll) window.setClassboardRoll(studentMembership.roll_number);
     const issueDate = document.querySelector('#issueForm input[name="date"]');
@@ -600,7 +602,7 @@
     const actions = compact ? row : document.createElement('div');
     if (!compact) actions.className = 'class-log-actions';
     actions.append(makeDeleteButton('Delete'));
-    if (!compact && session.state !== 'scheduled' && window.classboardContext?.roles.includes('cr')) {
+    if (!compact && session.state !== 'scheduled' && (window.classboardContext?.roles.includes('cr') || window.classboardContext?.roles.includes('admin'))) {
       const edit = document.createElement('button');
       edit.type = 'button'; edit.className = 'secondary-button class-log-edit-button';
       edit.dataset.editClassSession = session.id; edit.textContent = 'Edit';
@@ -757,7 +759,7 @@
     const classInfo = classResult.data;
     document.querySelectorAll('.brand-term').forEach((el) => { el.textContent = classInfo.semester ? `${classInfo.semester}${classInfo.semester === 1 ? 'st' : classInfo.semester === 2 ? 'nd' : classInfo.semester === 3 ? 'rd' : 'th'} Semester` : classInfo.code; });
     const updatesAddButton = document.getElementById('updatesAddButton');
-    if (updatesAddButton) updatesAddButton.hidden = !window.classboardContext?.roles?.includes('cr');
+    if (updatesAddButton) updatesAddButton.hidden = !(window.classboardContext?.roles?.includes('cr') || window.classboardContext?.roles?.includes('admin'));
     document.querySelectorAll('.page-heading .eyebrow').forEach((el) => {
       if (el.textContent.includes('INTEL-1')) el.textContent = `${classInfo.name} (${classInfo.code})`;
     });
@@ -1484,6 +1486,7 @@
       [['cr', 'Class representative'], ['admin', 'Admin']].forEach(([value, label]) => {
         const roleLabel = document.createElement('label');
         const check = document.createElement('input'); check.type = 'checkbox'; check.value = value; check.checked = user.roles.has(value);
+        if (value === 'admin' && !window.classboardContext?.isFounder) { check.disabled = true; check.title = 'Only founders can change admin access.'; }
         roleLabel.append(check, document.createTextNode(label)); roleGroup.append(roleLabel);
       });
       const rollLabel = document.createElement('label'); rollLabel.className = 'account-roll-label'; rollLabel.textContent = 'Student roll number';
@@ -1766,7 +1769,7 @@
       event.preventDefault();
       event.stopImmediatePropagation();
       const context = window.classboardContext;
-      if (!context?.roles.includes('cr')) { notifyApp('Only class representatives can edit saved class-log entries.', true); return; }
+      if (!(context?.roles.includes('cr') || context?.roles.includes('admin'))) { notifyApp('Only a CR or section admin can edit saved class-log entries.', true); return; }
       const session = window.classboardCurrentSessions?.find((item) => item.id === button.dataset.editClassSession);
       if (!session || session.state === 'scheduled') { notifyApp('This saved class-log entry is no longer available to edit.', true); return; }
       const subjects = window.classboardSubjects || [];
@@ -2199,7 +2202,7 @@
       event.preventDefault();
       event.stopImmediatePropagation();
       const context = window.classboardContext;
-      if (!context?.roles.includes('cr')) { notifyApp('Only an assigned CR can publish class updates.', true); return; }
+      if (!(context?.roles.includes('cr') || context?.roles.includes('admin'))) { notifyApp('Only a CR or section admin can publish class updates.', true); return; }
       const values = new FormData(updatesForm);
       const attachment = updatesForm.elements.namedItem('attachment')?.files?.[0] || null;
       if (attachment && (attachment.size > 10 * 1024 * 1024 || (!/\.pdf$/i.test(attachment.name) || (attachment.type && attachment.type !== 'application/pdf')))) {
@@ -2261,7 +2264,7 @@
       event.preventDefault();
       event.stopImmediatePropagation();
       const context = window.classboardContext;
-      if (!context?.roles.includes('cr')) { notifyApp('Only an assigned CR can add class log entries.', true); return; }
+      if (!(context?.roles.includes('cr') || context?.roles.includes('admin'))) { notifyApp('Only a CR or section admin can add class log entries.', true); return; }
       const subjectResult = await window.classboardSupabase.from('subjects').select('id,name').eq('class_id', context.classId);
       if (subjectResult.error) { notifyApp(`Could not load subjects: ${subjectResult.error.message}`, true); return; }
       const values = new FormData(classLogForm);
@@ -2323,7 +2326,7 @@
     scheduleForm?.addEventListener('submit', async (event) => {
       event.preventDefault(); event.stopImmediatePropagation();
       const context = window.classboardContext;
-      if (!context?.roles.includes('cr')) { notifyApp('Only an assigned CR can schedule classes.', true); return; }
+      if (!(context?.roles.includes('cr') || context?.roles.includes('admin'))) { notifyApp('Only a CR or section admin can schedule classes.', true); return; }
       const submit = scheduleForm.querySelector('[type="submit"]');
       submit.disabled = true;
       try {
@@ -2421,7 +2424,7 @@
     reminderForm?.addEventListener('submit', async (event) => {
       event.preventDefault(); event.stopImmediatePropagation();
       const context = window.classboardContext;
-      if (!context?.roles.includes('cr')) { notifyApp('Only an assigned CR can publish reminders.', true); return; }
+      if (!(context?.roles.includes('cr') || context?.roles.includes('admin'))) { notifyApp('Only a CR or section admin can publish reminders.', true); return; }
       const values = new FormData(reminderForm);
       const dueAt = new Date(`${values.get('date')}T12:00:00+05:30`).toISOString();
       const { error } = await window.classboardSupabase.from('reminders').insert({

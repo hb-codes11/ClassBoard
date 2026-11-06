@@ -93,6 +93,11 @@ Deno.serve(async (request: Request) => {
   if (roleError) return response(request, 500, { error: "Could not verify administrator access" });
   if (!adminRole) return response(request, 403, { error: "Active class Admin role required" });
 
+  // This legacy endpoint writes with the service role. Limit it to founders;
+  // section admins manage student and CR access through the scoped RPCs.
+  const { data: founder, error: founderError } = await callerClient.rpc("is_classboard_founder");
+  if (founderError || founder !== true) return response(request, 403, { error: "Founder access required for this operation" });
+
   if (body.action !== "invite_member" && body.action !== "set_roles") {
     return response(request, 400, { error: "Unsupported action" });
   }
@@ -161,6 +166,11 @@ Deno.serve(async (request: Request) => {
   }
 
   const targetId = targetUserId as string;
+  if (!roles.includes("admin")) {
+    const { data: targetFounder, error: founderLookupError } = await serviceClient.from("classboard_founders").select("user_id").eq("user_id", targetId).maybeSingle();
+    if (founderLookupError) return response(request, 500, { error: "Could not verify founder access" });
+    if (targetFounder) return response(request, 403, { error: "Founder admin access cannot be removed" });
+  }
   const { data: currentAdminRoles, error: currentAdminError } = await serviceClient
     .from("class_memberships")
     .select("user_id")
