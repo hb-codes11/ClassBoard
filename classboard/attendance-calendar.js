@@ -167,6 +167,20 @@
   let calendarChannel = null;
 
   const dateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  const mstExams = {
+    '2026-11-16': ['JAVA', 'Java Programming', 'CS3024T'],
+    '2026-11-17': ['AI', 'Artificial Intelligence', 'CS3023T'],
+    '2026-11-18': ['COM', 'Computer Organization & Microprocessors', 'CS3005T'],
+    '2026-11-19': ['SE', 'Software Engineering', 'CS3021T'],
+    '2026-11-20': ['SA', 'Statistical Analysis', 'CS3020T']
+  };
+  const ibmMstExams = {
+    '2026-11-16': ['DSC++', 'Data Structures using C++', 'CS3010T'],
+    '2026-11-17': ['ML', 'Machine Learning', 'CS3022T'],
+    '2026-11-18': ['JAVA', 'Object Oriented Programming using Java', 'CS3013T'],
+    '2026-11-19': ['SE', 'Software Engineering', 'CS3021T'],
+    '2026-11-20': ['SA', 'Statistical Analysis', 'CS3020T']
+  };
   const endSemExams = {
     '2026-12-09': ['COM', 'Computer Organization & Microprocessors', 'CS3005T'],
     '2026-12-14': ['SA', 'Statistical Analysis', 'CS3020T'],
@@ -184,6 +198,8 @@
   const eventForDate = (date) => {
     const key = dateKey(date);
     const code = window.classboardContext?.classCode;
+    const mst = code === 'IBM-1' ? ibmMstExams[key] : (code === 'INTEL-1' || code === 'INTEL-2') ? mstExams[key] : null;
+    if (mst) return { label: 'MST-II', kind: 'exam', short: mst[0], subject: mst[1], code: mst[2], time: '9:30 AM–10:00 AM' };
     const exam = code === 'IBM-1' ? ibmEndSemExams[key] : (code === 'INTEL-1' || code === 'INTEL-2') ? endSemExams[key] : null;
     if (exam) return { label: `End Sem · ${exam[0]}`, kind: 'exam', subject: exam[1], code: exam[2], time: '9:30 AM–12:30 PM' };
     return eventMap[key] || null;
@@ -231,6 +247,7 @@
     const event = eventForDate(date);
     const labels = [];
     if (event) labels.push(event.label);
+    if (event?.short) labels.push(event.short);
     const unique = new Set();
     visibleClasses(classes).forEach((item) => {
       const subject = subjectInfo(item.subject);
