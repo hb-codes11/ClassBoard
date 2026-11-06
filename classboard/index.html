@@ -1520,9 +1520,10 @@
         </section>
 
         <section class="page-view" id="page-calendar">
-          <div class="page-heading"><div><div class="eyebrow">Medi-Caps University · 3rd Semester</div><h1>Academics</h1><div class="page-description">MST schedule, class timetable, and semester calendar.</div></div></div>
+          <div class="page-heading"><div><div class="eyebrow">Medi-Caps University · 3rd Semester</div><h1>Academics</h1><div class="page-description">MST and end-semester schedules, class timetable, and semester calendar.</div></div></div>
           <div class="academics-tabs" role="tablist" aria-label="Academics sections">
             <button class="academics-tab" id="academicsTabMst" type="button" role="tab" aria-selected="true" aria-controls="academicsPanelMst" data-academics-tab="mst">MST</button>
+            <button class="academics-tab" id="academicsTabEndSem" type="button" role="tab" aria-selected="false" aria-controls="academicsPanelEndSem" data-academics-tab="endsem">End Sem</button>
             <button class="academics-tab" id="academicsTabTimetable" type="button" role="tab" aria-selected="false" aria-controls="academicsPanelTimetable" data-academics-tab="timetable">Time Table</button>
             <button class="academics-tab" id="academicsTabCalendar" type="button" role="tab" aria-selected="false" aria-controls="academicsPanelCalendar" data-academics-tab="calendar">Calendar</button>
           </div>
@@ -1535,6 +1536,20 @@
                 <article class="mst-exam-card" data-mst-exam="2026-11-19T09:30:00" data-subject-color="se"><div class="mst-exam-date"><div><span>Nov</span>19</div></div><span class="mst-exam-marker" aria-hidden="true"></span><div><div class="mst-exam-name">Software Engineering</div><div class="mst-exam-meta">Thursday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3021T</span></article>
                 <article class="mst-exam-card" data-mst-exam="2026-11-20T09:30:00" data-subject-color="sa"><div class="mst-exam-date"><div><span>Nov</span>20</div></div><span class="mst-exam-marker" aria-hidden="true"></span><div><div class="mst-exam-name">Statistical Analysis</div><div class="mst-exam-meta">Friday · 9:30–10:00 AM · Theory</div></div><span class="mst-exam-code">CS3020T</span></article>
               </div><div class="mst-notice">Exam schedule for 3rd semester. Theory papers are 30 minutes.</div>
+              <div class="academics-timetable-body" id="mstOfficialDocument"><div class="panel-title">Official MST-II timetable</div><a class="academics-timetable-frame" href="./mst2-ai-analytics-nov-2026.png" target="_blank" rel="noopener" aria-label="Open official MST-II timetable"><img class="timetable-dialog-image" src="./mst2-ai-analytics-nov-2026.png" alt="Official revised AI and Analytics MST-II timetable, November 2026" loading="lazy"></a></div>
+            </article>
+          </div>
+          <div class="academics-panel" id="academicsPanelEndSem" role="tabpanel" aria-labelledby="academicsTabEndSem" data-academics-panel="endsem" hidden>
+            <article class="panel"><div class="panel-header"><div><div class="panel-title">End Semester Examination</div><div class="panel-sub">December 2026 · 3rd Semester · AI &amp; Analytics</div></div><span class="update-tag" style="--update-accent:var(--blue)">END SEM</span></div>
+              <div id="endSemSchedule"><div class="mst-exam-list">
+                <article class="mst-exam-card" data-subject-color="com"><div class="mst-exam-date"><div><span>Dec</span>09</div></div><span class="mst-exam-marker" aria-hidden="true"></span><div><div class="mst-exam-name">Computer Organization &amp; Microprocessors</div><div class="mst-exam-meta">Wednesday · 9:30 AM–12:30 PM · Theory</div></div><span class="mst-exam-code">CS3005T</span></article>
+                <article class="mst-exam-card" data-subject-color="sa"><div class="mst-exam-date"><div><span>Dec</span>14</div></div><span class="mst-exam-marker" aria-hidden="true"></span><div><div class="mst-exam-name">Statistical Analysis</div><div class="mst-exam-meta">Monday · 9:30 AM–12:30 PM · Theory</div></div><span class="mst-exam-code">CS3020T</span></article>
+                <article class="mst-exam-card" data-subject-color="se"><div class="mst-exam-date"><div><span>Dec</span>17</div></div><span class="mst-exam-marker" aria-hidden="true"></span><div><div class="mst-exam-name">Software Engineering</div><div class="mst-exam-meta">Thursday · 9:30 AM–12:30 PM · Theory</div></div><span class="mst-exam-code">CS3021T</span></article>
+                <article class="mst-exam-card" data-subject-color="java"><div class="mst-exam-date"><div><span>Dec</span>21</div></div><span class="mst-exam-marker" aria-hidden="true"></span><div><div class="mst-exam-name">Java Programming</div><div class="mst-exam-meta">Monday · 9:30 AM–12:30 PM · Theory</div></div><span class="mst-exam-code">CS3024T</span></article>
+                <article class="mst-exam-card" data-subject-color="ai"><div class="mst-exam-date"><div><span>Dec</span>26</div></div><span class="mst-exam-marker" aria-hidden="true"></span><div><div class="mst-exam-name">Artificial Intelligence</div><div class="mst-exam-meta">Saturday · 9:30 AM–12:30 PM · Theory</div></div><span class="mst-exam-code">CS3023T</span></article>
+              </div><div class="mst-notice">Theory exams are 9:30 AM–12:30 PM. Report 45 minutes before the exam. Refer to the official notice for instructions and updates.</div>
+              <div class="academics-timetable-body"><div class="panel-title">Official end-semester timetable</div><a href="./end-sem-ai-analytics-dec-2026.pdf" target="_blank" rel="noopener">Open official PDF</a><a class="academics-timetable-frame" href="./end-sem-ai-analytics-dec-2026.pdf" target="_blank" rel="noopener" aria-label="Open official end-semester timetable PDF"><img class="timetable-dialog-image" src="./end-sem-ai-analytics-dec-2026.png" alt="Official AI and Analytics end-semester theory timetable, December 2026" loading="lazy"></a></div></div>
+              <div class="mst-notice" id="endSemUnavailable" hidden>No end-semester timetable has been provided for this section yet.</div>
             </article>
           </div>
           <div class="academics-panel" id="academicsPanelTimetable" role="tabpanel" aria-labelledby="academicsTabTimetable" data-academics-panel="timetable" hidden>
@@ -2431,7 +2446,7 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=16"></script>
+  <script src="classboard-auth.js?v=17"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>

@@ -179,6 +179,10 @@
       else image.removeAttribute('src');
       image.alt = timetableImage ? `Class timetable for CSE III ${classInfo.name}, July to December 2026` : 'IBM-1 timetable image is not available yet';
     });
+    const isAiAnalytics = classInfo.code === 'INTEL-1' || classInfo.code === 'INTEL-2';
+    document.getElementById('mstOfficialDocument').hidden = !isAiAnalytics;
+    document.getElementById('endSemSchedule').hidden = !isAiAnalytics;
+    document.getElementById('endSemUnavailable').hidden = isAiAnalytics;
     const examCards = [...document.querySelectorAll('#academicsPanelMst .mst-exam-card')];
     const examsBySection = classInfo.code === 'IBM-1' ? [
       ['Data Structures using C++', 'CS3010T', 'com'],
@@ -389,7 +393,7 @@
     if (!container) return;
     container.querySelectorAll('.update, .live-empty').forEach((node) => node.remove());
     const validFeed = Array.isArray(feed) ? feed : [];
-    const homeUpdates = validFeed.filter((item) => !isMstRelatedPost(item));
+    const homeUpdates = validFeed.filter((item) => !isMstRelatedPost(item) || isUpdatePinned(item));
     if (!homeUpdates.length) {
       addEmptyNote(container, 'No class updates or reminders have been published yet.');
       return;
@@ -440,7 +444,7 @@
       pill.textContent = cardType === 'reminder' ? 'Reminder' : cardType === 'deadline' ? 'Deadline' : 'Important';
       title.append(' ', pill);
     }
-    const isPinned = Boolean(homePage && isUpdatePinned(update));
+    const isPinned = Boolean(isUpdatePinned(update));
     if (isPinned) {
       const pinBadge = document.createElement('span');
       pinBadge.className = 'update-tag update-tag-pinned';
@@ -507,7 +511,7 @@
     card.append(dateTile, icon, copy);
     if (joinLink) card.append(joinLink);
     const canManageUpdates = window.classboardContext?.roles.some((role) => role === 'cr' || role === 'admin');
-    const canPin = Boolean(homePage && canManageUpdates);
+    const canPin = Boolean(canManageUpdates);
     const menuTrigger = document.createElement('button');
     menuTrigger.type = 'button';
     menuTrigger.className = 'update-menu-trigger';
@@ -1702,10 +1706,11 @@
           .eq('id', updateId)
           .eq('class_id', context.classId)
           .select('id, is_pinned');
+        if (!result.error && !result.data?.length) throw new Error('No item was updated. Check your section permissions.');
         if (result.error) {
           if (/is_pinned|column .*does not exist/i.test(result.error.message || '')) {
             togglePinnedUpdate(updateId);
-            renderHomeUpdates();
+            await loadLiveClassData(context.classId);
             button.disabled = false;
             notifyApp(`${label} ${nextPinned ? 'pinned' : 'unpinned'} in this browser. Run migration on ${table} for class-wide sync.`, true);
             return;
