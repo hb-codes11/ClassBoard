@@ -47,7 +47,7 @@
     setBatchSelectOptions(document.getElementById('attendanceCalendarBatch'), classCode);
     setBatchSelectOptions(document.querySelector('#calendarAddForm [name="batch"]'), classCode);
     setBatchSelectOptions(document.querySelector('#crClassForm [name="batch"]'), classCode, true);
-    setBatchSelectOptions(document.querySelector('#crScheduleForm [name="batch"]'), classCode, true);
+    document.querySelectorAll('#crScheduleForm [name="batch"]').forEach((select) => setBatchSelectOptions(select, classCode, true));
     const rollInput = document.querySelector('#adminAddMemberForm [name=rollNumber]');
     if (rollInput) { rollInput.max = String(maxRollForClass(classCode)); rollInput.placeholder = `1–${maxRollForClass(classCode)}`; }
     document.querySelectorAll('.private-note').forEach((note) => {
@@ -2288,34 +2288,67 @@
     }, true);
 
     const scheduleForm = document.getElementById('crScheduleForm');
+    const scheduleEntries = document.getElementById('scheduleEntries');
+    const addScheduleEntry = document.getElementById('addScheduleEntry');
+    const updateScheduleControls = () => {
+      const entries = [...scheduleEntries.querySelectorAll('.schedule-entry')];
+      addScheduleEntry.disabled = entries.length >= 6;
+      entries.forEach((entry, index) => {
+        const heading = entry.querySelector('.schedule-entry-heading');
+        if (heading) heading.textContent = `Schedule ${index + 1}`;
+      });
+    };
+    addScheduleEntry?.addEventListener('click', () => {
+      if (scheduleEntries.children.length >= 6) return;
+      const original = scheduleEntries.querySelector('.schedule-entry');
+      const entry = original.cloneNode(true);
+      entry.querySelectorAll('input').forEach((input) => { input.value = ''; });
+      entry.querySelector('[name="sessionType"]').value = 'Lecture';
+      const batch = entry.querySelector('[name="batch"]');
+      batch.value = 'All students';
+      batch.closest('[data-lab-batch-field]').hidden = true;
+      const header = document.createElement('div');
+      header.className = 'schedule-entry-header';
+      const heading = document.createElement('strong'); heading.className = 'schedule-entry-heading';
+      const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'text-link'; remove.textContent = 'Remove';
+      remove.addEventListener('click', () => { entry.remove(); updateScheduleControls(); });
+      header.append(heading, remove); entry.prepend(header);
+      entry.querySelector('[name="sessionType"]').addEventListener('change', (event) => {
+        const isLab = event.target.value === 'Lab';
+        batch.closest('[data-lab-batch-field]').hidden = !isLab;
+        batch.value = isLab ? batchCodesForClass()[0] : 'All students';
+      });
+      scheduleEntries.append(entry); updateScheduleControls();
+    });
     scheduleForm?.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      event.stopImmediatePropagation();
+      event.preventDefault(); event.stopImmediatePropagation();
       const context = window.classboardContext;
       if (!context?.roles.includes('cr')) { notifyApp('Only an assigned CR can schedule classes.', true); return; }
-      const subjectResult = await window.classboardSupabase.from('subjects').select('id,name').eq('class_id', context.classId);
-      if (subjectResult.error) { notifyApp(`Could not load subjects: ${subjectResult.error.message}`, true); return; }
-      const values = new FormData(scheduleForm);
-      const subject = subjectResult.data.find((item) => item.name === values.get('subject'));
-      const kind = String(values.get('sessionType')).toLowerCase();
-      const batchValue = String(values.get('batch'));
-      if (kind === 'lab' && !batchCodesForClass().includes(batchValue)) { notifyApp(`Choose ${batchCodesForClass().join(' or ')} for the lab.`, true); return; }
-      const startsAt = new Date(`${values.get('date')}T${values.get('time')}:00+05:30`).toISOString();
-      const { error } = await window.classboardSupabase.from('class_sessions').insert({
-        class_id: context.classId,
-        subject_id: subject?.id,
-        kind,
-        batch: kind === 'lecture' ? 'all' : batchValue,
-        state: 'scheduled',
-        starts_at: startsAt,
-        room: String(values.get('room')).trim(),
-        created_by: context.userId,
-        updated_by: context.userId
-      });
-      if (error) { notifyApp(`Class schedule did not save: ${error.message}`, true); return; }
-      scheduleForm.reset();
-      await loadLiveClassData(context.classId);
-      notifyApp('Class added to the shared timetable.');
+      const submit = scheduleForm.querySelector('[type="submit"]');
+      submit.disabled = true;
+      try {
+        const subjectResult = await window.classboardSupabase.from('subjects').select('id,name').eq('class_id', context.classId);
+        if (subjectResult.error) throw new Error(`Could not load subjects: ${subjectResult.error.message}`);
+        const rows = [...scheduleEntries.querySelectorAll('.schedule-entry')].map((entry, index) => {
+          const value = (name) => entry.querySelector(`[name="${name}"]`).value;
+          const subject = subjectResult.data.find((item) => item.name === value('subject'));
+          const kind = value('sessionType').toLowerCase();
+          const batch = value('batch');
+          if (!subject) throw new Error(`Choose a valid subject for schedule ${index + 1}.`);
+          if (kind === 'lab' && !batchCodesForClass().includes(batch)) throw new Error(`Choose a lab batch for schedule ${index + 1}.`);
+          if (!value('room').trim()) throw new Error(`Enter a room for schedule ${index + 1}.`);
+          const start = new Date(`${value('date')}T${value('time')}:00+05:30`);
+          if (Number.isNaN(start.getTime())) throw new Error(`Choose a valid date and time for schedule ${index + 1}.`);
+          return { class_id: context.classId, subject_id: subject.id, kind, batch: kind === 'lecture' ? 'all' : batch, state: 'scheduled', starts_at: start.toISOString(), room: value('room').trim(), created_by: context.userId, updated_by: context.userId };
+        });
+        const { error } = await window.classboardSupabase.from('class_sessions').insert(rows);
+        if (error) throw new Error(`Class schedules did not save: ${error.message}`);
+        scheduleEntries.querySelectorAll('.schedule-entry:not(:first-child)').forEach((entry) => entry.remove());
+        scheduleForm.reset(); updateScheduleControls();
+        try { await loadLiveClassData(context.classId); } catch (_) { notifyApp('Schedules saved, but the page could not refresh. Reload to see them.', true); return; }
+        notifyApp(`${rows.length} ${rows.length === 1 ? 'schedule added' : 'schedules added'} to the shared timetable.`);
+      } catch (error) { notifyApp(error.message || 'Class schedules could not be saved.', true); }
+      finally { submit.disabled = false; }
     }, true);
 
     const resourceForm = document.getElementById('crResourceForm');
@@ -2329,56 +2362,59 @@
     };
     resourceType?.addEventListener('change', syncResourceSubject);
     syncResourceSubject();
+    const resourceFileInput = resourceForm?.elements.namedItem('file');
+    const resourceTitleInput = resourceForm?.elements.namedItem('title');
+    const syncResourceTitle = () => {
+      const multiple = resourceFileInput.files.length > 1;
+      resourceTitleInput.required = !multiple;
+      resourceTitleInput.closest('.field-label').hidden = multiple;
+    };
+    resourceFileInput?.addEventListener('change', syncResourceTitle);
     resourceForm?.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      event.stopImmediatePropagation();
+      event.preventDefault(); event.stopImmediatePropagation();
       const context = window.classboardContext;
       if (!context?.roles.some((role) => role === 'cr' || role === 'admin')) { notifyApp('Only class representatives and admins can upload class resources.', true); return; }
+      const files = [...resourceFileInput.files];
+      const mimeTypes = { pdf: 'application/pdf', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' };
+      if (!files.length || files.some((file) => {
+        const ext = file.name.split('.').pop().toLowerCase();
+        return !mimeTypes[ext] || (file.type && file.type !== mimeTypes[ext]) || !file.size || file.size > 10 * 1024 * 1024;
+      })) { notifyApp('Each file must be a non-empty PDF, DOCX, or PPTX under 10 MB.', true); return; }
       const values = new FormData(resourceForm);
-      const file = values.get('file');
-      const extension = file instanceof File ? file.name.split('.').pop().toLowerCase() : '';
-      const resourceMimeTypes = {
-        pdf: 'application/pdf',
-        docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-      };
-      if (!(file instanceof File) || !resourceMimeTypes[extension] || (file.type && file.type !== resourceMimeTypes[extension]) || file.size === 0 || file.size > 10 * 1024 * 1024) {
-        notifyApp('Choose a non-empty PDF, DOCX, or PPTX file smaller than 10 MB.', true);
-        return;
-      }
-      const subjectResult = await window.classboardSupabase.from('subjects').select('id,name').eq('class_id', context.classId);
-      if (subjectResult.error) { notifyApp(`Could not load subjects: ${subjectResult.error.message}`, true); return; }
-      const kind = ({ Notes: 'notes', Syllabus: 'syllabus', 'Lab manual': 'lab_manual', 'MST / PYQs': 'mst_pyq', 'Academic calendar': 'calendar' })[String(values.get('type'))];
-      const subject = kind === 'calendar' ? null : subjectResult.data.find((item) => item.name === values.get('subject'));
-      if (kind !== 'calendar' && !subject) { notifyApp('Choose one of the listed class subjects.', true); return; }
-      const resourceId = crypto.randomUUID();
-      const safeName = file.name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g, '_').replace(/^[_\.]+|[_\.]+$/g, '') || `resource.${extension}`;
-      const storagePath = `${context.classId}/${resourceId}/${safeName}`;
-      const upload = await window.classboardSupabase.storage.from('class-resources').upload(storagePath, file, {
-        contentType: resourceMimeTypes[extension],
-        upsert: false
-      });
-      if (upload.error) { notifyApp(`Resource upload failed: ${upload.error.message}`, true); return; }
-      const insert = await window.classboardSupabase.from('resources').insert({
-        id: resourceId,
-        class_id: context.classId,
-        subject_id: subject?.id || null,
-        title: String(values.get('title')).trim(),
-        kind,
-        storage_path: storagePath,
-        uploaded_by: context.userId,
-        published_at: new Date().toISOString()
-      });
-      if (insert.error) {
-        await window.classboardSupabase.storage.from('class-resources').remove([storagePath]);
-        notifyApp(`File uploaded, but its resource record could not be saved: ${insert.error.message}`, true);
-        return;
-      }
-      resourceForm.reset();
-      syncResourceSubject();
-      closeUpload();
-      await loadLiveClassData(context.classId);
-      notifyApp('Resource published to the class.');
+      const submit = resourceForm.querySelector('[type="submit"]');
+      const uploadedPaths = [];
+      let saved = false;
+      submit.disabled = true;
+      try {
+        const subjectResult = await window.classboardSupabase.from('subjects').select('id,name').eq('class_id', context.classId);
+        if (subjectResult.error) throw new Error(`Could not load subjects: ${subjectResult.error.message}`);
+        const kind = ({ Notes: 'notes', Syllabus: 'syllabus', 'Lab manual': 'lab_manual', 'MST / PYQs': 'mst_pyq', 'Academic calendar': 'calendar' })[String(values.get('type'))];
+        const subject = kind === 'calendar' ? null : subjectResult.data.find((item) => item.name === values.get('subject'));
+        if (kind !== 'calendar' && !subject) throw new Error('Choose one of the listed class subjects.');
+        const records = [];
+        for (const file of files) {
+          const extension = file.name.split('.').pop().toLowerCase();
+          const resourceId = crypto.randomUUID();
+          const safeName = file.name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g, '_').replace(/^[_\.]+|[_\.]+$/g, '') || `resource.${extension}`;
+          const storagePath = `${context.classId}/${resourceId}/${safeName}`;
+          const upload = await window.classboardSupabase.storage.from('class-resources').upload(storagePath, file, { contentType: mimeTypes[extension], upsert: false });
+          if (upload.error) throw new Error(`Could not upload ${file.name}: ${upload.error.message}`);
+          uploadedPaths.push(storagePath);
+          records.push({ id: resourceId, class_id: context.classId, subject_id: subject?.id || null, title: files.length === 1 ? String(values.get('title')).trim() : file.name.replace(/\.[^.]+$/, '').slice(0, 180) || file.name.slice(0, 180), kind, storage_path: storagePath, uploaded_by: context.userId, published_at: new Date().toISOString() });
+        }
+        const insert = await window.classboardSupabase.from('resources').insert(records);
+        if (insert.error) throw new Error(`Resources could not be saved: ${insert.error.message}`);
+        saved = true;
+        resourceForm.reset(); syncResourceSubject(); syncResourceTitle(); closeUpload();
+        try { await loadLiveClassData(context.classId); } catch (_) { notifyApp('Resources published, but the page could not refresh. Reload to see them.', true); return; }
+        notifyApp(`${files.length} ${files.length === 1 ? 'resource published' : 'resources published'} to the class.`);
+      } catch (error) {
+        let cleanupError = null;
+        if (uploadedPaths.length && !saved) {
+          try { const result = await window.classboardSupabase.storage.from('class-resources').remove(uploadedPaths); cleanupError = result.error; } catch (err) { cleanupError = err; }
+        }
+        notifyApp((error.message || 'Resources could not be published.') + (cleanupError ? ' Some uploaded files could not be removed; contact an admin.' : ''), true);
+      } finally { submit.disabled = false; }
     }, true);
 
     const reminderForm = document.getElementById('crReminderForm');
