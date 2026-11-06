@@ -12,7 +12,6 @@
   const addForm = document.getElementById('calendarAddForm');
   const calendarNote = document.getElementById('attendanceCalendarNote');
   const monthButtons = [...document.querySelectorAll('[data-calendar-month]')];
-  const months = [9, 10];
   const subjects = [
     { name: 'Software Engineering', short: 'SE' },
     { name: 'Statistical Analysis', short: 'SA' },
@@ -168,8 +167,26 @@
   let calendarChannel = null;
 
   const dateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  const endSemExams = {
+    '2026-12-09': ['COM', 'Computer Organization & Microprocessors', 'CS3005T'],
+    '2026-12-14': ['SA', 'Statistical Analysis', 'CS3020T'],
+    '2026-12-17': ['SE', 'Software Engineering', 'CS3021T'],
+    '2026-12-21': ['JAVA', 'Java Programming', 'CS3024T'],
+    '2026-12-26': ['AI', 'Artificial Intelligence', 'CS3023T']
+  };
+  const ibmEndSemExams = {
+    '2026-12-10': ['DSC++', 'Data Structures using C++', 'CS3010T'],
+    '2026-12-14': ['SA', 'Statistical Analysis', 'CS3020T'],
+    '2026-12-17': ['SE', 'Software Engineering', 'CS3021T'],
+    '2026-12-21': ['JAVA', 'Object Oriented Programming using Java', 'CS3013T'],
+    '2026-12-26': ['ML', 'Machine Learning', 'CS3022T']
+  };
   const eventForDate = (date) => {
-    return eventMap[dateKey(date)] || null;
+    const key = dateKey(date);
+    const code = window.classboardContext?.classCode;
+    const exam = code === 'IBM-1' ? ibmEndSemExams[key] : (code === 'INTEL-1' || code === 'INTEL-2') ? endSemExams[key] : null;
+    if (exam) return { label: `End Sem · ${exam[0]}`, kind: 'exam', subject: exam[1], code: exam[2], time: '9:30 AM–12:30 PM' };
+    return eventMap[key] || null;
   };
   const batchCodes = () => window.classboardContext?.classCode === 'INTEL-2' ? ['B1', 'B2'] : ['A1', 'A2'];
   const setBatchOptions = (select) => {
@@ -200,13 +217,13 @@
   const createClass = ([subject, kind, batch, start, end, room], id) => ({ id, subject, kind, batch, start, end, room });
   const defaultClasses = (date) => {
     const event = eventForDate(date);
-    if (['holiday', 'convocation', 'exam'].includes(event?.kind)) return [];
+    if (['holiday', 'convocation', 'exam'].includes(event?.kind) || dateKey(date) > '2026-11-27') return [];
     const schedule = window.classboardContext?.classCode === 'IBM-1' ? ibmWeekdaySchedule : window.classboardContext?.classCode === 'INTEL-2' ? intel2WeekdaySchedule : weekdaySchedule;
     return (schedule[date.getDay()] || []).map((item, index) => createClass(item, `base-${date.getDay()}-${index}`));
   };
   const classesForDate = (date, overrides = calendarOverrides) => {
     const event = eventForDate(date);
-    if (['holiday', 'convocation', 'exam'].includes(event?.kind)) return [];
+    if (['holiday', 'convocation', 'exam'].includes(event?.kind) || dateKey(date) > '2026-11-27') return [];
     return Object.hasOwn(overrides, dateKey(date)) ? overrides[dateKey(date)] : defaultClasses(date);
   };
   const visibleClasses = (classes) => classes.filter((item) => item.kind !== 'lab' || item.batch === batchSelect.value);
@@ -229,6 +246,8 @@
     const firstWeekday = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const overrides = calendarOverrides;
+    const highlights = document.querySelector('.attendance-calendar-highlights');
+    if (highlights) highlights.hidden = month === 11;
     monthTitle.textContent = new Date(year, month, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
     monthButtons.forEach((button) => button.setAttribute('aria-pressed', String(Number(button.dataset.calendarMonth) === month)));
     grid.replaceChildren();
@@ -242,10 +261,10 @@
       const classes = classesForDate(date, overrides);
       const button = document.createElement('button');
       button.type = 'button';
-      const hasVisibleOverride = Object.hasOwn(overrides, key) && !['holiday', 'convocation', 'exam'].includes(event?.kind);
+      const hasVisibleOverride = key <= '2026-11-27' && Object.hasOwn(overrides, key) && !['holiday', 'convocation', 'exam'].includes(event?.kind);
       button.className = `attendance-day${date.getDay() === 0 || date.getDay() === 6 ? ' weekend' : ''}${event ? ` ${event.kind}` : ''}${hasVisibleOverride ? ' modified' : ''}${activeDateKey === key ? ' selected' : ''}`;
       button.setAttribute('role', 'gridcell');
-      button.setAttribute('aria-label', `${date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}${hasVisibleOverride ? ', edited' : ''}`);
+      button.setAttribute('aria-label', `${date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}${event ? `, ${event.label}${event.subject ? `, ${event.subject}, ${event.time}` : ''}` : ''}${hasVisibleOverride ? ', edited' : ''}`);
       const number = document.createElement('span'); number.className = 'attendance-day-number'; number.textContent = String(day); button.append(number);
       calendarLabels(date, classes).forEach((label) => {
         const eventLabel = label === event?.label;
@@ -373,13 +392,20 @@
     const event = eventForDate(date);
     const editable = canEditCalendar();
     dialogDate.textContent = date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    dialogSub.textContent = [event?.label, `${classes.length} ${classes.length === 1 ? 'class' : 'classes'} for ${batchSelect.value}`].filter(Boolean).join(' · ');
-    resetButton.hidden = !editable;
-    addForm.hidden = !editable;
+    dialogSub.textContent = event?.subject ? `${event.label} · ${event.time}` : [event?.label, `${classes.length} ${classes.length === 1 ? 'class' : 'classes'} for ${batchSelect.value}`].filter(Boolean).join(' · ');
+    resetButton.hidden = !editable || Boolean(event?.subject) || dateKey(date) > '2026-11-27';
+    addForm.hidden = !editable || Boolean(event?.subject) || dateKey(date) > '2026-11-27';
     resetButton.disabled = !Object.hasOwn(calendarOverrides, activeDateKey);
     classList.replaceChildren();
-    if (!classes.length) {
-      const empty = document.createElement('div'); empty.className = 'list-row'; empty.textContent = event?.kind === 'holiday' ? `${event.label} · No scheduled classes. Add a makeup class below if needed.` : 'No classes scheduled. Add a class below if needed.'; classList.append(empty);
+    if (event?.subject) {
+      const examRow = document.createElement('div'); examRow.className = 'list-row';
+      const details = document.createElement('div'); details.className = 'list-main';
+      const title = document.createElement('div'); title.className = 'list-title'; title.textContent = event.subject;
+      const meta = document.createElement('div'); meta.className = 'list-detail'; meta.textContent = `${event.code} · Theory · ${event.time}`;
+      details.append(title, meta); examRow.append(details); classList.append(examRow);
+    }
+    if (!classes.length && !event?.subject) {
+      const empty = document.createElement('div'); empty.className = 'list-row'; empty.textContent = dateKey(date) > '2026-11-27' ? 'Teaching has ended for the semester.' : event?.kind === 'holiday' ? `${event.label} · No scheduled classes. Add a makeup class below if needed.` : 'No classes scheduled. Add a class below if needed.'; classList.append(empty);
     }
     classes.forEach((session) => {
       const row = document.createElement('article'); row.className = 'calendar-class-row';

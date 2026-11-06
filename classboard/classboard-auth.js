@@ -174,15 +174,51 @@
     const academicsTimetableSubtitle = document.querySelector('#academicsPanelTimetable .panel-sub');
     if (academicsTimetableSubtitle) academicsTimetableSubtitle.textContent = `Weekly lectures and practicals · ${classLabel} · July–December 2026`;
     const timetableImage = classInfo.code === 'IBM-1' ? './class-timetable-ibm1-odd-semester-2026.jpg' : classInfo.code === 'INTEL-2' ? './class-timetable-intel2-odd-semester-2026.png' : './class-timetable-odd-semester-2026.png';
-    document.querySelectorAll('.timetable-preview-button img, .timetable-dialog-content img, .timetable-dialog-image, #academicsTimetableImg').forEach((image) => {
+    document.querySelectorAll('.timetable-preview-button img, .timetable-dialog-content img, #academicsTimetableImg').forEach((image) => {
       if (timetableImage) image.src = timetableImage;
       else image.removeAttribute('src');
       image.alt = timetableImage ? `Class timetable for CSE III ${classInfo.name}, July to December 2026` : 'IBM-1 timetable image is not available yet';
     });
     const isAiAnalytics = classInfo.code === 'INTEL-1' || classInfo.code === 'INTEL-2';
-    document.getElementById('mstOfficialDocument').hidden = !isAiAnalytics;
-    document.getElementById('endSemSchedule').hidden = !isAiAnalytics;
-    document.getElementById('endSemUnavailable').hidden = isAiAnalytics;
+    const isIbm = classInfo.code === 'IBM-1';
+    const mstDocument = document.getElementById('mstOfficialDocument');
+    mstDocument.hidden = !(isAiAnalytics || isIbm);
+    const mstImage = isIbm ? './mst2-advanced-ai-nov-2026.png' : './mst2-ai-analytics-nov-2026.png';
+    mstDocument.querySelector('a').href = mstImage;
+    mstDocument.querySelector('img').src = mstImage;
+    mstDocument.querySelector('img').alt = `Official ${isIbm ? 'Advanced AI' : 'AI and Analytics'} MST-II timetable, November 2026`;
+    document.getElementById('endSemSchedule').hidden = !(isAiAnalytics || isIbm);
+    document.getElementById('endSemUnavailable').hidden = isAiAnalytics || isIbm;
+    document.querySelector('#academicsPanelEndSem .panel-sub').textContent = `December 2026 · 3rd Semester · ${isIbm ? 'Advanced AI' : 'AI & Analytics'}`;
+    const endSemData = isIbm ? [
+      ['10', 'Thursday', 'Data Structures using C++', 'CS3010T', 'com'],
+      ['14', 'Monday', 'Statistical Analysis', 'CS3020T', 'sa'],
+      ['17', 'Thursday', 'Software Engineering', 'CS3021T', 'se'],
+      ['21', 'Monday', 'Object Oriented Programming using Java', 'CS3013T', 'java'],
+      ['26', 'Saturday', 'Machine Learning', 'CS3022T', 'ai']
+    ] : [
+      ['09', 'Wednesday', 'Computer Organization & Microprocessors', 'CS3005T', 'com'],
+      ['14', 'Monday', 'Statistical Analysis', 'CS3020T', 'sa'],
+      ['17', 'Thursday', 'Software Engineering', 'CS3021T', 'se'],
+      ['21', 'Monday', 'Java Programming', 'CS3024T', 'java'],
+      ['26', 'Saturday', 'Artificial Intelligence', 'CS3023T', 'ai']
+    ];
+    document.querySelectorAll('#endSemSchedule .mst-exam-card').forEach((card, index) => {
+      const [day, weekday, name, code, color] = endSemData[index];
+      card.querySelector('.mst-exam-date div').lastChild.textContent = day;
+      card.querySelector('.mst-exam-name').textContent = name;
+      card.querySelector('.mst-exam-meta').textContent = `${weekday} · 9:30 AM–12:30 PM · Theory`;
+      card.querySelector('.mst-exam-code').textContent = code;
+      card.dataset.subjectColor = color;
+    });
+    const endSemDocument = document.getElementById('endSemDocument');
+    const endSemSource = isIbm ? './end-sem-advanced-ai-dec-2026.png' : './end-sem-ai-analytics-dec-2026.pdf';
+    const endSemPreview = isIbm ? './end-sem-advanced-ai-dec-2026.png' : './end-sem-ai-analytics-dec-2026.png';
+    endSemDocument.querySelectorAll('a').forEach((link) => { link.href = endSemSource; });
+    endSemDocument.querySelector('a').textContent = isIbm ? 'Open official timetable' : 'Open official PDF';
+    const endSemImage = endSemDocument.querySelector('img');
+    endSemImage.src = endSemPreview;
+    endSemImage.alt = `Official ${isIbm ? 'Advanced AI' : 'AI and Analytics'} end-semester timetable, December 2026`;
     const examCards = [...document.querySelectorAll('#academicsPanelMst .mst-exam-card')];
     const examsBySection = classInfo.code === 'IBM-1' ? [
       ['Data Structures using C++', 'CS3010T', 'com'],
