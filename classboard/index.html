@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#006BFF" />
+  <meta name="theme-color" content="#0756A0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="ClassBoard" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -13,7 +13,7 @@
   <link rel="manifest" href="./site.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&amp;family=Figtree:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
   <style>
     :root {
       color-scheme: light;
@@ -1392,60 +1392,734 @@
       .auth-copy { margin-bottom: 10px; font-size: 13px; }
       .auth-field input, .auth-field select { min-height: 43px; }
     }
-    /* Tester Space & Grade Planner */
-    .tester-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, #7c3aed 14%, var(--surface)); color: #7c3aed; font-size: 11px; font-weight: 700; letter-spacing: .02em; border: 1px solid color-mix(in srgb, #7c3aed 30%, var(--line)); }
-    [data-theme="dark"] .tester-badge { background: color-mix(in srgb, #a78bfa 18%, var(--surface)); color: #c4b5fd; border-color: #a78bfa40; }
-    .planner-layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(310px, 0.95fr); gap: 20px; align-items: start; }
-    @media (max-width: 920px) { .planner-layout { grid-template-columns: 1fr; } }
-    .planner-subject-card { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 4px 14px rgba(16, 61, 120, .03); margin-bottom: 12px; overflow: hidden; transition: border-color .16s ease, box-shadow .16s ease; }
-    .planner-subject-card:hover { border-color: color-mix(in srgb, var(--card-accent, var(--blue)) 40%, var(--line)); }
-    .planner-subject-card.unselected { opacity: .55; background: var(--surface-2); }
-    .planner-subject-summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 13px 16px; user-select: none; }
+  
+    /* ===== ClassBoard redesign layer (tokens + components) ===== */
+    :root {
+      --blue:#0A74E6; --blue-deep:#0756A0; --blue-soft:#e1f0ff;
+      --page:#f0f6fd; --surface:#fff; --surface-2:#f6faff;
+      --text:#0f2540; --muted:#5b7089; --line:#dbe6f3;
+      --green:#0a7f5a; --green-soft:#def6ec; --amber:#8a5200; --amber-soft:#fff0cc;
+      --ink:#062f5c; --ink-2:#0756A0; --sun:#FFCE56; --sun-soft:#fff3cf;
+      --shadow:0 1px 2px rgba(7,86,160,.06), 0 8px 24px -12px rgba(7,86,160,.2);
+      --display:"Bricolage Grotesque","Figtree",system-ui,sans-serif;
+    }
+    [data-theme="dark"] {
+      --blue:#1f86ff; --blue-deep:#7db8ff; --blue-soft:#0f2d52;
+      --page:#06101f; --surface:#0c1a30; --surface-2:#12243f;
+      --text:#eaf4ff; --muted:#93abc9; --line:#1f3556;
+      --green:#5fe0a6; --green-soft:#0f3328; --amber:#ffc45c; --amber-soft:#3a2a0c;
+      --ink:#040b17; --ink-2:#0a2a52; --sun-soft:#3a2f12;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -12px rgba(0,0,0,.6);
+    }
+    body { font-family:"Figtree",Inter,system-ui,sans-serif; font-size:16px; }
+    h1, h2, .panel-title, .brand-name, .auth-brand-name, .stat-value, .page-heading h1 { font-family:var(--display); }
+    :focus-visible { outline:3px solid color-mix(in srgb, var(--blue) 45%, transparent); outline-offset:2px; }
+
+    /* sentence-case small labels instead of tracked caps */
+    .eyebrow, .hero-kicker, .section-label { text-transform:none; letter-spacing:0; font-size:13px; font-weight:600; }
+    .eyebrow { color:var(--muted); }
+    h1 { font-size:clamp(28px,3.4vw,38px); letter-spacing:-.035em; font-weight:700; }
+    .subtitle { font-size:14.5px; }
+    .date-label { font-size:12.5px; padding:5px 12px; border-radius:999px; background:var(--surface); border:1px solid var(--line); }
+
+    /* sidebar: dark ink column, white pill for the current page */
+    .sidebar { background:var(--ink); border-right:0; width:248px; padding:22px 14px 16px; color:#fff; }
+    .main { margin-left:248px; }
+    .brand { background:transparent; border:0; box-shadow:none; padding:4px 8px; margin-bottom:26px; }
+    .brand-name { color:#fff; font-size:19px; letter-spacing:-.03em; }
+    .brand-sub { color:#ffffff80; font-size:10.5px; }
+    .brand-term { background:var(--sun); color:#3a2700; font-size:11px; font-weight:700; padding:2px 9px; }
+    .section-label { color:#ffffff70; padding:0 12px; margin-bottom:8px; }
+    .nav { gap:3px; }
+    .nav-item { padding:11px 14px; border-radius:14px; color:#ffffffb8; font-size:14.5px; font-weight:500; }
+    .nav-item:hover { background:#ffffff14; color:#fff; }
+    .nav-item.active { background:#fff; color:var(--ink); font-weight:700; box-shadow:0 6px 16px -6px #00000070; }
+    .nav-count { background:var(--sun); color:#3a2700; font-weight:700; }
+    .help-card { background:#ffffff0d; border-color:#ffffff1c; border-radius:18px; }
+    .help-title { color:#fff; } .help-copy { color:#ffffff9a; } .help-icon { background:#ffffff1a; color:var(--sun); } .help-link { color:var(--sun); }
+    .profile, [data-theme="dark"] .profile { background:#ffffff0f; border:1px solid #ffffff1f; border-radius:18px; box-shadow:none; }
+    .profile:hover { border-color:#ffffff40; box-shadow:none; transform:none; }
+    .profile-name { color:#fff; }
+    .profile-class { color:#ffffff99; font-size:10.5px; }
+    .profile-role { background:#ffffff1c; color:#dcecff; font-size:10px; }
+    .profile .avatar, [data-theme="dark"] .profile .avatar { background:var(--sun); color:#3a2700; }
+    .dots { background:#ffffff14; color:#ffffffb0; border-radius:999px; }
+    .profile-menu { border-radius:18px; }
+    .profile-menu button { border-radius:12px; }
+
+    /* top bar */
+    .topbar, [data-theme="dark"] .topbar { background:color-mix(in srgb, var(--page) 86%, transparent); border-bottom:0; }
+    .crumb { font-size:13px; }
+    .icon-button { width:42px; height:42px; border-radius:999px; background:var(--surface); border:1px solid var(--line); box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; }
+    [data-theme="dark"] .icon-button { background:var(--surface); border-color:var(--line); box-shadow:none; }
+    .icon-button:hover { background:var(--blue-soft); box-shadow:none; transform:none; }
+    .section-select, .class-switcher, .role-switcher { border-radius:999px; border-color:var(--line); }
+    .unread { background:var(--sun); border-color:var(--surface); width:8px; height:8px; }
+
+    /* next-class hero: one solid ink block, no gradient or rings */
+    .hero { background:var(--ink-2); border:0; border-radius:28px; padding:30px 34px; min-height:200px; box-shadow:0 18px 36px -22px rgba(6,47,92,.7); backdrop-filter:none; -webkit-backdrop-filter:none; }
+    .hero:before, .hero:after { display:none; }
+    .hero-kicker { color:var(--sun); font-size:13px; }
+    .hero h2 { font-family:var(--display); font-size:clamp(24px,3vw,32px); letter-spacing:-.03em; }
+    .hero p { color:#cfe4ff; font-size:14px; }
+    .hero-class { background:#fff; color:var(--ink); border:0; border-radius:20px; width:240px; box-shadow:0 12px 24px -12px #00000090; backdrop-filter:none; -webkit-backdrop-filter:none; transform:rotate(1.2deg); }
+    .hero-class .class-meta, .hero-class .class-meta span { color:#5b7089; }
+    .hero-class .class-name { color:var(--ink); font-family:var(--display); font-weight:700; }
+    .hero-class .class-room { color:#5b7089; }
+
+    /* cards */
+    .panel, [data-theme="dark"] .panel { background:var(--surface); border:1px solid var(--line); border-radius:24px; box-shadow:var(--shadow); backdrop-filter:none; -webkit-backdrop-filter:none; }
+    .stat-card, [data-theme="dark"] .stat-card { background:var(--surface); border:1px solid var(--line); border-radius:20px; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; }
+    .stat-card:hover { transform:none; border-color:var(--blue); background:color-mix(in srgb, var(--blue-soft) 45%, var(--surface)); }
+    .stat-icon { border-radius:14px; }
+    .stats .stat-card:nth-child(1) .stat-icon { background:var(--blue-soft); color:var(--blue); }
+    .stats .stat-card:nth-child(2) .stat-icon { background:var(--sun-soft); color:var(--amber); }
+    .stats .stat-card:nth-child(3) .stat-icon { background:var(--green-soft); color:var(--green); }
+    .stat-value { font-size:28px; letter-spacing:-.04em; }
+    .stat-label { font-size:13px; }
+    .panel-title { font-size:17px; letter-spacing:-.02em; }
+    .panel-sub { font-size:12.5px; }
+    .list-row { border-radius:16px; }
+    .quick-action, .action-tile, .resource-card, .update-card, .exam, .mst-exam-card { border-radius:18px; }
+    .quick-action:hover { transform:none; background:var(--blue-soft); }
+
+    /* buttons: soft pills */
+    .primary-button, .secondary-button { min-height:42px; border-radius:999px; padding:0 20px; font-weight:650; font-size:14px; }
+    .primary-button { background:var(--blue); border-color:var(--blue); box-shadow:inset 0 -2px 0 #00000026; }
+    .primary-button:hover { background:var(--blue-deep); }
+    .secondary-button { background:transparent; border-color:color-mix(in srgb, var(--text) 22%, var(--line)); }
+    .secondary-button:hover { background:var(--blue-soft); border-color:var(--blue); color:var(--blue); }
+    .filter-chip { border-radius:999px; font-size:12.5px; padding:0 16px; min-height:36px; }
+    .filter-chip.active { background:var(--ink); border-color:var(--ink); color:#fff; }
+    [data-theme="dark"] .filter-chip.active { background:var(--sun); border-color:var(--sun); color:#3a2700; }
+    .tabs { gap:6px; border-bottom:0; }
+    .tab { padding:8px 16px; border:1px solid transparent; border-radius:999px; font-size:13.5px; }
+    .tab:hover { background:var(--surface-2); }
+    .tab.active { background:var(--blue-soft); border-color:transparent; color:var(--blue); font-weight:700; }
+    .text-field, .select-field, .text-area, .search-field { border-radius:14px; }
+    .update-tag, .class-log-tag, .batch-chip { border-radius:999px; }
+
+    /* sign-in */
+    .auth-gate { background:var(--ink); }
+    .auth-card { border-radius:30px; box-shadow:0 30px 60px -20px #000000a0; }
+    .auth-card h1 { font-family:var(--display); letter-spacing:-.035em; }
+    .auth-field input, .auth-field select { border-radius:14px; }
+    .auth-action { border-radius:999px; min-height:46px; font-weight:650; }
+    .auth-action.primary { background:var(--blue); box-shadow:inset 0 -2px 0 #00000026; }
+    .password-visibility { border-radius:999px; }
+
+    @media (max-width:760px) {
+      .main { margin-left:0; }
+      .hero { padding:22px; border-radius:24px; }
+      .hero-class { width:100%; transform:none; }
+      .panel { border-radius:20px; }
+    }
+    @media (prefers-reduced-motion:reduce) { *, *:before, *:after { transition:none !important; animation:none !important; } .hero-class { transform:none; } }
+  </style>
+<style id="cb-profile">
+    /* ===== Profile page redesign ===== */
+    #page-profile .profile-layout { gap:18px; }
+
+    /* identity card: blue banner, avatar overlapping it */
+    #page-profile .profile-hero { position:relative; flex-wrap:wrap; align-items:flex-end; gap:6px 22px; padding:104px 30px 28px; background:var(--surface); overflow:hidden; }
+    #page-profile .profile-hero::before { content:""; position:absolute; inset:0 0 auto 0; height:96px; background:var(--ink-2); }
+    #page-profile .profile-hero::after { content:""; position:absolute; top:26px; right:44px; width:38px; height:38px; background:var(--sun); clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%); }
+    #page-profile .profile-hero .avatar { position:relative; z-index:1; width:108px; height:108px; margin-top:-54px; border-radius:32px; background:var(--sun); color:#3a2700; font-family:var(--display); font-size:34px; font-weight:800; letter-spacing:-.03em; box-shadow:0 0 0 7px var(--surface); }
+    [data-theme="dark"] #page-profile .profile-hero .avatar { background:var(--sun); color:#3a2700; }
+    #page-profile .profile-hero-copy { flex:1 1 240px; min-width:0; padding-bottom:2px; }
+    #page-profile .profile-hero .list-title { font-family:var(--display); font-size:clamp(24px,3vw,32px); font-weight:700; letter-spacing:-.035em; line-height:1.1; }
+    #page-profile .profile-hero .list-detail { margin-top:5px; font-size:14.5px; color:var(--muted); }
+    #page-profile .profile-hero-badges { gap:8px; margin-top:14px; }
+    #page-profile .profile-class-badge, #page-profile .profile-meta-badge { display:inline-flex; align-items:center; gap:7px; padding:6px 13px; border-radius:999px; background:var(--blue-soft); color:var(--blue); font-size:12.5px; font-weight:650; line-height:1.3; }
+    [data-theme="dark"] #page-profile .profile-class-badge, [data-theme="dark"] #page-profile .profile-meta-badge { color:var(--blue-deep); }
+    #page-profile .profile-hero .secondary-button { align-self:flex-end; margin-bottom:2px; }
+
+    /* detail + settings panels */
+    #page-profile .profile-content-grid { gap:18px; grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr); }
+    #page-profile .profile-side-stack { gap:18px; }
+    #page-profile .profile-section-heading { padding:22px 24px 10px; border-bottom:0; gap:14px; }
+    #page-profile .profile-section-heading .panel-title { font-size:18px; }
+    #page-profile .profile-section-heading .panel-sub { font-size:13px; margin-top:2px; }
+    #page-profile .profile-detail-icon { width:42px; height:42px; border-radius:14px; }
+    #page-profile .profile-detail-row { min-height:76px; padding:14px 24px; gap:16px; }
+    #page-profile .profile-detail-row + .profile-detail-row { border-top:1px dashed var(--line); }
+    #page-profile .profile-detail-row .list-title { font-size:12.5px; font-weight:500; color:var(--muted); }
+    #page-profile .profile-detail-row .list-detail { margin-top:1px; font-size:15.5px; font-weight:600; color:var(--text); }
+    #page-profile .profile-details-grid .profile-detail-row:nth-child(2) .profile-detail-icon { background:var(--sun-soft); color:var(--amber); }
+    #page-profile .profile-details-grid .profile-detail-row:nth-child(3) .profile-detail-icon { background:var(--green-soft); color:var(--green); }
+    #page-profile .profile-detail-action { width:38px; height:38px; border-radius:999px; }
+
+    #page-profile .profile-panel .list-row { padding:14px 24px; gap:14px; border-radius:0; border-width:1px 0 0; border-style:dashed; border-color:var(--line); background:transparent; }
+    #page-profile .profile-row-icon { display:grid; place-items:center; width:42px; height:42px; flex:none; border-radius:999px; background:var(--blue-soft); color:var(--blue); }
+    #page-profile .profile-row-icon svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+    #page-profile .profile-panel .list-title { font-size:15px; font-weight:650; }
+    #page-profile .profile-panel .list-detail { font-size:13px; }
+
+    /* sign out reads as the one cautious action */
+    #page-profile .profile-signout-row { margin:6px 14px 14px; padding:14px 16px !important; border:0 !important; border-radius:18px !important; background:#fdeceb !important; }
+    #page-profile .profile-signout-row .list-title { color:#b42318; }
+    #page-profile .profile-signout-row .list-detail { color:#b42318b0; }
+    #page-profile .profile-signout-row .profile-row-icon { background:#fff; color:#b42318; }
+    [data-theme="dark"] #page-profile .profile-signout-row { background:#3a1618 !important; }
+    [data-theme="dark"] #page-profile .profile-signout-row .list-title { color:#ff9a90; }
+    [data-theme="dark"] #page-profile .profile-signout-row .list-detail { color:#ff9a90b0; }
+    [data-theme="dark"] #page-profile .profile-signout-row .profile-row-icon { background:#2a1012; color:#ff9a90; }
+
+    @media (max-width:900px) { #page-profile .profile-content-grid { grid-template-columns:minmax(0,1fr); } }
+    @media (max-width:760px) {
+      #page-profile .profile-hero { padding:92px 20px 22px; }
+      #page-profile .profile-hero .avatar { width:88px; height:88px; margin-top:-44px; border-radius:26px; font-size:28px; }
+      #page-profile .profile-hero .secondary-button { width:100%; margin-top:10px; }
+      #page-profile .profile-detail-row, #page-profile .profile-panel .list-row { padding-left:18px; padding-right:18px; }
+    }
+</style>
+<style id="cb-logo-match">
+    /* ===== Logo-exact colours: #168BFF -> #0756A0 ===== */
+    :root { --logo-blue:#168BFF; --logo-deep:#0756A0; }
+    [data-theme="dark"] { --logo-blue:#2d98ff; --logo-deep:#0b4a8c; }
+    /* sidebar + hero use the same blue-to-deep direction as the logo board */
+    .sidebar { background:linear-gradient(165deg,#0a62b4 0%,#06305f 100%); }
+    [data-theme="dark"] .sidebar { background:linear-gradient(165deg,#07264a 0%,#040b17 100%); }
+    .hero { background:linear-gradient(135deg,#168BFF 0%,#0756A0 100%); }
+    [data-theme="dark"] .hero { background:linear-gradient(135deg,#0f67c2 0%,#08305f 100%); }
+    .hero h2, .hero p { color:#fff; }
+    .hero p { opacity:.92; }
+    .hero-kicker { color:#FFE17A; }
+    #page-profile .profile-hero::before { background:linear-gradient(135deg,#168BFF 0%,#0756A0 100%); }
+    .auth-gate { background:linear-gradient(160deg,#168BFF 0%,#0756A0 60%,#062f5c 100%); }
+    /* exact logo blue for icons, highlights, rings, progress */
+    .stat-icon, .profile-detail-icon, .profile-row-icon, .nav-item svg, .icon-button:hover { color:var(--logo-blue); }
+    .nav-item svg { color:inherit; }
+    .nav-item.active svg { color:var(--logo-blue); }
+    .stats .stat-card:nth-child(1) .stat-icon { color:var(--logo-blue); }
+    :focus-visible { outline-color:color-mix(in srgb, var(--logo-blue) 55%, transparent); }
+    .progress span { background:linear-gradient(90deg,var(--logo-deep),var(--logo-blue)); }
+    .attendance-day.selected { outline-color:var(--logo-blue); }
+    .dots:hover, .stat-card:hover, .quick-action:hover { border-color:var(--logo-blue); }
+    /* darker blue stays only where white text sits on it (buttons) or blue text sits on soft fills */
+    .primary-button, .auth-action.primary { background:#0A74E6; }
+    .primary-button:hover, .auth-action.primary:hover { background:#0756A0; }
+</style>
+<style id="cb-profile-align">
+    /* Account card stretches to match the right column; rows share the extra height evenly */
+    #page-profile .profile-content-grid { align-items:stretch; }
+    #page-profile .profile-content-grid > .panel { display:flex; flex-direction:column; }
+    #page-profile .profile-content-grid > .panel .profile-details-grid { flex:1; display:grid; grid-auto-rows:1fr; }
+    #page-profile .profile-content-grid > .panel .profile-detail-row { min-height:76px; }
+    #page-profile .profile-side-stack { align-content:stretch; }
+</style>
+<style id="cb-shine">
+    /* ===== Shining gradient background (sign-in / reset) ===== */
+    .auth-gate {
+      background-color:#062f5c;
+      background-image:
+        radial-gradient(60% 55% at 12% 8%,  rgba(95,190,255,.95) 0%, rgba(95,190,255,0) 62%),
+        radial-gradient(45% 45% at 88% 12%, rgba(255,225,122,.55) 0%, rgba(255,225,122,0) 60%),
+        radial-gradient(55% 60% at 90% 92%, rgba(22,139,255,.85) 0%, rgba(22,139,255,0) 65%),
+        radial-gradient(50% 50% at 8% 95%,  rgba(7,86,160,.9) 0%, rgba(7,86,160,0) 65%),
+        radial-gradient(30% 22% at 50% 0%,  rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 100%),
+        linear-gradient(160deg,#168BFF 0%,#0756A0 55%,#062f5c 100%);
+      background-size:150% 150%,140% 140%,150% 150%,140% 140%,100% 100%,100% 100%;
+      background-position:0% 0%,100% 0%,100% 100%,0% 100%,50% 0%,50% 50%;
+      animation:cb-shine 16s ease-in-out infinite alternate;
+    }
+    [data-theme="dark"] .auth-gate {
+      background-color:#040b17;
+      background-image:
+        radial-gradient(60% 55% at 12% 8%,  rgba(31,134,255,.6) 0%, rgba(31,134,255,0) 62%),
+        radial-gradient(45% 45% at 88% 12%, rgba(255,206,86,.28) 0%, rgba(255,206,86,0) 60%),
+        radial-gradient(55% 60% at 90% 92%, rgba(15,103,194,.65) 0%, rgba(15,103,194,0) 65%),
+        radial-gradient(30% 22% at 50% 0%,  rgba(255,255,255,.12) 0%, rgba(255,255,255,0) 100%),
+        linear-gradient(160deg,#0a2a52 0%,#061a33 55%,#040b17 100%);
+      background-size:150% 150%,140% 140%,150% 150%,100% 100%,100% 100%;
+      background-position:0% 0%,100% 0%,100% 100%,50% 0%,50% 50%;
+    }
+    @keyframes cb-shine {
+      from { background-position:0% 0%,100% 0%,100% 100%,0% 100%,50% 0%,50% 50%; }
+      to   { background-position:30% 22%,70% 25%,72% 78%,25% 70%,50% 0%,50% 50%; }
+    }
+    .auth-card { background:rgba(255,255,255,.94); border:1px solid rgba(255,255,255,.7); box-shadow:0 30px 70px -20px rgba(3,24,52,.65), 0 0 0 8px rgba(255,255,255,.12); }
+    [data-theme="dark"] .auth-card { background:rgba(12,26,48,.92); border-color:rgba(255,255,255,.1); box-shadow:0 30px 70px -20px #000c; }
+    @media (prefers-reduced-motion:reduce) { .auth-gate { animation:none; } }
+</style>
+<style id="cb-hero-art">
+    /* hero back design: soft rings + logo sparkle */
+    .hero:before { display:block; width:560px; height:560px; right:-120px; top:-250px; border:0; border-radius:50%;
+      background:repeating-radial-gradient(circle at center, transparent 0 52px, rgba(255,255,255,.14) 52px 53px);
+      -webkit-mask-image:radial-gradient(circle at center, #000 25%, transparent 70%); mask-image:radial-gradient(circle at center, #000 25%, transparent 70%); }
+    .hero:after { display:block; width:46px; height:46px; right:310px; top:30px; border:0; border-radius:0; background:#FFE17A; opacity:.95;
+      clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%); filter:drop-shadow(0 0 14px rgba(255,225,122,.7)); }
+    [data-theme="dark"] .hero:after { opacity:.8; }
+    /* link inside the white "up next" card was white-on-white */
+    .hero-class .hero-link, .hero-class a, .hero-class button { color:#0756A0; font-weight:700; }
+    @media (max-width:900px) { .hero:after { right:24px; top:20px; width:30px; height:30px; } }
+</style>
+<style id="cb-brand-box">
+    /* outlined brand card, frosted for the blue sidebar */
+    .sidebar .brand { padding:13px 14px; margin-bottom:24px; border:1px solid rgba(255,255,255,.32); border-radius:22px;
+      background:rgba(255,255,255,.1); box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 10px 24px -14px rgba(3,24,52,.6);
+      -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+    .sidebar .brand-mark { width:44px; height:44px; border-radius:13px; box-shadow:0 6px 14px -6px rgba(3,24,52,.7); }
+    .sidebar .brand-term { background:var(--sun); color:#3a2700; }
+    [data-theme="dark"] .sidebar .brand { border-color:rgba(255,255,255,.2); background:rgba(255,255,255,.06); }
+</style>
+<style id="cb-less-milky">
+    /* deeper blue tint instead of whitish glass */
+    .sidebar .brand, .sidebar .profile, .sidebar .help-card { background:rgba(3,24,52,.28); border:1px solid rgba(255,255,255,.16); box-shadow:inset 0 1px 0 rgba(255,255,255,.08); -webkit-backdrop-filter:none; backdrop-filter:none; }
+    .sidebar .profile:hover { background:rgba(3,24,52,.38); border-color:rgba(255,255,255,.26); }
+    .sidebar .brand-sub, .sidebar .profile-class { color:rgba(255,255,255,.62); }
+    .sidebar .profile-role { background:rgba(255,255,255,.14); color:#e6f1ff; }
+    .sidebar .dots { background:rgba(3,24,52,.35); color:rgba(255,255,255,.8); }
+    [data-theme="dark"] .sidebar .brand, [data-theme="dark"] .sidebar .profile, [data-theme="dark"] .sidebar .help-card { background:rgba(0,0,0,.3); border-color:rgba(255,255,255,.12); }
+</style>
+<style id="cb-subject-dropdown">
+    /* each subject gets its own colour */
+    [data-subject-name^="Software"]   { --sc:#168BFF; }
+    [data-subject-name^="Statistical"]{ --sc:#8B5CF6; }
+    [data-subject-name^="Computer"]   { --sc:#F59E0B; }
+    [data-subject-name^="Java"]       { --sc:#F0603F; }
+    [data-subject-name^="Soft"]       { --sc:#10B981; }
+    [data-subject-name^="Artificial"] { --sc:#E0489B; }
+    .subject-attendance { --sc:var(--blue); }
+    .subject-attendance-name::before { content:""; display:inline-block; width:9px; height:9px; margin-right:9px; border-radius:50%; background:var(--sc); vertical-align:.05em; }
+    .subject-attendance .progress span { background:var(--sc); }
+
+    /* dropdown cards on the Attendance page */
+    .attendance-subject-grid { align-items:start; }
+    .attendance-subject-grid > .subject-attendance { border:1.5px solid color-mix(in srgb, var(--sc) 28%, var(--line)); border-radius:20px; padding:16px 18px; transition:box-shadow .2s, border-color .2s; }
+    .attendance-subject-grid > .subject-attendance .subject-attendance-top { cursor:pointer; gap:12px; }
+    .attendance-subject-grid > .subject-attendance .subject-attendance-name { font-size:15px; }
+    .attendance-subject-grid > .subject-attendance .subject-attendance-count { font-size:12.5px; }
+    .attendance-subject-grid > .subject-attendance .subject-attendance-top > div:first-child { flex:1; min-width:0; }
+    .subject-toggle { flex:none; display:grid; place-items:center; width:34px; height:34px; padding:0; border:0; border-radius:50%; background:color-mix(in srgb, var(--sc) 15%, var(--surface)); color:var(--sc); cursor:pointer; }
+    .subject-toggle svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; transition:transform .2s; }
+    .subject-attendance.is-open .subject-toggle svg { transform:rotate(180deg); }
+    /* collapsed: only the header + progress bar */
+    .attendance-subject-grid > .subject-attendance:not(.is-open) > :not(.subject-attendance-top):not(.progress) { display:none; }
+    /* open: coloured outline + glow, and the card spans the row so the form has room */
+    .attendance-subject-grid > .subject-attendance.is-open { grid-column:1 / -1; border-color:var(--sc); box-shadow:0 0 0 4px color-mix(in srgb, var(--sc) 16%, transparent), 0 14px 30px -18px color-mix(in srgb, var(--sc) 70%, transparent); }
+    .attendance-subject-grid > .subject-attendance.is-open .subject-attendance-top { padding-bottom:2px; }
+    @media (prefers-reduced-motion:reduce) { .subject-toggle svg, .subject-attendance { transition:none; } }
+</style>
+<style id="cb-subject-fix">
+    /* 1) colours: raise specificity so the default --sc no longer overrides them */
+    .subject-attendance[data-subject-name^="Software"]   { --sc:#168BFF; }
+    .subject-attendance[data-subject-name^="Statistical"]{ --sc:#8B5CF6; }
+    .subject-attendance[data-subject-name^="Computer"]   { --sc:#F59E0B; }
+    .subject-attendance[data-subject-name^="Java"]       { --sc:#F0603F; }
+    .subject-attendance[data-subject-name^="Soft"]       { --sc:#10B981; }
+    .subject-attendance[data-subject-name^="Artificial"] { --sc:#E0489B; }
+
+    /* 2) identical closed cards: name on its own 2-line row, then count / % / arrow */
+    .attendance-subject-grid { align-items:stretch; }
+    .attendance-subject-grid > .subject-attendance { display:flex; flex-direction:column; }
+    .attendance-subject-grid > .subject-attendance .subject-attendance-top { display:grid; grid-template-columns:minmax(0,1fr) auto auto; align-items:center; column-gap:10px; row-gap:6px; }
+    .attendance-subject-grid > .subject-attendance .subject-attendance-top > div:first-child { display:contents; }
+    .attendance-subject-grid > .subject-attendance .subject-attendance-name { grid-column:1 / -1; font-size:15px; line-height:1.3; min-height:2.6em; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
+    .attendance-subject-grid > .subject-attendance .subject-attendance-count { grid-column:1; grid-row:2; margin:0; }
+    .attendance-subject-grid > .subject-attendance .subject-attendance-percent { grid-column:2; grid-row:2; font-size:20px; }
+    .attendance-subject-grid > .subject-attendance .subject-toggle { grid-column:3; grid-row:2; }
+    .attendance-subject-grid > .subject-attendance .progress { margin-top:auto; padding-top:0; }
+    .attendance-subject-grid > .subject-attendance .subject-attendance-top { margin-bottom:12px; }
+    /* open card: name can use one line since it spans the row */
+    .attendance-subject-grid > .subject-attendance.is-open .subject-attendance-name { min-height:0; }
+</style>
+<style id="cb-subject-colours-v2">
+    .subject-attendance[data-subject-name^="Soft"]       { --sc:#F2549E; }
+    .subject-attendance[data-subject-name^="Artificial"] { --sc:#E5383B; }
+    .subject-attendance[data-subject-name^="Java"]       { --sc:#14B8A6; }
+</style>
+<style id="cb-subject-colours-final">
+    /* your original subject palette (same as exam cards / class log), exact name matches only */
+    .subject-attendance[data-subject-name="Software Engineering"] { --sc:#8957d8; }
+    .subject-attendance[data-subject-name="Statistical Analysis"] { --sc:#27a77a; }
+    .subject-attendance[data-subject-name^="Computer Organisation"] { --sc:#d8a20b; }
+    .subject-attendance[data-subject-name="Java Programming"]     { --sc:#ed8a22; }
+    .subject-attendance[data-subject-name="Soft Skills"]          { --sc:#d35d87; }
+    .subject-attendance[data-subject-name="Artificial Intelligence"] { --sc:#df4c55; }
+    [data-theme="dark"] .subject-attendance[data-subject-name="Software Engineering"] { --sc:#c9a5ff; }
+    [data-theme="dark"] .subject-attendance[data-subject-name="Statistical Analysis"] { --sc:#63e6a8; }
+    [data-theme="dark"] .subject-attendance[data-subject-name^="Computer Organisation"] { --sc:#ffdc55; }
+    [data-theme="dark"] .subject-attendance[data-subject-name="Java Programming"]     { --sc:#ffad4d; }
+    [data-theme="dark"] .subject-attendance[data-subject-name="Soft Skills"]          { --sc:#ff85ad; }
+    [data-theme="dark"] .subject-attendance[data-subject-name="Artificial Intelligence"] { --sc:#ff747e; }
+</style>
+<style id="cb-chip-fix">
+    /* active filter chip: always a solid fill with readable text */
+    .filter-chip.active, .filter-chip[aria-pressed="true"], .filter-chip[aria-selected="true"] { background:#0756A0 !important; border-color:#0756A0 !important; color:#fff !important; font-weight:700; }
+    .filter-chip.active *, .filter-chip[aria-pressed="true"] * { color:inherit !important; }
+    .filter-chip:not(.active):hover { background:var(--blue-soft); color:var(--blue-deep); border-color:color-mix(in srgb, var(--logo-blue,#168BFF) 45%, var(--line)); }
+    [data-theme="dark"] .filter-chip.active, [data-theme="dark"] .filter-chip[aria-pressed="true"], [data-theme="dark"] .filter-chip[aria-selected="true"] { background:#FFCE56 !important; border-color:#FFCE56 !important; color:#3a2700 !important; }
+</style>
+<style id="cb-tab-fix">
+    /* active tabs: solid fill, same style as the filter chips */
+    .tab.active, .tab[aria-selected="true"], .academics-tab.active, .academics-tab[aria-selected="true"] { background:#0756A0 !important; border-color:#0756A0 !important; color:#fff !important; font-weight:700; box-shadow:0 6px 14px -8px rgba(7,86,160,.8); }
+    .tab:not(.active):not([aria-selected="true"]):hover, .academics-tab:not(.active):not([aria-selected="true"]):hover { background:var(--blue-soft); color:var(--blue-deep); }
+    [data-theme="dark"] .tab.active, [data-theme="dark"] .tab[aria-selected="true"], [data-theme="dark"] .academics-tab.active, [data-theme="dark"] .academics-tab[aria-selected="true"] { background:#FFCE56 !important; border-color:#FFCE56 !important; color:#3a2700 !important; box-shadow:none; }
+</style>
+<style id="cb-grade-planner">
+    /* ===== Tester Space & Grade Planner (Redesign Theme) ===== */
+    #page-tester .page-heading h1 {
+      font-family: var(--display);
+      font-size: clamp(26px, 3.2vw, 36px);
+      letter-spacing: -.035em;
+      font-weight: 700;
+    }
+    .tester-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: var(--sun);
+      color: #3a2700;
+      font-family: var(--display);
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      box-shadow: 0 2px 8px -2px rgba(255, 206, 86, .5);
+    }
+    [data-theme="dark"] .tester-badge {
+      background: var(--sun);
+      color: #3a2700;
+    }
+
+    /* Dual-Semester Cumulative Tracker Banner */
+    .planner-cumulative-card {
+      border-radius: 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+      overflow: hidden;
+    }
+    .planner-dual-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 14px;
+      padding: 18px 22px;
+      border-radius: 20px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+    }
+    .planner-dual-metric-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0;
+    }
+    .planner-dual-metric-val {
+      font-family: var(--display);
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      margin-top: 4px;
+      letter-spacing: -.02em;
+    }
+    .planner-cgpa-banner {
+      grid-column: 1 / -1;
+      border-top: 1px dashed var(--line);
+      padding-top: 14px;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .planner-cgpa-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .planner-cgpa-val {
+      font-family: var(--display);
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--logo-blue);
+      letter-spacing: -.03em;
+    }
+
+    /* Layout */
+    .planner-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(310px, 0.95fr);
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 920px) {
+      .planner-layout { grid-template-columns: 1fr; }
+    }
+
+    /* Subject Cards */
+    .planner-subject-card {
+      border: 1.5px solid var(--line);
+      border-radius: 20px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+      overflow: hidden;
+      transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+    .planner-subject-card:hover {
+      border-color: color-mix(in srgb, var(--card-accent, var(--logo-blue)) 45%, var(--line));
+      transform: translateY(-1px);
+    }
+    .planner-subject-card[open] {
+      border-color: var(--card-accent, var(--logo-blue));
+      box-shadow: 0 10px 28px -12px color-mix(in srgb, var(--card-accent, var(--logo-blue)) 35%, transparent);
+    }
+    .planner-subject-card.unselected {
+      opacity: .5;
+      background: var(--surface-2);
+    }
+    .planner-subject-summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      user-select: none;
+    }
     .planner-subject-summary::-webkit-details-marker { display: none; }
-    .planner-subject-summary::after { content: '⌄'; font-size: 18px; margin-left: 6px; color: var(--muted); transition: transform .16s ease; }
-    .planner-subject-card[open] .planner-subject-summary::after { transform: rotate(180deg); }
-    .planner-course-checkbox { width: 18px; height: 18px; flex: none; accent-color: var(--blue); cursor: pointer; }
-    .planner-subject-icon { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 11px; letter-spacing: -.02em; background: var(--card-tint, var(--blue-soft)); color: var(--card-accent, var(--blue)); flex: none; }
-    .planner-subject-header { min-width: 0; flex: 1; }
-    .planner-subject-name { font-weight: 700; font-size: 13.5px; line-height: 1.3; color: var(--text); }
-    .planner-subject-meta { color: var(--muted); font-size: 11px; margin-top: 2px; }
-    .planner-subject-badge-wrap { display: flex; align-items: center; gap: 8px; flex: none; }
-    .planner-grade-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 52px; padding: 3px 8px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--line); color: var(--text); font-size: 11px; font-weight: 750; }
-    .planner-grade-badge.grade-o { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
-    .planner-grade-badge.grade-aplus { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
-    .planner-grade-badge.grade-a { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
-    .planner-grade-badge.grade-bplus { background: #fef3c7; color: #b45309; border-color: #fde68a; }
-    .planner-grade-badge.grade-b { background: #fffbeb; color: #d97706; border-color: #fef3c7; }
-    .planner-grade-badge.grade-c { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
-    .planner-grade-badge.grade-p { background: #fae8ff; color: #86198f; border-color: #f5d0fe; }
-    .planner-grade-badge.grade-f { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-    .planner-credit-pill { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 8px; background: var(--blue-soft); color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid transparent; }
-    .planner-credit-pill:hover { border-color: var(--blue); }
-    .planner-credit-input { width: 52px; padding: 2px 4px; font-size: 11px; font-weight: 700; border: 1px solid var(--blue); border-radius: 6px; }
-    .planner-marks-body { border-top: 1px solid var(--line); padding: 14px 16px; background: color-mix(in srgb, var(--surface) 97%, var(--surface-2)); }
-    .planner-marks-notice { font-size: 11px; color: var(--muted); line-height: 1.45; margin-bottom: 12px; }
-    .planner-marks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
-    .planner-mark-field { display: flex; flex-direction: column; gap: 4px; }
-    .planner-mark-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 650; color: var(--muted); }
-    .planner-mark-max { color: var(--muted); font-weight: 500; opacity: .75; }
-    .planner-mark-input { padding: 7px 9px; font-size: 13px; font-weight: 600; }
-    .planner-target-result { margin-top: 14px; padding: 13px 15px; border-radius: 12px; font-size: 12.5px; line-height: 1.5; background: var(--surface-2); border: 1px solid var(--line); color: var(--text); }
-    .planner-target-result.result-success { background: color-mix(in srgb, var(--green) 9%, var(--surface)); border-color: color-mix(in srgb, var(--green) 30%, var(--line)); color: var(--text); }
-    .planner-target-result.result-warning { background: color-mix(in srgb, var(--amber) 10%, var(--surface)); border-color: color-mix(in srgb, var(--amber) 32%, var(--line)); color: var(--text); }
-    .planner-target-result.result-error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
-    .planner-scale-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 8px; margin-top: 12px; }
-    .planner-scale-item { display: flex; flex-direction: column; gap: 4px; }
-    .planner-scale-label { font-size: 10.5px; font-weight: 700; color: var(--muted); }
-    .planner-scale-input { padding: 6px 8px; font-size: 12px; font-weight: 650; }
-    .planner-dual-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; padding: 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); }
-    .planner-dual-metric-label { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; font-weight: 700; color: var(--muted); }
-    .planner-dual-metric-val { font-size: 15px; font-weight: 750; color: var(--text); margin-top: 2px; }
+    .planner-subject-summary::after {
+      content: '';
+      width: 9px;
+      height: 9px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      margin-left: 6px;
+      flex: none;
+      transition: transform .2s ease;
+    }
+    .planner-subject-card[open] .planner-subject-summary::after {
+      transform: rotate(-135deg);
+    }
+    .planner-course-checkbox {
+      width: 20px;
+      height: 20px;
+      flex: none;
+      accent-color: var(--logo-blue);
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    .planner-subject-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: -.02em;
+      background: var(--card-tint, var(--blue-soft));
+      color: var(--card-accent, var(--logo-blue));
+      flex: none;
+    }
+    .planner-subject-header {
+      min-width: 0;
+      flex: 1;
+    }
+    .planner-subject-name {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1.3;
+      color: var(--text);
+    }
+    .planner-subject-meta {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+    .planner-subject-badge-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: none;
+    }
+
+    /* Grade badges */
+    .planner-grade-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 72px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-family: var(--display);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: -.01em;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      color: var(--text);
+      transition: all .16s ease;
+    }
+    .planner-grade-badge.grade-o { background: #dff8ee; color: #067246; border-color: #b3efd4; }
+    .planner-grade-badge.grade-aplus { background: #e5f1ff; color: #0756A0; border-color: #b8dbff; }
+    .planner-grade-badge.grade-a { background: #f0edff; color: #5f3dc4; border-color: #dcd4ff; }
+    .planner-grade-badge.grade-bplus { background: #fff8e1; color: #9a6700; border-color: #ffe399; }
+    .planner-grade-badge.grade-b { background: #fff0eb; color: #b84310; border-color: #ffd4c4; }
+    .planner-grade-badge.grade-c { background: #fdf2f8; color: #9d174d; border-color: #fbcfe8; }
+    .planner-grade-badge.grade-p { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+    .planner-grade-badge.grade-f, .planner-grade-badge.grade-x { background: #fdeceb; color: #b42318; border-color: #f8c2be; }
+
+    [data-theme="dark"] .planner-grade-badge.grade-o { background: #0d3826; color: #5fe0a6; border-color: #176041; }
+    [data-theme="dark"] .planner-grade-badge.grade-aplus { background: #0f2d52; color: #7db8ff; border-color: #1b4982; }
+    [data-theme="dark"] .planner-grade-badge.grade-a { background: #251b47; color: #bfaaff; border-color: #3b2b73; }
+    [data-theme="dark"] .planner-grade-badge.grade-bplus { background: #3a2a0c; color: #ffce56; border-color: #594216; }
+    [data-theme="dark"] .planner-grade-badge.grade-b { background: #3a1c12; color: #ffa27d; border-color: #5c2f21; }
+    [data-theme="dark"] .planner-grade-badge.grade-c { background: #381223; color: #f472b6; border-color: #5a203b; }
+    [data-theme="dark"] .planner-grade-badge.grade-p { background: #1e293b; color: #94a3b8; border-color: #334155; }
+    [data-theme="dark"] .planner-grade-badge.grade-f, [data-theme="dark"] .planner-grade-badge.grade-x { background: #3a1618; color: #ff9a90; border-color: #5c2327; }
+
+    .planner-credit-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 11.5px;
+      font-weight: 750;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all .16s ease;
+    }
+    .planner-credit-pill:hover {
+      border-color: var(--logo-blue);
+      background: color-mix(in srgb, var(--logo-blue) 16%, var(--surface));
+    }
+    .planner-credit-input {
+      width: 54px;
+      padding: 2px 6px;
+      font-family: var(--display);
+      font-size: 11.5px;
+      font-weight: 750;
+      border: 1px solid var(--logo-blue);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    /* Marks expansion body */
+    .planner-marks-body {
+      border-top: 1px solid var(--line);
+      padding: 18px 20px;
+      background: color-mix(in srgb, var(--surface) 95%, var(--page));
+    }
+    .planner-marks-notice {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .planner-marks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+      gap: 12px;
+    }
+    .planner-mark-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .planner-mark-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      font-weight: 650;
+      color: var(--muted);
+    }
+    .planner-mark-max {
+      color: var(--muted);
+      font-weight: 500;
+      opacity: .75;
+    }
+    .planner-mark-input {
+      padding: 9px 12px;
+      font-size: 14px;
+      font-weight: 650;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      transition: border-color .16s ease;
+    }
+    .planner-mark-input:focus {
+      border-color: var(--logo-blue);
+      outline: none;
+    }
+
+    /* Target Simulator */
+    .planner-target-result {
+      margin-top: 16px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      background: var(--surface-2);
+      border: 1.5px solid var(--line);
+      color: var(--text);
+    }
+    .planner-target-result.result-success {
+      background: color-mix(in srgb, var(--green-soft) 80%, var(--surface));
+      border-color: color-mix(in srgb, var(--green) 35%, var(--line));
+      color: var(--text);
+    }
+    .planner-target-result.result-warning {
+      background: color-mix(in srgb, var(--amber-soft) 80%, var(--surface));
+      border-color: color-mix(in srgb, var(--amber) 40%, var(--line));
+      color: var(--text);
+    }
+    .planner-target-result.result-error {
+      background: #fdeceb;
+      border-color: #f8c2be;
+      color: #b42318;
+    }
+    [data-theme="dark"] .planner-target-result.result-error {
+      background: #3a1618;
+      border-color: #5c2327;
+      color: #ff9a90;
+    }
+
+    /* Scale Reference */
+    .planner-scale-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .planner-scale-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .planner-scale-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .planner-scale-input {
+      padding: 6px 10px;
+      font-size: 12.5px;
+      font-weight: 650;
+      border-radius: 10px;
+    }
   </style>
 </head>
 <body data-role="student">
   <section class="auth-gate" id="authGate" aria-labelledby="authTitle">
     <div class="auth-card">
-      <div class="auth-brand"><img src="./classboard-logo.svg" alt="" /><span class="auth-brand-copy"><span class="auth-brand-name">ClassBoard</span><span class="auth-brand-subtitle">INTEL CLASS PORTAL</span></span></div>
+      <div class="auth-brand"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJvYXJkIiB4MT0iNyIgeTE9IjUiIHgyPSI0MiIgeTI9IjQ0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiMxNjhCRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDc1NkEwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJwYXBlciIgeDE9IjE0IiB5MT0iMTEiIHgyPSIzNiIgeTI9IjM3IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiNGRkZGRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRENFRUZGIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cGF0aCBkPSJNMTMgMy41aDIyQTkuNSA5LjUgMCAwIDEgNDQuNSAxM3YyMmE5LjUgOS41IDAgMCAxLTkuNSA5LjVIMTNBOS41IDkuNSAwIDAgMSAzLjUgMzVWMTNBOS41IDkuNSAwIDAgMSAxMyAzLjVaIiBmaWxsPSJ1cmwoI2JvYXJkKSIvPgogIDxwYXRoIGQ9Ik0xMy4xIDE2LjJjMC0zLjIgMi42LTUuOCA1LjgtNS44aDE2LjN2MjEuMUgxOC45YTUuOCA1LjggMCAwIDAtNS44IDUuOFYxNi4yWiIgZmlsbD0idXJsKCNwYXBlcikiLz4KICA8cGF0aCBkPSJNMTMuMSAzNy4zYTUuOCA1LjggMCAwIDEgNS44LTUuOGgxNi4zIiBzdHJva2U9IiNCOERCRkYiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMTkuMiAxNy4zaDEwLjZNMTkuMiAyMS44aDcuMiIgc3Ryb2tlPSIjMTY4QkZGIiBzdHJva2Utd2lkdGg9IjIuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0ibTI4LjEgMjYuMyAyLjYgMi42IDUtNi4xIiBzdHJva2U9IiNGRkNFNTYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJtMzguMyA4IC44IDIuMiAyLjIuOC0yLjIuOC0uOCAyLjItLjgtMi4yLTIuMi0uOCAyLjItLjguOC0yLjJaIiBmaWxsPSIjRkZFMTdBIi8+Cjwvc3ZnPgo=" alt="" /><span class="auth-brand-copy"><span class="auth-brand-name">ClassBoard</span><span class="auth-brand-subtitle">INTEL CLASS PORTAL</span></span></div>
       <h1 id="authTitle">Welcome back!</h1>
       <p class="auth-copy">Sign in to your Medicaps account to continue to ClassBoard.</p>
       <form id="authForm">
@@ -1474,7 +2148,7 @@
   <div class="app" hidden>
     <aside class="sidebar" id="appSidebar">
       <div class="brand">
-        <div class="brand-mark"><img src="./classboard-logo.svg" alt="ClassBoard logo" /></div>
+        <div class="brand-mark"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJvYXJkIiB4MT0iNyIgeTE9IjUiIHgyPSI0MiIgeTI9IjQ0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiMxNjhCRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDc1NkEwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJwYXBlciIgeDE9IjE0IiB5MT0iMTEiIHgyPSIzNiIgeTI9IjM3IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiNGRkZGRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRENFRUZGIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cGF0aCBkPSJNMTMgMy41aDIyQTkuNSA5LjUgMCAwIDEgNDQuNSAxM3YyMmE5LjUgOS41IDAgMCAxLTkuNSA5LjVIMTNBOS41IDkuNSAwIDAgMSAzLjUgMzVWMTNBOS41IDkuNSAwIDAgMSAxMyAzLjVaIiBmaWxsPSJ1cmwoI2JvYXJkKSIvPgogIDxwYXRoIGQ9Ik0xMy4xIDE2LjJjMC0zLjIgMi42LTUuOCA1LjgtNS44aDE2LjN2MjEuMUgxOC45YTUuOCA1LjggMCAwIDAtNS44IDUuOFYxNi4yWiIgZmlsbD0idXJsKCNwYXBlcikiLz4KICA8cGF0aCBkPSJNMTMuMSAzNy4zYTUuOCA1LjggMCAwIDEgNS44LTUuOGgxNi4zIiBzdHJva2U9IiNCOERCRkYiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMTkuMiAxNy4zaDEwLjZNMTkuMiAyMS44aDcuMiIgc3Ryb2tlPSIjMTY4QkZGIiBzdHJva2Utd2lkdGg9IjIuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0ibTI4LjEgMjYuMyAyLjYgMi42IDUtNi4xIiBzdHJva2U9IiNGRkNFNTYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJtMzguMyA4IC44IDIuMiAyLjIuOC0yLjIuOC0uOCAyLjItLjgtMi4yLTIuMi0uOCAyLjItLjguOC0yLjJaIiBmaWxsPSIjRkZFMTdBIi8+Cjwvc3ZnPgo=" alt="ClassBoard logo" /></div>
         <div class="brand-copy"><div class="brand-name">ClassBoard</div><div class="brand-sub">INTEL CLASS PORTAL</div><div class="brand-term">3rd Semester</div></div>
       </div>
       <div class="section-label">Workspace</div>
@@ -1486,7 +2160,7 @@
         <button class="nav-item" data-view="Class Log"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M8 17h7"/></svg>Class Log</button>
         <button class="nav-item" data-view="Attendance"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/><path d="M16 6h4v4"/></svg>Attendance</button>
         <button class="nav-item" data-view="Class representatives" id="crWorkspaceNav" hidden><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h4"/></svg>Class Representatives</button>
-        <button class="nav-item" data-view="Tester Space" id="testerSpaceNav" hidden><svg viewBox="0 0 24 24"><path d="M10 2v7.31L4.66 18c-.81 1.25.09 2.92 1.57 2.92h15.54c1.48 0 2.38-1.67 1.57-2.92L14 9.31V2M8.5 2h7M10 5h4M7 16h10"/></svg>Tester Space <span class="nav-count" style="background:#7c3aed">BETA</span></button>
+        <button class="nav-item" data-view="Tester Space" id="testerSpaceNav" hidden><svg viewBox="0 0 24 24"><path d="M10 2v7.31L4.66 18c-.81 1.25.09 2.92 1.57 2.92h15.54c1.48 0 2.38-1.67 1.57-2.92L14 9.31V2M8.5 2h7M10 5h4M7 16h10"/></svg>Tester Space <span class="nav-count" style="background:var(--sun);color:#3a2700;font-weight:800">BETA</span></button>
       </nav>
       <div class="sidebar-bottom">
         <div class="profile-wrap">
@@ -1502,7 +2176,7 @@
         <div class="topbar-start">
           <button class="icon-button sidebar-toggle" id="sidebarToggle" type="button" aria-label="Open sidebar" title="Open sidebar" aria-controls="appSidebar" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
           <button class="icon-button page-back-button" id="pageBackButton" type="button" aria-label="Go back" title="Go back" disabled><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
-          <div class="mobile-brand"><img src="./classboard-logo.svg" alt="" /> <span>ClassBoard</span></div>
+          <div class="mobile-brand"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJvYXJkIiB4MT0iNyIgeTE9IjUiIHgyPSI0MiIgeTI9IjQ0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiMxNjhCRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDc1NkEwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJwYXBlciIgeDE9IjE0IiB5MT0iMTEiIHgyPSIzNiIgeTI9IjM3IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiNGRkZGRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRENFRUZGIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cGF0aCBkPSJNMTMgMy41aDIyQTkuNSA5LjUgMCAwIDEgNDQuNSAxM3YyMmE5LjUgOS41IDAgMCAxLTkuNSA5LjVIMTNBOS41IDkuNSAwIDAgMSAzLjUgMzVWMTNBOS41IDkuNSAwIDAgMSAxMyAzLjVaIiBmaWxsPSJ1cmwoI2JvYXJkKSIvPgogIDxwYXRoIGQ9Ik0xMy4xIDE2LjJjMC0zLjIgMi42LTUuOCA1LjgtNS44aDE2LjN2MjEuMUgxOC45YTUuOCA1LjggMCAwIDAtNS44IDUuOFYxNi4yWiIgZmlsbD0idXJsKCNwYXBlcikiLz4KICA8cGF0aCBkPSJNMTMuMSAzNy4zYTUuOCA1LjggMCAwIDEgNS44LTUuOGgxNi4zIiBzdHJva2U9IiNCOERCRkYiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMTkuMiAxNy4zaDEwLjZNMTkuMiAyMS44aDcuMiIgc3Ryb2tlPSIjMTY4QkZGIiBzdHJva2Utd2lkdGg9IjIuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0ibTI4LjEgMjYuMyAyLjYgMi42IDUtNi4xIiBzdHJva2U9IiNGRkNFNTYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJtMzguMyA4IC44IDIuMiAyLjIuOC0yLjIuOC0uOCAyLjItLjgtMi4yLTIuMi0uOCAyLjItLjguOC0yLjJaIiBmaWxsPSIjRkZFMTdBIi8+Cjwvc3ZnPgo=" alt="" /> <span>ClassBoard</span></div>
           <div class="crumb">Workspace <span style="padding:0 7px;color:var(--line)">/</span> <strong id="crumbPage">Home</strong></div>
         </div>
         <div class="top-actions">
@@ -1761,7 +2435,7 @@
           <section class="stats"><div class="stat-card"><div><div class="stat-value" id="adminStudentCount">—</div><div class="stat-label">Roll numbers assigned</div></div></div><div class="stat-card"><div><div class="stat-value" id="adminCrCount">—</div><div class="stat-label">Class Representatives</div></div></div><div class="stat-card"><div><div class="stat-value" id="adminMemberCount">—</div><div class="stat-label">Class accounts</div></div></div></section>
           <div class="workspace-grid">
             <div class="workspace-stack">
-              <article class="panel"><div class="panel-header"><div><div class="panel-title">Access &amp; roles</div><div class="panel-sub">Grant access to this section and assign roles. Only founders can change admin access.</div></div></div><form class="admin-add-member-form" id="adminAddMemberForm"><label class="field-label">College email<input class="text-field" type="email" name="email" required placeholder="student@medicaps.ac.in"></label><label class="field-label">Roll number <span>(optional)</span><input class="text-field" type="number" name="rollNumber" min="1" max="66" placeholder="1–66"></label><button class="primary-button" type="submit">Grant section access</button><p class="admin-add-member-note">The student must create a ClassBoard account first. Access is granted only to the selected section.</p></form><div class="admin-account-toolbar"><input class="search-field" id="adminAccountSearch" type="search" placeholder="Search name, email or roll number" aria-label="Search class accounts"><select class="select-field" id="adminAccountFilter" aria-label="Filter accounts by role"><option value="all">All accounts</option><option value="student">Students</option><option value="cr">Class representatives</option><option value="admin">Admins</option><option value="tester">Testers</option></select><span class="admin-account-count" id="adminAccountResultCount" aria-live="polite">Loading accounts</span></div><div class="workspace-table" id="accountList"><div class="list-row">Run the latest access-control migration to load class accounts.</div></div><div class="admin-account-no-results" id="adminAccountNoResults" hidden>No accounts match those filters.</div></article>
+              <article class="panel"><div class="panel-header"><div><div class="panel-title">Access &amp; roles</div><div class="panel-sub">Grant access to this section and assign roles. Only founders can change admin access.</div></div></div><form class="admin-add-member-form" id="adminAddMemberForm"><label class="field-label">College email<input class="text-field" type="email" name="email" required placeholder="student@medicaps.ac.in"></label><label class="field-label">Roll number <span>(optional)</span><input class="text-field" type="number" name="rollNumber" min="1" max="66" placeholder="1–66"></label><button class="primary-button" type="submit">Grant section access</button><p class="admin-add-member-note">The student must create a ClassBoard account first. Access is granted only to the selected section.</p></form><div class="admin-account-toolbar"><input class="search-field" id="adminAccountSearch" type="search" placeholder="Search name, email or roll number" aria-label="Search class accounts"><select class="select-field" id="adminAccountFilter" aria-label="Filter accounts by role"><option value="all">All accounts</option><option value="student">Students</option><option value="cr">Class representatives</option><option value="admin">Admins</option></select><span class="admin-account-count" id="adminAccountResultCount" aria-live="polite">Loading accounts</span></div><div class="workspace-table" id="accountList"><div class="list-row">Run the latest access-control migration to load class accounts.</div></div><div class="admin-account-no-results" id="adminAccountNoResults" hidden>No accounts match those filters.</div></article>
               <article class="panel"><div class="panel-header"><div><div class="panel-title">Portal details</div><div class="panel-sub">Current class configuration.</div></div></div><div class="workspace-table"><div class="list-row"><div class="list-main"><div class="list-title">Class name</div><div class="list-detail" data-config-value="class">AI &amp; Analytics - A (INTEL-1)</div></div></div><div class="list-row"><div class="list-main"><div class="list-title">Semester</div><div class="list-detail" data-config-value="semester">3rd Semester · Odd Semester 2026</div></div></div><div class="list-row"><div class="list-main"><div class="list-title">Attendance visibility</div><div class="list-detail">Private concern messages visible to assigned CRs and admins.</div></div><span class="status">Enabled</span></div></div></article>
             </div>
             <div class="workspace-stack">
@@ -1773,9 +2447,9 @@
         <section class="page-view" id="page-tester">
           <div class="page-heading">
             <div>
-              <div class="eyebrow" style="display:flex;align-items:center;gap:8px">
+              <div class="eyebrow" style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
                 <span>Tester Space · Experimental Labs</span>
-                <span class="tester-badge">🧪 BETA FEATURE</span>
+                <span class="tester-badge">🧪 BETA</span>
               </div>
               <h1>Grade &amp; SGPA Planner</h1>
               <div class="page-description">Calculate credit-weighted semester SGPA and plan cumulative CGPA across Semester 1 and Semester 2.</div>
@@ -1787,32 +2461,37 @@
           </div>
 
           <!-- Cumulative Dual-Semester Performance Summary Card -->
-          <article class="panel" style="margin-bottom:18px">
+          <article class="planner-cumulative-card">
             <div class="panel-header">
               <div>
                 <div class="panel-title">Cumulative Performance Tracker</div>
                 <div class="panel-sub">Combined progress across Odd Semester (Dec 2025) and Even Semester (May 2026).</div>
               </div>
-              <span class="update-tag" style="--update-accent:var(--blue)">Dual Semester</span>
+              <span class="update-tag" style="--update-accent:var(--logo-blue)">Dual Semester</span>
             </div>
-            <div class="planner-dual-metrics">
-              <div>
-                <div class="planner-dual-metric-label">Semester 1 (Dec 2025)</div>
-                <div class="planner-dual-metric-val" id="plannerSem1Summary">—</div>
-              </div>
-              <div>
-                <div class="planner-dual-metric-label">Semester 2 (May 2026)</div>
-                <div class="planner-dual-metric-val" id="plannerSem2Summary">—</div>
-              </div>
-              <div style="grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 10px; margin-top: 4px; display:flex; justify-content:space-between; align-items:center">
-                <span style="font-size:12px; font-weight:700; color:var(--text)">Combined Cumulative CGPA:</span>
-                <span style="font-size:22px; font-weight:800; color:var(--blue); letter-spacing:-.04em" id="plannerDualCgpa">—</span>
+            <div style="padding:0 22px 22px">
+              <div class="planner-dual-metrics">
+                <div>
+                  <div class="planner-dual-metric-label">Semester 1 (Dec 2025)</div>
+                  <div class="planner-dual-metric-val" id="plannerSem1Summary">—</div>
+                </div>
+                <div>
+                  <div class="planner-dual-metric-label">Semester 2 (May 2026)</div>
+                  <div class="planner-dual-metric-val" id="plannerSem2Summary">—</div>
+                </div>
+                <div class="planner-cgpa-banner">
+                  <span class="planner-cgpa-label">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--sun)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    Combined Cumulative CGPA:
+                  </span>
+                  <span class="planner-cgpa-val" id="plannerDualCgpa">—</span>
+                </div>
               </div>
             </div>
           </article>
 
           <!-- Semester Switching Tabs -->
-          <div class="tabs" style="margin-bottom:18px">
+          <div class="tabs" style="margin-bottom:20px">
             <button class="tab" id="plannerTabSem1" type="button">Semester 1 (Dec 2025 · 21.25 cr)</button>
             <button class="tab active" id="plannerTabSem2" type="button">Semester 2 (May 2026 · 20.25 cr)</button>
           </div>
@@ -1822,14 +2501,14 @@
             <div class="planner-main-stack">
               <!-- Semester 1 Container -->
               <div id="plannerPanelSem1" hidden>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
                   <div>
-                    <h2 style="font-size:16px;font-weight:750;margin:0">Semester 1 Courses</h2>
-                    <div style="font-size:11px;color:var(--muted)">ODD SEMESTER · DEC 2025 (admitted 2025 batch)</div>
+                    <h2 style="font-size:17px;font-weight:750;margin:0">Semester 1 Courses</h2>
+                    <div style="font-size:12px;color:var(--muted)">ODD SEMESTER · DEC 2025 (admitted 2025 batch)</div>
                   </div>
-                  <button class="secondary-button" id="plannerToggleAll" type="button" style="font-size:11px;padding:6px 10px">Expand all</button>
+                  <button class="secondary-button" id="plannerToggleAll" type="button" style="font-size:12px;min-height:34px;padding:0 14px">Expand all</button>
                 </div>
-                <div class="notice-box" style="margin-bottom:14px">
+                <div class="notice-box" style="margin-bottom:16px;border-radius:16px">
                   <span>ℹ️</span>
                   <span><strong>Audit courses:</strong> Sports Club (CL3018P) and Foreign Language (LN3003T) receive Grade X and 0 earned credits on official university slips. They are unchecked by default.</span>
                 </div>
@@ -1838,13 +2517,13 @@
 
               <!-- Semester 2 Container -->
               <div id="plannerPanelSem2">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
                   <div>
-                    <h2 style="font-size:16px;font-weight:750;margin:0">Semester 2 Courses</h2>
-                    <div style="font-size:11px;color:var(--muted)">EVEN SEMESTER · MAY 2026 (admitted 2025 batch)</div>
+                    <h2 style="font-size:17px;font-weight:750;margin:0">Semester 2 Courses</h2>
+                    <div style="font-size:12px;color:var(--muted)">EVEN SEMESTER · MAY 2026 (admitted 2025 batch)</div>
                   </div>
                 </div>
-                <div class="notice-box" style="margin-bottom:14px">
+                <div class="notice-box" style="margin-bottom:16px;border-radius:16px">
                   <span>ℹ️</span>
                   <span><strong>Audit courses:</strong> Foreign Language (LN3003T) and Indian Language (LN3004T) receive Grade X and 0 earned credits on official slips. They are unchecked by default.</span>
                 </div>
@@ -1852,17 +2531,19 @@
               </div>
 
               <!-- Grade Point Scale Panel -->
-              <article class="panel" style="margin-top:18px">
+              <article class="panel" style="margin-top:20px">
                 <div class="panel-header">
                   <div>
                     <div class="panel-title">Official Grade Point Scale</div>
                     <div class="panel-sub">Minimum total marks out of 100 for each grade point (Medi-Caps 2025+ scheme). Editable for scenario testing.</div>
                   </div>
-                  <span class="update-tag" style="--update-accent:var(--blue)">Editable</span>
+                  <span class="update-tag" style="--update-accent:var(--logo-blue)">Editable</span>
                 </div>
-                <div class="planner-scale-grid" id="plannerScale"></div>
-                <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.45">
-                  Points below 35 count as Grade F (0 GP). Course credit weights determine final SGPA and cumulative CGPA.
+                <div style="padding:0 22px 20px">
+                  <div class="planner-scale-grid" id="plannerScale"></div>
+                  <div style="font-size:12px;color:var(--muted);margin-top:14px;line-height:1.5">
+                    Marks below 35 count as Grade F (0 GP). Course credit weights determine final SGPA and cumulative CGPA.
+                  </div>
                 </div>
               </article>
             </div>
@@ -1870,28 +2551,28 @@
             <!-- Right Column: Results & Target Simulator -->
             <aside class="planner-side-stack">
               <!-- At a Glance Card -->
-              <article class="panel" style="margin-bottom:18px">
+              <article class="panel" style="margin-bottom:20px">
                 <div class="panel-header">
                   <div>
                     <div class="panel-title">At a Glance</div>
                     <div class="panel-sub">Active semester metrics.</div>
                   </div>
                 </div>
-                <div style="padding:16px 18px">
+                <div style="padding:18px 22px">
                   <div class="metric" style="padding-top:0">
                     <div class="stat-label">Registered Semester Credits</div>
-                    <div class="stat-value" id="plannerCredits" style="font-size:26px;color:var(--blue);margin:4px 0">—</div>
-                    <div style="font-size:10.5px;color:var(--muted)">Higher-credit courses carry more weight in the calculation.</div>
+                    <div class="stat-value" id="plannerCredits" style="font-size:28px;color:var(--logo-blue);margin:6px 0">—</div>
+                    <div style="font-size:11.5px;color:var(--muted)">Higher-credit courses carry more weight in the calculation.</div>
                   </div>
-                  <div class="metric" style="padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+                  <div class="metric" style="padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
                     <div class="stat-label">Projected Semester SGPA</div>
-                    <div class="stat-value" id="plannerProjection" style="font-size:26px;margin:4px 0">—</div>
-                    <div style="font-size:10.5px;color:var(--muted)">Calculated from currently entered marks.</div>
+                    <div class="stat-value" id="plannerProjection" style="font-size:32px;margin:6px 0;color:var(--text)">—</div>
+                    <div style="font-size:11.5px;color:var(--muted)">Calculated from currently entered marks.</div>
                   </div>
-                  <div class="metric" style="padding-bottom:0;padding-top:14px">
+                  <div class="metric" style="padding-bottom:0;padding-top:16px">
                     <div class="stat-label">Maximum Achievable SGPA</div>
-                    <div class="stat-value" id="plannerMaximum" style="font-size:26px;color:var(--green);margin:4px 0">—</div>
-                    <div style="font-size:10.5px;color:var(--muted)">Assumes full marks in all blank/future components.</div>
+                    <div class="stat-value" id="plannerMaximum" style="font-size:28px;color:var(--green);margin:6px 0">—</div>
+                    <div style="font-size:11.5px;color:var(--muted)">Assumes full marks in all blank/future components.</div>
                   </div>
                 </div>
               </article>
@@ -1904,8 +2585,8 @@
                     <div class="panel-sub">Calculate what marks you need.</div>
                   </div>
                 </div>
-                <div style="padding:16px 18px">
-                  <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="padding:18px 22px">
+                  <div style="display:flex;flex-direction:column;gap:14px">
                     <label class="field-label">
                       Target type
                       <select class="select-field" id="plannerTargetType">
@@ -1917,10 +2598,10 @@
                       Target Grade Point
                       <input class="text-field" id="plannerTargetGpa" type="number" min="4" max="10" step="0.05" value="8.0">
                     </label>
-                    <div id="plannerPriorWrap" hidden style="display:flex;flex-direction:column;gap:10px;padding:12px;background:var(--surface-2);border-radius:10px;border:1px solid var(--line)">
+                    <div id="plannerPriorWrap" hidden style="display:flex;flex-direction:column;gap:12px;padding:14px;background:var(--surface-2);border-radius:14px;border:1px solid var(--line)">
                       <div style="display:flex;justify-content:space-between;align-items:center">
-                        <span style="font-size:11px;font-weight:700;color:var(--muted)">Prior Academic Record</span>
-                        <button class="secondary-button" id="plannerImportSem1Gpa" type="button" style="font-size:10px;padding:3px 7px">Use Sem 1 SGPA</button>
+                        <span style="font-size:11.5px;font-weight:700;color:var(--muted)">Prior Academic Record</span>
+                        <button class="secondary-button" id="plannerImportSem1Gpa" type="button" style="font-size:11px;min-height:28px;padding:0 10px">Use Sem 1 SGPA</button>
                       </div>
                       <label class="field-label">
                         Previous CGPA
@@ -2682,7 +3363,6 @@
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
   <script src="./attendance-calendar.js?v=8"></script>
-  <script src="./grade-planner.js?v=1"></script>
   <script>
     (() => {
       const slide = document.getElementById('notificationSlide');
@@ -2720,5 +3400,27 @@
       });
     })();
   </script>
-  </body>
+  <script src="./grade-planner.js?v=2"></script>
+  <script id="cb-subject-dropdown-js">
+(function(){
+  var CHEV='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  function set(card,open){card.classList.toggle('is-open',open);var b=card.querySelector('.subject-toggle');if(b){b.setAttribute('aria-expanded',open);b.setAttribute('aria-label',(open?'Hide':'Show')+' details for '+(card.dataset.subjectName||'subject'));}}
+  function enhance(){
+    document.querySelectorAll('.attendance-subject-grid > .subject-attendance').forEach(function(card){
+      var top=card.querySelector('.subject-attendance-top');
+      if(!top||top.querySelector('.subject-toggle'))return;
+      var b=document.createElement('button');b.type='button';b.className='subject-toggle';b.innerHTML=CHEV;top.appendChild(b);
+      set(card,card.classList.contains('is-open'));
+    });
+  }
+  document.addEventListener('click',function(e){
+    var top=e.target.closest&&e.target.closest('.attendance-subject-grid .subject-attendance-top');
+    if(!top)return;var card=top.closest('.subject-attendance');set(card,!card.classList.contains('is-open'));
+  });
+  enhance();document.addEventListener('DOMContentLoaded',enhance);window.addEventListener('load',enhance);
+  var page=document.getElementById('page-attendance');
+  if(page&&window.MutationObserver)new MutationObserver(enhance).observe(page,{childList:true,subtree:true});
+})();
+</script>
+</body>
 </html>

@@ -93,12 +93,12 @@
   ];
 
   const COLOR_PALETTES = [
-    { accent: '#006BFF', bg: '#e5f1ff' },
-    { accent: '#087a4e', bg: '#e3f8ef' },
-    { accent: '#7c3aed', bg: '#f3e8ff' },
-    { accent: '#d97706', bg: '#fef3c7' },
-    { accent: '#dc2626', bg: '#fee2e2' },
-    { accent: '#0284c7', bg: '#e0f2fe' }
+    { accent: '#168BFF', bg: '#e5f1ff' },
+    { accent: '#0a7f5a', bg: '#def6ec' },
+    { accent: '#8957d8', bg: '#f3eaff' },
+    { accent: '#d8a20b', bg: '#fff3cf' },
+    { accent: '#df4c55', bg: '#fdeceb' },
+    { accent: '#14b8a6', bg: '#e6f9f6' }
   ];
 
   let state = {
@@ -393,7 +393,7 @@
         gradeBadge.className = 'planner-grade-badge';
       } else {
         const label = stat.currentGrade.label;
-        gradeBadge.textContent = `${label} (${stat.currentGrade.gp} GP)`;
+        gradeBadge.textContent = `${label} · ${stat.currentGrade.gp} GP`;
         gradeBadge.className = `planner-grade-badge grade-${label.toLowerCase().replace('+', 'plus')}`;
       }
     });
