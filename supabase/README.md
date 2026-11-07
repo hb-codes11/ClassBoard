@@ -56,7 +56,7 @@ select 'FRIEND_USER_UUID'::uuid, id, 'cr'::public.class_role from target_class;
 24. Confirm the two owners can sign in and that each new college account appears as a Student. Assign CR/Admin access from Admin workspace; only a CR can publish class updates, class logs, timetables, and reminders. Admins manage roles, review attendance concerns, and can upload or remove shared content.
 25. Apply `migrations/025_shared_class_calendar.sql` to publish calendar edits class-wide with real-time updates. Existing browser-local calendar overrides are copied into the shared calendar on the first successful staff load.
 26. Apply `migrations/026_add_intel2_section.sql` to create INTEL-2, copy the subject list, enable B1/B2 batch records, and update student batch setup for that section. The INTEL-2 weekly timetable is loaded from its own section-specific defaults in the app. Dated class-log entries, calendar overrides, notes, updates, attendance records, and memberships remain separate by `class_id` and start empty.
-27. Apply `migrations/028_tester_space_access.sql` to create `public.app_testers` and enforce database-level access control for the Tester Space (including the SGPA/CGPA Grade Planner). Founders automatically have access and can grant or revoke tester access for users in the Founder Dashboard.
+27. Apply `migrations/032_tester_space_access.sql` to create `public.app_testers` and enforce database-level access control for the Tester Space (including the SGPA/CGPA Grade Planner). Founders automatically have access and can grant or revoke tester access for users in the Founder Dashboard.
 
 ## Start INTEL-2 access
 

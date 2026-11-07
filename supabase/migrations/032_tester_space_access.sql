@@ -1,4 +1,4 @@
--- ClassBoard Migration 028: Tester Space & Grade Planner Access Control
+-- ClassBoard Migration 032: Tester Space & Grade Planner Access Control
 --
 -- 1. Creates a durable `app_testers` table for managing Tester Space access.
 -- 2. Automatically grants access to founders:
@@ -19,7 +19,22 @@
 
 begin;
 
--- Re-assert / create is_classboard_founder()
+-- Ensure founders are registered in public.classboard_founders if the table exists
+do $$
+begin
+  if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = 'classboard_founders') then
+    insert into public.classboard_founders (user_id)
+    select id from auth.users
+    where lower(email) in (
+      'en25cs3070059@medicaps.ac.in',
+      'en25cs3070130@medicaps.ac.in'
+    )
+    on conflict do nothing;
+  end if;
+end;
+$$;
+
+-- Founder verification checks classboard_founders table AND founder email allowlist
 create or replace function public.is_classboard_founder()
 returns boolean
 language plpgsql
@@ -29,9 +44,21 @@ set search_path = ''
 as $$
 declare
   caller_email text;
+  caller_is_founder boolean := false;
 begin
   if (select auth.uid()) is null then
     return false;
+  end if;
+
+  -- Check classboard_founders table
+  if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = 'classboard_founders') then
+    select exists (
+      select 1 from public.classboard_founders where user_id = (select auth.uid())
+    ) into caller_is_founder;
+
+    if caller_is_founder then
+      return true;
+    end if;
   end if;
 
   select lower(coalesce(u.email, (select auth.jwt()->>'email'), ''))
@@ -224,5 +251,6 @@ $$;
 revoke all on function public.set_tester_access(text, boolean) from public, anon;
 grant execute on function public.set_tester_access(text, boolean) to authenticated;
 
+notify pgrst, 'reload schema';
 commit;
 
