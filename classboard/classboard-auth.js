@@ -304,12 +304,37 @@
     if (greeting) greeting.textContent = `Hello, ${displayName.toLocaleUpperCase('en-IN')}`;
     const homeDate = document.getElementById('homeDate');
     if (homeDate) homeDate.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric' });
+    const founderEmails = ['en25cs3070059@medicaps.ac.in', 'en25cs3070130@medicaps.ac.in'];
+    const initialTesterEmails = [
+      'en25cs3070077@medicaps.ac.in',
+      'en25cs3070117@medicaps.ac.in',
+      'en25cs3090193@medicaps.ac.in',
+      'en25cs3070103@medicaps.ac.in',
+      'en25cs3070096@medicaps.ac.in',
+      'en25cs3070100@medicaps.ac.in'
+    ];
+    const userEmail = (user.email || '').toLowerCase();
+    const isKnownFounder = founderEmails.includes(userEmail);
     const { data: founderAccess, error: founderError } = await window.classboardSupabase.rpc('is_classboard_founder');
-    const isFounder = !founderError && founderAccess === true;
+    const isFounder = (!founderError && founderAccess === true) || isKnownFounder;
+
+    let isTester = isFounder || initialTesterEmails.includes(userEmail);
+    try {
+      const { data: testerAccess, error: testerError } = await window.classboardSupabase.rpc('is_classboard_tester');
+      if (!testerError && typeof testerAccess === 'boolean') {
+        isTester = testerAccess || isFounder;
+      }
+    } catch (_) {}
+
     const studentMembership = classMemberships.find((row) => row.role === 'student');
     const classId = classInfo.id;
-    window.classboardContext = { classId, classCode: classInfo.code, className: classInfo.name, userId: user.id, roles, isFounder, rollNumber: studentMembership?.roll_number ?? null };
+    window.classboardContext = { classId, classCode: classInfo.code, className: classInfo.name, userId: user.id, userEmail, roles, isFounder, isTester, rollNumber: studentMembership?.roll_number ?? null };
     setRoleOptions(roles, isFounder);
+
+    const testerNav = document.getElementById('testerSpaceNav');
+    if (testerNav) testerNav.hidden = !isTester;
+    const mobileTesterNav = document.getElementById('mobileTesterSpaceNav');
+    if (mobileTesterNav) mobileTesterNav.hidden = !isTester;
     window.dispatchEvent(new Event('classboard:attendance-calendar-context'));
     if (studentMembership && window.setClassboardRoll) window.setClassboardRoll(studentMembership.roll_number);
     const issueDate = document.querySelector('#issueForm input[name="date"]');
@@ -1494,6 +1519,27 @@
     }
     const profiles = new Map((profileResult.data || []).map((profile) => [profile.user_id, profile]));
     const contacts = new Map((contactResult.data || []).map((contact) => [contact.user_id, contact.email]));
+
+    let activeTesterEmails = new Set([
+      'en25cs3070059@medicaps.ac.in',
+      'en25cs3070130@medicaps.ac.in',
+      'en25cs3070077@medicaps.ac.in',
+      'en25cs3070117@medicaps.ac.in',
+      'en25cs3090193@medicaps.ac.in',
+      'en25cs3070103@medicaps.ac.in',
+      'en25cs3070096@medicaps.ac.in',
+      'en25cs3070100@medicaps.ac.in'
+    ]);
+
+    if (window.classboardContext?.isFounder) {
+      try {
+        const { data: testerList, error: testerErr } = await client.rpc('list_classboard_testers');
+        if (!testerErr && Array.isArray(testerList)) {
+          activeTesterEmails = new Set(testerList.filter((t) => t.is_active).map((t) => (t.email || '').toLowerCase()));
+        }
+      } catch (_) {}
+    }
+
     const users = new Map();
     (memberships || []).forEach((membership) => {
       const profile = profiles.get(membership.user_id) || {};
@@ -1505,6 +1551,9 @@
       const user = users.get(membership.user_id);
       user.roles.add(membership.role);
       if (membership.role === 'student') user.rollNumber = membership.roll_number;
+      if (email && activeTesterEmails.has(email.toLowerCase())) {
+        user.roles.add('tester');
+      }
     });
 
     container.replaceChildren();
@@ -1529,17 +1578,45 @@
         if (value === 'admin' && !window.classboardContext?.isFounder) { check.disabled = true; check.title = 'Only founders can change admin access.'; }
         roleLabel.append(check, document.createTextNode(label)); roleGroup.append(roleLabel);
       });
+      const isUserTester = activeTesterEmails.has((user.email || '').toLowerCase());
+      if (window.classboardContext?.isFounder) {
+        const testerLabel = document.createElement('label');
+        const testerCheck = document.createElement('input');
+        testerCheck.type = 'checkbox';
+        testerCheck.value = 'tester';
+        testerCheck.checked = isUserTester;
+        testerLabel.append(testerCheck, document.createTextNode('Tester'));
+        roleGroup.append(testerLabel);
+      }
       const rollLabel = document.createElement('label'); rollLabel.className = 'account-roll-label'; rollLabel.textContent = 'Student roll number';
       const roll = document.createElement('input'); roll.className = 'text-field'; roll.type = 'number'; roll.min = '1'; roll.max = String(maxRollForClass()); roll.placeholder = 'Optional'; roll.value = user.rollNumber ?? '';
       rollLabel.append(roll);
       const save = document.createElement('button'); save.className = 'secondary-button'; save.type = 'button'; save.textContent = 'Save roles';
       save.addEventListener('click', async () => {
-        const roles = ['student', ...[...roleGroup.querySelectorAll('input:checked')].map((input) => input.value)];
+        const roles = ['student', ...[...roleGroup.querySelectorAll('input:checked')]
+          .map((input) => input.value)
+          .filter((val) => val !== 'tester')];
         const rollNumber = roll.value ? Number(roll.value) : null;
         if (rollNumber !== null && (!Number.isInteger(rollNumber) || rollNumber < 1 || rollNumber > maxRollForClass())) {
           notifyApp(`Student roll number must be between 1 and ${maxRollForClass()}.`, true); return;
         }
         save.disabled = true;
+
+        if (window.classboardContext?.isFounder && user.email) {
+          const testerInput = roleGroup.querySelector('input[value="tester"]');
+          if (testerInput && testerInput.checked !== isUserTester) {
+            const { error: testerError } = await client.rpc('set_tester_access', {
+              p_email: user.email,
+              p_is_tester: testerInput.checked
+            });
+            if (testerError) {
+              notifyApp(`Could not update tester access: ${testerError.message}`, true);
+              save.disabled = false;
+              return;
+            }
+          }
+        }
+
         const { error } = await client.rpc('set_class_member_roles', {
           p_user_id: user.userId, p_class_id: classId, p_roles: roles, p_roll_number: rollNumber
         });

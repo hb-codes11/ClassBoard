@@ -1392,6 +1392,54 @@
       .auth-copy { margin-bottom: 10px; font-size: 13px; }
       .auth-field input, .auth-field select { min-height: 43px; }
     }
+    /* Tester Space & Grade Planner */
+    .tester-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, #7c3aed 14%, var(--surface)); color: #7c3aed; font-size: 11px; font-weight: 700; letter-spacing: .02em; border: 1px solid color-mix(in srgb, #7c3aed 30%, var(--line)); }
+    [data-theme="dark"] .tester-badge { background: color-mix(in srgb, #a78bfa 18%, var(--surface)); color: #c4b5fd; border-color: #a78bfa40; }
+    .planner-layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(310px, 0.95fr); gap: 20px; align-items: start; }
+    @media (max-width: 920px) { .planner-layout { grid-template-columns: 1fr; } }
+    .planner-subject-card { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 4px 14px rgba(16, 61, 120, .03); margin-bottom: 12px; overflow: hidden; transition: border-color .16s ease, box-shadow .16s ease; }
+    .planner-subject-card:hover { border-color: color-mix(in srgb, var(--card-accent, var(--blue)) 40%, var(--line)); }
+    .planner-subject-card.unselected { opacity: .55; background: var(--surface-2); }
+    .planner-subject-summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 13px 16px; user-select: none; }
+    .planner-subject-summary::-webkit-details-marker { display: none; }
+    .planner-subject-summary::after { content: '⌄'; font-size: 18px; margin-left: 6px; color: var(--muted); transition: transform .16s ease; }
+    .planner-subject-card[open] .planner-subject-summary::after { transform: rotate(180deg); }
+    .planner-course-checkbox { width: 18px; height: 18px; flex: none; accent-color: var(--blue); cursor: pointer; }
+    .planner-subject-icon { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 11px; letter-spacing: -.02em; background: var(--card-tint, var(--blue-soft)); color: var(--card-accent, var(--blue)); flex: none; }
+    .planner-subject-header { min-width: 0; flex: 1; }
+    .planner-subject-name { font-weight: 700; font-size: 13.5px; line-height: 1.3; color: var(--text); }
+    .planner-subject-meta { color: var(--muted); font-size: 11px; margin-top: 2px; }
+    .planner-subject-badge-wrap { display: flex; align-items: center; gap: 8px; flex: none; }
+    .planner-grade-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 52px; padding: 3px 8px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--line); color: var(--text); font-size: 11px; font-weight: 750; }
+    .planner-grade-badge.grade-o { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    .planner-grade-badge.grade-aplus { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+    .planner-grade-badge.grade-a { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+    .planner-grade-badge.grade-bplus { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+    .planner-grade-badge.grade-b { background: #fffbeb; color: #d97706; border-color: #fef3c7; }
+    .planner-grade-badge.grade-c { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+    .planner-grade-badge.grade-p { background: #fae8ff; color: #86198f; border-color: #f5d0fe; }
+    .planner-grade-badge.grade-f { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+    .planner-credit-pill { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 8px; background: var(--blue-soft); color: var(--blue); font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid transparent; }
+    .planner-credit-pill:hover { border-color: var(--blue); }
+    .planner-credit-input { width: 52px; padding: 2px 4px; font-size: 11px; font-weight: 700; border: 1px solid var(--blue); border-radius: 6px; }
+    .planner-marks-body { border-top: 1px solid var(--line); padding: 14px 16px; background: color-mix(in srgb, var(--surface) 97%, var(--surface-2)); }
+    .planner-marks-notice { font-size: 11px; color: var(--muted); line-height: 1.45; margin-bottom: 12px; }
+    .planner-marks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+    .planner-mark-field { display: flex; flex-direction: column; gap: 4px; }
+    .planner-mark-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 650; color: var(--muted); }
+    .planner-mark-max { color: var(--muted); font-weight: 500; opacity: .75; }
+    .planner-mark-input { padding: 7px 9px; font-size: 13px; font-weight: 600; }
+    .planner-target-result { margin-top: 14px; padding: 13px 15px; border-radius: 12px; font-size: 12.5px; line-height: 1.5; background: var(--surface-2); border: 1px solid var(--line); color: var(--text); }
+    .planner-target-result.result-success { background: color-mix(in srgb, var(--green) 9%, var(--surface)); border-color: color-mix(in srgb, var(--green) 30%, var(--line)); color: var(--text); }
+    .planner-target-result.result-warning { background: color-mix(in srgb, var(--amber) 10%, var(--surface)); border-color: color-mix(in srgb, var(--amber) 32%, var(--line)); color: var(--text); }
+    .planner-target-result.result-error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+    .planner-scale-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 8px; margin-top: 12px; }
+    .planner-scale-item { display: flex; flex-direction: column; gap: 4px; }
+    .planner-scale-label { font-size: 10.5px; font-weight: 700; color: var(--muted); }
+    .planner-scale-input { padding: 6px 8px; font-size: 12px; font-weight: 650; }
+    .planner-dual-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; padding: 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); }
+    .planner-dual-metric-label { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; font-weight: 700; color: var(--muted); }
+    .planner-dual-metric-val { font-size: 15px; font-weight: 750; color: var(--text); margin-top: 2px; }
   </style>
 </head>
 <body data-role="student">
@@ -1438,6 +1486,7 @@
         <button class="nav-item" data-view="Class Log"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M8 17h7"/></svg>Class Log</button>
         <button class="nav-item" data-view="Attendance"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/><path d="M16 6h4v4"/></svg>Attendance</button>
         <button class="nav-item" data-view="Class representatives" id="crWorkspaceNav" hidden><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h4"/></svg>Class Representatives</button>
+        <button class="nav-item" data-view="Tester Space" id="testerSpaceNav" hidden><svg viewBox="0 0 24 24"><path d="M10 2v7.31L4.66 18c-.81 1.25.09 2.92 1.57 2.92h15.54c1.48 0 2.38-1.67 1.57-2.92L14 9.31V2M8.5 2h7M10 5h4M7 16h10"/></svg>Tester Space <span class="nav-count" style="background:#7c3aed">BETA</span></button>
       </nav>
       <div class="sidebar-bottom">
         <div class="profile-wrap">
@@ -1712,12 +1761,183 @@
           <section class="stats"><div class="stat-card"><div><div class="stat-value" id="adminStudentCount">—</div><div class="stat-label">Roll numbers assigned</div></div></div><div class="stat-card"><div><div class="stat-value" id="adminCrCount">—</div><div class="stat-label">Class Representatives</div></div></div><div class="stat-card"><div><div class="stat-value" id="adminMemberCount">—</div><div class="stat-label">Class accounts</div></div></div></section>
           <div class="workspace-grid">
             <div class="workspace-stack">
-              <article class="panel"><div class="panel-header"><div><div class="panel-title">Access &amp; roles</div><div class="panel-sub">Grant access to this section and assign roles. Only founders can change admin access.</div></div></div><form class="admin-add-member-form" id="adminAddMemberForm"><label class="field-label">College email<input class="text-field" type="email" name="email" required placeholder="student@medicaps.ac.in"></label><label class="field-label">Roll number <span>(optional)</span><input class="text-field" type="number" name="rollNumber" min="1" max="66" placeholder="1–66"></label><button class="primary-button" type="submit">Grant section access</button><p class="admin-add-member-note">The student must create a ClassBoard account first. Access is granted only to the selected section.</p></form><div class="admin-account-toolbar"><input class="search-field" id="adminAccountSearch" type="search" placeholder="Search name, email or roll number" aria-label="Search class accounts"><select class="select-field" id="adminAccountFilter" aria-label="Filter accounts by role"><option value="all">All accounts</option><option value="student">Students</option><option value="cr">Class representatives</option><option value="admin">Admins</option></select><span class="admin-account-count" id="adminAccountResultCount" aria-live="polite">Loading accounts</span></div><div class="workspace-table" id="accountList"><div class="list-row">Run the latest access-control migration to load class accounts.</div></div><div class="admin-account-no-results" id="adminAccountNoResults" hidden>No accounts match those filters.</div></article>
+              <article class="panel"><div class="panel-header"><div><div class="panel-title">Access &amp; roles</div><div class="panel-sub">Grant access to this section and assign roles. Only founders can change admin access.</div></div></div><form class="admin-add-member-form" id="adminAddMemberForm"><label class="field-label">College email<input class="text-field" type="email" name="email" required placeholder="student@medicaps.ac.in"></label><label class="field-label">Roll number <span>(optional)</span><input class="text-field" type="number" name="rollNumber" min="1" max="66" placeholder="1–66"></label><button class="primary-button" type="submit">Grant section access</button><p class="admin-add-member-note">The student must create a ClassBoard account first. Access is granted only to the selected section.</p></form><div class="admin-account-toolbar"><input class="search-field" id="adminAccountSearch" type="search" placeholder="Search name, email or roll number" aria-label="Search class accounts"><select class="select-field" id="adminAccountFilter" aria-label="Filter accounts by role"><option value="all">All accounts</option><option value="student">Students</option><option value="cr">Class representatives</option><option value="admin">Admins</option><option value="tester">Testers</option></select><span class="admin-account-count" id="adminAccountResultCount" aria-live="polite">Loading accounts</span></div><div class="workspace-table" id="accountList"><div class="list-row">Run the latest access-control migration to load class accounts.</div></div><div class="admin-account-no-results" id="adminAccountNoResults" hidden>No accounts match those filters.</div></article>
               <article class="panel"><div class="panel-header"><div><div class="panel-title">Portal details</div><div class="panel-sub">Current class configuration.</div></div></div><div class="workspace-table"><div class="list-row"><div class="list-main"><div class="list-title">Class name</div><div class="list-detail" data-config-value="class">AI &amp; Analytics - A (INTEL-1)</div></div></div><div class="list-row"><div class="list-main"><div class="list-title">Semester</div><div class="list-detail" data-config-value="semester">3rd Semester · Odd Semester 2026</div></div></div><div class="list-row"><div class="list-main"><div class="list-title">Attendance visibility</div><div class="list-detail">Private concern messages visible to assigned CRs and admins.</div></div><span class="status">Enabled</span></div></div></article>
             </div>
             <div class="workspace-stack">
               <article class="panel"><div class="panel-header"><div><div class="panel-title">How role control works</div><div class="panel-sub">Section admins manage student and CR access. Only founders can grant or remove admin access.</div></div></div><div class="private-note">Keep at least one active admin. Roll numbers are optional for admins and CRs; students can enter theirs when they join. Rolls 1–32 are A1 and 33–66 are A2. CRs and section admins publish class information; founders assign section admins.</div></article>
             </div>
+          </div>
+        </section>
+
+        <section class="page-view" id="page-tester">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow" style="display:flex;align-items:center;gap:8px">
+                <span>Tester Space · Experimental Labs</span>
+                <span class="tester-badge">🧪 BETA FEATURE</span>
+              </div>
+              <h1>Grade &amp; SGPA Planner</h1>
+              <div class="page-description">Calculate credit-weighted semester SGPA and plan cumulative CGPA across Semester 1 and Semester 2.</div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="secondary-button" id="plannerSampleFill" type="button" title="Fill sample verification marks matching official grade slips">Pre-fill verification slip</button>
+              <button class="secondary-button" id="plannerResetMarks" type="button" title="Clear all marks for this semester">Reset marks</button>
+            </div>
+          </div>
+
+          <!-- Cumulative Dual-Semester Performance Summary Card -->
+          <article class="panel" style="margin-bottom:18px">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Cumulative Performance Tracker</div>
+                <div class="panel-sub">Combined progress across Odd Semester (Dec 2025) and Even Semester (May 2026).</div>
+              </div>
+              <span class="update-tag" style="--update-accent:var(--blue)">Dual Semester</span>
+            </div>
+            <div class="planner-dual-metrics">
+              <div>
+                <div class="planner-dual-metric-label">Semester 1 (Dec 2025)</div>
+                <div class="planner-dual-metric-val" id="plannerSem1Summary">—</div>
+              </div>
+              <div>
+                <div class="planner-dual-metric-label">Semester 2 (May 2026)</div>
+                <div class="planner-dual-metric-val" id="plannerSem2Summary">—</div>
+              </div>
+              <div style="grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 10px; margin-top: 4px; display:flex; justify-content:space-between; align-items:center">
+                <span style="font-size:12px; font-weight:700; color:var(--text)">Combined Cumulative CGPA:</span>
+                <span style="font-size:22px; font-weight:800; color:var(--blue); letter-spacing:-.04em" id="plannerDualCgpa">—</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Semester Switching Tabs -->
+          <div class="tabs" style="margin-bottom:18px">
+            <button class="tab" id="plannerTabSem1" type="button">Semester 1 (Dec 2025 · 21.25 cr)</button>
+            <button class="tab active" id="plannerTabSem2" type="button">Semester 2 (May 2026 · 20.25 cr)</button>
+          </div>
+
+          <div class="planner-layout">
+            <!-- Left Column: Course Cards -->
+            <div class="planner-main-stack">
+              <!-- Semester 1 Container -->
+              <div id="plannerPanelSem1" hidden>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                  <div>
+                    <h2 style="font-size:16px;font-weight:750;margin:0">Semester 1 Courses</h2>
+                    <div style="font-size:11px;color:var(--muted)">ODD SEMESTER · DEC 2025 (admitted 2025 batch)</div>
+                  </div>
+                  <button class="secondary-button" id="plannerToggleAll" type="button" style="font-size:11px;padding:6px 10px">Expand all</button>
+                </div>
+                <div class="notice-box" style="margin-bottom:14px">
+                  <span>ℹ️</span>
+                  <span><strong>Audit courses:</strong> Sports Club (CL3018P) and Foreign Language (LN3003T) receive Grade X and 0 earned credits on official university slips. They are unchecked by default.</span>
+                </div>
+                <div id="plannerSem1Subjects"></div>
+              </div>
+
+              <!-- Semester 2 Container -->
+              <div id="plannerPanelSem2">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                  <div>
+                    <h2 style="font-size:16px;font-weight:750;margin:0">Semester 2 Courses</h2>
+                    <div style="font-size:11px;color:var(--muted)">EVEN SEMESTER · MAY 2026 (admitted 2025 batch)</div>
+                  </div>
+                </div>
+                <div class="notice-box" style="margin-bottom:14px">
+                  <span>ℹ️</span>
+                  <span><strong>Audit courses:</strong> Foreign Language (LN3003T) and Indian Language (LN3004T) receive Grade X and 0 earned credits on official slips. They are unchecked by default.</span>
+                </div>
+                <div id="plannerSem2Subjects"></div>
+              </div>
+
+              <!-- Grade Point Scale Panel -->
+              <article class="panel" style="margin-top:18px">
+                <div class="panel-header">
+                  <div>
+                    <div class="panel-title">Official Grade Point Scale</div>
+                    <div class="panel-sub">Minimum total marks out of 100 for each grade point (Medi-Caps 2025+ scheme). Editable for scenario testing.</div>
+                  </div>
+                  <span class="update-tag" style="--update-accent:var(--blue)">Editable</span>
+                </div>
+                <div class="planner-scale-grid" id="plannerScale"></div>
+                <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.45">
+                  Points below 35 count as Grade F (0 GP). Course credit weights determine final SGPA and cumulative CGPA.
+                </div>
+              </article>
+            </div>
+
+            <!-- Right Column: Results & Target Simulator -->
+            <aside class="planner-side-stack">
+              <!-- At a Glance Card -->
+              <article class="panel" style="margin-bottom:18px">
+                <div class="panel-header">
+                  <div>
+                    <div class="panel-title">At a Glance</div>
+                    <div class="panel-sub">Active semester metrics.</div>
+                  </div>
+                </div>
+                <div style="padding:16px 18px">
+                  <div class="metric" style="padding-top:0">
+                    <div class="stat-label">Registered Semester Credits</div>
+                    <div class="stat-value" id="plannerCredits" style="font-size:26px;color:var(--blue);margin:4px 0">—</div>
+                    <div style="font-size:10.5px;color:var(--muted)">Higher-credit courses carry more weight in the calculation.</div>
+                  </div>
+                  <div class="metric" style="padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+                    <div class="stat-label">Projected Semester SGPA</div>
+                    <div class="stat-value" id="plannerProjection" style="font-size:26px;margin:4px 0">—</div>
+                    <div style="font-size:10.5px;color:var(--muted)">Calculated from currently entered marks.</div>
+                  </div>
+                  <div class="metric" style="padding-bottom:0;padding-top:14px">
+                    <div class="stat-label">Maximum Achievable SGPA</div>
+                    <div class="stat-value" id="plannerMaximum" style="font-size:26px;color:var(--green);margin:4px 0">—</div>
+                    <div style="font-size:10.5px;color:var(--muted)">Assumes full marks in all blank/future components.</div>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Target Planner Card -->
+              <article class="panel">
+                <div class="panel-header">
+                  <div>
+                    <div class="panel-title">Target Simulator</div>
+                    <div class="panel-sub">Calculate what marks you need.</div>
+                  </div>
+                </div>
+                <div style="padding:16px 18px">
+                  <div style="display:flex;flex-direction:column;gap:12px">
+                    <label class="field-label">
+                      Target type
+                      <select class="select-field" id="plannerTargetType">
+                        <option value="sgpa">Semester SGPA Target</option>
+                        <option value="cgpa">Overall Cumulative CGPA Target</option>
+                      </select>
+                    </label>
+                    <label class="field-label">
+                      Target Grade Point
+                      <input class="text-field" id="plannerTargetGpa" type="number" min="4" max="10" step="0.05" value="8.0">
+                    </label>
+                    <div id="plannerPriorWrap" hidden style="display:flex;flex-direction:column;gap:10px;padding:12px;background:var(--surface-2);border-radius:10px;border:1px solid var(--line)">
+                      <div style="display:flex;justify-content:space-between;align-items:center">
+                        <span style="font-size:11px;font-weight:700;color:var(--muted)">Prior Academic Record</span>
+                        <button class="secondary-button" id="plannerImportSem1Gpa" type="button" style="font-size:10px;padding:3px 7px">Use Sem 1 SGPA</button>
+                      </div>
+                      <label class="field-label">
+                        Previous CGPA
+                        <input class="text-field" id="plannerPriorGpa" type="number" min="0" max="10" step="0.01" placeholder="e.g. 7.98">
+                      </label>
+                      <label class="field-label">
+                        Previous Earned Credits
+                        <input class="text-field" id="plannerPriorCredits" type="number" min="1" max="100" step="0.25" placeholder="e.g. 21.25">
+                      </label>
+                    </div>
+                  </div>
+                  <div class="planner-target-result" id="plannerTargetResult">
+                    Enter target grade point to simulate your required marks.
+                  </div>
+                </div>
+              </article>
+            </aside>
           </div>
         </section>
         <footer class="site-footer"><span>About ClassBoard · AI &amp; Analytics - A (INTEL-1), 3rd Semester</span><span class="footer-credit"><span>Developed by</span><span class="footer-wordmark">Hasnaat &amp; Harsh 🕸️✨</span></span></footer>
@@ -1733,6 +1953,7 @@
         <button data-view="Class Log"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Class Log</button>
         <button data-view="Attendance"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-7"/></svg>Attendance</button>
         <button data-view="Class representatives" id="mobileCrWorkspaceNav" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h4"/></svg>Class Representatives</button>
+        <button data-view="Tester Space" id="mobileTesterSpaceNav" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v7.31L4.66 18c-.81 1.25.09 2.92 1.57 2.92h15.54c1.48 0 2.38-1.67 1.57-2.92L14 9.31V2M8.5 2h7M10 5h4M7 16h10"/></svg>Tester Space</button>
         <button data-view="Profile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
         <span class="mobile-more-divider" aria-hidden="true"></span>
         <button class="mobile-more-theme" type="button" id="mobileThemeToggle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.9 13A8.5 8.5 0 0 1 11 3.1 8.5 8.5 0 1 0 20.9 13Z"/></svg>Change appearance</button>
@@ -1958,7 +2179,8 @@
     const pageMap = {
       'Home': 'home', 'Notes & Syllabus': 'resources', 'Updates': 'updates', 'Academics': 'calendar',
       'Class Log': 'classes', 'Attendance': 'attendance',
-      'Notifications': 'notifications', 'Profile': 'profile', 'Class representatives': 'cr', 'Admin workspace': 'admin'
+      'Notifications': 'notifications', 'Profile': 'profile', 'Class representatives': 'cr', 'Admin workspace': 'admin',
+      'Tester Space': 'tester'
     };
     const pageHistory = [];
     let currentPage = null;
@@ -1968,6 +2190,13 @@
     }
     function openPage(page, activeName, { recordHistory = true } = {}) {
       const pageId = pageMap[activeName] || page;
+      if (pageId === 'tester' && !window.classboardContext?.isTester && !window.classboardContext?.isFounder) {
+        showToast('Tester Space is restricted to approved beta testers.');
+        return;
+      }
+      if (pageId === 'tester' && window.initClassboardGradePlanner) {
+        window.initClassboardGradePlanner();
+      }
       const nextPage = pageId ? { pageId, activeName: activeName || 'Home' } : null;
       if (nextPage) {
         if (recordHistory && currentPage && (currentPage.pageId !== nextPage.pageId || currentPage.activeName !== nextPage.activeName)) {
@@ -2453,6 +2682,7 @@
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
   <script src="./attendance-calendar.js?v=8"></script>
+  <script src="./grade-planner.js?v=1"></script>
   <script>
     (() => {
       const slide = document.getElementById('notificationSlide');
