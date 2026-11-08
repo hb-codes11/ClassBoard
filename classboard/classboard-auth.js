@@ -460,6 +460,116 @@
     return /\b(?:mst[a-z0-9_-]*|mid[\s-]*semester)\b/i.test(content);
   }
 
+  function applyUpdatesFilter() {
+    const activeChip = document.querySelector('.updates-toolbar .filter-chip.active');
+    const filter = activeChip ? activeChip.dataset.updateFilter : 'all';
+    const updateList = document.getElementById('updateList');
+    if (!updateList) return;
+
+    const cards = updateList.querySelectorAll('.update');
+    cards.forEach((card) => {
+      const match = filter === 'all' || card.dataset.category === filter;
+      card.style.display = match ? '' : 'none';
+    });
+
+    const pinnedHeader = updateList.querySelector('.updates-pinned-header');
+    if (pinnedHeader) {
+      const hasVisiblePinned = [...updateList.querySelectorAll('.update[data-section="pinned"]')].some((c) => c.style.display !== 'none');
+      pinnedHeader.style.display = hasVisiblePinned ? '' : 'none';
+    }
+
+    const comingUpHeader = updateList.querySelector('.updates-coming-up-header');
+    if (comingUpHeader) {
+      const hasVisibleComingUp = [...updateList.querySelectorAll('.update[data-section="coming-up"]')].some((c) => c.style.display !== 'none');
+      comingUpHeader.style.display = hasVisibleComingUp ? '' : 'none';
+    }
+
+    const emptyFilter = updateList.querySelector('.updates-empty-filter');
+    const anyVisible = [...cards].some((c) => c.style.display !== 'none');
+    if (!anyVisible && cards.length > 0) {
+      if (!emptyFilter) {
+        const emptyEl = document.createElement('div');
+        emptyEl.className = 'live-empty updates-empty-filter';
+        emptyEl.textContent = 'No updates match the selected filter.';
+        updateList.append(emptyEl);
+      } else {
+        emptyFilter.style.display = '';
+      }
+    } else if (emptyFilter) {
+      emptyFilter.style.display = 'none';
+    }
+  }
+  window.applyClassboardUpdatesFilter = applyUpdatesFilter;
+
+  function renderUpdatesPage(feed = window.classboardUpdateFeed) {
+    const updateList = document.getElementById('updateList');
+    if (!updateList) return;
+    updateList.replaceChildren();
+
+    const items = Array.isArray(feed) ? feed : [];
+
+    const allCount = items.length;
+    const importantCount = items.filter((item) => {
+      const cat = String(item.category || '').toLowerCase();
+      return cat === 'important' || item.importance === 'important';
+    }).length;
+    const deadlineCount = items.filter((item) => {
+      const cat = String(item.category || '').toLowerCase();
+      return cat === 'deadline';
+    }).length;
+    const reminderCount = items.filter((item) => item.isReminder).length;
+
+    const countAllEl = document.getElementById('updatesCountAll');
+    const countImpEl = document.getElementById('updatesCountImportant');
+    const countDeadEl = document.getElementById('updatesCountDeadline');
+    const countRemEl = document.getElementById('updatesCountReminder');
+    const totalCountEl = document.getElementById('updatesTotalCount');
+
+    if (countAllEl) countAllEl.textContent = allCount;
+    if (countImpEl) countImpEl.textContent = importantCount;
+    if (countDeadEl) countDeadEl.textContent = deadlineCount;
+    if (countRemEl) countRemEl.textContent = reminderCount;
+    if (totalCountEl) totalCountEl.textContent = `${allCount} update${allCount === 1 ? '' : 's'}`;
+
+    if (!items.length) {
+      addEmptyNote(updateList, 'No class updates or reminders have been published yet.');
+      return;
+    }
+
+    const pinnedItems = items.filter((item) => isUpdatePinned(item));
+    const unpinnedItems = items.filter((item) => !isUpdatePinned(item));
+
+    if (pinnedItems.length > 0) {
+      const pinnedHeader = document.createElement('div');
+      pinnedHeader.className = 'updates-section-header updates-pinned-header';
+      pinnedHeader.dataset.sectionType = 'pinned';
+      pinnedHeader.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg><span>PINNED FOR YOUR CLASS</span>';
+      updateList.append(pinnedHeader);
+
+      pinnedItems.forEach((item) => {
+        const card = addUpdateCard(item, '');
+        card.dataset.section = 'pinned';
+        updateList.append(card);
+      });
+    }
+
+    if (unpinnedItems.length > 0) {
+      const comingUpHeader = document.createElement('div');
+      comingUpHeader.className = 'updates-section-header updates-coming-up-header';
+      comingUpHeader.dataset.sectionType = 'coming-up';
+      comingUpHeader.innerHTML = '<span class="updates-coming-up-dot" aria-hidden="true"></span><span>COMING UP</span>';
+      updateList.append(comingUpHeader);
+
+      unpinnedItems.forEach((item) => {
+        const card = addUpdateCard(item, '');
+        card.dataset.section = 'coming-up';
+        updateList.append(card);
+      });
+    }
+
+    applyUpdatesFilter();
+  }
+
   function renderHomeUpdates(feed = window.classboardUpdateFeed) {
     const container = document.getElementById('homeUpdateList');
     if (!container) return;
@@ -495,40 +605,56 @@
     card.dataset.category = update.isReminder ? 'Reminder' : category === 'deadline' ? 'Deadline' : category === 'important' || update.importance === 'important' ? 'Important' : 'General';
     const displayDate = update.isReminder ? update.due_at : cardType === 'deadline' && update.expires_at ? update.expires_at : update.published_at || update.created_at;
     const date = new Date(displayDate);
-    const dateTile = document.createElement('div'); dateTile.className = 'update-date';
-    const month = document.createElement('span'); month.className = 'update-date-month'; month.textContent = date.toLocaleString('en-IN', { month: 'short' });
+    const dateTile = document.createElement('div');
+    dateTile.className = `update-date ${cardType === 'reminder' ? 'update-date-amber' : cardType === 'deadline' ? 'update-date-rose' : 'update-date-blue'}`;
+    const month = document.createElement('span'); month.className = 'update-date-month'; month.textContent = date.toLocaleString('en-IN', { month: 'short' }).toUpperCase();
     const day = document.createElement('span'); day.className = 'update-date-day'; day.textContent = String(date.getDate());
     dateTile.append(month, day);
-    const icon = document.createElement('div'); icon.className = 'update-icon';
-    icon.innerHTML = update.isReminder
-      ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l3 2M5 3 3 5m16-2 2 2"></path></svg>'
-      : cardType === 'deadline'
-        ? '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18M8 14h2m4 0h2"></path></svg>'
-        : cardType === 'important'
-          ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6m0 4h.01"></path></svg>'
-          : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5m0-8h.01"></path></svg>';
-    const copy = document.createElement('div'); copy.className = 'update-copy';
-    const title = document.createElement('div');
-    title.className = 'update-title';
-    title.textContent = update.title;
-    if (cardType !== 'general') {
-      const pill = document.createElement('span'); pill.className = 'update-tag';
-      pill.textContent = cardType === 'reminder' ? 'Reminder' : cardType === 'deadline' ? 'Deadline' : 'Important';
-      title.append(' ', pill);
-    }
+
     const isPinned = Boolean(isUpdatePinned(update));
+    if (isPinned) card.classList.add('is-pinned');
+
+    const copy = document.createElement('div'); copy.className = 'update-copy';
+    const tagGroup = document.createElement('div'); tagGroup.className = 'update-tag-group';
+    if (cardType === 'important' || update.importance === 'important' || category === 'important') {
+      const impTag = document.createElement('span');
+      impTag.className = 'update-tag update-tag-important';
+      impTag.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg><span>IMPORTANT</span>';
+      tagGroup.append(impTag);
+    }
     if (isPinned) {
-      const pinBadge = document.createElement('span');
-      pinBadge.className = 'update-tag update-tag-pinned';
-      pinBadge.textContent = 'Pinned';
-      title.append(' ', pinBadge);
-      card.classList.add('is-pinned');
+      const pinTag = document.createElement('span');
+      pinTag.className = 'update-tag update-tag-pinned';
+      pinTag.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg><span>PINNED</span>';
+      tagGroup.append(pinTag);
+    }
+    if (cardType === 'reminder') {
+      const remTag = document.createElement('span');
+      remTag.className = 'update-tag update-tag-reminder';
+      remTag.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l3 2M5 3 3 5m16-2 2 2"></path></svg><span>REMINDER</span>';
+      tagGroup.append(remTag);
+    }
+    if (cardType === 'deadline') {
+      const deadTag = document.createElement('span');
+      deadTag.className = 'update-tag update-tag-deadline';
+      deadTag.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg><span>DEADLINE</span>';
+      tagGroup.append(deadTag);
     }
     const urgent = update.isReminder && /\burgent\b/i.test(update.body || '');
     if (urgent) {
-      const status = document.createElement('span'); status.className = 'update-urgent'; status.textContent = 'Urgent';
-      title.append(' ', status);
+      const urgTag = document.createElement('span');
+      urgTag.className = 'update-tag update-tag-urgent';
+      urgTag.textContent = 'URGENT';
+      tagGroup.append(urgTag);
     }
+
+    const title = document.createElement('div');
+    title.className = 'update-title';
+    title.textContent = update.title;
+
+    if (tagGroup.children.length) copy.append(tagGroup);
+    copy.append(title);
+
     const body = document.createElement('div'); body.className = 'update-body';
     const bodyText = String(update.body || '').trim();
     let readableBody = bodyText;
@@ -544,27 +670,19 @@
         }
       } catch {}
     }
-    if (readableBody && !(urgent && /^urgent[.!]?$/i.test(readableBody))) body.textContent = readableBody;
+    if (readableBody && !(urgent && /^urgent[.!]?$/i.test(readableBody))) {
+      body.textContent = readableBody;
+      copy.append(body);
+    }
+
     const time = document.createElement('div');
     time.className = 'update-time';
     const dueAt = update.isReminder ? update.due_at : cardType === 'deadline' ? update.expires_at : null;
     time.textContent = dueAt
       ? `${update.isReminder ? 'Reminder due' : 'Due'} ${new Date(dueAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`
       : `Posted ${new Date(update.published_at || update.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`;
-    copy.append(title);
-    if (readableBody && !(urgent && /^urgent[.!]?$/i.test(readableBody))) copy.append(body);
-    let joinLink = null;
-    if (sessionUrl) {
-      joinLink = document.createElement('a');
-      joinLink.className = 'update-join-link';
-      joinLink.href = sessionUrl;
-      joinLink.target = '_blank';
-      joinLink.rel = 'noopener noreferrer';
-      if (update.isReminder) {
-        joinLink.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"></rect><path d="m16 10 5-3v10l-5-3"></path></svg><span>Join session</span>';
-      } else joinLink.textContent = 'Open link ↗';
-    }
     copy.append(time);
+
     if (update.attachment_path) {
       const attachmentActions = document.createElement('div');
       attachmentActions.className = 'update-attachment-actions';
@@ -604,8 +722,19 @@
       card.dataset.resourceTitle = rawName;
       copy.append(attachmentActions);
     }
-    card.append(dateTile, icon, copy);
-    if (joinLink) card.append(joinLink);
+
+    const actionsWrap = document.createElement('div');
+    actionsWrap.className = 'update-card-actions';
+    if (sessionUrl) {
+      const joinLink = document.createElement('a');
+      joinLink.className = 'update-join-link';
+      joinLink.href = sessionUrl;
+      joinLink.target = '_blank';
+      joinLink.rel = 'noopener noreferrer';
+      joinLink.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="14" height="12" rx="2"></rect><path d="m16 10 6-4v12l-6-4"></path></svg><span>Join session</span>';
+      actionsWrap.append(joinLink);
+    }
+
     const canManageUpdates = window.classboardContext?.roles.some((role) => role === 'cr' || role === 'admin');
     const canPin = Boolean(canManageUpdates);
     const menuTrigger = document.createElement('button');
@@ -616,7 +745,7 @@
     menuTrigger.setAttribute('aria-haspopup', 'menu');
     menuTrigger.setAttribute('aria-expanded', 'false');
     menuTrigger.hidden = !canManageUpdates;
-    menuTrigger.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg>';
+    menuTrigger.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg>';
     const menu = document.createElement('div');
     menu.className = 'update-card-menu';
     menu.role = 'menu';
@@ -638,7 +767,9 @@
     deleteButton.textContent = update.isReminder ? 'Delete reminder' : 'Delete update';
     deleteButton.hidden = !canManageUpdates;
     menu.append(deleteButton);
-    card.append(menuTrigger, menu);
+
+    actionsWrap.append(menuTrigger, menu);
+    card.append(dateTile, copy, actionsWrap);
     return card;
   }
 
@@ -890,15 +1021,7 @@
       return new Date(dateFor(a)) - new Date(dateFor(b));
     });
     window.classboardUpdateFeed = updateFeed;
-    const updateList = document.getElementById('updateList');
-    if (updateList) {
-      updateList.querySelectorAll('.update, .live-empty').forEach((node) => node.remove());
-      if (!updateFeed.length) {
-        addEmptyNote(updateList, 'No class updates or reminders have been published yet.');
-      } else {
-        updateFeed.slice(0, 40).forEach((item) => updateList.append(addUpdateCard(item, '')));
-      }
-    }
+    renderUpdatesPage(updateFeed);
     renderHomeUpdates(updateFeed);
 
     const resourceGrid = document.getElementById('resourceGrid');
@@ -1278,6 +1401,79 @@
     else window.openClassboardPage?.(card.dataset.homeNavigationPage);
   });
 
+  function getSubjectColorClass(subjectName) {
+    const name = String(subjectName || '').toLowerCase();
+    if (/software engineering|\bse\b/i.test(name)) return 'color-se';
+    if (/statistical analysis|\bsa\b/i.test(name)) return 'color-sa';
+    if (/artificial intelligence|machine learning|\bml\b|\bai\b/i.test(name)) return 'color-ai';
+    if (/java/i.test(name)) return 'color-java';
+    if (/computer organisation|computer organization|\bcom\b|data structures|\bdsc\b/i.test(name)) return 'color-com';
+    if (/soft skills/i.test(name)) return 'color-soft-skills';
+    return 'color-default';
+  }
+
+  function getDayLabel(dateObj) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const target = new Date(dateObj);
+    target.setHours(0, 0, 0, 0);
+
+    if (target.getTime() === today.getTime()) return 'Today';
+    if (target.getTime() === yesterday.getTime()) return 'Yesterday';
+    return dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function applyNotificationsFilter() {
+    const activeChip = document.querySelector('.notifications-toolbar .filter-chip.active');
+    const filter = activeChip ? activeChip.dataset.notificationFilter : 'all';
+    const list = document.getElementById('notificationList');
+    if (!list) return;
+
+    const daySections = list.querySelectorAll('.notification-day');
+    let totalVisible = 0;
+
+    daySections.forEach((section) => {
+      const items = section.querySelectorAll('.notification-item');
+      let visibleInDay = 0;
+      items.forEach((item) => {
+        let matches = false;
+        if (filter === 'all') matches = true;
+        else if (filter === 'resource') matches = item.dataset.category === 'resource';
+        else if (filter === 'class') matches = item.dataset.category === 'class';
+        else if (filter === 'important') matches = item.dataset.category === 'important';
+
+        item.style.display = matches ? '' : 'none';
+        if (matches) visibleInDay++;
+      });
+
+      if (visibleInDay > 0) {
+        section.style.display = '';
+        const countEl = section.querySelector('.notification-day-count');
+        if (countEl) countEl.textContent = visibleInDay;
+        totalVisible += visibleInDay;
+      } else {
+        section.style.display = 'none';
+      }
+    });
+
+    const emptyFilter = list.querySelector('.notifications-empty-filter');
+    if (totalVisible === 0 && daySections.length > 0) {
+      if (!emptyFilter) {
+        const emptyEl = document.createElement('div');
+        emptyEl.className = 'live-empty notifications-empty-filter';
+        emptyEl.textContent = 'No notifications match this category.';
+        list.append(emptyEl);
+      } else {
+        emptyFilter.style.display = '';
+      }
+    } else if (emptyFilter) {
+      emptyFilter.style.display = 'none';
+    }
+  }
+  window.applyClassboardNotificationsFilter = applyNotificationsFilter;
+
   async function loadNotifications(classId) {
     const client = window.classboardSupabase;
     const list = document.getElementById('notificationList');
@@ -1331,56 +1527,230 @@
     while (updatedSeenIds.size > 500) updatedSeenIds.delete(updatedSeenIds.values().next().value);
     seenByUser.set(seenKey, updatedSeenIds);
     list.replaceChildren();
+
     const renderedNotificationDetails = [];
-    let currentDay = '';
-    notifications.forEach((notification) => {
-      const source = sources.get(notification.source_id);
-      if (!source) return;
-      const subject = Array.isArray(source.subjects) ? source.subjects[0] : source.subjects;
-      let title = source.title;
-      let detail = '';
-      if (notification.source_type === 'attendance_issue') {
-        title = 'Attendance concern reviewed';
-        detail = 'Your CR or a class admin reviewed your concern.';
-      }
-      else if (notification.source_type === 'update') detail = [source.category === 'deadline' ? 'Deadline' : source.category === 'important' ? 'Important' : 'Update', source.body || ''].filter(Boolean).join(' · ');
-      else if (notification.source_type === 'reminder') detail = [source.body, `Due ${new Date(source.due_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`].filter(Boolean).join(' · ');
-      else if (notification.source_type === 'resource') detail = [subject?.name, resourceKindLabel(source.kind)].filter(Boolean).join(' · ');
-      else {
-        title = `${subject?.name || 'Class'}${source.class_number ? ` · Class ${source.class_number}` : ''}`;
-        detail = `${source.kind === 'lab' ? `Lab · ${source.batch}` : 'Lecture'} · ${new Date(source.starts_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}${source.room ? ` · ${source.room}` : ''}`;
-      }
-      const createdAt = new Date(notification.created_at);
-      const dayKey = `${createdAt.getFullYear()}-${createdAt.getMonth()}-${createdAt.getDate()}`;
-      if (dayKey !== currentDay) {
-        currentDay = dayKey;
-        const group = document.createElement('section'); group.className = 'notification-day';
-        const label = document.createElement('div'); label.className = 'notification-day-label';
-        const today = new Date(); today.setHours(0, 0, 0, 0);
-        const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
-        const notificationDay = new Date(createdAt); notificationDay.setHours(0, 0, 0, 0);
-        label.textContent = notificationDay.getTime() === today.getTime() ? 'Today' : notificationDay.getTime() === yesterday.getTime() ? 'Yesterday' : createdAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-        group.append(label); list.append(group);
-      }
-      let type = notification.source_type === 'attendance_issue' ? 'attendance-issue' : notification.source_type === 'reminder' ? 'reminder' : notification.source_type === 'resource' ? 'resource' : notification.source_type === 'class_session' ? 'class' : source.category === 'deadline' ? 'deadline' : source.category === 'important' ? 'important' : 'update';
-      const labels = { update: 'Class update', important: 'Important notice', deadline: 'Deadline', reminder: 'Reminder', resource: 'New resource', class: 'Class schedule', 'attendance-issue': 'Attendance concern' };
-      renderedNotificationDetails.push({ id: String(notification.id), title, message: detail, label: labels[type] });
-      const row = document.createElement('article'); row.className = `notification-item notification-${type}`; row.dataset.notificationId = notification.id;
-      if (notification.read_at) row.classList.add('notification-read');
-      const mark = document.createElement('div');
-      mark.className = 'notification-icon';
-      const badgeText = notification.source_type === 'attendance_issue' ? '✓' : notification.source_type === 'resource' ? resourceKindLabel(source.kind).split(' ')[0].toUpperCase() : notification.source_type === 'reminder' ? 'REM' : notification.source_type === 'class_session' ? 'CLASS' : type === 'deadline' ? 'DUE' : type === 'important' ? '!' : 'INFO';
-      mark.textContent = badgeText;
-      if (badgeText.length >= 6) mark.dataset.length = 'long';
-      const main = document.createElement('div'); main.className = 'notification-main';
-      const typeLabel = document.createElement('div'); typeLabel.className = 'notification-type'; typeLabel.textContent = labels[type];
-      const heading = document.createElement('div'); heading.className = 'list-title'; heading.textContent = title;
-      const sub = document.createElement('div'); sub.className = 'list-detail'; sub.textContent = detail;
-      const meta = document.createElement('div'); meta.className = 'notification-meta';
-      const date = document.createElement('time'); date.dateTime = notification.created_at; date.textContent = createdAt.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
-      const unread = document.createElement('span'); unread.className = 'notification-unread'; unread.setAttribute('aria-label', notification.read_at ? 'Read' : 'Unread');
-      meta.append(date, unread); main.append(typeLabel, heading, sub); row.append(mark, main, meta); list.lastElementChild.append(row);
-    });
+    const validNotifications = notifications.filter((item) => sources.has(item.source_id));
+
+    // Calculate category counts for toolbar
+    const countAll = validNotifications.length;
+    const countResource = validNotifications.filter((item) => item.source_type === 'resource').length;
+    const countClass = validNotifications.filter((item) => item.source_type === 'class_session').length;
+    const countImportant = validNotifications.filter((item) => {
+      const source = sources.get(item.source_id);
+      return item.source_type === 'update' && (source.category === 'important' || source.importance === 'important');
+    }).length;
+
+    const notifAllEl = document.getElementById('notifCountAll');
+    const notifResEl = document.getElementById('notifCountResource');
+    const notifClassEl = document.getElementById('notifCountClass');
+    const notifImpEl = document.getElementById('notifCountImportant');
+
+    if (notifAllEl) notifAllEl.textContent = countAll;
+    if (notifResEl) notifResEl.textContent = countResource;
+    if (notifClassEl) notifClassEl.textContent = countClass;
+    if (notifImpEl) notifImpEl.textContent = countImportant;
+
+    if (!validNotifications.length) {
+      addEmptyNote(list, 'No class notifications yet. New updates and reminders will appear here.');
+    } else {
+      // Group by day
+      const dayGroups = new Map();
+      validNotifications.forEach((notification) => {
+        const createdAt = new Date(notification.created_at);
+        const dayKey = `${createdAt.getFullYear()}-${String(createdAt.getMonth() + 1).padStart(2, '0')}-${String(createdAt.getDate()).padStart(2, '0')}`;
+        if (!dayGroups.has(dayKey)) {
+          dayGroups.set(dayKey, {
+            date: createdAt,
+            label: getDayLabel(createdAt),
+            items: []
+          });
+        }
+        dayGroups.get(dayKey).items.push(notification);
+      });
+
+      dayGroups.forEach((group, dayKey) => {
+        const daySection = document.createElement('section');
+        daySection.className = 'notification-day';
+        daySection.dataset.dayKey = dayKey;
+
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'notification-day-header';
+
+        const dayTitle = document.createElement('span');
+        dayTitle.className = 'notification-day-title';
+        dayTitle.textContent = group.label;
+
+        const dayCount = document.createElement('span');
+        dayCount.className = 'notification-day-count';
+        dayCount.textContent = group.items.length;
+
+        dayHeader.append(dayTitle, dayCount);
+        daySection.append(dayHeader);
+
+        group.items.forEach((notification) => {
+          const source = sources.get(notification.source_id);
+          const subject = Array.isArray(source.subjects) ? source.subjects[0] : source.subjects;
+
+          let notifCategory = 'update';
+          let eyebrow = 'CLASS UPDATE';
+          let iconColorClass = 'color-default';
+          let iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>';
+          let targetPage = 'updates';
+
+          if (notification.source_type === 'resource') {
+            notifCategory = 'resource';
+            eyebrow = 'NEW RESOURCE';
+            iconColorClass = 'color-resource';
+            iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>';
+            targetPage = 'resources';
+          } else if (notification.source_type === 'class_session') {
+            notifCategory = 'class';
+            eyebrow = 'CLASS SCHEDULE';
+            iconColorClass = getSubjectColorClass(subject?.name);
+            iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
+            targetPage = 'classes';
+          } else if (notification.source_type === 'update') {
+            const isImportant = source.category === 'important' || source.importance === 'important';
+            const isDeadline = source.category === 'deadline';
+            if (isImportant) {
+              notifCategory = 'important';
+              eyebrow = 'IMPORTANT NOTICE';
+              iconColorClass = 'color-important';
+              iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+            } else if (isDeadline) {
+              notifCategory = 'deadline';
+              eyebrow = 'DEADLINE';
+              iconColorClass = 'color-ai';
+              iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+            } else {
+              notifCategory = 'update';
+              eyebrow = 'CLASS UPDATE';
+              iconColorClass = 'color-default';
+            }
+            targetPage = 'updates';
+          } else if (notification.source_type === 'reminder') {
+            notifCategory = 'reminder';
+            eyebrow = 'REMINDER';
+            iconColorClass = 'color-com';
+            iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l3 2M5 3 3 5m16-2 2 2"></path></svg>';
+            targetPage = 'updates';
+          } else if (notification.source_type === 'attendance_issue') {
+            notifCategory = 'attendance';
+            eyebrow = 'ATTENDANCE CONCERN';
+            iconColorClass = 'color-default';
+            iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            targetPage = 'attendance';
+          }
+
+          let title = source.title;
+          let detail = '';
+
+          if (notification.source_type === 'attendance_issue') {
+            title = 'Attendance concern reviewed';
+            detail = 'Your CR or a class admin reviewed your concern.';
+          } else if (notification.source_type === 'update') {
+            title = source.title;
+            detail = source.body ? (source.body.length > 85 ? source.body.slice(0, 85) + '…' : source.body) : (source.category === 'deadline' ? 'Deadline' : source.category === 'important' ? 'Important' : 'Update');
+          } else if (notification.source_type === 'reminder') {
+            title = source.title;
+            detail = [source.body, `Due ${new Date(source.due_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`].filter(Boolean).join(' · ');
+          } else if (notification.source_type === 'resource') {
+            title = source.title;
+            detail = [subject?.name, resourceKindLabel(source.kind)].filter(Boolean).join(' · ');
+          } else if (notification.source_type === 'class_session') {
+            title = subject?.name || 'Class';
+            detail = `${source.kind === 'lab' ? `Lab · ${source.batch}` : 'Lecture'} · ${new Date(source.starts_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}${source.room ? ` · ${source.room}` : ''}`;
+          }
+
+          renderedNotificationDetails.push({ id: String(notification.id), title, message: detail, label: eyebrow });
+
+          const row = document.createElement('article');
+          row.className = `notification-item notification-${notifCategory}`;
+          if (notification.read_at) row.classList.add('notification-read');
+          row.dataset.notificationId = String(notification.id);
+          row.dataset.category = notifCategory;
+          row.tabIndex = 0;
+          row.setAttribute('role', 'button');
+          row.setAttribute('aria-label', `${eyebrow}: ${title}. ${detail}`);
+
+          const iconTile = document.createElement('div');
+          iconTile.className = `notification-icon-tile ${iconColorClass}`;
+          iconTile.setAttribute('aria-hidden', 'true');
+          iconTile.innerHTML = iconSvg;
+
+          const main = document.createElement('div');
+          main.className = 'notification-main';
+
+          const eyebrowEl = document.createElement('div');
+          eyebrowEl.className = 'notification-eyebrow';
+          eyebrowEl.textContent = eyebrow;
+
+          const titleEl = document.createElement('div');
+          titleEl.className = 'list-title';
+          titleEl.textContent = title;
+
+          const detailEl = document.createElement('div');
+          detailEl.className = 'list-detail';
+          detailEl.textContent = detail;
+
+          main.append(eyebrowEl, titleEl, detailEl);
+
+          const meta = document.createElement('div');
+          meta.className = 'notification-meta';
+
+          const createdAt = new Date(notification.created_at);
+          const timeEl = document.createElement('time');
+          timeEl.dateTime = notification.created_at;
+          timeEl.textContent = createdAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+
+          const arrowPill = document.createElement('span');
+          arrowPill.className = 'notification-arrow-pill';
+          arrowPill.setAttribute('aria-hidden', 'true');
+          arrowPill.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>';
+
+          meta.append(timeEl, arrowPill);
+          row.append(iconTile, main, meta);
+
+          const handleOpen = async () => {
+            if (!notification.read_at) {
+              notification.read_at = new Date().toISOString();
+              row.classList.add('notification-read');
+              window.classboardSupabase.from('notifications')
+                .update({ read_at: notification.read_at })
+                .eq('id', notification.id)
+                .then(() => {});
+
+              const updatesBadge = document.getElementById('updatesUnreadCount');
+              if (updatesBadge && !updatesBadge.hidden) {
+                const current = parseInt(updatesBadge.textContent, 10);
+                if (!isNaN(current) && current > 0) {
+                  const next = current - 1;
+                  updatesBadge.textContent = next > 99 ? '99+' : String(next);
+                  updatesBadge.hidden = next === 0;
+                }
+              }
+            }
+            if (targetPage && window.openClassboardPage) {
+              window.openClassboardPage(targetPage);
+            }
+          };
+
+          row.addEventListener('click', handleOpen);
+          row.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleOpen();
+            }
+          });
+
+          daySection.append(row);
+        });
+
+        list.append(daySection);
+      });
+
+      applyNotificationsFilter();
+    }
     if (!list.children.length) addEmptyNote(list, 'No class notifications yet. New updates and reminders will appear here.');
     document.querySelectorAll('.unread').forEach((dot) => dot.remove());
     if ((unreadCountResult.count || 0) > 0) document.querySelectorAll('[aria-label="Notifications"]').forEach((button) => {

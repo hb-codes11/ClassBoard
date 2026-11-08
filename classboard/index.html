@@ -1535,6 +1535,690 @@
     }
     @media (prefers-reduced-motion:reduce) { *, *:before, *:after { transition:none !important; animation:none !important; } .hero-class { transform:none; } }
   </style>
+  <style id="cb-updates-notifications">
+    /* =========================================================
+       UPDATES REDESIGN (Image 1)
+       ========================================================= */
+    .updates-toolbar, .notifications-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .updates-filter-chips, .notifications-filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .updates-toolbar .filter-chip, .notifications-toolbar .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      min-height: 35px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .16s ease;
+    }
+    .updates-toolbar .filter-chip:hover, .notifications-toolbar .filter-chip:hover {
+      background: var(--surface-2);
+      border-color: color-mix(in srgb, var(--blue) 40%, var(--line));
+    }
+    .updates-toolbar .filter-chip.active, .notifications-toolbar .filter-chip.active {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 4px 12px -3px rgba(6, 47, 92, 0.4);
+    }
+    [data-theme="dark"] .updates-toolbar .filter-chip.active, [data-theme="dark"] .notifications-toolbar .filter-chip.active {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #ffffff;
+      box-shadow: 0 4px 14px -3px rgba(22, 139, 255, 0.4);
+    }
+    .updates-toolbar .chip-count, .notifications-toolbar .chip-count {
+      opacity: 0.85;
+      font-weight: 700;
+      font-size: 12px;
+      margin-left: 2px;
+    }
+    .updates-total-count, .notifications-sort-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      margin-left: auto;
+    }
+
+    /* Section headers */
+    .updates-section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 26px 0 14px;
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .updates-section-header:first-child {
+      margin-top: 6px;
+    }
+    .updates-section-header.updates-pinned-header {
+      color: var(--blue);
+    }
+    .updates-section-header.updates-pinned-header svg {
+      width: 14px;
+      height: 14px;
+      stroke-width: 2.2;
+    }
+    .updates-section-header.updates-coming-up-header {
+      color: var(--text);
+    }
+    .updates-coming-up-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #f59e0b;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+    }
+
+    /* Update Card */
+    #page-updates .update-card {
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 18px;
+      padding: 20px 22px;
+      margin-bottom: 14px;
+      border-radius: 18px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: 0 2px 10px rgba(7, 86, 160, 0.035);
+      position: relative;
+      transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+    #page-updates .update-card:hover {
+      border-color: color-mix(in srgb, var(--blue) 35%, var(--line));
+      box-shadow: 0 6px 20px -4px rgba(7, 86, 160, 0.07);
+    }
+    [data-theme="dark"] #page-updates .update-card {
+      background: var(--surface);
+      border-color: var(--line);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Date Tile */
+    .update-date {
+      width: 56px;
+      min-height: 60px;
+      padding: 6px 0;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      text-align: center;
+      line-height: 1.1;
+      border: 1px solid transparent;
+      box-sizing: border-box;
+    }
+    .update-date .update-date-month {
+      font-size: 10.5px;
+      font-weight: 750;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+    .update-date .update-date-day {
+      font-size: 21px;
+      font-weight: 800;
+      font-family: var(--display);
+    }
+
+    /* Date Tile Theme Variants */
+    .update-card.update-important .update-date, .update-card.is-pinned .update-date, .update-card.update-general .update-date {
+      background: #eaf3ff;
+      border-color: #cce2ff;
+      color: #0756A0;
+    }
+    .update-card.update-important .update-date .update-date-month, .update-card.is-pinned .update-date .update-date-month, .update-card.update-general .update-date .update-date-month {
+      color: #0A74E6;
+    }
+    [data-theme="dark"] .update-card.update-important .update-date, [data-theme="dark"] .update-card.is-pinned .update-date, [data-theme="dark"] .update-card.update-general .update-date {
+      background: rgba(10, 116, 230, 0.16);
+      border-color: rgba(10, 116, 230, 0.35);
+      color: #7db8ff;
+    }
+    [data-theme="dark"] .update-card.update-important .update-date .update-date-month, [data-theme="dark"] .update-card.is-pinned .update-date .update-date-month, [data-theme="dark"] .update-card.update-general .update-date .update-date-month {
+      color: #9eccff;
+    }
+
+    .update-card.update-reminder .update-date {
+      background: #fff9e6;
+      border-color: #ffe8a3;
+      color: #8a5200;
+    }
+    .update-card.update-reminder .update-date .update-date-month {
+      color: #b45309;
+    }
+    [data-theme="dark"] .update-card.update-reminder .update-date {
+      background: rgba(245, 158, 11, 0.16);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #fcd34d;
+    }
+
+    .update-card.update-deadline .update-date {
+      background: #fdebee;
+      border-color: #fcd0d5;
+      color: #df4c55;
+    }
+    .update-card.update-deadline .update-date .update-date-month {
+      color: #e11d48;
+    }
+    [data-theme="dark"] .update-card.update-deadline .update-date {
+      background: rgba(223, 76, 85, 0.16);
+      border-color: rgba(223, 76, 85, 0.35);
+      color: #fda4af;
+    }
+
+    /* Update Card Copy */
+    #page-updates .update-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+    .update-tag-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+    .update-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4.5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      line-height: 1.3;
+    }
+    .update-tag svg {
+      width: 12px;
+      height: 12px;
+      stroke-width: 2.2;
+    }
+    .update-tag.update-tag-important {
+      background: #e1f0ff;
+      color: #0A74E6;
+    }
+    [data-theme="dark"] .update-tag.update-tag-important {
+      background: rgba(10, 116, 230, 0.2);
+      color: #7db8ff;
+    }
+    .update-tag.update-tag-pinned {
+      background: #fff3cf;
+      color: #8a5200;
+    }
+    [data-theme="dark"] .update-tag.update-tag-pinned {
+      background: rgba(255, 206, 86, 0.2);
+      color: #ffd875;
+    }
+    .update-tag.update-tag-reminder {
+      background: #fff3cf;
+      color: #8a5200;
+    }
+    [data-theme="dark"] .update-tag.update-tag-reminder {
+      background: rgba(255, 206, 86, 0.2);
+      color: #ffd875;
+    }
+    .update-tag.update-tag-deadline {
+      background: #fdebee;
+      color: #df4c55;
+    }
+    [data-theme="dark"] .update-tag.update-tag-deadline {
+      background: rgba(223, 76, 85, 0.2);
+      color: #fda4af;
+    }
+
+    #page-updates .update-title {
+      font-family: var(--display);
+      font-size: 16.5px;
+      font-weight: 750;
+      color: var(--text);
+      line-height: 1.35;
+      letter-spacing: -.02em;
+      margin-top: 1px;
+    }
+    #page-updates .update-body {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-top: 2px;
+    }
+    #page-updates .update-time {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Actions Column (Right) */
+    .update-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+    .update-join-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 16px;
+      border-radius: 999px;
+      background: var(--blue);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background .16s ease, box-shadow .16s ease;
+      white-space: nowrap;
+    }
+    .update-join-link:hover {
+      background: var(--blue-deep);
+      box-shadow: 0 4px 12px color-mix(in srgb, var(--blue) 35%, transparent);
+    }
+    .update-join-link svg {
+      width: 14px;
+      height: 14px;
+    }
+    .update-menu-trigger {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all .16s ease;
+    }
+    .update-menu-trigger:hover, .update-menu-trigger[aria-expanded="true"] {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: var(--surface-2);
+    }
+    .update-menu-trigger svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Attachment inside update card */
+    #page-updates .update-attachment-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      width: 100%;
+    }
+    #page-updates .update-attachment-button {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #f8fbff;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(7, 86, 160, .03);
+      transition: all .18s ease;
+      box-sizing: border-box;
+    }
+    #page-updates .update-attachment-button:hover {
+      background: #ffffff;
+      border-color: color-mix(in srgb, var(--blue) 50%, var(--line));
+      box-shadow: 0 4px 16px -2px rgba(7, 86, 160, .09);
+      transform: translateY(-1px);
+    }
+    [data-theme="dark"] #page-updates .update-attachment-button {
+      background: var(--surface-2);
+      border-color: var(--line);
+    }
+    [data-theme="dark"] #page-updates .update-attachment-button:hover {
+      background: color-mix(in srgb, var(--surface-2) 90%, var(--blue) 10%);
+      border-color: color-mix(in srgb, var(--blue) 50%, var(--line));
+    }
+
+    /* =========================================================
+       NOTIFICATIONS REDESIGN (Image 2)
+       ========================================================= */
+    #page-notifications #markRead {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 650;
+      cursor: pointer;
+      transition: all .16s ease;
+    }
+    #page-notifications #markRead:hover {
+      background: var(--blue-soft);
+      border-color: var(--blue);
+    }
+    [data-theme="dark"] #page-notifications #markRead {
+      background: var(--surface-2);
+      border-color: var(--line);
+      color: #7db8ff;
+    }
+
+    #notificationList {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+    .notification-day {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .notification-day-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0 6px 4px;
+    }
+    .notification-day-title {
+      font-family: var(--display);
+      font-size: 13.5px;
+      font-weight: 750;
+      color: var(--text);
+    }
+    .notification-day-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 750;
+      line-height: 1;
+    }
+    [data-theme="dark"] .notification-day-count {
+      background: rgba(10, 116, 230, 0.2);
+      color: #7db8ff;
+    }
+
+    /* Notification Item Card */
+    .notification-item {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: 0 1px 4px rgba(7, 86, 160, 0.03);
+      cursor: pointer;
+      transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease, transform .18s ease;
+      position: relative;
+    }
+    .notification-item:hover {
+      background: var(--surface-2);
+      border-color: color-mix(in srgb, var(--blue) 40%, var(--line));
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(7, 86, 160, 0.06);
+    }
+    [data-theme="dark"] .notification-item {
+      background: var(--surface);
+      border-color: var(--line);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Notification Icon Tile */
+    .notification-icon-tile {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      transition: transform .18s ease;
+    }
+    .notification-item:hover .notification-icon-tile {
+      transform: scale(1.04);
+    }
+    .notification-icon-tile svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Notification Icon Color Variants */
+    .notification-icon-tile.color-resource {
+      background: #fdebee;
+      color: #df4c55;
+    }
+    [data-theme="dark"] .notification-icon-tile.color-resource {
+      background: rgba(223, 76, 85, 0.18);
+      color: #fda4af;
+    }
+
+    .notification-icon-tile.color-java {
+      background: #fff3e0;
+      color: #ed8a22;
+    }
+    [data-theme="dark"] .notification-icon-tile.color-java {
+      background: rgba(237, 138, 34, 0.18);
+      color: #fdba74;
+    }
+
+    .notification-icon-tile.color-com {
+      background: #fff9e6;
+      color: #d8a20b;
+    }
+    [data-theme="dark"] .notification-icon-tile.color-com {
+      background: rgba(216, 162, 11, 0.18);
+      color: #fde047;
+    }
+
+    .notification-icon-tile.color-se {
+      background: #f3e8ff;
+      color: #8957d8;
+    }
+    [data-theme="dark"] .notification-icon-tile.color-se {
+      background: rgba(137, 87, 216, 0.18);
+      color: #d8b4fe;
+    }
+
+    .notification-icon-tile.color-ai {
+      background: #fdebee;
+      color: #df4c55;
+    }
+    [data-theme="dark"] .notification-icon-tile.color-ai {
+      background: rgba(223, 76, 85, 0.18);
+      color: #fda4af;
+    }
+
+    .notification-icon-tile.color-sa {
+      background: #def6ec;
+      color: #27a77a;
+    }
+    [data-theme="dark"] .notification-icon-tile.color-sa {
+      background: rgba(39, 167, 122, 0.18);
+      color: #6ee7b7;
+    }
+
+    .notification-icon-tile.color-soft-skills {
+      background: #fdeef4;
+      color: #d35d87;
+    }
+    [data-theme="dark"] .notification-icon-tile.color-soft-skills {
+      background: rgba(211, 93, 135, 0.18);
+      color: #f472b6;
+    }
+
+    .notification-icon-tile.color-important {
+      background: #fff9e6;
+      color: #d8a20b;
+    }
+    [data-theme="dark"] .notification-icon-tile.color-important {
+      background: rgba(216, 162, 11, 0.18);
+      color: #fde047;
+    }
+
+    .notification-icon-tile.color-default {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    /* Notification Content */
+    .notification-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .notification-eyebrow {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--blue);
+      line-height: 1.25;
+      margin-bottom: 1px;
+    }
+    .notification-item .list-title {
+      font-family: var(--display);
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.35;
+      letter-spacing: -.01em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .notification-item .list-detail {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Notification Meta & Arrow */
+    .notification-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .notification-arrow-pill {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--blue-soft);
+      color: var(--blue);
+      transition: background-color .16s ease, color .16s ease, transform .16s ease;
+    }
+    .notification-arrow-pill svg {
+      width: 14px;
+      height: 14px;
+    }
+    .notification-item:hover .notification-arrow-pill {
+      background: var(--blue);
+      color: #ffffff;
+      transform: translate(1px, -1px);
+    }
+    [data-theme="dark"] .notification-arrow-pill {
+      background: rgba(10, 116, 230, 0.2);
+      color: #7db8ff;
+    }
+    [data-theme="dark"] .notification-item:hover .notification-arrow-pill {
+      background: var(--blue);
+      color: #ffffff;
+    }
+
+    /* Read indicator */
+    .notification-item.notification-read {
+      opacity: 0.82;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 650px) {
+      #page-updates .update-card {
+        grid-template-columns: 46px minmax(0, 1fr);
+        padding: 14px 16px;
+        gap: 12px;
+      }
+      .update-card-actions {
+        grid-column: 2;
+        margin-left: 0;
+        margin-top: 6px;
+      }
+      .update-date {
+        width: 46px;
+        min-height: 52px;
+      }
+      .update-date .update-date-day {
+        font-size: 18px;
+      }
+      .notification-item {
+        grid-template-columns: 38px minmax(0, 1fr) auto;
+        padding: 12px 14px;
+        gap: 10px;
+      }
+      .notification-icon-tile {
+        width: 38px;
+        height: 38px;
+      }
+      .notification-icon-tile svg {
+        width: 17px;
+        height: 17px;
+      }
+      .notification-meta {
+        gap: 6px;
+      }
+    }
+  </style>
 <style id="cb-profile">
     /* ===== Profile page redesign ===== */
     #page-profile .profile-layout { gap:18px; }
@@ -2295,8 +2979,16 @@
         </section>
 
         <section class="page-view" id="page-updates">
-          <div class="page-heading"><div><div class="eyebrow">AI &amp; Analytics - A (INTEL-1)</div><h1>Updates</h1><div class="page-description">Important updates, deadlines and reminders from your class.</div></div><button class="primary-button updates-add-button" id="updatesAddButton" type="button" hidden><span aria-hidden="true">＋</span> Add update</button></div>
-          <div class="toolbar updates-toolbar" role="group" aria-label="Filter updates"><button class="filter-chip active" data-update-filter="all" aria-pressed="true">All updates</button><button class="filter-chip" data-update-filter="Important" aria-pressed="false">Important updates</button><button class="filter-chip" data-update-filter="Deadline" aria-pressed="false">Deadlines</button><button class="filter-chip" data-update-filter="Reminder" aria-pressed="false">Reminders</button></div>
+          <div class="page-heading"><div><h1>Updates</h1><div class="page-description">Important updates, deadlines and reminders from your class.</div></div><button class="primary-button updates-add-button" id="updatesAddButton" type="button" hidden><span aria-hidden="true">＋</span> Add update</button></div>
+          <div class="toolbar updates-toolbar" role="group" aria-label="Filter updates">
+            <div class="updates-filter-chips">
+              <button class="filter-chip active" data-update-filter="all" aria-pressed="true">All updates <span class="chip-count" id="updatesCountAll"></span></button>
+              <button class="filter-chip" data-update-filter="Important" aria-pressed="false">Important updates <span class="chip-count" id="updatesCountImportant"></span></button>
+              <button class="filter-chip" data-update-filter="Deadline" aria-pressed="false">Deadlines <span class="chip-count" id="updatesCountDeadline"></span></button>
+              <button class="filter-chip" data-update-filter="Reminder" aria-pressed="false">Reminders <span class="chip-count" id="updatesCountReminder"></span></button>
+            </div>
+            <span class="updates-total-count" id="updatesTotalCount"></span>
+          </div>
           <div id="updateList"></div>
         </section>
 
@@ -2418,8 +3110,23 @@
         </section>
 
         <section class="page-view" id="page-notifications">
-          <div class="page-heading"><div><div class="eyebrow">Your class</div><h1>Notifications</h1><div class="page-description">Recent class updates and reminders.</div></div><button class="secondary-button" id="markRead">Mark all as read</button></div>
-          <article class="panel" id="notificationList"></article>
+          <div class="page-heading">
+            <div>
+              <h1>Notifications</h1>
+              <div class="page-description">Recent class updates and reminders, all in one place.</div>
+            </div>
+            <button class="secondary-button" id="markRead"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:14px;height:14px;stroke-width:2.5;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:-1px;margin-right:4px"><polyline points="20 6 9 17 4 12"></polyline></svg>Mark all as read</button>
+          </div>
+          <div class="toolbar notifications-toolbar" role="group" aria-label="Filter notifications">
+            <div class="notifications-filter-chips">
+              <button class="filter-chip active" data-notification-filter="all" aria-pressed="true">All notifications <span class="chip-count" id="notifCountAll"></span></button>
+              <button class="filter-chip" data-notification-filter="resource" aria-pressed="false">Resources <span class="chip-count" id="notifCountResource"></span></button>
+              <button class="filter-chip" data-notification-filter="class" aria-pressed="false">Class schedule <span class="chip-count" id="notifCountClass"></span></button>
+              <button class="filter-chip" data-notification-filter="important" aria-pressed="false">Important <span class="chip-count" id="notifCountImportant"></span></button>
+            </div>
+            <span class="notifications-sort-label">Newest first</span>
+          </div>
+          <div id="notificationList"></div>
         </section>
 
         <section class="page-view" id="page-profile">
@@ -3316,17 +4023,29 @@
     document.getElementById('classSubjectFilter').addEventListener('change', filterClassLog);
     document.getElementById('classMonthFilter').addEventListener('change', filterClassLog);
     document.querySelectorAll('[data-update-filter]').forEach((button) => button.addEventListener('click', () => {
-      const clearFilter = button.dataset.updateFilter !== 'all' && button.classList.contains('active');
-      const showAll = clearFilter || button.dataset.updateFilter === 'all';
       document.querySelectorAll('[data-update-filter]').forEach((chip) => {
-        const active = showAll ? chip.dataset.updateFilter === 'all' : chip === button;
+        const active = chip === button;
         chip.classList.toggle('active', active);
         chip.setAttribute('aria-pressed', String(active));
       });
-      const selectedCategory = showAll ? null : button.dataset.updateFilter;
-      document.querySelectorAll('#updateList .update').forEach((row) => {
-        row.style.display = !selectedCategory || row.dataset.category === selectedCategory ? '' : 'none';
+      if (window.applyClassboardUpdatesFilter) {
+        window.applyClassboardUpdatesFilter();
+      } else {
+        const selectedCategory = button.dataset.updateFilter === 'all' ? null : button.dataset.updateFilter;
+        document.querySelectorAll('#updateList .update').forEach((row) => {
+          row.style.display = !selectedCategory || row.dataset.category === selectedCategory ? '' : 'none';
+        });
+      }
+    }));
+    document.querySelectorAll('[data-notification-filter]').forEach((button) => button.addEventListener('click', () => {
+      document.querySelectorAll('[data-notification-filter]').forEach((chip) => {
+        const active = chip === button;
+        chip.classList.toggle('active', active);
+        chip.setAttribute('aria-pressed', String(active));
       });
+      if (window.applyClassboardNotificationsFilter) {
+        window.applyClassboardNotificationsFilter();
+      }
     }));
     const attendanceCards = [...document.querySelectorAll('#page-attendance [data-subject-card]')];
     const attendanceGrid = document.createElement('div');
@@ -3435,7 +4154,7 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=21"></script>
+  <script src="classboard-auth.js?v=22"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
