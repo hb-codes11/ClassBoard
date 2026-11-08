@@ -2227,42 +2227,42 @@
        NOTES & SYLLABUS REDESIGN — "Quiet Cards" (#page-resources)
        ========================================================= */
     #page-resources {
-      --res-border: #DBE6F3;
-      --res-card-bg: #FFFFFF;
-      --res-text: #0F2540;
-      --res-muted: #5B7089;
-      --res-brand: #0A74E6;
-      --res-deep: #0756A0;
-      --res-soft: #E1F0FF;
-
-      /* Subject Accent Colours (Light) */
-      --accent-se: #8957D8;
-      --accent-sa: #27A77A;
-      --accent-com: #D8A20B;
-      --accent-java: #ED8A22;
-      --accent-ai: #DF4C55;
-      --accent-soft-skills: #D35D87;
-      --accent-default: #0A74E6;
+      --page: #F0F6FD;
+      --surface: #FFFFFF;
+      --line: #DBE6F3;
+      --text: #0F2540;
+      --muted: #5B7089;
+      --resource-accent: var(--blue);
     }
 
     [data-theme="dark"] #page-resources {
-      --res-border: #1F3556;
-      --res-card-bg: #0C1A30;
-      --res-text: #EAF4FF;
-      --res-muted: #93ABC9;
-      --res-brand: #7DB8FF;
-      --res-deep: #FFCE56;
-      --res-soft: rgba(10, 116, 230, 0.2);
-
-      /* Subject Accent Colours (Dark) */
-      --accent-se: #C9A5FF;
-      --accent-sa: #63E6A8;
-      --accent-com: #FFDC55;
-      --accent-java: #FFAD4D;
-      --accent-ai: #FF747E;
-      --accent-soft-skills: #FF85AD;
-      --accent-default: #7DB8FF;
+      --page: #06101F;
+      --surface: #0C1A30;
+      --line: #1F3556;
+      --text: #EAF4FF;
+      --muted: #93ABC9;
+      --resource-accent: #7DB8FF;
     }
+
+    /* Subject Accent Colours (Light) */
+    #page-resources .resource-card[data-subject-color="se"] { --resource-accent: #8957D8; }
+    #page-resources .resource-card[data-subject-color="sa"] { --resource-accent: #27A77A; }
+    #page-resources .resource-card[data-subject-color="com"] { --resource-accent: #D8A20B; }
+    #page-resources .resource-card[data-subject-color="java"] { --resource-accent: #ED8A22; }
+    #page-resources .resource-card[data-subject-color="ai"] { --resource-accent: #DF4C55; }
+    #page-resources .resource-card[data-subject="Soft Skills"],
+    #page-resources .resource-card[data-subject*="Soft Skills" i],
+    #page-resources .resource-card[data-subject-color="soft-skills"] { --resource-accent: #D35D87; }
+
+    /* Subject Accent Colours (Dark) */
+    [data-theme="dark"] #page-resources .resource-card[data-subject-color="se"] { --resource-accent: #C9A5FF; }
+    [data-theme="dark"] #page-resources .resource-card[data-subject-color="sa"] { --resource-accent: #63E6A8; }
+    [data-theme="dark"] #page-resources .resource-card[data-subject-color="com"] { --resource-accent: #FFDC55; }
+    [data-theme="dark"] #page-resources .resource-card[data-subject-color="java"] { --resource-accent: #FFAD4D; }
+    [data-theme="dark"] #page-resources .resource-card[data-subject-color="ai"] { --resource-accent: #FF747E; }
+    [data-theme="dark"] #page-resources .resource-card[data-subject="Soft Skills"],
+    [data-theme="dark"] #page-resources .resource-card[data-subject*="Soft Skills" i],
+    [data-theme="dark"] #page-resources .resource-card[data-subject-color="soft-skills"] { --resource-accent: #FF85AD; }
 
     #page-resources .page-heading {
       display: flex;
@@ -2276,7 +2276,7 @@
       font-family: 'Figtree', sans-serif;
       font-size: 12px;
       font-weight: 550;
-      color: var(--res-muted);
+      color: var(--muted);
       letter-spacing: normal;
       text-transform: none;
       margin-bottom: 2px;
@@ -2287,24 +2287,23 @@
       font-weight: 700;
       letter-spacing: -0.03em;
       line-height: 1.15;
-      color: var(--res-text);
+      color: var(--text);
       margin: 0;
     }
     #page-resources .page-description {
       font-family: 'Figtree', sans-serif;
       font-size: 13px;
-      color: var(--res-muted);
+      color: var(--muted);
       line-height: 1.4;
       margin-top: 4px;
     }
-
-    /* Drive Add button in header */
     #page-resources .drive-add-button {
       height: 34px;
       padding: 0 16px;
       border-radius: 999px;
       background: var(--blue);
       color: #fff;
+      font-family: 'Figtree', sans-serif;
       font-size: 13px;
       font-weight: 650;
       border: 0;
@@ -2324,7 +2323,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      margin: 12px 0 14px;
+      margin: 14px 0 16px;
       padding: 0;
       background: transparent;
       border: 0;
@@ -2332,25 +2331,45 @@
     }
     #page-resources .search-field {
       flex: 1 1 auto;
-      height: 38px;
-      border-radius: 999px;
-      border: 1px solid var(--res-border);
-      background: var(--res-card-bg);
-      color: var(--res-text);
-      padding: 0 16px;
-      font-size: 13px;
+      height: 42px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      padding: 0 16px 0 46px;
       font-family: 'Figtree', sans-serif;
+      font-size: 13.5px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235B7089' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: 16px center;
+      background-size: 16px 16px;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    [data-theme="dark"] #page-resources .search-field {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2393ABC9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+    }
+    #page-resources .search-field:focus {
+      border-color: var(--blue);
+      outline: 3px solid rgba(10, 116, 230, 0.45);
+      outline-offset: 1px;
     }
     #page-resources .select-field {
-      height: 38px;
-      border-radius: 999px;
-      border: 1px solid var(--res-border);
-      background: var(--res-card-bg);
-      color: var(--res-text);
-      padding: 0 14px;
-      font-size: 13px;
+      flex: 0 0 auto;
+      height: 42px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      padding: 0 36px 0 16px;
       font-family: 'Figtree', sans-serif;
+      font-size: 13.5px;
       cursor: pointer;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    #page-resources .select-field:focus {
+      border-color: var(--blue);
+      outline: 3px solid rgba(10, 116, 230, 0.45);
+      outline-offset: 1px;
     }
 
     /* Filter Tabs (no container track) */
@@ -2375,9 +2394,9 @@
       box-shadow: none;
       padding: 7px 16px;
       border-radius: 999px;
-      color: var(--res-muted);
+      color: var(--muted);
       font-family: 'Figtree', sans-serif;
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 500;
       cursor: pointer;
       white-space: nowrap;
@@ -2386,19 +2405,27 @@
       display: inline-flex;
       align-items: center;
     }
-    #page-resources .tab:hover {
-      background: var(--res-soft);
-      color: var(--res-text);
+    #page-resources .tab:not(.active):hover {
+      background: var(--blue-soft) !important;
+      color: var(--blue-deep) !important;
+    }
+    [data-theme="dark"] #page-resources .tab:not(.active):hover {
+      background: rgba(10, 116, 230, 0.2) !important;
+      color: #EAF4FF !important;
     }
     #page-resources .tab.active {
       background: #0756A0 !important;
       color: #FFFFFF !important;
       font-weight: 700;
+      border-color: transparent !important;
+      box-shadow: none !important;
     }
     [data-theme="dark"] #page-resources .tab.active {
       background: #FFCE56 !important;
       color: #3A2700 !important;
       font-weight: 700;
+      border-color: transparent !important;
+      box-shadow: none !important;
     }
 
     /* Responsive Grid: min 280px per col, 3 col desktop, 1 col mobile, gap 14px */
@@ -2412,27 +2439,23 @@
     /* Quiet Card */
     #page-resources .resource-card {
       position: relative;
-      background: var(--res-card-bg);
-      border: 1px solid var(--res-border);
+      background: var(--surface);
+      border: 1px solid var(--line);
       border-radius: 14px;
       box-shadow: none;
       padding: 15px 14px 13px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      grid-template-rows: auto auto 1fr auto;
+      row-gap: 8px;
+      column-gap: 6px;
+      align-items: center;
       min-height: auto;
       transform: none !important;
       transition: border-color .18s ease, box-shadow .18s ease;
-      --card-accent: var(--accent-default);
+      box-sizing: border-box;
     }
-    #page-resources .resource-card[data-subject-color="se"] { --card-accent: var(--accent-se); }
-    #page-resources .resource-card[data-subject-color="sa"] { --card-accent: var(--accent-sa); }
-    #page-resources .resource-card[data-subject-color="com"] { --card-accent: var(--accent-com); }
-    #page-resources .resource-card[data-subject-color="java"] { --card-accent: var(--accent-java); }
-    #page-resources .resource-card[data-subject-color="ai"] { --card-accent: var(--accent-ai); }
-    #page-resources .resource-card[data-subject-color="soft-skills"] { --card-accent: var(--accent-soft-skills); }
-
-    /* Left 3px accent line (rounded on right, inset 14px top and bottom) */
     #page-resources .resource-card::before {
       content: '';
       position: absolute;
@@ -2440,117 +2463,160 @@
       top: 14px;
       bottom: 14px;
       width: 3px;
-      background: var(--card-accent);
+      background: var(--resource-accent);
       border-radius: 0 3px 3px 0;
       pointer-events: none;
     }
-
-    /* Hover: border becomes 45% of accent colour + soft shadow in accent colour. No lift or scale */
     #page-resources .resource-card:hover {
-      border-color: color-mix(in srgb, var(--card-accent) 45%, var(--res-border));
-      box-shadow: 0 4px 16px -2px color-mix(in srgb, var(--card-accent) 18%, transparent);
-      transform: none;
+      border-color: color-mix(in srgb, var(--resource-accent) 45%, var(--line)) !important;
+      box-shadow: 0 4px 16px -2px color-mix(in srgb, var(--resource-accent) 18%, transparent) !important;
+      transform: none !important;
+    }
+    [data-theme="dark"] #page-resources .resource-card:hover {
+      box-shadow: 0 4px 16px -2px color-mix(in srgb, var(--resource-accent) 24%, transparent) !important;
     }
 
-    /* Row 1: Top Row */
-    #page-resources .resource-card-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+    /* Subtree flattening with display: contents */
+    #page-resources .resource-card .list-main,
+    #page-resources .resource-card .resource-meta,
+    #page-resources .resource-card .resource-meta-line {
+      display: contents;
     }
-    #page-resources .resource-tag {
+
+    /* Row 1: Left - PDF tag chip */
+    #page-resources .resource-card .file-icon {
+      grid-row: 1;
+      grid-column: 1;
+      justify-self: start;
+      align-self: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      min-width: 0;
+      height: auto;
+      padding: 2px 6px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: transparent;
+      color: var(--muted);
       font-family: 'Figtree', sans-serif;
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: .02em;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: var(--res-muted);
-      border: 1px solid var(--res-border);
-      border-radius: 5px;
-      padding: 2px 6px;
       line-height: 1.2;
+      margin: 0;
     }
-    #page-resources .resource-kind-label {
+
+    /* Row 1: Right - File type */
+    #page-resources .resource-card .resource-meta-separator {
+      display: none !important;
+    }
+    #page-resources .resource-card .resource-meta-line > span:not(.resource-subject):not(.resource-meta-separator) {
+      grid-row: 1;
+      grid-column: 2 / -1;
+      justify-self: end;
+      align-self: center;
       font-family: 'Figtree', sans-serif;
       font-size: 12px;
-      color: var(--res-muted);
+      font-weight: 400;
+      color: var(--muted);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      text-align: right;
+      line-height: 1.2;
+      margin: 0;
     }
 
-    /* Row 2: Title (clamped to 2 lines, Figtree 15px, weight 650) */
-    #page-resources .resource-title {
+    /* Row 2: File title */
+    #page-resources .resource-card .resource-title {
+      grid-row: 2;
+      grid-column: 1 / -1;
       font-family: 'Figtree', sans-serif;
       font-size: 15px;
       font-weight: 650;
-      line-height: 1.35;
       letter-spacing: -0.01em;
-      color: var(--res-text);
+      line-height: 1.35;
+      color: var(--text);
+      margin: 2px 0 0;
+      text-align: left;
       display: -webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
       overflow: hidden;
-      margin: 2px 0 0;
+      min-width: 0;
+      word-break: break-word;
     }
 
-    /* Row 3: Subject row (6px dot + subject in accent colour) */
-    #page-resources .resource-subject-row {
-      display: flex;
-      align-items: center;
-      gap: 7px;
+    /* Row 3: Subject row */
+    #page-resources .resource-card .resource-subject {
+      grid-row: 3;
+      grid-column: 1 / -1;
+      align-self: start;
       font-family: 'Figtree', sans-serif;
       font-size: 13px;
       font-weight: 600;
-      color: var(--card-accent);
+      color: var(--resource-accent);
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
       min-width: 0;
+      word-break: break-word;
+      white-space: normal;
+      margin: 0;
     }
-    #page-resources .resource-subject-dot {
+    #page-resources .resource-card .resource-subject::before {
+      content: '';
+      display: inline-block;
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--card-accent);
+      background: var(--resource-accent);
       flex-shrink: 0;
     }
-    #page-resources .resource-subject {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      color: inherit;
-    }
 
-    /* Row 4: Bottom row */
-    #page-resources .resource-card-bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+    /* Row 4: Left - Date */
+    #page-resources .resource-card .resource-added-date {
+      grid-row: 4;
+      grid-column: 1;
+      justify-self: start;
+      align-self: center;
+      font-family: 'Figtree', sans-serif;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
       margin-top: auto;
       padding-top: 6px;
     }
-    #page-resources .resource-added-date {
-      font-family: 'Figtree', sans-serif;
-      font-size: 12px;
-      color: var(--res-muted);
-      white-space: nowrap;
-    }
-    #page-resources .resource-actions {
-      display: flex;
+
+    /* Row 4: Right - Action buttons */
+    #page-resources .resource-card .resource-actions {
+      grid-row: 4;
+      grid-column: 2;
+      justify-self: end;
+      align-self: center;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
-      margin-left: auto;
+      margin: 0;
+      margin-top: auto;
+      padding: 0;
+      padding-top: 6px;
+      width: auto;
+      max-width: none;
     }
-
-    /* Outlined Preview Button */
-    #page-resources .resource-preview-button {
+    #page-resources .resource-card .resource-preview-button {
       height: 28px;
       min-height: 28px;
-      padding: 0 10px;
+      padding: 0 12px;
       border-radius: 8px;
-      border: 1px solid var(--res-border);
+      border: 1px solid var(--line);
       background: transparent;
-      color: var(--res-text);
+      color: var(--text);
       font-family: 'Figtree', sans-serif;
       font-size: 12px;
       font-weight: 700;
@@ -2562,16 +2628,18 @@
       transition: background-color .15s ease, border-color .15s ease, color .15s ease;
     }
     #page-resources .resource-card:hover .resource-preview-button {
-      border-color: color-mix(in srgb, var(--card-accent) 55%, var(--res-border));
+      border-color: color-mix(in srgb, var(--resource-accent) 55%, var(--line));
     }
-    #page-resources .resource-preview-button:hover {
-      background: var(--card-accent) !important;
-      border-color: var(--card-accent) !important;
+    #page-resources .resource-card .resource-preview-button:hover {
+      background: var(--resource-accent) !important;
+      border-color: var(--resource-accent) !important;
       color: #FFFFFF !important;
     }
+    [data-theme="dark"] #page-resources .resource-card .resource-preview-button:hover {
+      color: #14182B !important;
+    }
 
-    /* Icon-only Download Button */
-    #page-resources .resource-download-button {
+    #page-resources .resource-card .resource-download-button {
       width: 28px;
       height: 28px;
       min-height: 28px;
@@ -2579,24 +2647,31 @@
       border-radius: 8px;
       border: 0;
       background: transparent;
-      color: var(--res-muted);
+      color: var(--muted);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      box-shadow: none;
       transition: background-color .15s ease, color .15s ease;
     }
-    #page-resources .resource-download-button:hover {
-      background: var(--res-soft);
-      color: var(--res-brand);
+    #page-resources .resource-card .resource-download-button:hover {
+      background: var(--blue-soft);
+      color: var(--blue);
     }
-    #page-resources .resource-download-button svg {
-      width: 15px;
-      height: 15px;
+    #page-resources .resource-card .resource-download-button svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
     }
 
-    /* Icon-only Delete Button */
-    #page-resources .resource-delete-button {
+    /* Row 4: Right - Delete button */
+    #page-resources .resource-card .resource-delete-button,
+    #page-resources .resource-card .delete-content-button {
+      grid-row: 4;
+      grid-column: 3;
+      justify-self: end;
+      align-self: center;
       width: 28px;
       height: 28px;
       min-height: 28px;
@@ -2604,36 +2679,50 @@
       border-radius: 8px;
       border: 0;
       background: transparent;
-      color: var(--res-muted);
+      color: var(--muted);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      box-shadow: none;
+      margin: 0;
+      margin-top: auto;
+      padding-top: 6px;
+      max-width: none;
       transition: background-color .15s ease, color .15s ease;
     }
-    #page-resources .resource-delete-button:hover {
-      background: #fdebee;
-      color: #df4c55;
+    #page-resources .resource-card .resource-delete-button[hidden],
+    #page-resources .resource-card .delete-content-button[hidden] {
+      display: none !important;
     }
-    [data-theme="dark"] #page-resources .resource-delete-button:hover {
-      background: rgba(223, 76, 85, 0.2);
-      color: #ff747e;
+    #page-resources .resource-card .resource-delete-button:hover,
+    #page-resources .resource-card .delete-content-button:hover {
+      background: #FDECEB;
+      color: #B42318;
     }
-    #page-resources .resource-delete-button svg {
-      width: 15px;
-      height: 15px;
+    [data-theme="dark"] #page-resources .resource-card .resource-delete-button:hover,
+    [data-theme="dark"] #page-resources .resource-card .delete-content-button:hover {
+      background: #3A1618;
+      color: #FF9A90;
+    }
+    #page-resources .resource-card .resource-delete-button svg,
+    #page-resources .resource-card .delete-content-button svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
     }
 
     /* Empty state */
     #page-resources .empty-filter {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 40px 16px;
-      color: var(--res-muted);
+      padding: 48px 16px;
+      color: var(--muted);
       font-size: 13.5px;
+      font-family: 'Figtree', sans-serif;
     }
 
-    /* Focus & Reduced motion */
+    /* Focus & Accessibility */
     #page-resources :focus-visible {
       outline: 3px solid rgba(10, 116, 230, 0.45);
       outline-offset: 2px;
@@ -2649,7 +2738,8 @@
       }
     }
 
-    @media (max-width: 650px) {
+    /* Responsive */
+    @media (max-width: 560px) {
       #page-resources .resource-grid {
         grid-template-columns: 1fr;
       }
@@ -2657,20 +2747,32 @@
         flex-direction: column;
         align-items: stretch;
       }
+      #page-resources .search-field,
+      #page-resources .select-field {
+        width: 100%;
+        min-height: 42px;
+      }
       #page-resources .tab {
         min-height: 40px;
+        padding: 9px 16px;
       }
-      #page-resources .resource-preview-button {
-        min-height: 32px;
+      #page-resources .resource-card .resource-preview-button {
+        min-height: 40px;
+        height: 40px;
+        padding: 0 14px;
+        font-size: 13px;
       }
-      #page-resources .resource-download-button,
-      #page-resources .resource-delete-button {
-        width: 32px;
-        height: 32px;
-        min-height: 32px;
+      #page-resources .resource-card .resource-download-button,
+      #page-resources .resource-card .resource-delete-button,
+      #page-resources .resource-card .delete-content-button {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
       }
     }
-  </style>
+
+    </style>
 <style id="cb-profile">
     /* ===== Profile page redesign ===== */
     #page-profile .profile-layout { gap:18px; }
@@ -4606,7 +4708,7 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=24"></script>
+  <script src="classboard-auth.js?v=25"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
