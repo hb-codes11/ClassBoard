@@ -907,13 +907,7 @@
   }
 
   function resourceSubjectColor(name = '') {
-    const subjectName = name.toLowerCase();
-    if (/software engineering/.test(subjectName)) return 'se';
-    if (/statistical analysis/.test(subjectName)) return 'sa';
-    if (/artificial intelligence|machine learning/.test(subjectName)) return 'ai';
-    if (/java/.test(subjectName)) return 'java';
-    if (/computer organisation|computer organization|data structures/.test(subjectName)) return 'com';
-    return 'default';
+    return getSubjectColorClass(name).replace('color-', '');
   }
 
   async function addResourceCard(resource, compact = false) {
@@ -935,41 +929,104 @@
     card.dataset.search = `${resource.title} ${subject?.name || ''} ${kind} ${resource.unit_label || ''}`.toLowerCase();
     card.dataset.resourcePath = resource.storage_path || '';
     card.dataset.resourceTitle = resource.title;
-    const extension = resource.storage_path?.split('.').pop()?.toUpperCase();
-    const icon = document.createElement('div'); icon.className = 'file-icon'; icon.textContent = ['PDF', 'DOCX', 'PPTX'].includes(extension) ? extension : 'FILE';
-    const main = document.createElement('div'); main.className = 'list-main';
-    const title = document.createElement('div'); title.className = 'resource-title'; title.textContent = resource.title;
-    const meta = document.createElement('div'); meta.className = 'resource-meta';
-    const metaLine = document.createElement('div'); metaLine.className = 'resource-meta-line';
-    const subjectLabel = document.createElement('span'); subjectLabel.className = 'resource-subject'; subjectLabel.textContent = subject?.name || '';
-    const kindLabel = document.createElement('span'); kindLabel.textContent = [kind, resource.unit_label].filter(Boolean).join(' · ');
-    if (subjectLabel.textContent) metaLine.append(subjectLabel);
-    if (subjectLabel.textContent && kindLabel.textContent) {
-      const separator = document.createElement('span'); separator.className = 'resource-meta-separator'; separator.textContent = '·'; metaLine.append(separator);
+    const extension = resource.storage_path?.split('.').pop()?.toUpperCase() || 'PDF';
+    const tagText = ['PDF', 'DOCX', 'PPTX'].includes(extension) ? extension : 'PDF';
+
+    if (compact) {
+      const icon = document.createElement('div'); icon.className = 'file-icon'; icon.textContent = tagText;
+      const main = document.createElement('div'); main.className = 'list-main';
+      const title = document.createElement('div'); title.className = 'resource-title'; title.textContent = resource.title;
+      const meta = document.createElement('div'); meta.className = 'resource-meta';
+      const metaLine = document.createElement('div'); metaLine.className = 'resource-meta-line';
+      const subjectLabel = document.createElement('span'); subjectLabel.className = 'resource-subject'; subjectLabel.textContent = subject?.name || '';
+      const kindLabel = document.createElement('span'); kindLabel.textContent = [kind, resource.unit_label].filter(Boolean).join(' · ');
+      if (subjectLabel.textContent) metaLine.append(subjectLabel);
+      if (subjectLabel.textContent && kindLabel.textContent) {
+        const separator = document.createElement('span'); separator.className = 'resource-meta-separator'; separator.textContent = '·'; metaLine.append(separator);
+      }
+      if (kindLabel.textContent) metaLine.append(kindLabel);
+      const addedDate = document.createElement('div'); addedDate.className = 'resource-added-date';
+      addedDate.textContent = `Added ${new Date(resource.published_at || resource.created_at).toLocaleDateString('en-IN')}`;
+      meta.append(metaLine, addedDate);
+      main.append(title, meta);
+      const actions = document.createElement('div'); actions.className = 'resource-actions';
+      const preview = document.createElement('button');
+      preview.type = 'button'; preview.className = 'resource-preview-button'; preview.dataset.previewPdf = 'true';
+      preview.textContent = 'Preview'; preview.setAttribute('aria-label', `Preview ${resource.title}`);
+      const download = document.createElement('button');
+      download.type = 'button'; download.className = 'resource-download-button'; download.dataset.downloadPdf = 'true';
+      download.innerHTML = '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>';
+      download.setAttribute('aria-label', `Download ${resource.title}`);
+      actions.append(preview, download);
+      card.append(icon, main, actions);
+      return card;
     }
-    if (kindLabel.textContent) metaLine.append(kindLabel);
-    const addedDate = document.createElement('div'); addedDate.className = 'resource-added-date';
-    addedDate.textContent = `Added ${new Date(resource.published_at || resource.created_at).toLocaleDateString('en-IN')}`;
-    meta.append(metaLine, addedDate);
-    main.append(title, meta);
-    const actions = document.createElement('div'); actions.className = 'resource-actions';
+
+    // Notes & Syllabus page (#page-resources) 4-row Quiet Cards
+    // Row 1: Top (tag on left, kind on right)
+    const topRow = document.createElement('div');
+    topRow.className = 'resource-card-top';
+    const tag = document.createElement('span');
+    tag.className = 'file-icon resource-tag';
+    tag.textContent = tagText;
+    const kindLabel = document.createElement('span');
+    kindLabel.className = 'resource-kind-label';
+    kindLabel.textContent = [kind, resource.unit_label].filter(Boolean).join(' · ') || 'Resource';
+    topRow.append(tag, kindLabel);
+
+    // Row 2: Title (clamped to 2 lines)
+    const title = document.createElement('div');
+    title.className = 'resource-title';
+    title.textContent = resource.title;
+
+    // Row 3: Subject row (dot + subject in accent colour)
+    const subjectRow = document.createElement('div');
+    subjectRow.className = 'resource-subject-row';
+    const subjectDot = document.createElement('span');
+    subjectDot.className = 'resource-subject-dot';
+    subjectDot.setAttribute('aria-hidden', 'true');
+    const subjectText = document.createElement('span');
+    subjectText.className = 'resource-subject';
+    subjectText.textContent = subject?.name || 'Class Resource';
+    subjectRow.append(subjectDot, subjectText);
+
+    // Row 4: Bottom row (Date on left, actions on right)
+    const bottomRow = document.createElement('div');
+    bottomRow.className = 'resource-card-bottom';
+    const addedDate = document.createElement('span');
+    addedDate.className = 'resource-added-date';
+    const d = new Date(resource.published_at || resource.created_at);
+    addedDate.textContent = `Added ${d.toLocaleDateString('en-IN')}`;
+
+    const actions = document.createElement('div');
+    actions.className = 'resource-actions';
+
     const preview = document.createElement('button');
-    preview.type = 'button'; preview.className = 'resource-preview-button'; preview.dataset.previewPdf = 'true';
-    preview.textContent = 'Preview'; preview.setAttribute('aria-label', `Preview ${resource.title}`);
+    preview.type = 'button';
+    preview.className = 'resource-preview-button';
+    preview.dataset.previewPdf = 'true';
+    preview.textContent = 'Preview';
+    preview.setAttribute('aria-label', `Preview ${resource.title}`);
+
     const download = document.createElement('button');
-    download.type = 'button'; download.className = 'resource-download-button'; download.dataset.downloadPdf = 'true';
-    download.innerHTML = '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>';
+    download.type = 'button';
+    download.className = 'resource-download-button';
+    download.dataset.downloadPdf = 'true';
     download.setAttribute('aria-label', `Download ${resource.title}`);
+    download.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
+
     actions.append(preview, download);
-    card.append(icon, main, actions);
-    if (!compact) {
-      const remove = makeDeleteButton('Delete resource');
-      remove.classList.add('resource-delete-button');
-      remove.setAttribute('aria-label', `Delete ${resource.title}`);
-      remove.title = 'Delete resource';
-      remove.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6m4-6v6M5 7l1 14h12l1-14M9 7V4h6v3"/></svg>';
-      card.append(remove);
-    }
+
+    const remove = makeDeleteButton('Delete resource');
+    remove.classList.add('resource-delete-button');
+    remove.setAttribute('aria-label', `Delete ${resource.title}`);
+    remove.title = 'Delete resource';
+    remove.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M5 7l1 14h12l1-14M9 7V4h6v3"/></svg>';
+    actions.append(remove);
+
+    bottomRow.append(addedDate, actions);
+
+    card.append(topRow, title, subjectRow, bottomRow);
     return card;
   }
 

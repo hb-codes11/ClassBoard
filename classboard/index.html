@@ -181,7 +181,7 @@
     #page-home .home-action-link:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
     .update { display: flex; gap: 12px; padding: 12px 18px; border-top: 1px solid var(--line); }
     .update:first-of-type { border-top: 0; }
-    .update-card { --update-accent: var(--blue); position: relative; display: grid; grid-template-columns: 56px 42px minmax(0, 1fr) auto auto; align-items: center; gap: 13px; min-height: 90px; margin: 10px 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); box-shadow: 0 4px 14px rgba(26, 54, 84, .035); }
+    .update-card { --update-accent: var(--blue); position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: start; gap: 14px; min-height: 84px; margin: 10px 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 2px 8px rgba(7, 86, 160, .03); box-sizing: border-box; }
     [data-home-navigation-page] { cursor: pointer; }
     [data-home-navigation-page]:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
     .update-card[data-home-navigation-page]:hover, .resource-card[data-home-navigation-page]:hover { border-color: color-mix(in srgb, var(--blue) 38%, var(--line)); }
@@ -190,39 +190,24 @@
     #homeUpdateList > .update-card { margin-inline: 14px; }
     #homeReminderList > .update-card { margin-inline: 14px; }
     #homeReminderList { container-type: inline-size; }
-    #homeReminderList > .update-card.update-mst { grid-template-columns: 56px 42px minmax(0, 1fr); }
-    @container (max-width: 540px) {
-      #homeReminderList > .update-card { grid-template-columns: 42px 32px minmax(0, 1fr) auto 30px; grid-template-rows: auto; align-items: center; gap: 7px; min-height: 68px; padding: 8px; }
-      #homeReminderList > .update-card .update-date { grid-column: 1; grid-row: 1; min-height: 46px; }
-      #homeReminderList > .update-card .update-date-day { font-size: 17px; }
-      #homeReminderList > .update-card .update-icon { grid-column: 2; grid-row: 1; width: 32px; height: 32px; }
-      #homeReminderList > .update-card .update-icon svg { width: 17px; height: 17px; }
-      #homeReminderList > .update-card .update-copy { grid-column: 3; grid-row: 1; min-width: 0; }
-      #homeReminderList > .update-card .update-title { font-size: 11px; line-height: 1.25; overflow-wrap: break-word; word-break: normal; }
-      #homeReminderList > .update-card .update-body { font-size: 9px; line-height: 1.3; margin-top: 3px; }
-      #homeReminderList > .update-card .update-time { font-size: 9px; line-height: 1.3; margin-top: 3px; }
-      #homeReminderList > .update-card .update-tag { margin-left: 3px; font-size: 7px; padding: 2px 5px; }
-      #homeReminderList > .update-card .update-join-link { grid-column: 4; grid-row: 1; min-height: 30px; gap: 5px; padding-inline: 8px; font-size: 9px; }
-      #homeReminderList > .update-card .update-join-link svg { width: 13px; height: 13px; }
-      #homeReminderList > .update-card .update-menu-trigger { grid-column: 5; grid-row: 1; width: 30px; height: 30px; }
-      #homeReminderList > .update-card.update-mst { grid-template-columns: 42px 32px minmax(0, 1fr); }
-      #homeReminderList > .update-card.update-mst .update-date { grid-column: 1; grid-row: 1; }
-      #homeReminderList > .update-card.update-mst .update-icon { grid-column: 2; grid-row: 1; }
-      #homeReminderList > .update-card.update-mst .update-copy { grid-column: 3; grid-row: 1; }
-      #homeReminderList > .update-card.update-mst .update-title { font-size: 10px; }
-      #homeReminderList > .update-card.update-mst .update-time { white-space: nowrap; }
-    }
-    @container (max-width: 410px) {
-      #homeReminderList > .update-card { grid-template-columns: 38px 30px minmax(0, 1fr) 30px; grid-template-rows: auto auto; gap: 6px; min-height: 0; padding: 8px; }
-      #homeReminderList > .update-card .update-date { grid-column: 1; grid-row: 1 / 3; min-height: 42px; }
-      #homeReminderList > .update-card .update-icon { grid-column: 2; grid-row: 1; width: 30px; height: 30px; }
-      #homeReminderList > .update-card .update-copy { grid-column: 3; grid-row: 1; }
-      #homeReminderList > .update-card .update-join-link { grid-column: 3; grid-row: 2; justify-self: start; min-height: 28px; }
-      #homeReminderList > .update-card .update-menu-trigger { grid-column: 4; grid-row: 1; width: 30px; height: 30px; }
-      #homeReminderList > .update-card.update-mst { grid-template-columns: 38px 30px minmax(0, 1fr); grid-template-rows: auto; }
-      #homeReminderList > .update-card.update-mst .update-date { grid-column: 1; grid-row: 1; }
-      #homeReminderList > .update-card.update-mst .update-icon { grid-column: 2; grid-row: 1; }
-      #homeReminderList > .update-card.update-mst .update-copy { grid-column: 3; grid-row: 1; }
+    @container (max-width: 480px) {
+      #homeReminderList > .update-card, #homeUpdateList > .update-card {
+        grid-template-columns: 46px minmax(0, 1fr);
+        padding: 12px 14px;
+        gap: 10px;
+      }
+      #homeReminderList > .update-card .update-date, #homeUpdateList > .update-card .update-date {
+        min-height: 48px;
+        width: 46px;
+      }
+      #homeReminderList > .update-card .update-date .update-date-day, #homeUpdateList > .update-card .update-date .update-date-day {
+        font-size: 17px;
+      }
+      #homeReminderList > .update-card .update-card-actions, #homeUpdateList > .update-card .update-card-actions {
+        grid-column: 2;
+        margin-left: 0;
+        margin-top: 6px;
+      }
     }
     .update-card.update-important { --update-accent: var(--blue); }
     .update-card.update-deadline { --update-accent: #e6535e; }
@@ -884,19 +869,17 @@
       .subject-calculator .secondary-button { grid-column: 1 / -1; }
       .panel-header { padding: 14px 15px 10px; }
       .update { padding-inline: 15px; }
-      .update-card { grid-template-columns: 43px 34px minmax(0, 1fr) auto; gap: 8px; margin: 8px 0; padding: 10px; }
-      #homeUpdateList > .update-card { margin-inline: 10px; }
-      #homeReminderList > .update-card { margin-inline: 10px; }
-      .update-card .update-join-link { grid-column: 3; grid-row: 2; justify-self: start; min-height: 30px; }
-      .update-card .update-menu-trigger { grid-column: 4; grid-row: 1; }
-      .update-date { min-height: 46px; }
-      .update-date-day { font-size: 17px; }
-      .update-icon { width: 34px; height: 34px; }
-      .update-icon svg { width: 18px; height: 18px; }
-      .update-card .update-title { font-size: 11px; }
-      .update-card .update-body { font-size: 10px; }
-      .update-card .update-time { font-size: 9px; }
-      .update-tag, .update-urgent, .update-tag-pinned { font-size: 8px; padding: 3px 6px; }
+      .update-card { grid-template-columns: 46px minmax(0, 1fr) auto !important; gap: 10px !important; margin: 8px 0 !important; padding: 12px 14px !important; }
+      #homeUpdateList > .update-card { margin-inline: 10px !important; }
+      #homeReminderList > .update-card { margin-inline: 10px !important; }
+      .update-card-actions { display: flex !important; align-items: center !important; gap: 8px !important; }
+      .update-card .update-join-link { min-height: 30px; font-size: 11px; padding: 6px 12px; }
+      .update-date { min-height: 48px !important; width: 46px !important; }
+      .update-date-day { font-size: 17px !important; }
+      .update-card .update-title { font-size: 13.5px !important; }
+      .update-card .update-body { font-size: 11.5px !important; }
+      .update-card .update-time { font-size: 10px !important; }
+      .update-tag, .update-urgent, .update-tag-pinned { font-size: 8.5px; padding: 3px 6px; }
       .update-menu-trigger { width: 32px; height: 32px; }
       .quick-actions { margin-top: 14px; gap: 7px; }
       .quick-action { display: grid; justify-items: start; gap: 7px; min-height: 78px; padding: 10px; }
@@ -2445,16 +2428,16 @@
       box-shadow: none;
       padding: 15px 14px 13px 20px;
       overflow: hidden;
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      grid-template-rows: auto auto 1fr auto;
-      row-gap: 8px;
-      column-gap: 6px;
-      align-items: center;
-      min-height: auto;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      justify-content: flex-start !important;
+      gap: 8px;
+      min-height: 140px;
+      box-sizing: border-box;
       transform: none !important;
       transition: border-color .18s ease, box-shadow .18s ease;
-      box-sizing: border-box;
+      text-align: left;
     }
     #page-resources .resource-card::before {
       content: '';
@@ -2476,48 +2459,37 @@
       box-shadow: 0 4px 16px -2px color-mix(in srgb, var(--resource-accent) 24%, transparent) !important;
     }
 
-    /* Subtree flattening with display: contents */
-    #page-resources .resource-card .list-main,
-    #page-resources .resource-card .resource-meta,
-    #page-resources .resource-card .resource-meta-line {
-      display: contents;
+    /* Row 1: Top (tag on left, kind on right) */
+    #page-resources .resource-card-top {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      width: 100% !important;
+      gap: 10px;
     }
-
-    /* Row 1: Left - PDF tag chip */
-    #page-resources .resource-card .file-icon {
-      grid-row: 1;
-      grid-column: 1;
-      justify-self: start;
-      align-self: center;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: auto;
-      min-width: 0;
-      height: auto;
-      padding: 2px 6px;
-      border: 1px solid var(--line);
-      border-radius: 5px;
-      background: transparent;
-      color: var(--muted);
-      font-family: 'Figtree', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      line-height: 1.2;
-      margin: 0;
+    #page-resources .resource-card .file-icon,
+    #page-resources .resource-card .resource-tag {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: auto !important;
+      min-width: 0 !important;
+      height: auto !important;
+      padding: 2px 6px !important;
+      border: 1px solid var(--line) !important;
+      border-radius: 5px !important;
+      background: transparent !important;
+      color: var(--muted) !important;
+      font-family: 'Figtree', sans-serif !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.06em !important;
+      text-transform: uppercase !important;
+      line-height: 1.2 !important;
+      margin: 0 !important;
+      flex-shrink: 0 !important;
     }
-
-    /* Row 1: Right - File type */
-    #page-resources .resource-card .resource-meta-separator {
-      display: none !important;
-    }
-    #page-resources .resource-card .resource-meta-line > span:not(.resource-subject):not(.resource-meta-separator) {
-      grid-row: 1;
-      grid-column: 2 / -1;
-      justify-self: end;
-      align-self: center;
+    #page-resources .resource-card .resource-kind-label {
       font-family: 'Figtree', sans-serif;
       font-size: 12px;
       font-weight: 400;
@@ -2528,12 +2500,11 @@
       text-align: right;
       line-height: 1.2;
       margin: 0;
+      margin-left: auto;
     }
 
-    /* Row 2: File title */
+    /* Row 2: Title */
     #page-resources .resource-card .resource-title {
-      grid-row: 2;
-      grid-column: 1 / -1;
       font-family: 'Figtree', sans-serif;
       font-size: 15px;
       font-weight: 650;
@@ -2546,68 +2517,77 @@
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
       overflow: hidden;
-      min-width: 0;
+      width: 100% !important;
       word-break: break-word;
     }
 
-    /* Row 3: Subject row */
-    #page-resources .resource-card .resource-subject {
-      grid-row: 3;
-      grid-column: 1 / -1;
-      align-self: start;
-      font-family: 'Figtree', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--resource-accent);
-      text-align: left;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      flex-wrap: wrap;
-      min-width: 0;
-      word-break: break-word;
-      white-space: normal;
-      margin: 0;
+    /* Row 3: Subject */
+    #page-resources .resource-subject-row {
+      display: flex !important;
+      align-items: center !important;
+      gap: 7px !important;
+      width: 100% !important;
+      margin: 0 !important;
+      flex-wrap: wrap !important;
     }
-    #page-resources .resource-card .resource-subject::before {
-      content: '';
-      display: inline-block;
+    #page-resources .resource-subject-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
       background: var(--resource-accent);
       flex-shrink: 0;
     }
+    #page-resources .resource-card .resource-subject {
+      font-family: 'Figtree', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--resource-accent);
+      text-align: left;
+      line-height: 1.3;
+      margin: 0;
+    }
 
-    /* Row 4: Left - Date */
+    /* Backwards compatibility for list-main / meta-line */
+    #page-resources .resource-card .list-main {
+      width: 100% !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 4px !important;
+    }
+    #page-resources .resource-card .resource-meta {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 3px !important;
+      width: 100% !important;
+    }
+    #page-resources .resource-card .resource-meta-separator {
+      display: none !important;
+    }
+
+    /* Row 4: Bottom row (Date on left, actions on right) */
+    #page-resources .resource-card-bottom {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      width: 100% !important;
+      gap: 12px !important;
+      margin-top: auto !important;
+      padding-top: 6px;
+    }
     #page-resources .resource-card .resource-added-date {
-      grid-row: 4;
-      grid-column: 1;
-      justify-self: start;
-      align-self: center;
       font-family: 'Figtree', sans-serif;
       font-size: 12px;
       color: var(--muted);
       white-space: nowrap;
-      margin-top: auto;
-      padding-top: 6px;
-    }
-
-    /* Row 4: Right - Action buttons */
-    #page-resources .resource-card .resource-actions {
-      grid-row: 4;
-      grid-column: 2;
-      justify-self: end;
-      align-self: center;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
       margin: 0;
-      margin-top: auto;
-      padding: 0;
-      padding-top: 6px;
-      width: auto;
-      max-width: none;
+    }
+    #page-resources .resource-card .resource-actions {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      margin-left: auto !important;
+      width: auto !important;
+      padding: 0 !important;
     }
     #page-resources .resource-card .resource-preview-button {
       height: 28px;
@@ -2665,13 +2645,9 @@
       stroke: currentColor;
     }
 
-    /* Row 4: Right - Delete button */
+    /* Delete button */
     #page-resources .resource-card .resource-delete-button,
     #page-resources .resource-card .delete-content-button {
-      grid-row: 4;
-      grid-column: 3;
-      justify-self: end;
-      align-self: center;
       width: 28px;
       height: 28px;
       min-height: 28px;
@@ -2686,9 +2662,6 @@
       cursor: pointer;
       box-shadow: none;
       margin: 0;
-      margin-top: auto;
-      padding-top: 6px;
-      max-width: none;
       transition: background-color .15s ease, color .15s ease;
     }
     #page-resources .resource-card .resource-delete-button[hidden],
@@ -4708,7 +4681,7 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=25"></script>
+  <script src="classboard-auth.js?v=26"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
