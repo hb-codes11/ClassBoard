@@ -1343,7 +1343,11 @@
       renderedNotificationDetails.push({ id: String(notification.id), title, message: detail, label: labels[type] });
       const row = document.createElement('article'); row.className = `notification-item notification-${type}`; row.dataset.notificationId = notification.id;
       if (notification.read_at) row.classList.add('notification-read');
-      const mark = document.createElement('div'); mark.className = 'notification-icon'; mark.textContent = notification.source_type === 'attendance_issue' ? '✓' : notification.source_type === 'resource' ? resourceKindLabel(source.kind).split(' ')[0].toUpperCase() : notification.source_type === 'reminder' ? 'REM' : notification.source_type === 'class_session' ? 'CLASS' : type === 'deadline' ? 'DUE' : type === 'important' ? '!' : 'INFO';
+      const mark = document.createElement('div');
+      mark.className = 'notification-icon';
+      const badgeText = notification.source_type === 'attendance_issue' ? '✓' : notification.source_type === 'resource' ? resourceKindLabel(source.kind).split(' ')[0].toUpperCase() : notification.source_type === 'reminder' ? 'REM' : notification.source_type === 'class_session' ? 'CLASS' : type === 'deadline' ? 'DUE' : type === 'important' ? '!' : 'INFO';
+      mark.textContent = badgeText;
+      if (badgeText.length >= 6) mark.dataset.length = 'long';
       const main = document.createElement('div'); main.className = 'notification-main';
       const typeLabel = document.createElement('div'); typeLabel.className = 'notification-type'; typeLabel.textContent = labels[type];
       const heading = document.createElement('div'); heading.className = 'list-title'; heading.textContent = title;
