@@ -907,13 +907,7 @@
   }
 
   function resourceSubjectColor(name = '') {
-    const subjectName = name.toLowerCase();
-    if (/software engineering/.test(subjectName)) return 'se';
-    if (/statistical analysis/.test(subjectName)) return 'sa';
-    if (/artificial intelligence|machine learning/.test(subjectName)) return 'ai';
-    if (/java/.test(subjectName)) return 'java';
-    if (/computer organisation|computer organization|data structures/.test(subjectName)) return 'com';
-    return 'default';
+    return getSubjectColorClass(name).replace('color-', '');
   }
 
   async function addResourceCard(resource, compact = false) {
@@ -935,41 +929,111 @@
     card.dataset.search = `${resource.title} ${subject?.name || ''} ${kind} ${resource.unit_label || ''}`.toLowerCase();
     card.dataset.resourcePath = resource.storage_path || '';
     card.dataset.resourceTitle = resource.title;
-    const extension = resource.storage_path?.split('.').pop()?.toUpperCase();
-    const icon = document.createElement('div'); icon.className = 'file-icon'; icon.textContent = ['PDF', 'DOCX', 'PPTX'].includes(extension) ? extension : 'FILE';
-    const main = document.createElement('div'); main.className = 'list-main';
-    const title = document.createElement('div'); title.className = 'resource-title'; title.textContent = resource.title;
-    const meta = document.createElement('div'); meta.className = 'resource-meta';
-    const metaLine = document.createElement('div'); metaLine.className = 'resource-meta-line';
-    const subjectLabel = document.createElement('span'); subjectLabel.className = 'resource-subject'; subjectLabel.textContent = subject?.name || '';
-    const kindLabel = document.createElement('span'); kindLabel.textContent = [kind, resource.unit_label].filter(Boolean).join(' · ');
-    if (subjectLabel.textContent) metaLine.append(subjectLabel);
-    if (subjectLabel.textContent && kindLabel.textContent) {
-      const separator = document.createElement('span'); separator.className = 'resource-meta-separator'; separator.textContent = '·'; metaLine.append(separator);
+    const extension = resource.storage_path?.split('.').pop()?.toUpperCase() || 'PDF';
+    const tagText = ['PDF', 'DOCX', 'PPTX'].includes(extension) ? extension : 'PDF';
+
+    if (compact) {
+      const icon = document.createElement('div'); icon.className = 'file-icon'; icon.textContent = tagText;
+      const main = document.createElement('div'); main.className = 'list-main';
+      const title = document.createElement('div'); title.className = 'resource-title'; title.textContent = resource.title;
+      const meta = document.createElement('div'); meta.className = 'resource-meta';
+      const metaLine = document.createElement('div'); metaLine.className = 'resource-meta-line';
+      const subjectLabel = document.createElement('span'); subjectLabel.className = 'resource-subject'; subjectLabel.textContent = subject?.name || '';
+      const kindLabel = document.createElement('span'); kindLabel.textContent = [kind, resource.unit_label].filter(Boolean).join(' · ');
+      if (subjectLabel.textContent) metaLine.append(subjectLabel);
+      if (subjectLabel.textContent && kindLabel.textContent) {
+        const separator = document.createElement('span'); separator.className = 'resource-meta-separator'; separator.textContent = '·'; metaLine.append(separator);
+      }
+      if (kindLabel.textContent) metaLine.append(kindLabel);
+      const addedDate = document.createElement('div'); addedDate.className = 'resource-added-date';
+      addedDate.textContent = `Added ${new Date(resource.published_at || resource.created_at).toLocaleDateString('en-IN')}`;
+      meta.append(metaLine, addedDate);
+      main.append(title, meta);
+      const actions = document.createElement('div'); actions.className = 'resource-actions';
+      const preview = document.createElement('button');
+      preview.type = 'button'; preview.className = 'resource-preview-button'; preview.dataset.previewPdf = 'true';
+      preview.textContent = 'Preview'; preview.setAttribute('aria-label', `Preview ${resource.title}`);
+      const download = document.createElement('button');
+      download.type = 'button'; download.className = 'resource-download-button'; download.dataset.downloadPdf = 'true';
+      download.innerHTML = '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>';
+      download.setAttribute('aria-label', `Download ${resource.title}`);
+      actions.append(preview, download);
+      card.append(icon, main, actions);
+      return card;
     }
-    if (kindLabel.textContent) metaLine.append(kindLabel);
-    const addedDate = document.createElement('div'); addedDate.className = 'resource-added-date';
-    addedDate.textContent = `Added ${new Date(resource.published_at || resource.created_at).toLocaleDateString('en-IN')}`;
-    meta.append(metaLine, addedDate);
-    main.append(title, meta);
-    const actions = document.createElement('div'); actions.className = 'resource-actions';
+
+    // Quiet Cards layout for Notes & Syllabus page (#page-resources)
+    // Row 1: Top (tag on left, kind on right)
+    const topRow = document.createElement('div');
+    topRow.className = 'resource-card-top';
+
+    const tag = document.createElement('span');
+    tag.className = 'resource-tag';
+    tag.textContent = tagText;
+
+    const kindLabel = document.createElement('span');
+    kindLabel.className = 'resource-kind-label';
+    kindLabel.textContent = [kind, resource.unit_label].filter(Boolean).join(' · ') || 'Resource';
+
+    topRow.append(tag, kindLabel);
+
+    // Row 2: Title (clamped to 2 lines)
+    const title = document.createElement('div');
+    title.className = 'resource-title';
+    title.textContent = resource.title;
+
+    // Row 3: Subject row (6px dot + subject name in accent colour)
+    const subjectRow = document.createElement('div');
+    subjectRow.className = 'resource-subject-row';
+
+    const subjectDot = document.createElement('span');
+    subjectDot.className = 'resource-subject-dot';
+    subjectDot.setAttribute('aria-hidden', 'true');
+
+    const subjectText = document.createElement('span');
+    subjectText.className = 'resource-subject';
+    subjectText.textContent = subject?.name || 'Class Resource';
+
+    subjectRow.append(subjectDot, subjectText);
+
+    // Row 4: Bottom row (Added date on left, actions on right)
+    const bottomRow = document.createElement('div');
+    bottomRow.className = 'resource-card-bottom';
+
+    const addedDate = document.createElement('span');
+    addedDate.className = 'resource-added-date';
+    const d = new Date(resource.published_at || resource.created_at);
+    addedDate.textContent = `Added ${d.toLocaleDateString('en-IN')}`;
+
+    const actions = document.createElement('div');
+    actions.className = 'resource-actions';
+
     const preview = document.createElement('button');
-    preview.type = 'button'; preview.className = 'resource-preview-button'; preview.dataset.previewPdf = 'true';
-    preview.textContent = 'Preview'; preview.setAttribute('aria-label', `Preview ${resource.title}`);
+    preview.type = 'button';
+    preview.className = 'resource-preview-button';
+    preview.dataset.previewPdf = 'true';
+    preview.textContent = 'Preview';
+    preview.setAttribute('aria-label', `Preview ${resource.title}`);
+
     const download = document.createElement('button');
-    download.type = 'button'; download.className = 'resource-download-button'; download.dataset.downloadPdf = 'true';
-    download.innerHTML = '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>';
+    download.type = 'button';
+    download.className = 'resource-download-button';
+    download.dataset.downloadPdf = 'true';
     download.setAttribute('aria-label', `Download ${resource.title}`);
+    download.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
+
     actions.append(preview, download);
-    card.append(icon, main, actions);
-    if (!compact) {
-      const remove = makeDeleteButton('Delete resource');
-      remove.classList.add('resource-delete-button');
-      remove.setAttribute('aria-label', `Delete ${resource.title}`);
-      remove.title = 'Delete resource';
-      remove.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6m4-6v6M5 7l1 14h12l1-14M9 7V4h6v3"/></svg>';
-      card.append(remove);
-    }
+
+    const remove = makeDeleteButton('Delete resource');
+    remove.classList.add('resource-delete-button');
+    remove.setAttribute('aria-label', `Delete ${resource.title}`);
+    remove.title = 'Delete resource';
+    remove.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M5 7l1 14h12l1-14M9 7V4h6v3"/></svg>';
+    actions.append(remove);
+
+    bottomRow.append(addedDate, actions);
+
+    card.append(topRow, title, subjectRow, bottomRow);
     return card;
   }
 
@@ -1483,21 +1547,6 @@
   }
   window.applyClassboardNotificationsFilter = applyNotificationsFilter;
 
-  function formatRelativeTime(date) {
-    if (!date) return '';
-    const now = new Date();
-    const d = new Date(date);
-    const diffSec = Math.floor((now - d) / 1000);
-    if (diffSec < 60) return 'Just now';
-    const diffMin = Math.floor(diffSec / 60);
-    if (diffMin < 60) return `${diffMin}m ago`;
-    const diffHour = Math.floor(diffMin / 60);
-    if (diffHour < 24) return `${diffHour}h ago`;
-    const diffDay = Math.floor(diffHour / 24);
-    if (diffDay < 7) return `${diffDay}d ago`;
-    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-  }
-
   async function loadNotifications(classId) {
     const client = window.classboardSupabase;
     const list = document.getElementById('notificationList');
@@ -1616,55 +1665,53 @@
           const subject = Array.isArray(source.subjects) ? source.subjects[0] : source.subjects;
 
           let notifCategory = 'update';
-          let tagText = 'Update';
-          let subjectName = '';
-          let accentKey = 'default';
+          let eyebrow = 'CLASS UPDATE';
+          let iconColorClass = 'color-default';
+          let iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>';
           let targetPage = 'updates';
 
           if (notification.source_type === 'resource') {
             notifCategory = 'resource';
-            tagText = resourceKindLabel(source.kind) || 'Resource';
-            subjectName = subject?.name || 'Class Resource';
-            accentKey = getSubjectColorClass(subject?.name).replace('color-', '');
-            if (!accentKey || accentKey === 'default') accentKey = 'se';
+            eyebrow = 'NEW RESOURCE';
+            iconColorClass = 'color-resource';
+            iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>';
             targetPage = 'resources';
           } else if (notification.source_type === 'class_session') {
             notifCategory = 'class';
-            tagText = source.kind === 'lab' ? 'Lab' : 'Lecture';
-            subjectName = subject?.name || 'Class Session';
-            accentKey = getSubjectColorClass(subject?.name).replace('color-', '');
+            eyebrow = 'CLASS SCHEDULE';
+            iconColorClass = getSubjectColorClass(subject?.name);
+            iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
             targetPage = 'classes';
           } else if (notification.source_type === 'update') {
             const isImportant = source.category === 'important' || source.importance === 'important';
             const isDeadline = source.category === 'deadline';
             if (isImportant) {
               notifCategory = 'important';
-              tagText = 'Important';
-              subjectName = 'Important Notice';
-              accentKey = 'important';
+              eyebrow = 'IMPORTANT NOTICE';
+              iconColorClass = 'color-important';
+              iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
             } else if (isDeadline) {
               notifCategory = 'deadline';
-              tagText = 'Deadline';
-              subjectName = 'Class Deadline';
-              accentKey = 'deadline';
+              eyebrow = 'DEADLINE';
+              iconColorClass = 'color-ai';
+              iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
             } else {
               notifCategory = 'update';
-              tagText = 'Update';
-              subjectName = 'Class Update';
-              accentKey = 'default';
+              eyebrow = 'CLASS UPDATE';
+              iconColorClass = 'color-default';
             }
             targetPage = 'updates';
           } else if (notification.source_type === 'reminder') {
             notifCategory = 'reminder';
-            tagText = 'Reminder';
-            subjectName = 'Reminder';
-            accentKey = 'reminder';
+            eyebrow = 'REMINDER';
+            iconColorClass = 'color-com';
+            iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l3 2M5 3 3 5m16-2 2 2"></path></svg>';
             targetPage = 'updates';
           } else if (notification.source_type === 'attendance_issue') {
             notifCategory = 'attendance';
-            tagText = 'Concern';
-            subjectName = 'Attendance Issue';
-            accentKey = 'reply';
+            eyebrow = 'ATTENDANCE CONCERN';
+            iconColorClass = 'color-default';
+            iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>';
             targetPage = 'attendance';
           }
 
@@ -1676,7 +1723,7 @@
             detail = 'Your CR or a class admin reviewed your concern.';
           } else if (notification.source_type === 'update') {
             title = source.title;
-            detail = source.body ? (source.body.length > 70 ? source.body.slice(0, 70) + '…' : source.body) : (source.category === 'deadline' ? 'Deadline' : source.category === 'important' ? 'Important' : 'Update');
+            detail = source.body ? (source.body.length > 85 ? source.body.slice(0, 85) + '…' : source.body) : (source.category === 'deadline' ? 'Deadline' : source.category === 'important' ? 'Important' : 'Update');
           } else if (notification.source_type === 'reminder') {
             title = source.title;
             detail = [source.body, `Due ${new Date(source.due_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`].filter(Boolean).join(' · ');
@@ -1688,99 +1735,63 @@
             detail = `${source.kind === 'lab' ? `Lab · ${source.batch}` : 'Lecture'} · ${new Date(source.starts_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}${source.room ? ` · ${source.room}` : ''}`;
           }
 
-          renderedNotificationDetails.push({ id: String(notification.id), title, message: detail, label: tagText });
+          renderedNotificationDetails.push({ id: String(notification.id), title, message: detail, label: eyebrow });
 
           const row = document.createElement('article');
           row.className = `notification-item notification-${notifCategory}`;
           if (notification.read_at) row.classList.add('notification-read');
           row.dataset.notificationId = String(notification.id);
           row.dataset.category = notifCategory;
-          row.dataset.accent = accentKey;
           row.tabIndex = 0;
           row.setAttribute('role', 'button');
-          row.setAttribute('aria-label', `${tagText}: ${title}. ${detail}`);
+          row.setAttribute('aria-label', `${eyebrow}: ${title}. ${detail}`);
 
-          // Row 1: Tag + Time/Unread
-          const topRow = document.createElement('div');
-          topRow.className = 'notification-card-top';
+          const iconTile = document.createElement('div');
+          iconTile.className = `notification-icon-tile ${iconColorClass}`;
+          iconTile.setAttribute('aria-hidden', 'true');
+          iconTile.innerHTML = iconSvg;
 
-          const tagEl = document.createElement('span');
-          tagEl.className = 'notification-tag';
-          tagEl.textContent = tagText;
+          const main = document.createElement('div');
+          main.className = 'notification-main';
 
-          const timeWrap = document.createElement('div');
-          timeWrap.className = 'notification-time-wrap';
+          const eyebrowEl = document.createElement('div');
+          eyebrowEl.className = 'notification-eyebrow';
+          eyebrowEl.textContent = eyebrow;
 
-          const timeEl = document.createElement('time');
-          timeEl.dateTime = notification.created_at;
-          timeEl.title = new Date(notification.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
-          timeEl.textContent = formatRelativeTime(notification.created_at);
-
-          const unreadDot = document.createElement('span');
-          unreadDot.className = 'notification-unread-dot';
-          unreadDot.setAttribute('aria-label', notification.read_at ? 'Read' : 'Unread');
-
-          timeWrap.append(timeEl, unreadDot);
-          topRow.append(tagEl, timeWrap);
-
-          // Row 2: Title (clamped to 2 lines)
           const titleEl = document.createElement('div');
           titleEl.className = 'list-title';
           titleEl.textContent = title;
-
-          // Row 3: Subject / source with 6px dot in accent colour
-          const subjectRow = document.createElement('div');
-          subjectRow.className = 'notification-subject-row';
-
-          const subjectDot = document.createElement('span');
-          subjectDot.className = 'notification-subject-dot';
-          subjectDot.setAttribute('aria-hidden', 'true');
-
-          const subjectText = document.createElement('span');
-          subjectText.className = 'notification-subject-name';
-          subjectText.textContent = subjectName || 'Class update';
-
-          subjectRow.append(subjectDot, subjectText);
-
-          // Row 4: Small muted detail on left, Open + Mark as read buttons on right
-          const bottomRow = document.createElement('div');
-          bottomRow.className = 'notification-card-bottom';
 
           const detailEl = document.createElement('div');
           detailEl.className = 'list-detail';
           detailEl.textContent = detail;
 
-          const actionsWrap = document.createElement('div');
-          actionsWrap.className = 'notification-card-actions';
+          main.append(eyebrowEl, titleEl, detailEl);
 
-          const openBtn = document.createElement('button');
-          openBtn.type = 'button';
-          openBtn.className = 'notification-open-button';
-          openBtn.setAttribute('aria-label', `Open ${title}`);
-          openBtn.innerHTML = `<span>Open</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`;
+          const meta = document.createElement('div');
+          meta.className = 'notification-meta';
 
-          const markBtn = document.createElement('button');
-          markBtn.type = 'button';
-          markBtn.className = 'notification-mark-single';
-          markBtn.setAttribute('aria-label', 'Mark as read');
-          markBtn.title = 'Mark as read';
-          markBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+          const createdAt = new Date(notification.created_at);
+          const timeEl = document.createElement('time');
+          timeEl.dateTime = notification.created_at;
+          timeEl.textContent = createdAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
 
-          actionsWrap.append(openBtn, markBtn);
-          bottomRow.append(detailEl, actionsWrap);
+          const arrowPill = document.createElement('span');
+          arrowPill.className = 'notification-arrow-pill';
+          arrowPill.setAttribute('aria-hidden', 'true');
+          arrowPill.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>';
 
-          row.append(topRow, titleEl, subjectRow, bottomRow);
+          meta.append(timeEl, arrowPill);
+          row.append(iconTile, main, meta);
 
-          const markReadLocally = async () => {
+          const handleOpen = async () => {
             if (!notification.read_at) {
               notification.read_at = new Date().toISOString();
               row.classList.add('notification-read');
-              unreadDot.hidden = true;
-              markBtn.style.opacity = '0.3';
-              markBtn.style.pointerEvents = 'none';
-              await window.classboardSupabase.from('notifications')
+              window.classboardSupabase.from('notifications')
                 .update({ read_at: notification.read_at })
-                .eq('id', notification.id);
+                .eq('id', notification.id)
+                .then(() => {});
 
               const updatesBadge = document.getElementById('updatesUnreadCount');
               if (updatesBadge && !updatesBadge.hidden) {
@@ -1792,29 +1803,14 @@
                 }
               }
             }
-          };
-
-          markBtn.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            await markReadLocally();
-          });
-
-          const handleOpen = async () => {
-            await markReadLocally();
             if (targetPage && window.openClassboardPage) {
               window.openClassboardPage(targetPage);
             }
           };
 
-          openBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            handleOpen();
-          });
-
           row.addEventListener('click', handleOpen);
           row.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
-              if (e.target === markBtn) return;
               e.preventDefault();
               handleOpen();
             }
@@ -1847,6 +1843,7 @@
       }
     }
   }
+
 
   async function markAllNotificationsRead() {
     const context = window.classboardContext;
