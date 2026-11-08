@@ -68,7 +68,7 @@
     .mobile-brand { display: none; }
     .brand-copy { min-width: 0; flex: 1; }
     .brand-name { font-weight: 730; letter-spacing: -.035em; font-size: 10px; line-height: 1.15; }
-    .brand-sub { color: var(--muted); font-size: 11px; letter-spacing: .025em; margin-top: 3px; line-height: 1.3; white-space: nowrap; }
+    .brand-sub { color: var(--muted); font-size: 9.5px; letter-spacing: .03em; font-weight: 650; margin-top: 3px; line-height: 1.3; white-space: nowrap; }
     .brand-term { display: inline-flex; margin-top: 5px; padding: 2px 7px; border-radius: 20px; background: var(--blue-soft); color: var(--blue); font-size: 10px; font-weight: 650; line-height: 1.4; }
     .section-label { color: var(--muted); padding: 0 11px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: .11em; font-size: 10px; font-weight: 700; }
     .nav { display: grid; gap: 5px; }
@@ -1355,7 +1355,7 @@
     .auth-brand img { width: 58px; height: 52px; object-fit: contain; }
     .auth-brand-copy { display: grid; gap: 3px; text-align: left; letter-spacing: 0; }
     .auth-brand-name { color: var(--text); font-size: 20px; font-weight: 780; line-height: 1.05; letter-spacing: -.04em; text-transform: none; }
-    .auth-brand-subtitle { color: var(--muted); font-size: 10px; font-weight: 650; letter-spacing: .09em; }
+    .auth-brand-subtitle { color: var(--muted); font-size: 8.5px; font-weight: 700; letter-spacing: .04em; white-space: nowrap; line-height: 1.2; }
     .auth-card h1 { margin-top: 12px; text-align: center; font-size: clamp(29px, 3.4vw, 34px); letter-spacing: -.04em; }
     .auth-copy { max-width: 40ch; margin: 4px auto 12px; text-align: center; font-size: 14px; line-height: 1.4; }
     .auth-copy strong { white-space: nowrap; }
@@ -1389,6 +1389,7 @@
       .auth-card { padding: 19px 17px; }
       .auth-brand { gap: 2px; font-size: 12px; }
       .auth-brand img { width: 46px; height: 42px; }
+      .auth-brand-subtitle { font-size: 7.5px; letter-spacing: .02em; }
       .auth-card h1 { margin-top: 10px; font-size: 29px; }
       .auth-copy { margin-bottom: 10px; font-size: 13px; }
       .auth-field input, .auth-field select { min-height: 43px; }
@@ -1428,7 +1429,7 @@
     .main { margin-left:248px; }
     .brand { background:transparent; border:0; box-shadow:none; padding:4px 8px; margin-bottom:26px; }
     .brand-name { color:#fff; font-size:19px; letter-spacing:-.03em; }
-    .brand-sub { color:#ffffff80; font-size:10.5px; }
+    .brand-sub { color:#ffffff80; font-size:9.5px; letter-spacing:.03em; font-weight:650; white-space:nowrap; }
     .brand-term { background:var(--sun); color:#3a2700; font-size:11px; font-weight:700; padding:2px 9px; }
     .section-label { color:#ffffff70; padding:0 12px; margin-bottom:8px; }
     .nav { gap:3px; }
@@ -2158,7 +2159,7 @@
 <body data-role="student">
   <section class="auth-gate" id="authGate" aria-labelledby="authTitle">
     <div class="auth-card">
-      <div class="auth-brand"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJvYXJkIiB4MT0iNyIgeTE9IjUiIHgyPSI0MiIgeTI9IjQ0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiMxNjhCRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDc1NkEwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJwYXBlciIgeDE9IjE0IiB5MT0iMTEiIHgyPSIzNiIgeTI9IjM3IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiNGRkZGRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRENFRUZGIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cGF0aCBkPSJNMTMgMy41aDIyQTkuNSA5LjUgMCAwIDEgNDQuNSAxM3YyMmE5LjUgOS41IDAgMCAxLTkuNSA5LjVIMTNBOS41IDkuNSAwIDAgMSAzLjUgMzVWMTNBOS41IDkuNSAwIDAgMSAxMyAzLjVaIiBmaWxsPSJ1cmwoI2JvYXJkKSIvPgogIDxwYXRoIGQ9Ik0xMy4xIDE2LjJjMC0zLjIgMi42LTUuOCA1LjgtNS44aDE2LjN2MjEuMUgxOC45YTUuOCA1LjggMCAwIDAtNS44IDUuOFYxNi4yWiIgZmlsbD0idXJsKCNwYXBlcikiLz4KICA8cGF0aCBkPSJNMTMuMSAzNy4zYTUuOCA1LjggMCAwIDEgNS44LTUuOGgxNi4zIiBzdHJva2U9IiNCOERCRkYiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMTkuMiAxNy4zaDEwLjZNMTkuMiAyMS44aDcuMiIgc3Ryb2tlPSIjMTY4QkZGIiBzdHJva2Utd2lkdGg9IjIuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0ibTI4LjEgMjYuMyAyLjYgMi42IDUtNi4xIiBzdHJva2U9IiNGRkNFNTYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJtMzguMyA4IC44IDIuMiAyLjIuOC0yLjIuOC0uOCAyLjItLjgtMi4yLTIuMi0uOCAyLjItLjguOC0yLjJaIiBmaWxsPSIjRkZFMTdBIi8+Cjwvc3ZnPgo=" alt="" /><span class="auth-brand-copy"><span class="auth-brand-name">ClassBoard</span><span class="auth-brand-subtitle">INTEL CLASS PORTAL</span></span></div>
+      <div class="auth-brand"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJvYXJkIiB4MT0iNyIgeTE9IjUiIHgyPSI0MiIgeTI9IjQ0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiMxNjhCRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDc1NkEwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJwYXBlciIgeDE9IjE0IiB5MT0iMTEiIHgyPSIzNiIgeTI9IjM3IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiNGRkZGRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRENFRUZGIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cGF0aCBkPSJNMTMgMy41aDIyQTkuNSA5LjUgMCAwIDEgNDQuNSAxM3YyMmE5LjUgOS41IDAgMCAxLTkuNSA5LjVIMTNBOS41IDkuNSAwIDAgMSAzLjUgMzVWMTNBOS41IDkuNSAwIDAgMSAxMyAzLjVaIiBmaWxsPSJ1cmwoI2JvYXJkKSIvPgogIDxwYXRoIGQ9Ik0xMy4xIDE2LjJjMC0zLjIgMi42LTUuOCA1LjgtNS44aDE2LjN2MjEuMUgxOC45YTUuOCA1LjggMCAwIDAtNS44IDUuOFYxNi4yWiIgZmlsbD0idXJsKCNwYXBlcikiLz4KICA8cGF0aCBkPSJNMTMuMSAzNy4zYTUuOCA1LjggMCAwIDEgNS44LTUuOGgxNi4zIiBzdHJva2U9IiNCOERCRkYiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMTkuMiAxNy4zaDEwLjZNMTkuMiAyMS44aDcuMiIgc3Ryb2tlPSIjMTY4QkZGIiBzdHJva2Utd2lkdGg9IjIuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0ibTI4LjEgMjYuMyAyLjYgMi42IDUtNi4xIiBzdHJva2U9IiNGRkNFNTYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJtMzguMyA4IC44IDIuMiAyLjIuOC0yLjIuOC0uOCAyLjItLjgtMi4yLTIuMi0uOCAyLjItLjguOC0yLjJaIiBmaWxsPSIjRkZFMTdBIi8+Cjwvc3ZnPgo=" alt="" /><span class="auth-brand-copy"><span class="auth-brand-name">ClassBoard</span><span class="auth-brand-subtitle">INTEL &amp; IBM CLASS PORTAL</span></span></div>
       <h1 id="authTitle">Welcome back!</h1>
       <p class="auth-copy">Sign in to your Medicaps account to continue to ClassBoard.</p>
       <form id="authForm">
@@ -2188,7 +2189,7 @@
     <aside class="sidebar" id="appSidebar">
       <div class="brand">
         <div class="brand-mark"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJvYXJkIiB4MT0iNyIgeTE9IjUiIHgyPSI0MiIgeTI9IjQ0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiMxNjhCRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDc1NkEwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJwYXBlciIgeDE9IjE0IiB5MT0iMTEiIHgyPSIzNiIgeTI9IjM3IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiNGRkZGRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRENFRUZGIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cGF0aCBkPSJNMTMgMy41aDIyQTkuNSA5LjUgMCAwIDEgNDQuNSAxM3YyMmE5LjUgOS41IDAgMCAxLTkuNSA5LjVIMTNBOS41IDkuNSAwIDAgMSAzLjUgMzVWMTNBOS41IDkuNSAwIDAgMSAxMyAzLjVaIiBmaWxsPSJ1cmwoI2JvYXJkKSIvPgogIDxwYXRoIGQ9Ik0xMy4xIDE2LjJjMC0zLjIgMi42LTUuOCA1LjgtNS44aDE2LjN2MjEuMUgxOC45YTUuOCA1LjggMCAwIDAtNS44IDUuOFYxNi4yWiIgZmlsbD0idXJsKCNwYXBlcikiLz4KICA8cGF0aCBkPSJNMTMuMSAzNy4zYTUuOCA1LjggMCAwIDEgNS44LTUuOGgxNi4zIiBzdHJva2U9IiNCOERCRkYiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMTkuMiAxNy4zaDEwLjZNMTkuMiAyMS44aDcuMiIgc3Ryb2tlPSIjMTY4QkZGIiBzdHJva2Utd2lkdGg9IjIuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0ibTI4LjEgMjYuMyAyLjYgMi42IDUtNi4xIiBzdHJva2U9IiNGRkNFNTYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJtMzguMyA4IC44IDIuMiAyLjIuOC0yLjIuOC0uOCAyLjItLjgtMi4yLTIuMi0uOCAyLjItLjguOC0yLjJaIiBmaWxsPSIjRkZFMTdBIi8+Cjwvc3ZnPgo=" alt="ClassBoard logo" /></div>
-        <div class="brand-copy"><div class="brand-name">ClassBoard</div><div class="brand-sub">INTEL CLASS PORTAL</div><div class="brand-term">3rd Semester</div></div>
+        <div class="brand-copy"><div class="brand-name">ClassBoard</div><div class="brand-sub">INTEL &amp; IBM CLASS PORTAL</div><div class="brand-term">3rd Semester</div></div>
       </div>
       <div class="section-label">Workspace</div>
       <nav class="nav" aria-label="Main navigation">
