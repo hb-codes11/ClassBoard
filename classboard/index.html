@@ -1673,13 +1673,6 @@
     [data-theme="dark"] .sidebar .brand, [data-theme="dark"] .sidebar .profile, [data-theme="dark"] .sidebar .help-card { background:rgba(0,0,0,.3); border-color:rgba(255,255,255,.12); }
 </style>
 <style id="cb-subject-dropdown">
-    /* each subject gets its own colour */
-    [data-subject-name^="Software"]   { --sc:#168BFF; }
-    [data-subject-name^="Statistical"]{ --sc:#8B5CF6; }
-    [data-subject-name^="Computer"]   { --sc:#F59E0B; }
-    [data-subject-name^="Java"]       { --sc:#F0603F; }
-    [data-subject-name^="Soft"]       { --sc:#10B981; }
-    [data-subject-name^="Artificial"] { --sc:#E0489B; }
     .subject-attendance { --sc:var(--blue); }
     .subject-attendance-name::before { content:""; display:inline-block; width:9px; height:9px; margin-right:9px; border-radius:50%; background:var(--sc); vertical-align:.05em; }
     .subject-attendance .progress span { background:var(--sc); }
@@ -1702,15 +1695,7 @@
     @media (prefers-reduced-motion:reduce) { .subject-toggle svg, .subject-attendance { transition:none; } }
 </style>
 <style id="cb-subject-fix">
-    /* 1) colours: raise specificity so the default --sc no longer overrides them */
-    .subject-attendance[data-subject-name^="Software"]   { --sc:#168BFF; }
-    .subject-attendance[data-subject-name^="Statistical"]{ --sc:#8B5CF6; }
-    .subject-attendance[data-subject-name^="Computer"]   { --sc:#F59E0B; }
-    .subject-attendance[data-subject-name^="Java"]       { --sc:#F0603F; }
-    .subject-attendance[data-subject-name^="Soft"]       { --sc:#10B981; }
-    .subject-attendance[data-subject-name^="Artificial"] { --sc:#E0489B; }
-
-    /* 2) identical closed cards: name on its own 2-line row, then count / % / arrow */
+    /* Identical closed cards: name on its own 2-line row, then count / % / arrow */
     .attendance-subject-grid { align-items:stretch; }
     .attendance-subject-grid > .subject-attendance { display:flex; flex-direction:column; }
     .attendance-subject-grid > .subject-attendance .subject-attendance-top { display:grid; grid-template-columns:minmax(0,1fr) auto auto; align-items:center; column-gap:10px; row-gap:6px; }
@@ -1724,25 +1709,62 @@
     /* open card: name can use one line since it spans the row */
     .attendance-subject-grid > .subject-attendance.is-open .subject-attendance-name { min-height:0; }
 </style>
-<style id="cb-subject-colours-v2">
-    .subject-attendance[data-subject-name^="Soft"]       { --sc:#F2549E; }
-    .subject-attendance[data-subject-name^="Artificial"] { --sc:#E5383B; }
-    .subject-attendance[data-subject-name^="Java"]       { --sc:#14B8A6; }
-</style>
 <style id="cb-subject-colours-final">
-    /* your original subject palette (same as exam cards / class log), exact name matches only */
-    .subject-attendance[data-subject-name="Software Engineering"] { --sc:#8957d8; }
-    .subject-attendance[data-subject-name="Statistical Analysis"] { --sc:#27a77a; }
-    .subject-attendance[data-subject-name^="Computer Organisation"] { --sc:#d8a20b; }
-    .subject-attendance[data-subject-name="Java Programming"]     { --sc:#ed8a22; }
-    .subject-attendance[data-subject-name="Soft Skills"]          { --sc:#d35d87; }
-    .subject-attendance[data-subject-name="Artificial Intelligence"] { --sc:#df4c55; }
-    [data-theme="dark"] .subject-attendance[data-subject-name="Software Engineering"] { --sc:#c9a5ff; }
-    [data-theme="dark"] .subject-attendance[data-subject-name="Statistical Analysis"] { --sc:#63e6a8; }
-    [data-theme="dark"] .subject-attendance[data-subject-name^="Computer Organisation"] { --sc:#ffdc55; }
-    [data-theme="dark"] .subject-attendance[data-subject-name="Java Programming"]     { --sc:#ffad4d; }
-    [data-theme="dark"] .subject-attendance[data-subject-name="Soft Skills"]          { --sc:#ff85ad; }
-    [data-theme="dark"] .subject-attendance[data-subject-name="Artificial Intelligence"] { --sc:#ff747e; }
+    /* ===== Official Subject Palette (Lecture & Lab cards) ===== */
+    /* SE - PURPLE */
+    .subject-attendance[data-subject-name*="Software"],
+    .subject-attendance[data-subject-name*="SE"],
+    .subject-attendance[data-attendance-subject-name*="Software"] { --sc: #8957d8 !important; }
+
+    /* SA - GREEN */
+    .subject-attendance[data-subject-name*="Statistical"],
+    .subject-attendance[data-subject-name*="SA"],
+    .subject-attendance[data-attendance-subject-name*="Statistical"] { --sc: #27a77a !important; }
+
+    /* COM - YELLOW */
+    .subject-attendance[data-subject-name*="Computer"],
+    .subject-attendance[data-subject-name*="COM"],
+    .subject-attendance[data-attendance-subject-name*="Computer"] { --sc: #d8a20b !important; }
+
+    /* JAVA - ORANGE */
+    .subject-attendance[data-subject-name*="Java"],
+    .subject-attendance[data-subject-name*="JAVA"],
+    .subject-attendance[data-attendance-subject-name*="Java"] { --sc: #ed8a22 !important; }
+
+    /* AI - RED */
+    .subject-attendance[data-subject-name*="Artificial"],
+    .subject-attendance[data-subject-name*="AI"],
+    .subject-attendance[data-attendance-subject-name*="Artificial"] { --sc: #df4c55 !important; }
+
+    /* Soft Skills - ROSE */
+    .subject-attendance[data-subject-name*="Soft Skills"],
+    .subject-attendance[data-subject-name*="SS"],
+    .subject-attendance[data-attendance-subject-name*="Soft Skills"] { --sc: #d35d87 !important; }
+
+    /* ===== Dark Mode Variants ===== */
+    [data-theme="dark"] .subject-attendance[data-subject-name*="Software"],
+    [data-theme="dark"] .subject-attendance[data-subject-name*="SE"],
+    [data-theme="dark"] .subject-attendance[data-attendance-subject-name*="Software"] { --sc: #c9a5ff !important; }
+
+    [data-theme="dark"] .subject-attendance[data-subject-name*="Statistical"],
+    [data-theme="dark"] .subject-attendance[data-subject-name*="SA"],
+    [data-theme="dark"] .subject-attendance[data-attendance-subject-name*="Statistical"] { --sc: #63e6a8 !important; }
+
+    [data-theme="dark"] .subject-attendance[data-subject-name*="Computer"],
+    [data-theme="dark"] .subject-attendance[data-subject-name*="COM"],
+    [data-theme="dark"] .subject-attendance[data-attendance-subject-name*="Computer"] { --sc: #ffdc55 !important; }
+
+    [data-theme="dark"] .subject-attendance[data-subject-name*="Java"],
+    [data-theme="dark"] .subject-attendance[data-subject-name*="JAVA"],
+    [data-theme="dark"] .subject-attendance[data-attendance-subject-name*="Java"] { --sc: #ffad4d !important; }
+
+    [data-theme="dark"] .subject-attendance[data-subject-name*="Artificial"],
+    [data-theme="dark"] .subject-attendance[data-subject-name*="AI"],
+    [data-theme="dark"] .subject-attendance[data-attendance-subject-name*="Artificial"] { --sc: #ff747e !important; }
+
+    [data-theme="dark"] .subject-attendance[data-subject-name*="Soft Skills"],
+    [data-theme="dark"] .subject-attendance[data-subject-name*="SS"],
+    [data-theme="dark"] .subject-attendance[data-attendance-subject-name*="Soft Skills"] { --sc: #ff85ad !important; }
 </style>
 <style id="cb-chip-fix">
     /* active filter chip: always a solid fill with readable text */
