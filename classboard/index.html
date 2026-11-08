@@ -68,7 +68,7 @@
     .mobile-brand { display: none; }
     .brand-copy { min-width: 0; flex: 1; }
     .brand-name { font-weight: 730; letter-spacing: -.035em; font-size: 10px; line-height: 1.15; }
-    .brand-sub { color: var(--muted); font-size: 9.5px; letter-spacing: .03em; font-weight: 650; margin-top: 3px; line-height: 1.3; white-space: nowrap; }
+    .brand-sub { color: var(--muted); font-size: 8px; letter-spacing: .02em; font-weight: 700; margin-top: 3px; line-height: 1.3; white-space: nowrap; }
     .brand-term { display: inline-flex; margin-top: 5px; padding: 2px 7px; border-radius: 20px; background: var(--blue-soft); color: var(--blue); font-size: 10px; font-weight: 650; line-height: 1.4; }
     .section-label { color: var(--muted); padding: 0 11px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: .11em; font-size: 10px; font-weight: 700; }
     .nav { display: grid; gap: 5px; }
@@ -768,7 +768,7 @@
     .filter-chip, .tab, .primary-button, .secondary-button, .search-field, .select-field, .text-field,
     .text-area { font-size: var(--text-small); }
     .brand .brand-name { font-size: 20px; }
-    .brand .brand-sub { font-size: 11px; }
+    .brand .brand-sub { font-size: 8px; letter-spacing: .02em; font-weight: 700; }
     .brand .brand-term { font-size: 10px; }
     .eyebrow, .date-label, .class-meta, .hero-kicker, .hero p, .class-room, .hero-link,
     .stat-label, .stat-note, .reminder-date span, .pill, .file-icon, .toast, .mobile-nav button {
@@ -792,7 +792,7 @@
       .brand { gap: 8px; padding: 9px; }
       .brand-mark { width: 34px; height: 34px; }
       .brand .brand-name { font-size: 17px; line-height: 1.15; overflow-wrap: anywhere; }
-      .brand .brand-sub { font-size: 9px; letter-spacing: 0; line-height: 1.25; white-space: normal; }
+      .brand .brand-sub { font-size: 7.5px; letter-spacing: 0; line-height: 1.25; white-space: nowrap; }
       .brand .brand-term { font-size: 9px; }
       .content { padding-inline: 25px; }
       .topbar { padding-inline: 25px; }
@@ -1429,7 +1429,7 @@
     .main { margin-left:248px; }
     .brand { background:transparent; border:0; box-shadow:none; padding:4px 8px; margin-bottom:26px; }
     .brand-name { color:#fff; font-size:19px; letter-spacing:-.03em; }
-    .brand-sub { color:#ffffff80; font-size:9.5px; letter-spacing:.03em; font-weight:650; white-space:nowrap; }
+    .brand-sub, .brand .brand-sub, .sidebar .brand-sub { color:#ffffff80; font-size:8px; letter-spacing:.02em; font-weight:700; white-space:nowrap; }
     .brand-term { background:var(--sun); color:#3a2700; font-size:11px; font-weight:700; padding:2px 9px; }
     .section-label { color:#ffffff70; padding:0 12px; margin-bottom:8px; }
     .nav { gap:3px; }
@@ -1658,10 +1658,10 @@
 </style>
 <style id="cb-brand-box">
     /* outlined brand card, frosted for the blue sidebar */
-    .sidebar .brand { padding:13px 14px; margin-bottom:24px; border:1px solid rgba(255,255,255,.32); border-radius:22px;
+    .sidebar .brand { padding:12px 12px; margin-bottom:24px; border:1px solid rgba(255,255,255,.32); border-radius:22px; gap:10px;
       background:rgba(255,255,255,.1); box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 10px 24px -14px rgba(3,24,52,.6);
       -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
-    .sidebar .brand-mark { width:44px; height:44px; border-radius:13px; box-shadow:0 6px 14px -6px rgba(3,24,52,.7); }
+    .sidebar .brand-mark { width:42px; height:42px; flex-shrink:0; border-radius:13px; box-shadow:0 6px 14px -6px rgba(3,24,52,.7); }
     .sidebar .brand-term { background:var(--sun); color:#3a2700; }
     [data-theme="dark"] .sidebar .brand { border-color:rgba(255,255,255,.2); background:rgba(255,255,255,.06); }
 </style>
@@ -1669,7 +1669,8 @@
     /* deeper blue tint instead of whitish glass */
     .sidebar .brand, .sidebar .profile, .sidebar .help-card { background:rgba(3,24,52,.28); border:1px solid rgba(255,255,255,.16); box-shadow:inset 0 1px 0 rgba(255,255,255,.08); -webkit-backdrop-filter:none; backdrop-filter:none; }
     .sidebar .profile:hover { background:rgba(3,24,52,.38); border-color:rgba(255,255,255,.26); }
-    .sidebar .brand-sub, .sidebar .profile-class { color:rgba(255,255,255,.62); }
+    .sidebar .brand-sub { color:rgba(255,255,255,.75); font-size:8px; letter-spacing:.02em; font-weight:700; white-space:nowrap; line-height:1.25; margin-top:3px; }
+    .sidebar .profile-class { color:rgba(255,255,255,.62); }
     .sidebar .profile-role { background:rgba(255,255,255,.14); color:#e6f1ff; }
     .sidebar .dots { background:rgba(3,24,52,.35); color:rgba(255,255,255,.8); }
     [data-theme="dark"] .sidebar .brand, [data-theme="dark"] .sidebar .profile, [data-theme="dark"] .sidebar .help-card { background:rgba(0,0,0,.3); border-color:rgba(255,255,255,.12); }
