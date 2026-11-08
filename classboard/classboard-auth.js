@@ -572,12 +572,36 @@
       preview.type = 'button';
       preview.className = 'update-attachment-button';
       preview.dataset.previewPdf = 'true';
-      preview.setAttribute('aria-label', `Preview attached PDF: ${update.attachment_name || 'Update attachment'}`);
-      preview.innerHTML = '<span class="update-attachment-file-icon" aria-hidden="true">PDF</span><span class="update-attachment-name"></span>';
-      preview.querySelector('.update-attachment-name').textContent = `PDF · ${update.attachment_name || 'View attachment'}`;
+      const rawName = (update.attachment_name || 'Attached Document').replace(/^PDF\s*[·•-]\s*/i, '');
+      preview.setAttribute('aria-label', `Preview attached document: ${rawName}`);
+      preview.innerHTML = `
+        <span class="update-attachment-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <line x1="10" y1="9" x2="8" y2="9"></line>
+          </svg>
+          <span class="update-attachment-tag">PDF</span>
+        </span>
+        <span class="update-attachment-copy">
+          <span class="update-attachment-name"></span>
+          <span class="update-attachment-meta">PDF Document · Tap to preview</span>
+        </span>
+        <span class="update-attachment-badge-action" aria-hidden="true">
+          <span>Preview</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+        </span>
+      `;
+      preview.querySelector('.update-attachment-name').textContent = rawName;
       attachmentActions.append(preview);
       card.dataset.resourcePath = update.attachment_path;
-      card.dataset.resourceTitle = update.attachment_name || 'Update attachment';
+      card.dataset.resourceTitle = rawName;
       copy.append(attachmentActions);
     }
     card.append(dateTile, icon, copy);
