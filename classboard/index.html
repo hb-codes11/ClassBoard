@@ -249,23 +249,30 @@
       .update-attachment-meta { font-size: 10px; }
       .update-attachment-badge-action { padding: 4px 8px; font-size: 10.5px; }
     }
-    .update-join-link { grid-column: 4; grid-row: 1; justify-self: end; display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 13px; border-radius: 9px; background: var(--blue); color: #fff; font-size: 10px; font-weight: 700; text-decoration: none; white-space: nowrap; box-shadow: 0 2px 5px color-mix(in srgb, var(--blue) 20%, transparent); }
-    .update-join-link svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-    .update-join-link:hover { background: color-mix(in srgb, var(--blue) 85%, #000); }
+    .update-card-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; align-self: center; position: relative; }
+    .update-card:has(.update-attachment-actions) .update-card-actions { align-self: start; margin-top: 2px; }
+    .update-join-link { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; height: 36px; padding: 0 16px; border-radius: 999px; background: var(--blue); color: #fff; font-size: 12px; font-weight: 700; text-decoration: none; white-space: nowrap; box-shadow: 0 2px 6px color-mix(in srgb, var(--blue) 25%, transparent); box-sizing: border-box; transition: background .16s ease, box-shadow .16s ease, transform .16s ease; }
+    .update-join-link svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .update-join-link:hover { background: var(--blue-deep); box-shadow: 0 4px 12px color-mix(in srgb, var(--blue) 35%, transparent); transform: translateY(-1px); }
+    .update-join-link:active { transform: translateY(0); }
     .update-join-link:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
     .update-tag { display: inline-flex; align-items: center; padding: 4px 8px; margin-left: 7px; border-radius: 20px; background: color-mix(in srgb, var(--update-accent) 18%, var(--surface)); color: var(--update-accent); font-size: 9px; font-weight: 780; letter-spacing: .02em; text-transform: uppercase; vertical-align: 1px; }
     .update-urgent { display: inline-flex; align-items: center; gap: 5px; margin-right: 7px; padding: 4px 8px; border-radius: 20px; background: #e6535e20; color: #e6535e; font-size: 9px; font-weight: 780; text-transform: uppercase; }
-    .update-menu-trigger { grid-column: 5; grid-row: 1; display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--text); cursor: pointer; }
-    .update-menu-trigger:hover, .update-menu-trigger[aria-expanded="true"] { border-color: var(--blue); color: var(--blue); }
-    .update-menu-trigger svg { width: 19px; height: 19px; fill: currentColor; }
-    .update-menu-trigger[hidden], .update-card-menu[hidden] { display: none; }
-    .update-card-menu { position: absolute; z-index: 3; top: calc(100% - 3px); right: 14px; min-width: 150px; padding: 5px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); box-shadow: 0 10px 28px rgba(26, 54, 84, .16); }
+    .update-menu-trigger { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; transition: all .16s ease; }
+    .update-menu-trigger:hover, .update-menu-trigger[aria-expanded="true"] { border-color: var(--blue); color: var(--blue); background: var(--surface-2); }
+    .update-menu-trigger svg { width: 17px; height: 17px; fill: currentColor; }
+    .update-menu-trigger[hidden], .update-card-menu[hidden] { display: none !important; }
+    .update-card-menu { position: absolute; z-index: 30; top: calc(100% + 4px); right: 0; min-width: 154px; padding: 5px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: 0 10px 28px rgba(26, 54, 84, .16); }
     .update-card-menu:not([hidden]) { display: flex; flex-direction: column; gap: 2px; }
-    .update-menu-pin, .update-menu-delete { width: 100%; min-height: 36px; padding: 0 10px; border: 0; border-radius: 7px; background: transparent; text-align: left; font: inherit; font-size: 12px; cursor: pointer; }
-    .update-menu-pin { color: var(--text); }
-    .update-menu-pin:hover, .update-menu-pin:focus-visible { background: color-mix(in srgb, var(--blue) 10%, var(--surface)); color: var(--blue); outline: none; }
-    .update-menu-delete { color: #c0392b; }
-    .update-menu-delete:hover, .update-menu-delete:focus-visible { background: color-mix(in srgb, #e6535e 10%, var(--surface)); outline: none; }
+    .update-menu-pin, .update-menu-edit, .update-menu-delete { width: 100%; min-height: 36px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; text-align: left; font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; transition: background-color .15s ease, color .15s ease; box-sizing: border-box; }
+    .update-menu-pin, .update-menu-edit { color: var(--text); }
+    .update-menu-pin:hover, .update-menu-pin:focus-visible, .update-menu-edit:hover, .update-menu-edit:focus-visible { background: color-mix(in srgb, var(--blue) 10%, var(--surface)); color: var(--blue); outline: none; }
+    .update-menu-delete { color: #df4c55; }
+    .update-menu-delete:hover, .update-menu-delete:focus-visible { background: color-mix(in srgb, #df4c55 10%, var(--surface)); color: #b91c1c; outline: none; }
+    [data-theme="dark"] .update-card-menu { background: var(--surface); border-color: var(--line); box-shadow: 0 10px 30px rgba(0, 0, 0, .45); }
+    [data-theme="dark"] .update-menu-pin:hover, [data-theme="dark"] .update-menu-pin:focus-visible, [data-theme="dark"] .update-menu-edit:hover, [data-theme="dark"] .update-menu-edit:focus-visible { background: rgba(10, 116, 230, 0.2); color: #7db8ff; }
+    [data-theme="dark"] .update-menu-delete { color: #fda4af; }
+    [data-theme="dark"] .update-menu-delete:hover, [data-theme="dark"] .update-menu-delete:focus-visible { background: rgba(223, 76, 85, 0.2); color: #fecdd3; }
     .update-tag-pinned { background: color-mix(in srgb, var(--blue) 18%, var(--surface)); color: var(--blue); }
     .updates-toolbar { gap: 8px; margin: 0 0 20px; }
     .updates-toolbar .filter-chip { min-height: 40px; display: inline-flex; align-items: center; gap: 8px; padding: 0 15px; border-radius: 22px; font-size: 12px; }
@@ -1806,6 +1813,11 @@
       align-items: center;
       gap: 10px;
       margin-left: auto;
+      align-self: center;
+    }
+    .update-card:has(.update-attachment-actions) .update-card-actions {
+      align-self: start;
+      margin-top: 2px;
     }
     .update-join-link {
       display: inline-flex;
@@ -4681,7 +4693,7 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=26"></script>
+  <script src="classboard-auth.js?v=27"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>

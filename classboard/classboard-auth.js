@@ -2273,7 +2273,7 @@
         if (willOpen) menu.querySelector('[role="menuitem"]:not([hidden])')?.focus();
         return;
       }
-      if (event.target.closest('[data-delete-content], [data-pin-content]') && event.target.closest('.update-card-menu')) closeUpdateMenus();
+      if (event.target.closest('[data-delete-content], [data-pin-content], [data-edit-content]') && event.target.closest('.update-card-menu')) closeUpdateMenus();
       else if (!event.target.closest('.update-card-menu')) closeUpdateMenus();
     });
     document.addEventListener('keydown', (event) => {
