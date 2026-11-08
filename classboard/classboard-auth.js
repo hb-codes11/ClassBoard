@@ -243,6 +243,17 @@
     const timetableDialogSubtitle = document.querySelector('#classTimetableDialog .panel-sub');
     if (timetableDialogSubtitle) timetableDialogSubtitle.textContent = `CSE · III · ${classLabel} · July–December 2026`;
     document.querySelectorAll('[data-config-value="class"]').forEach((el) => { el.textContent = classLabel; });
+    const javaCardNames = document.querySelectorAll('#page-attendance .subject-attendance[data-attendance-subject-name="Java Programming"] .subject-attendance-name');
+    javaCardNames.forEach((el) => {
+      const isLab = el.closest('.subject-attendance')?.dataset.attendanceMode === 'lab';
+      el.textContent = isIbm
+        ? (isLab ? 'Object Oriented Programming using Java (JAVA) Lab' : 'Object Oriented Programming using Java (JAVA)')
+        : (isLab ? 'Java Programming Lab' : 'Java Programming');
+    });
+    const ssCardNames = document.querySelectorAll('#page-attendance .subject-attendance[data-attendance-subject-name="Soft Skills"] .subject-attendance-name');
+    ssCardNames.forEach((el) => {
+      el.textContent = isIbm ? 'Soft Skills-I' : 'Soft Skills';
+    });
     const profileClassDetail = [...document.querySelectorAll('.profile-detail-row')].find((row) => row.querySelector('.list-title')?.textContent === 'Class');
     if (profileClassDetail) {
       profileClassDetail.querySelector('.list-detail').textContent = classLabel;
@@ -1043,6 +1054,22 @@
     const client = window.classboardSupabase;
     const cards = [...document.querySelectorAll('#page-attendance [data-subject-card]')];
     const subjectByName = new Map((window.classboardSubjects || []).map((subject) => [subject.name, subject]));
+    const resolveSubject = (name) => {
+      if (!name) return null;
+      let s = subjectByName.get(name);
+      if (s) return s;
+      if (name === 'Java Programming' || name === 'Object Oriented Programming using Java') {
+        return subjectByName.get('Object Oriented Programming using Java') || subjectByName.get('Java Programming');
+      }
+      if (name === 'Soft Skills' || name === 'Soft Skills-I') {
+        return subjectByName.get('Soft Skills-I') || subjectByName.get('Soft Skills');
+      }
+      for (const [key, val] of subjectByName.entries()) {
+        if (key.toLowerCase() === name.toLowerCase()) return val;
+        if (key.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(key.toLowerCase())) return val;
+      }
+      return null;
+    };
     const isStaff = roles.includes('cr') || roles.includes('admin');
     const batchFromRoll = batchForRoll(rollNumber);
     const batchPickerWrap = document.getElementById('attendanceLabBatchWrap');
@@ -1068,7 +1095,7 @@
     const personalCounts = new Map((progressResult.data || []).map((row) => [countKey(row.subject_id, row.kind, row.batch), row.attended_classes]));
     cards.forEach((card) => {
       const subjectName = card.dataset.attendanceSubjectName || String(card.dataset.subjectName || '').replace(/ Lab$/, '');
-      const subject = subjectByName.get(subjectName);
+      const subject = resolveSubject(subjectName);
       if (!subject) return;
       const kind = card.dataset.attendanceMode === 'lab' ? 'lab' : 'lecture';
       const batch = kind === 'lab' ? activeBatch : 'all';
@@ -1120,7 +1147,7 @@
           }
           const savePersonalAttendance = activeRoles.includes('student')
             && enteredAttended <= (activeStaff ? enteredHeld : Number(heldInput.value));
-          const activeSubject = subjectByName.get(card.dataset.attendanceSubjectName || String(card.dataset.subjectName || '').replace(/ Lab$/, ''));
+          const activeSubject = resolveSubject(card.dataset.attendanceSubjectName || String(card.dataset.subjectName || '').replace(/ Lab$/, ''));
           if (!activeSubject) {
             notifyApp('Could not identify this subject. Refresh and try again.', true);
             button.disabled = false;

@@ -3214,7 +3214,7 @@
       card.className = 'resource-card';
       card.dataset.subject = data.get('subject');
       const resourceSubject = String(data.get('subject')).toLowerCase();
-      card.dataset.subjectColor = /software engineering/.test(resourceSubject) ? 'se' : /statistical analysis/.test(resourceSubject) ? 'sa' : /artificial intelligence/.test(resourceSubject) ? 'ai' : /java programming/.test(resourceSubject) ? 'java' : /computer organisation|computer organization/.test(resourceSubject) ? 'com' : 'default';
+      card.dataset.subjectColor = /software engineering/.test(resourceSubject) ? 'se' : /statistical analysis/.test(resourceSubject) ? 'sa' : /artificial intelligence|machine learning|\bml\b/.test(resourceSubject) ? 'ai' : /java/.test(resourceSubject) ? 'java' : /computer organisation|computer organization|\bcom\b|data structures|\bdsc\b/.test(resourceSubject) ? 'com' : 'default';
       card.dataset.type = data.get('type');
       card.dataset.search = `${data.get('title')} ${data.get('subject')} ${data.get('type')}`.toLowerCase();
       const icon = document.createElement('div'); icon.className = 'file-icon'; icon.textContent = file.name.split('.').pop().toUpperCase();
@@ -3317,11 +3317,12 @@
       card.dataset.attendanceMode = 'lecture';
       card.dataset.attendanceSubjectName = card.dataset.subjectName;
       attendanceGrid.append(card);
-      if (card.dataset.subjectName === 'Soft Skills') return;
+      if (card.dataset.subjectName.includes('Soft Skills')) return;
       const labCard = card.cloneNode(true);
       labCard.dataset.attendanceMode = 'lab';
       labCard.dataset.subjectName = `${card.dataset.subjectName} Lab`;
       labCard.dataset.attendanceSubjectName = card.dataset.attendanceSubjectName;
+      if (card.dataset.section) labCard.dataset.section = card.dataset.section;
       const labName = labCard.querySelector('.subject-attendance-name');
       labName.textContent = `${labName.textContent} Lab`;
       labCard.querySelectorAll('.subject-held, .subject-attended, .future-held, .future-attend').forEach((input) => { input.value = '0'; });
@@ -3330,8 +3331,25 @@
     labAttendanceCards.forEach((card) => attendanceGrid.append(card));
     const allAttendanceCards = [...attendanceCards, ...labAttendanceCards];
     const attendanceMode = document.getElementById('attendanceMode');
-    const showAttendanceMode = () => allAttendanceCards.forEach((card) => { card.hidden = card.dataset.attendanceMode !== attendanceMode.value; });
+
+    const getActiveSection = () => window.classboardContext?.classCode || localStorage.getItem('classboard-selected-class') || 'INTEL-1';
+    const isIbm = () => getActiveSection() === 'IBM-1';
+    const isCardForCurrentSection = (card) => {
+      const section = card.dataset.section;
+      if (!section || section === 'both') return true;
+      return isIbm() ? section === 'ibm' : section === 'intel';
+    };
+
+    const showAttendanceMode = () => {
+      allAttendanceCards.forEach((card) => {
+        const modeMatches = card.dataset.attendanceMode === attendanceMode.value;
+        const sectionMatches = isCardForCurrentSection(card);
+        card.hidden = !modeMatches || !sectionMatches;
+      });
+    };
     attendanceMode.addEventListener('change', showAttendanceMode);
+    window.addEventListener('classboard:attendance-calendar-context', showAttendanceMode);
+    window.addEventListener('classboard:class-changed', showAttendanceMode);
     showAttendanceMode();
     allAttendanceCards.forEach((card) => {
       const heldInput = card.querySelector('.subject-held');
@@ -3397,7 +3415,7 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=19"></script>
+  <script src="classboard-auth.js?v=20"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
