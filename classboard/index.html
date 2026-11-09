@@ -2956,16 +2956,19 @@
 
     .cb-search-dialog {
       width: min(660px, calc(100vw - 32px));
-      max-height: min(620px, calc(100dvh - 80px));
-      margin: clamp(40px, 12vh, 100px) auto auto;
+      height: min(600px, calc(100dvh - 80px));
+      max-height: min(600px, calc(100dvh - 80px));
+      margin: clamp(40px, 10vh, 80px) auto auto;
       padding: 0;
       border: 1px solid var(--line);
       border-radius: 18px;
       background: var(--surface);
       color: var(--text);
       box-shadow: 0 28px 80px rgba(7, 17, 31, 0.38), 0 8px 24px rgba(7, 17, 31, 0.12);
-      overflow: hidden;
+      overflow: hidden !important;
       outline: none;
+      display: flex;
+      flex-direction: column;
     }
     .cb-search-dialog::backdrop {
       background: color-mix(in srgb, #07111f 65%, transparent);
@@ -2983,9 +2986,11 @@
     .cb-search-shell {
       display: flex;
       flex-direction: column;
-      max-height: min(620px, calc(100dvh - 80px));
+      height: 100%;
+      max-height: 100%;
+      min-height: 0;
       width: 100%;
-      overflow: hidden;
+      overflow: hidden !important;
     }
     .cb-search-header {
       display: flex;
@@ -2994,6 +2999,7 @@
       padding: 14px 18px;
       border-bottom: 1px solid var(--line);
       background: color-mix(in srgb, var(--surface) 95%, var(--page));
+      flex: 0 0 auto !important;
     }
     .cb-search-icon {
       width: 20px;
@@ -3057,6 +3063,8 @@
       border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
       overflow-x: auto;
       scrollbar-width: none;
+      flex: 0 0 auto !important;
+      background: var(--surface);
     }
     .cb-search-filter-pills::-webkit-scrollbar { display: none; }
     .cb-search-pill {
@@ -3087,8 +3095,9 @@
       color: #3a2700;
     }
     .cb-search-results {
-      flex: 1;
-      overflow-y: auto;
+      flex: 1 1 0% !important;
+      min-height: 0 !important;
+      overflow-y: auto !important;
       padding: 8px 10px;
       overscroll-behavior: contain;
     }
@@ -3203,6 +3212,7 @@
       background: color-mix(in srgb, var(--surface) 95%, var(--page));
       font-size: 11px;
       color: var(--muted);
+      flex: 0 0 auto !important;
     }
     .cb-search-shortcuts {
       display: flex;
@@ -5335,7 +5345,7 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=32"></script>
+  <script src="classboard-auth.js?v=33"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
@@ -5718,9 +5728,21 @@
       items.forEach((el, idx) => {
         el.classList.toggle('is-selected', idx === selectedIndex);
         if (idx === selectedIndex) {
-          el.scrollIntoView({ block: 'nearest' });
+          const cTop = resultsContainer.scrollTop;
+          const cHeight = resultsContainer.clientHeight;
+          const iTop = el.offsetTop - resultsContainer.offsetTop;
+          const iHeight = el.offsetHeight;
+
+          if (iTop < cTop) {
+            resultsContainer.scrollTop = iTop;
+          } else if (iTop + iHeight > cTop + cHeight) {
+            resultsContainer.scrollTop = iTop + iHeight - cHeight;
+          }
         }
       });
+      if (dialog.scrollTop !== 0) dialog.scrollTop = 0;
+      const shell = dialog.querySelector('.cb-search-shell');
+      if (shell && shell.scrollTop !== 0) shell.scrollTop = 0;
     }
 
     function executeItem(item) {
@@ -5804,11 +5826,18 @@
       if (!dialog.open) {
         dialog.showModal();
       }
+      dialog.scrollTop = 0;
+      const shell = dialog.querySelector('.cb-search-shell');
+      if (shell) shell.scrollTop = 0;
+      resultsContainer.scrollTop = 0;
+
       input.value = '';
       setFilter('all');
       renderResults(search('', activeFilter), '');
       requestAnimationFrame(() => {
-        input.focus();
+        input.focus({ preventScroll: true });
+        dialog.scrollTop = 0;
+        if (shell) shell.scrollTop = 0;
       });
     }
 
