@@ -908,7 +908,7 @@
       html, body { max-width: 100%; overflow-x: hidden; }
       body { -webkit-tap-highlight-color: transparent; }
       .main { padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
-      .topbar { height: auto; min-height: calc(120px + env(safe-area-inset-top)); display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px 44px; grid-template-rows: 44px 44px; align-content: center; gap: 8px; padding: calc(8px + env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 8px max(14px, env(safe-area-inset-left)); }
+      .topbar { height: auto; min-height: calc(120px + env(safe-area-inset-top)); display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px 44px 44px; grid-template-rows: 44px 44px; align-content: center; gap: 8px; padding: calc(8px + env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 8px max(14px, env(safe-area-inset-left)); }
       .topbar-start, .top-actions { display: contents; }
       .topbar-start .crumb { display: none; }
       .sidebar-toggle { grid-column: 1; grid-row: 1; }
@@ -916,8 +916,11 @@
       .mobile-brand { grid-column: 2; grid-row: 1; min-width: 0; display: flex; align-items: center; gap: 7px; overflow: hidden; color: var(--text); font-size: 16px; font-weight: 750; letter-spacing: -.035em; white-space: nowrap; }
       .mobile-brand img { display: block; width: 30px; height: 30px; object-fit: contain; flex: none; }
       .top-actions [aria-label="Academic calendar"], .top-actions #themeToggle { display: none; }
-      .top-actions > .icon-button[aria-label="Notifications"] { grid-column: 3; grid-row: 1; }
-      .top-actions > .icon-button[aria-label="Profile"] { grid-column: 4; grid-row: 1; }
+      .top-actions > #topbarSearchButton { grid-column: 3; grid-row: 1; width: 44px; height: 44px; min-width: 0; padding: 0; border-radius: 13px; justify-content: center; }
+      .top-actions > #topbarSearchButton .topbar-search-text,
+      .top-actions > #topbarSearchButton .topbar-search-kbd { display: none; }
+      .top-actions > .icon-button[aria-label="Notifications"] { grid-column: 4; grid-row: 1; }
+      .top-actions > .icon-button[aria-label="Profile"] { grid-column: 5; grid-row: 1; }
       .role-switcher, .class-switcher { grid-column: 1 / -1; grid-row: 2; width: 100%; max-width: none; min-height: 44px; padding-left: 40px; border-radius: 12px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23738196' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='8' width='18' height='12' rx='2'/%3E%3Cpath d='M8 8V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3M3 13h18m-11 0v2h4v-2'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23738196' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 12px center, right 12px center; background-size: 18px, 14px; font-size: 14px; }
       body[data-multiple-classes="true"][data-has-role-switcher="true"] .topbar { min-height: calc(172px + env(safe-area-inset-top)); grid-template-rows: 44px 44px 44px; }
       body[data-multiple-classes="true"] .class-switcher { grid-row: 2; }
@@ -1015,10 +1018,11 @@
     }
     @media (max-width: 390px) {
       .content { padding-top: 17px; }
-      .topbar { padding-inline: 10px; }
+      .topbar { padding-inline: 10px; grid-template-columns: 40px minmax(0, 1fr) 40px 40px 40px; gap: 6px; }
       .role-switcher, .class-switcher { width: 100%; max-width: none; font-size: 11px; }
       .top-actions { gap: 4px; }
       .icon-button { width: 40px; height: 40px; }
+      .top-actions > #topbarSearchButton { width: 40px; height: 40px; }
       .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .stats .stat-card:last-child { grid-column: 1 / -1; }
       .stat-card { min-height: 72px; display: flex; text-align: left; padding: 10px; }
@@ -2858,6 +2862,411 @@
       }
     }
 
+    /* =========================================================
+       GLOBAL SEARCH & COMMAND PALETTE (Cmd+K)
+       ========================================================= */
+    .topbar-search-button {
+      height: 38px;
+      min-width: 190px;
+      max-width: 260px;
+      padding: 0 12px 0 11px;
+      border-radius: 12px;
+      border: 1px solid color-mix(in srgb, var(--line) 76%, white 24%);
+      background: color-mix(in srgb, var(--surface) 80%, transparent);
+      color: var(--muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      box-shadow: 0 2px 7px #182b420a, inset 0 1px #ffffff40;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: transform .16s ease, color .16s ease, border-color .16s ease, box-shadow .16s ease, background-color .16s ease;
+    }
+    .topbar-search-button:hover {
+      border-color: var(--blue);
+      color: var(--text);
+      background: var(--surface);
+    }
+    .topbar-search-button svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+      flex: none;
+    }
+    .topbar-search-text {
+      flex: 1;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .topbar-search-button:hover .topbar-search-text {
+      color: var(--text);
+    }
+    .topbar-search-kbd {
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 650;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: color-mix(in srgb, var(--line) 55%, transparent);
+      color: var(--muted);
+      border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+      letter-spacing: 0.04em;
+      flex: none;
+    }
+    [data-theme="dark"] .topbar-search-button {
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(14, 25, 42, 0.7);
+      box-shadow: 0 2px 7px rgba(0, 0, 0, 0.3);
+    }
+    [data-theme="dark"] .topbar-search-kbd {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: var(--muted);
+    }
+    @media (min-width: 761px) and (max-width: 1024px) {
+      .topbar-search-button {
+        min-width: 0;
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        justify-content: center;
+        border-radius: 12px;
+      }
+      .topbar-search-text, .topbar-search-kbd {
+        display: none;
+      }
+    }
+
+    .cb-search-dialog {
+      width: min(660px, calc(100vw - 32px));
+      max-height: min(620px, calc(100dvh - 80px));
+      margin: clamp(40px, 12vh, 100px) auto auto;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 28px 80px rgba(7, 17, 31, 0.38), 0 8px 24px rgba(7, 17, 31, 0.12);
+      overflow: hidden;
+      outline: none;
+    }
+    .cb-search-dialog::backdrop {
+      background: color-mix(in srgb, #07111f 65%, transparent);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    [data-theme="dark"] .cb-search-dialog {
+      background: #0d1a2d;
+      border-color: #213757;
+      box-shadow: 0 32px 90px rgba(0, 0, 0, 0.65);
+    }
+    [data-theme="dark"] .cb-search-dialog::backdrop {
+      background: rgba(2, 6, 14, 0.82);
+    }
+    .cb-search-shell {
+      display: flex;
+      flex-direction: column;
+      max-height: min(620px, calc(100dvh - 80px));
+      width: 100%;
+      overflow: hidden;
+    }
+    .cb-search-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--surface) 95%, var(--page));
+    }
+    .cb-search-icon {
+      width: 20px;
+      height: 20px;
+      stroke: var(--blue);
+      stroke-width: 2.2;
+      fill: none;
+      flex: none;
+    }
+    .cb-search-input {
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 16px;
+      font-family: inherit;
+      line-height: 1.4;
+    }
+    .cb-search-input::placeholder {
+      color: var(--muted);
+      opacity: 0.85;
+    }
+    .cb-search-close {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      padding: 4px;
+      border-radius: 8px;
+      transition: color .15s ease;
+    }
+    .cb-search-close:hover {
+      color: var(--text);
+    }
+    .cb-search-esc-badge {
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 5px;
+      border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--line) 40%, transparent);
+      color: var(--muted);
+    }
+    .cb-search-close-x {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+    .cb-search-filter-pills {
+      display: flex;
+      gap: 6px;
+      padding: 10px 18px;
+      border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .cb-search-filter-pills::-webkit-scrollbar { display: none; }
+    .cb-search-pill {
+      flex: none;
+      border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+    .cb-search-pill:hover {
+      color: var(--text);
+      border-color: var(--muted);
+    }
+    .cb-search-pill.is-active {
+      background: var(--blue-deep);
+      border-color: var(--blue-deep);
+      color: #ffffff;
+    }
+    [data-theme="dark"] .cb-search-pill.is-active {
+      background: #ffce56;
+      border-color: #ffce56;
+      color: #3a2700;
+    }
+    .cb-search-results {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 10px;
+      overscroll-behavior: contain;
+    }
+    .cb-search-group-title {
+      font-size: 10.5px;
+      font-weight: 750;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 10px 4px;
+      font-family: inherit;
+    }
+    .cb-search-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 12px;
+      border-radius: 11px;
+      cursor: pointer;
+      transition: background 0.1s ease;
+      user-select: none;
+    }
+    .cb-search-item:hover, .cb-search-item.is-selected {
+      background: var(--blue-soft);
+    }
+    [data-theme="dark"] .cb-search-item:hover,
+    [data-theme="dark"] .cb-search-item.is-selected {
+      background: rgba(10, 116, 230, 0.2);
+    }
+    .cb-search-item-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      background: color-mix(in srgb, var(--line) 45%, transparent);
+      color: var(--muted);
+    }
+    .cb-search-item.is-selected .cb-search-item-icon {
+      background: color-mix(in srgb, var(--blue) 20%, transparent);
+      color: var(--blue);
+    }
+    .cb-search-item-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+    .cb-search-item-main {
+      flex: 1;
+      min-width: 0;
+    }
+    .cb-search-item-title {
+      font-size: 14px;
+      font-weight: 650;
+      color: var(--text);
+      line-height: 1.35;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cb-search-item-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cb-search-item-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex: none;
+    }
+    .cb-search-item-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 5px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      flex: none;
+      background: var(--surface);
+    }
+    .cb-search-empty {
+      padding: 44px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .cb-search-empty-title {
+      font-size: 15px;
+      font-weight: 650;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .cb-search-empty-sub {
+      font-size: 13px;
+    }
+    .cb-search-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 18px;
+      border-top: 1px solid var(--line);
+      background: color-mix(in srgb, var(--surface) 95%, var(--page));
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .cb-search-shortcuts {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .cb-search-shortcuts kbd {
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--line) 40%, transparent);
+      color: var(--text);
+      margin-right: 4px;
+    }
+
+    @keyframes cbHighlightPulse {
+      0% { box-shadow: 0 0 0 0 rgba(10, 116, 230, 0.65); transform: scale(1); }
+      50% { box-shadow: 0 0 0 10px rgba(10, 116, 230, 0.15); transform: scale(1.008); }
+      100% { box-shadow: 0 0 0 0 rgba(10, 116, 230, 0); transform: scale(1); }
+    }
+    .cb-pulse-highlight {
+      animation: cbHighlightPulse 1.4s ease 2;
+      border-color: var(--blue) !important;
+    }
+
+    @media (max-width: 760px) {
+      .cb-search-dialog {
+        width: 100vw;
+        max-width: 100vw;
+        height: 100dvh;
+        max-height: 100dvh;
+        margin: 0;
+        border-radius: 0;
+        border: none;
+        top: 0;
+        left: 0;
+      }
+      .cb-search-shell {
+        height: 100dvh;
+        max-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      .cb-search-header {
+        padding: 12px 14px;
+      }
+      .cb-search-esc-badge {
+        display: none;
+      }
+      .cb-search-shortcuts {
+        display: none;
+      }
+      .cb-search-footer {
+        padding: 8px 14px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .cb-pulse-highlight {
+        animation: none;
+      }
+      .topbar-search-button,
+      .cb-search-item,
+      .cb-search-pill {
+        transition: none;
+      }
+    }
     </style>
 <style id="cb-profile">
     /* ===== Profile page redesign ===== */
@@ -3633,6 +4042,11 @@
           <div class="crumb">Workspace <span style="padding:0 7px;color:var(--line)">/</span> <strong id="crumbPage">Home</strong></div>
         </div>
         <div class="top-actions">
+          <button class="topbar-search-button icon-button" id="topbarSearchButton" type="button" aria-label="Search ClassBoard" title="Search ClassBoard (⌘K)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+            <span class="topbar-search-text">Search...</span>
+            <kbd class="topbar-search-kbd">⌘K</kbd>
+          </button>
           <select class="class-switcher" id="classSwitcher" aria-label="Your class section" title="Switch between class sections" hidden></select>
           <select class="role-switcher" id="roleSwitcher" aria-label="Your workspace" title="Switch between roles assigned to your account"><option value="student">Student View</option><option value="cr">Class Representatives</option><option value="admin">Admin Workspace</option></select>
           <button class="icon-button" id="topbarCalendarButton" type="button" aria-label="Academic calendar" title="Academic calendar"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M14 14h2M8 17h3"/></svg></button>
@@ -4162,6 +4576,33 @@
     </div>
   </dialog>
   <dialog class="app-dialog" id="appDialog"><div class="dialog-content" id="dialogContent"></div></dialog>
+  <dialog class="cb-search-dialog" id="globalSearchDialog" aria-modal="true" aria-label="Search ClassBoard">
+    <div class="cb-search-shell">
+      <div class="cb-search-header">
+        <svg class="cb-search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="search" class="cb-search-input" id="globalSearchInput" placeholder="Search notes, syllabus, updates, subjects, pages..." autocomplete="off" spellcheck="false" aria-autocomplete="list" aria-controls="globalSearchResults" />
+        <button class="cb-search-close" id="globalSearchClose" type="button" aria-label="Close search">
+          <kbd class="cb-search-esc-badge">ESC</kbd>
+          <svg class="cb-search-close-x" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="cb-search-filter-pills" id="searchFilterPills">
+        <button type="button" class="cb-search-pill is-active" data-search-filter="all">All</button>
+        <button type="button" class="cb-search-pill" data-search-filter="notes">Notes &amp; Syllabus</button>
+        <button type="button" class="cb-search-pill" data-search-filter="updates">Updates</button>
+        <button type="button" class="cb-search-pill" data-search-filter="pages">Pages</button>
+      </div>
+      <div class="cb-search-results" id="globalSearchResults" role="listbox"></div>
+      <div class="cb-search-footer">
+        <div class="cb-search-shortcuts">
+          <span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+          <span><kbd>↵</kbd> Select</span>
+          <span><kbd>esc</kbd> Close</span>
+        </div>
+        <div class="cb-search-status" id="globalSearchStatus">Quick jump or start typing to search</div>
+      </div>
+    </div>
+  </dialog>
   </div>
   <script>
     const root = document.documentElement;
@@ -4886,7 +5327,7 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=30"></script>
+  <script src="classboard-auth.js?v=31"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
@@ -4951,5 +5392,504 @@
   if(page&&window.MutationObserver)new MutationObserver(enhance).observe(page,{childList:true,subtree:true});
 })();
 </script>
+  <script id="cb-global-search-js">
+  (function () {
+    const dialog = document.getElementById('globalSearchDialog');
+    const input = document.getElementById('globalSearchInput');
+    const closeBtn = document.getElementById('globalSearchClose');
+    const triggerBtn = document.getElementById('topbarSearchButton');
+    const resultsContainer = document.getElementById('globalSearchResults');
+    const filterPills = document.getElementById('searchFilterPills');
+    const statusText = document.getElementById('globalSearchStatus');
+
+    if (!dialog || !input || !resultsContainer) return;
+
+    let activeFilter = 'all';
+    let currentResults = [];
+    let selectedIndex = 0;
+
+    const SUBJECT_COLORS = {
+      'Software Engineering': '#8957D8',
+      'Statistical Analysis': '#27A77A',
+      'Statistical Analysis (SA)': '#27A77A',
+      'Computer Organisation & Microprocessors': '#D8A20B',
+      'Computer Organisation & Microprocessors (COM)': '#D8A20B',
+      'Java Programming': '#ED8A22',
+      'Artificial Intelligence': '#DF4C55',
+      'Artificial Intelligence (AI)': '#DF4C55',
+      'Soft Skills': '#D35D87'
+    };
+
+    function getSubjectColor(name) {
+      if (!name) return '#0A74E6';
+      for (const [key, color] of Object.entries(SUBJECT_COLORS)) {
+        if (name.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(name.toLowerCase())) {
+          return color;
+        }
+      }
+      return '#0A74E6';
+    }
+
+    const STATIC_PAGES = [
+      {
+        type: 'page',
+        pageId: 'home',
+        title: 'Home',
+        subtitle: 'Dashboard, next class & today\'s overview',
+        icon: '<svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+        badge: 'Page'
+      },
+      {
+        type: 'page',
+        pageId: 'resources',
+        title: 'Notes & Syllabus',
+        subtitle: 'Study materials, lecture notes, lab manuals & PYQs',
+        icon: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+        badge: 'Page'
+      },
+      {
+        type: 'page',
+        pageId: 'updates',
+        title: 'Updates & Deadlines',
+        subtitle: 'Official class notices, deadlines & reminders',
+        icon: '<svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>',
+        badge: 'Page'
+      },
+      {
+        type: 'page',
+        pageId: 'calendar',
+        title: 'Academics & Timetable',
+        subtitle: 'Class schedule, timetable & academic calendar',
+        icon: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+        badge: 'Page'
+      },
+      {
+        type: 'page',
+        pageId: 'attendance',
+        title: 'Attendance Planner',
+        subtitle: 'Subject attendance calculator & absence tracker',
+        icon: '<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+        badge: 'Page'
+      },
+      {
+        type: 'page',
+        pageId: 'classes',
+        title: 'Class Log',
+        subtitle: 'Daily lecture numbers, lab records & topics covered',
+        icon: '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+        badge: 'Page'
+      },
+      {
+        type: 'page',
+        pageId: 'cr',
+        title: 'Class Representatives',
+        subtitle: 'CR team info, private concerns & workspace',
+        icon: '<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+        badge: 'Page'
+      },
+      {
+        type: 'page',
+        pageId: 'profile',
+        title: 'Profile & Settings',
+        subtitle: 'Roll number, batch, account details & sign out',
+        icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>',
+        badge: 'Page'
+      }
+    ];
+
+    const SUBJECTS = [
+      { name: 'Software Engineering', alias: 'SE' },
+      { name: 'Statistical Analysis', alias: 'SA' },
+      { name: 'Computer Organisation & Microprocessors', alias: 'COM' },
+      { name: 'Java Programming', alias: 'Java' },
+      { name: 'Artificial Intelligence', alias: 'AI ML' },
+      { name: 'Soft Skills', alias: 'SS' }
+    ];
+
+    function getAllResources() {
+      if (Array.isArray(window.classboardResources) && window.classboardResources.length) {
+        return window.classboardResources.map((res) => ({
+          type: 'resource',
+          id: res.id,
+          title: res.title || 'Untitled file',
+          subject: res.subjects?.name || '',
+          kind: res.kind || 'notes',
+          unitLabel: res.unit_label || '',
+          badge: (res.kind || 'PDF').toUpperCase(),
+          storagePath: res.storage_path || ''
+        }));
+      }
+      const cards = document.querySelectorAll('#resourceGrid .resource-card');
+      const list = [];
+      cards.forEach((card) => {
+        const title = card.querySelector('.resource-title')?.textContent?.trim() || '';
+        const subject = card.dataset.subject || card.querySelector('.resource-subject')?.textContent?.trim() || '';
+        const kind = card.dataset.type || card.dataset.kind || 'PDF';
+        if (title) {
+          list.push({
+            type: 'resource',
+            id: card.dataset.resourceId || title,
+            title,
+            subject,
+            kind,
+            badge: kind.toUpperCase(),
+            element: card
+          });
+        }
+      });
+      return list;
+    }
+
+    function getAllUpdates() {
+      const feed = window.classboardUpdateFeed;
+      if (Array.isArray(feed) && feed.length) {
+        return feed.map((item) => ({
+          type: 'update',
+          id: item.id,
+          title: item.title || 'Class update',
+          body: item.body || '',
+          category: item.category || (item.isReminder ? 'deadline' : 'normal'),
+          isReminder: Boolean(item.isReminder),
+          badge: item.isReminder ? 'REMINDER' : (item.importance === 'urgent' || item.category === 'important') ? 'IMPORTANT' : 'UPDATE'
+        }));
+      }
+      return [];
+    }
+
+    function search(query, filter = 'all') {
+      const q = query.trim().toLowerCase();
+      const results = [];
+
+      // 1. Pages
+      if (filter === 'all' || filter === 'pages') {
+        const pageMatches = STATIC_PAGES.filter((p) => {
+          if (!q) return true;
+          return p.title.toLowerCase().includes(q) || p.subtitle.toLowerCase().includes(q) || p.pageId.toLowerCase().includes(q);
+        });
+        if (pageMatches.length) {
+          results.push({ category: 'Pages', items: pageMatches });
+        }
+      }
+
+      // 2. Notes & Syllabus
+      if (filter === 'all' || filter === 'notes') {
+        const resources = getAllResources();
+        const resMatches = resources.filter((r) => {
+          if (!q) return false;
+          return r.title.toLowerCase().includes(q) ||
+            r.subject.toLowerCase().includes(q) ||
+            r.kind.toLowerCase().includes(q) ||
+            (r.unitLabel && r.unitLabel.toLowerCase().includes(q));
+        });
+        if (resMatches.length) {
+          results.push({ category: 'Notes & Syllabus', items: resMatches.slice(0, 15) });
+        } else if (!q && (filter === 'all' || filter === 'notes')) {
+          results.push({ category: 'Recent Study Materials', items: resources.slice(0, 4) });
+        }
+      }
+
+      // 3. Updates & Announcements
+      if (filter === 'all' || filter === 'updates') {
+        const updates = getAllUpdates();
+        const updateMatches = updates.filter((u) => {
+          if (!q) return false;
+          return u.title.toLowerCase().includes(q) ||
+            u.body.toLowerCase().includes(q) ||
+            u.badge.toLowerCase().includes(q);
+        });
+        if (updateMatches.length) {
+          results.push({ category: 'Updates & Announcements', items: updateMatches.slice(0, 8) });
+        } else if (!q && (filter === 'all' || filter === 'updates')) {
+          results.push({ category: 'Latest Updates', items: updates.slice(0, 3) });
+        }
+      }
+
+      // 4. Subjects
+      if ((filter === 'all' || filter === 'notes') && q) {
+        const subjectMatches = SUBJECTS.filter((s) => {
+          return s.name.toLowerCase().includes(q) || s.alias.toLowerCase().includes(q);
+        }).map((s) => ({
+          type: 'subject',
+          title: s.name,
+          subtitle: `Filter all notes & syllabus for ${s.name}`,
+          subjectName: s.name,
+          color: getSubjectColor(s.name),
+          badge: 'Subject'
+        }));
+        if (subjectMatches.length) {
+          results.push({ category: 'Subjects', items: subjectMatches });
+        }
+      }
+
+      return results;
+    }
+
+    function renderResults(groupedResults, query) {
+      resultsContainer.replaceChildren();
+      currentResults = [];
+      selectedIndex = 0;
+
+      let totalCount = 0;
+      groupedResults.forEach((g) => { totalCount += g.items.length; });
+
+      if (!totalCount) {
+        const empty = document.createElement('div');
+        empty.className = 'cb-search-empty';
+        empty.innerHTML = `
+          <div class="cb-search-empty-title">No results found for "${escapeHtml(query)}"</div>
+          <div class="cb-search-empty-sub">Try searching for subjects (e.g. Java, SE, SA), note titles, or pages.</div>
+        `;
+        resultsContainer.appendChild(empty);
+        if (statusText) statusText.textContent = 'No matching results';
+        return;
+      }
+
+      if (statusText) {
+        statusText.textContent = query
+          ? `${totalCount} result${totalCount === 1 ? '' : 's'} for "${query}"`
+          : 'Suggestions & quick jump';
+      }
+
+      let globalIndex = 0;
+      groupedResults.forEach((group) => {
+        if (!group.items.length) return;
+        const groupHeading = document.createElement('div');
+        groupHeading.className = 'cb-search-group-title';
+        groupHeading.textContent = group.category;
+        resultsContainer.appendChild(groupHeading);
+
+        group.items.forEach((item) => {
+          const itemIndex = globalIndex++;
+          currentResults.push(item);
+
+          const itemEl = document.createElement('div');
+          itemEl.className = 'cb-search-item' + (itemIndex === 0 ? ' is-selected' : '');
+          itemEl.setAttribute('role', 'option');
+          itemEl.setAttribute('data-index', String(itemIndex));
+
+          let iconHtml = '';
+          let subHtml = '';
+
+          if (item.type === 'page') {
+            iconHtml = item.icon;
+            subHtml = escapeHtml(item.subtitle);
+          } else if (item.type === 'resource') {
+            const color = getSubjectColor(item.subject);
+            iconHtml = '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+            subHtml = `<span class="cb-search-item-dot" style="background:${color}"></span><span>${escapeHtml(item.subject || 'Class note')}</span>`;
+          } else if (item.type === 'update') {
+            iconHtml = '<svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>';
+            subHtml = escapeHtml(item.body ? (item.body.slice(0, 60) + (item.body.length > 60 ? '…' : '')) : 'Class announcement');
+          } else if (item.type === 'subject') {
+            const color = item.color || getSubjectColor(item.title);
+            iconHtml = '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>';
+            subHtml = `<span class="cb-search-item-dot" style="background:${color}"></span><span>${escapeHtml(item.subtitle)}</span>`;
+          }
+
+          itemEl.innerHTML = `
+            <div class="cb-search-item-icon" aria-hidden="true">${iconHtml}</div>
+            <div class="cb-search-item-main">
+              <div class="cb-search-item-title">${escapeHtml(item.title)}</div>
+              <div class="cb-search-item-sub">${subHtml}</div>
+            </div>
+            <div class="cb-search-item-badge">${escapeHtml(item.badge || 'OPEN')}</div>
+          `;
+
+          itemEl.addEventListener('mouseenter', () => setSelectedIndex(itemIndex));
+          itemEl.addEventListener('click', () => executeItem(item));
+
+          resultsContainer.appendChild(itemEl);
+        });
+      });
+    }
+
+    function setSelectedIndex(index) {
+      if (!currentResults.length) return;
+      selectedIndex = Math.max(0, Math.min(index, currentResults.length - 1));
+      const items = resultsContainer.querySelectorAll('.cb-search-item');
+      items.forEach((el, idx) => {
+        el.classList.toggle('is-selected', idx === selectedIndex);
+        if (idx === selectedIndex) {
+          el.scrollIntoView({ block: 'nearest' });
+        }
+      });
+    }
+
+    function executeItem(item) {
+      if (!item) return;
+      closeGlobalSearch();
+
+      if (item.type === 'page') {
+        if (typeof window.openClassboardPage === 'function') {
+          window.openClassboardPage(item.pageId);
+        } else {
+          window.location.hash = '#' + item.pageId;
+        }
+      } else if (item.type === 'resource') {
+        if (typeof window.openClassboardPage === 'function') {
+          window.openClassboardPage('resources');
+        } else {
+          window.location.hash = '#resources';
+        }
+        setTimeout(() => {
+          const cards = document.querySelectorAll('#resourceGrid .resource-card');
+          for (const card of cards) {
+            const titleEl = card.querySelector('.resource-title');
+            if (titleEl && titleEl.textContent.trim().toLowerCase() === item.title.toLowerCase()) {
+              card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              card.classList.add('cb-pulse-highlight');
+              setTimeout(() => card.classList.remove('cb-pulse-highlight'), 3000);
+              break;
+            }
+          }
+        }, 250);
+      } else if (item.type === 'update') {
+        if (typeof window.openClassboardPage === 'function') {
+          window.openClassboardPage('updates');
+        } else {
+          window.location.hash = '#updates';
+        }
+        setTimeout(() => {
+          const cards = document.querySelectorAll('#updateList .update-card, #updateList .reminder-card');
+          for (const card of cards) {
+            const titleEl = card.querySelector('.list-title, .update-title');
+            if (titleEl && titleEl.textContent.trim().toLowerCase().includes(item.title.toLowerCase())) {
+              card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              card.classList.add('cb-pulse-highlight');
+              setTimeout(() => card.classList.remove('cb-pulse-highlight'), 3000);
+              break;
+            }
+          }
+        }, 250);
+      } else if (item.type === 'subject') {
+        if (typeof window.openClassboardPage === 'function') {
+          window.openClassboardPage('resources');
+        } else {
+          window.location.hash = '#resources';
+        }
+        setTimeout(() => {
+          const select = document.getElementById('subjectFilter');
+          if (select) {
+            for (const opt of select.options) {
+              if (opt.value && opt.value.toLowerCase().includes(item.subjectName.toLowerCase())) {
+                select.value = opt.value;
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+                break;
+              }
+            }
+          }
+        }, 250);
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function openGlobalSearch() {
+      if (!dialog.open) {
+        dialog.showModal();
+      }
+      input.value = '';
+      setFilter('all');
+      renderResults(search('', activeFilter), '');
+      requestAnimationFrame(() => {
+        input.focus();
+      });
+    }
+
+    function closeGlobalSearch() {
+      if (dialog.open) {
+        dialog.close();
+      }
+    }
+
+    function setFilter(filter) {
+      activeFilter = filter;
+      filterPills.querySelectorAll('.cb-search-pill').forEach((pill) => {
+        pill.classList.toggle('is-active', pill.dataset.searchFilter === filter);
+      });
+      renderResults(search(input.value, activeFilter), input.value);
+    }
+
+    // Input listener
+    input.addEventListener('input', () => {
+      renderResults(search(input.value, activeFilter), input.value);
+    });
+
+    // Keyboard navigation inside input
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedIndex(selectedIndex + 1);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedIndex(selectedIndex - 1);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (currentResults[selectedIndex]) {
+          executeItem(currentResults[selectedIndex]);
+        }
+      } else if (e.key === 'Escape') {
+        closeGlobalSearch();
+      }
+    });
+
+    // Filter pill clicks
+    filterPills.addEventListener('click', (e) => {
+      const pill = e.target.closest('.cb-search-pill');
+      if (pill && pill.dataset.searchFilter) {
+        setFilter(pill.dataset.searchFilter);
+        input.focus();
+      }
+    });
+
+    // Close button & dialog backdrop click
+    closeBtn.addEventListener('click', closeGlobalSearch);
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) {
+        closeGlobalSearch();
+      }
+    });
+
+    // Topbar search button click
+    if (triggerBtn) {
+      triggerBtn.addEventListener('click', openGlobalSearch);
+    }
+
+    // Global keyboard shortcuts (Cmd+K / Ctrl+K and /)
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (dialog.open) closeGlobalSearch();
+        else openGlobalSearch();
+      } else if (e.key === '/' && !dialog.open) {
+        const tag = document.activeElement ? document.activeElement.tagName : '';
+        if (!['INPUT', 'TEXTAREA', 'SELECT'].includes(tag) && !document.activeElement?.isContentEditable) {
+          e.preventDefault();
+          openGlobalSearch();
+        }
+      }
+    });
+
+    // Update shortcuts label for Windows/Linux vs Mac
+    const isMac = navigator.platform ? navigator.platform.toUpperCase().indexOf('MAC') >= 0 : false;
+    if (!isMac) {
+      const kbd = document.querySelector('.topbar-search-kbd');
+      if (kbd) kbd.textContent = 'Ctrl+K';
+      const trigger = document.getElementById('topbarSearchButton');
+      if (trigger) trigger.setAttribute('title', 'Search ClassBoard (Ctrl+K)');
+    }
+
+    // Expose open function globally
+    window.openClassboardSearch = openGlobalSearch;
+  })();
+  </script>
 </body>
 </html>

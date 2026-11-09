@@ -1097,6 +1097,8 @@
     const homeResources = document.getElementById('homeResourceGrid');
     homeResources.querySelectorAll('.home-resource-card, .live-empty').forEach((node) => node.remove());
     const resources = resourceResult.data || [];
+    window.classboardResources = resources;
+    window.dispatchEvent(new CustomEvent('classboard:resources-loaded', { detail: resources }));
     await showPublishedCalendar(resources);
     if (!resources.length) {
       resourceEmpty.textContent = 'No resources have been published yet.';
