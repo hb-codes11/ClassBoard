@@ -908,7 +908,9 @@
       html, body { max-width: 100%; overflow-x: hidden; }
       body { -webkit-tap-highlight-color: transparent; }
       .main { padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
-      .topbar { height: auto; min-height: calc(120px + env(safe-area-inset-top)); display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px 44px 44px; grid-template-rows: 44px 44px; align-content: center; gap: 8px; padding: calc(8px + env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 8px max(14px, env(safe-area-inset-left)); }
+      .topbar { height: auto; min-height: calc(58px + env(safe-area-inset-top)); display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px 44px 44px; grid-template-rows: 44px; align-content: center; gap: 8px; padding: calc(7px + env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 7px max(14px, env(safe-area-inset-left)); }
+      body[data-has-role-switcher="true"] .topbar,
+      body[data-multiple-classes="true"] .topbar { min-height: calc(112px + env(safe-area-inset-top)); grid-template-rows: 44px 44px; }
       .topbar-start, .top-actions { display: contents; }
       .topbar-start .crumb { display: none; }
       .sidebar-toggle { grid-column: 1; grid-row: 1; }
@@ -919,14 +921,20 @@
       .top-actions > #topbarSearchButton { grid-column: 3; grid-row: 1; width: 44px; height: 44px; min-width: 0; padding: 0; border-radius: 13px; justify-content: center; }
       .top-actions > #topbarSearchButton .topbar-search-text,
       .top-actions > #topbarSearchButton .topbar-search-kbd { display: none; }
+      .top-actions > #topbarSearchButton svg { width: 18px; height: 18px; }
       .top-actions > .icon-button[aria-label="Notifications"] { grid-column: 4; grid-row: 1; }
       .top-actions > .icon-button[aria-label="Profile"] { grid-column: 5; grid-row: 1; }
       .role-switcher, .class-switcher { grid-column: 1 / -1; grid-row: 2; width: 100%; max-width: none; min-height: 44px; padding-left: 40px; border-radius: 12px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23738196' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='8' width='18' height='12' rx='2'/%3E%3Cpath d='M8 8V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3M3 13h18m-11 0v2h4v-2'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23738196' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 12px center, right 12px center; background-size: 18px, 14px; font-size: 14px; }
-      body[data-multiple-classes="true"][data-has-role-switcher="true"] .topbar { min-height: calc(172px + env(safe-area-inset-top)); grid-template-rows: 44px 44px 44px; }
+      .role-switcher[hidden], .class-switcher[hidden],
+      body:not([data-has-role-switcher="true"]):not([data-multiple-classes="true"]) .role-switcher,
+      body:not([data-has-role-switcher="true"]):not([data-multiple-classes="true"]) .class-switcher { display: none !important; }
+      body[data-multiple-classes="true"][data-has-role-switcher="true"] .topbar { min-height: calc(164px + env(safe-area-inset-top)); grid-template-rows: 44px 44px 44px; }
       body[data-multiple-classes="true"] .class-switcher { grid-row: 2; }
       body[data-multiple-classes="true"][data-has-role-switcher="true"] .role-switcher { grid-row: 3; }
       .icon-button { width: 44px; height: 44px; border-radius: 13px; }
-      .content { min-height: calc(100svh - 124px); padding: 20px max(14px, env(safe-area-inset-right)) 22px max(14px, env(safe-area-inset-left)); }
+      .content { min-height: calc(100svh - 68px); padding: 14px max(14px, env(safe-area-inset-right)) 22px max(14px, env(safe-area-inset-left)); }
+      body[data-has-role-switcher="true"] .content,
+      body[data-multiple-classes="true"] .content { min-height: calc(100svh - 124px); padding-top: 18px; }
       .text-field, .select-field, .search-field, .text-area, .auth-field input { min-height: 44px; font-size: 16px; }
       .auth-gate { min-height: 100svh; padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
       .auth-card { padding: 22px; }
@@ -1017,7 +1025,7 @@
       .pdf-preview-close { width: 44px; }
     }
     @media (max-width: 390px) {
-      .content { padding-top: 17px; }
+      .content { padding-top: 12px; }
       .topbar { padding-inline: 10px; grid-template-columns: 40px minmax(0, 1fr) 40px 40px 40px; gap: 6px; }
       .role-switcher, .class-switcher { width: 100%; max-width: none; font-size: 11px; }
       .top-actions { gap: 4px; }
@@ -4048,7 +4056,7 @@
             <kbd class="topbar-search-kbd">⌘K</kbd>
           </button>
           <select class="class-switcher" id="classSwitcher" aria-label="Your class section" title="Switch between class sections" hidden></select>
-          <select class="role-switcher" id="roleSwitcher" aria-label="Your workspace" title="Switch between roles assigned to your account"><option value="student">Student View</option><option value="cr">Class Representatives</option><option value="admin">Admin Workspace</option></select>
+          <select class="role-switcher" id="roleSwitcher" aria-label="Your workspace" title="Switch between roles assigned to your account" hidden><option value="student">Student View</option><option value="cr">Class Representatives</option><option value="admin">Admin Workspace</option></select>
           <button class="icon-button" id="topbarCalendarButton" type="button" aria-label="Academic calendar" title="Academic calendar"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M14 14h2M8 17h3"/></svg></button>
           <button class="icon-button" id="themeToggle" aria-label="Switch theme" title="Switch light/dark theme"><svg viewBox="0 0 24 24"><path d="M20.9 13A8.5 8.5 0 0 1 11 3.1 8.5 8.5 0 1 0 20.9 13Z"/></svg></button>
           <button class="icon-button" aria-label="Notifications" data-page="notifications"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span class="unread"></span></button>
@@ -5327,7 +5335,7 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=31"></script>
+  <script src="classboard-auth.js?v=32"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
