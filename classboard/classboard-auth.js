@@ -926,6 +926,7 @@
     card.dataset.subject = subject?.name || '';
     card.dataset.subjectColor = resourceSubjectColor(subject?.name || '');
     card.dataset.type = kind;
+    card.dataset.kind = resource.kind || kind;
     card.dataset.search = `${resource.title} ${subject?.name || ''} ${kind} ${resource.unit_label || ''}`.toLowerCase();
     card.dataset.resourcePath = resource.storage_path || '';
     card.dataset.resourceTitle = resource.title;
@@ -1108,7 +1109,8 @@
       const homeCards = await Promise.all(resources.slice(0, 2).map((resource) => addResourceCard(resource, true)));
       homeCards.forEach((card) => homeResources.append(card));
     }
-    if (resources.length) document.getElementById('resourceSearch')?.dispatchEvent(new Event('input', { bubbles: true }));
+    if (window.classboardFilterResources) window.classboardFilterResources();
+    else if (resources.length) document.getElementById('resourceSearch')?.dispatchEvent(new Event('input', { bubbles: true }));
     document.querySelectorAll('.stat-label').forEach((label) => {
       if (label.textContent.trim() === 'Resources available') label.previousElementSibling.textContent = String(resources.length);
       if (label.textContent.trim() === 'Upcoming reminders') label.previousElementSibling.textContent = String((reminderResult.data || []).length);

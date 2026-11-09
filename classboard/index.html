@@ -2440,16 +2440,20 @@
       box-shadow: none;
       padding: 15px 14px 13px 20px;
       overflow: hidden;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: stretch !important;
-      justify-content: flex-start !important;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
       gap: 8px;
       min-height: 140px;
       box-sizing: border-box;
-      transform: none !important;
+      transform: none;
       transition: border-color .18s ease, box-shadow .18s ease;
       text-align: left;
+    }
+    #page-resources .resource-card[hidden],
+    #page-resources .resource-card.is-hidden {
+      display: none !important;
     }
     #page-resources .resource-card::before {
       content: '';
@@ -4523,19 +4527,40 @@
     const resourceSearch = document.getElementById('resourceSearch');
     const subjectFilter = document.getElementById('subjectFilter');
     let resourceType = 'all';
+    function normalizeResourceType(t) {
+      const s = String(t || '').toLowerCase().trim().replace(/_/g, ' ');
+      if (!s || s === 'all') return 'all';
+      if (/note/.test(s)) return 'notes';
+      if (/syllab/.test(s)) return 'syllabus';
+      if (/lab|manual/.test(s)) return 'lab manual';
+      if (/mst|pyq|exam|paper/.test(s)) return 'mst / pyqs';
+      return s;
+    }
     function filterResources() {
-      const query = resourceSearch.value.trim().toLowerCase();
+      const query = (resourceSearch?.value || '').trim().toLowerCase();
       let shown = 0;
-      document.querySelectorAll('.resource-card').forEach((card) => {
-        const matches = card.dataset.search.includes(query) && (subjectFilter.value === 'all' || card.dataset.subject === subjectFilter.value) && (resourceType === 'all' || card.dataset.type === resourceType);
+      const activeType = normalizeResourceType(resourceType);
+      document.querySelectorAll('#resourceGrid .resource-card').forEach((card) => {
+        const cardSearch = (card.dataset.search || '').toLowerCase();
+        const cardSubject = card.dataset.subject || '';
+        const cardType = normalizeResourceType(card.dataset.type || card.dataset.kind);
+        const matchesQuery = !query || cardSearch.includes(query);
+        const matchesSubject = subjectFilter.value === 'all' || !subjectFilter.value || cardSubject === subjectFilter.value;
+        const matchesType = activeType === 'all' || cardType === activeType;
+        const matches = matchesQuery && matchesSubject && matchesType;
         card.style.display = matches ? 'flex' : 'none';
+        card.hidden = !matches;
+        card.classList.toggle('is-hidden', !matches);
         if (matches) shown++;
       });
-      document.getElementById('resourceEmpty').style.display = shown ? 'none' : 'block';
+      const emptyEl = document.getElementById('resourceEmpty');
+      if (emptyEl) emptyEl.style.display = shown ? 'none' : 'block';
     }
-    resourceSearch.addEventListener('input', filterResources);
-    subjectFilter.addEventListener('change', filterResources);
-    document.querySelectorAll('[data-resource-type]').forEach((tab) => tab.addEventListener('click', () => {
+    window.classboardFilterResources = filterResources;
+    resourceSearch?.addEventListener('input', filterResources);
+    subjectFilter?.addEventListener('change', filterResources);
+    document.querySelectorAll('[data-resource-type]').forEach((tab) => tab.addEventListener('click', (event) => {
+      event.preventDefault();
       resourceType = tab.dataset.resourceType;
       document.querySelectorAll('[data-resource-type]').forEach((button) => button.classList.toggle('active', button === tab));
       filterResources();
@@ -4693,7 +4718,7 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=27"></script>
+  <script src="classboard-auth.js?v=28"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
