@@ -83,7 +83,7 @@
       updatePushUI();
       hidePromptBanner();
       if (typeof window.notifyApp === 'function') {
-        window.notifyApp('Background notifications enabled! You will get alerts even when ClassBoard is closed.');
+        window.notifyApp('Background notifications enabled! You will get notifications even when ClassBoard is closed.');
       }
       return true;
     } catch (err) {
@@ -145,7 +145,7 @@
 
     const sub = await getExistingSubscription();
     if (sub) {
-      if (statusEl) statusEl.textContent = 'Active on this device (alerts when closed)';
+      if (statusEl) statusEl.textContent = 'Active on this device (notifications when closed)';
       if (toggleBtn) {
         toggleBtn.textContent = 'Turn off';
         toggleBtn.classList.remove('primary-button');
@@ -153,7 +153,7 @@
         toggleBtn.disabled = false;
       }
     } else {
-      if (statusEl) statusEl.textContent = 'Never miss important CR updates — sends alerts directly to your device lock screen.';
+      if (statusEl) statusEl.textContent = 'Never miss updates — notifications sent directly to your lock screen.';
       if (toggleBtn) {
         toggleBtn.textContent = 'Enable';
         toggleBtn.classList.remove('secondary-button');

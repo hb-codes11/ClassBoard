@@ -4456,7 +4456,7 @@
                   <div class="profile-section-heading"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg></span><div><div class="panel-title">Preferences</div><div class="panel-sub">Customize your experience.</div></div></div>
                   <div class="list-row"><span class="profile-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg></span><div class="list-main"><div class="list-title">Appearance</div><div class="list-detail">Switch between light and dark mode.</div></div><button class="secondary-button" type="button" id="profileThemeButton">Change theme</button></div>
                   <div class="list-row"><span class="profile-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12a2 2 0 0 0 4 0"></path></svg></span><div class="list-main"><div class="list-title">Notifications</div><div class="list-detail">Class updates, new notes and replies.</div></div><button class="text-link" type="button" data-page="notifications">View notifications →</button></div>
-                  <div class="list-row"><span class="profile-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12a2 2 0 0 0 4 0"></path></svg></span><div class="list-main"><div class="list-title">Background Notifications</div><div class="list-detail" id="pushNotificationStatus">Never miss important CR updates — sends alerts directly to your device lock screen.</div></div><button class="primary-button" type="button" id="pushNotificationToggle">Enable</button></div>
+                  <div class="list-row"><span class="profile-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12a2 2 0 0 0 4 0"></path></svg></span><div class="list-main"><div class="list-title">Background Notifications</div><div class="list-detail" id="pushNotificationStatus">Never miss updates — notifications sent directly to your lock screen.</div></div><button class="primary-button" type="button" id="pushNotificationToggle">Enable</button></div>
                 </article>
               </div>
             </div>
@@ -4717,7 +4717,7 @@
         <div class="push-prompt-body">
           <div class="push-prompt-badge">New Feature</div>
           <div class="push-prompt-title" id="pushPromptTitle">Background Notifications</div>
-          <div class="push-prompt-desc">Never miss important CR updates — get instant alerts on your lock screen even when ClassBoard is closed.</div>
+          <div class="push-prompt-desc">Never miss updates — get notifications on your lock screen even when ClassBoard is closed.</div>
           <div class="push-prompt-actions">
             <button class="primary-button push-prompt-action-btn" id="pushPromptEnable" type="button">Turn on</button>
             <button class="push-prompt-dismiss-btn" id="pushPromptDismiss" type="button">Maybe later</button>
@@ -5521,7 +5521,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="classboard-auth.js?v=34"></script>
-  <script src="push-manager.js?v=2"></script>
+  <script src="push-manager.js?v=3"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
