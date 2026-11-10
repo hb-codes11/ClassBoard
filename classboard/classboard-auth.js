@@ -2182,6 +2182,7 @@
     showMessage('Checking your class access…');
     try {
       await enterClass(session.user);
+      window.classboardActivityTracker?.initSession(session.user);
     } catch (error) {
       app.hidden = true;
       gate.hidden = false;
@@ -2952,6 +2953,7 @@
       updatesForm.reset();
       syncDeadlineField();
       submitButton.disabled = false;
+      window.classboardTrackActivity?.('update_create', `Published update: ${update.title}`, 'updates', { category });
       try {
         await loadLiveClassData(context.classId);
         notifyApp('Update published for the class.');
@@ -2987,6 +2989,7 @@
       });
       if (error) { notifyApp(`Class Log did not save: ${error.message}`, true); return; }
       classLogForm.reset();
+      window.classboardTrackActivity?.('class_logged', `Logged ${kind} for ${subject?.name || 'subject'}`, 'cr', { kind, batch: values.get('batch') });
       await loadLiveClassData(context.classId);
       notifyApp('Class Log saved to Supabase.');
     }, true);
@@ -3145,7 +3148,10 @@
           url: './#updates'
         }
       }).catch(() => {});
-      reminderForm.reset(); await loadLiveClassData(context.classId); notifyApp('Reminder published for the class.');
+      reminderForm.reset();
+      window.classboardTrackActivity?.('reminder_create', `Created reminder: ${reminderTitle}`, 'updates');
+      await loadLiveClassData(context.classId);
+      notifyApp('Reminder published for the class.');
     }, true);
   }
 
@@ -3154,8 +3160,14 @@
     if (!validCollegeEmail()) return;
     busy(true);
     showMessage('Signing in…');
-    const { error } = await window.classboardSupabase.auth.signInWithPassword({ email: cleanEmail(), password: passwordInput.value });
-    if (error) showMessage(error.message, true);
+    sessionStorage.setItem('cb_pending_auth_method', 'password');
+    const { data, error } = await window.classboardSupabase.auth.signInWithPassword({ email: cleanEmail(), password: passwordInput.value });
+    if (error) {
+      sessionStorage.removeItem('cb_pending_auth_method');
+      showMessage(error.message, true);
+    } else if (data?.user) {
+      window.classboardActivityTracker?.initSession(data.user, 'password');
+    }
     busy(false);
   });
 
@@ -3168,16 +3180,24 @@
     }
     busy(true);
     showMessage('Creating your account…');
+    sessionStorage.setItem('cb_pending_auth_method', 'password');
     const { data, error } = await window.classboardSupabase.auth.signUp({ email: cleanEmail(), password: passwordInput.value });
-    if (error) showMessage(error.message, true);
+    if (error) {
+      sessionStorage.removeItem('cb_pending_auth_method');
+      showMessage(error.message, true);
+    }
     else if (!data.session) showMessage('Account request accepted. Check your college inbox to confirm your email, then sign in.');
-    else showMessage('Account created. Checking your class access…');
+    else {
+      showMessage('Account created. Checking your class access…');
+      window.classboardActivityTracker?.initSession(data.user, 'password');
+    }
     busy(false);
   });
 
   document.getElementById('googleSignInButton').addEventListener('click', async () => {
     busy(true);
     showMessage('Opening Google sign-in…');
+    sessionStorage.setItem('cb_pending_auth_method', 'google');
     const { error } = await window.classboardSupabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -3186,6 +3206,7 @@
       }
     });
     if (error) {
+      sessionStorage.removeItem('cb_pending_auth_method');
       showMessage(error.message, true);
       busy(false);
     }
@@ -3205,6 +3226,7 @@
     const button = document.getElementById(id);
     if (button) button.addEventListener('click', async (event) => {
       event.preventDefault();
+      await window.classboardActivityTracker?.handleLogout();
       await window.classboardSupabase.auth.signOut();
     });
   });

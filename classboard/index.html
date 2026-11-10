@@ -14,6 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&amp;family=Figtree:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./founder-intelligence.css?v=1" />
   <style>
     :root {
       color-scheme: light;
@@ -4997,6 +4998,7 @@
         }
         currentPage = nextPage;
         sessionStorage.setItem('classboard-page', pageId);
+        window.classboardTrackActivity?.('page_view', `Viewed ${activeName || pageId} page`, pageId);
       }
       document.querySelectorAll('.page-view').forEach((section) => section.classList.toggle('active', section.id === `page-${pageId}`));
       document.querySelectorAll('.nav-item, .mobile-nav button').forEach((button) => button.classList.toggle('active', button.dataset.view === activeName || (activeName === 'Notes & Syllabus' && button.textContent.trim() === 'Learn')));
@@ -5520,7 +5522,9 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=35"></script>
+  <script src="activity-tracker.js?v=1"></script>
+  <script src="founder-intelligence.js?v=1"></script>
+  <script src="classboard-auth.js?v=36"></script>
   <script src="push-manager.js?v=4"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
