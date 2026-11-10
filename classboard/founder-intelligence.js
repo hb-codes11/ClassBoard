@@ -199,19 +199,21 @@
                 <input type="search" class="founder-search-input" id="founderSearchInput" placeholder="Search name, email, roll number…" />
               </div>
 
-              <div class="founder-filter-group" id="founderStatusFilters">
-                <button class="founder-filter-pill active" data-status="all" type="button">All</button>
-                <button class="founder-filter-pill" data-status="online" type="button">🟢 Online</button>
-                <button class="founder-filter-pill" data-status="recently_active" type="button">🟡 Recently active</button>
-                <button class="founder-filter-pill" data-status="offline" type="button">Offline</button>
-              </div>
+              <div class="founder-toolbar-actions">
+                <div class="founder-filter-group" id="founderStatusFilters">
+                  <button class="founder-filter-pill active" data-status="all" type="button">All</button>
+                  <button class="founder-filter-pill" data-status="online" type="button">🟢 Online</button>
+                  <button class="founder-filter-pill" data-status="recently_active" type="button">🟡 Recently active</button>
+                  <button class="founder-filter-pill" data-status="offline" type="button">Offline</button>
+                </div>
 
-              <select class="select-field" id="founderSortSelect" style="padding:6px 10px;font-size:0.82rem;margin:0;">
-                <option value="last_active">Sort: Most recently active</option>
-                <option value="last_login">Sort: Latest login</option>
-                <option value="sessions">Sort: Most sessions</option>
-                <option value="name">Sort: Name (A–Z)</option>
-              </select>
+                <select class="select-field founder-sort-select" id="founderSortSelect">
+                  <option value="last_active">Sort: Most recently active</option>
+                  <option value="last_login">Sort: Latest login</option>
+                  <option value="sessions">Sort: Most sessions</option>
+                  <option value="name">Sort: Name (A–Z)</option>
+                </select>
+              </div>
             </div>
 
             <!-- Table -->
@@ -248,7 +250,7 @@
           </div>
 
           <!-- Right: Live Activity Feed Ticker -->
-          <div class="founder-card" style="width:340px;">
+          <div class="founder-card founder-stream-card">
             <div class="founder-card-header">
               <div class="founder-card-title">
                 <span>Live Activity Stream</span>
@@ -374,6 +376,8 @@
       tabBtnRoles.setAttribute('aria-selected', 'false');
       panelIntel.hidden = false;
       rolesPanel.hidden = true;
+      if (headingH1) headingH1.textContent = 'Founder Workspace';
+      if (headingDesc) headingDesc.textContent = 'Comprehensive platform intelligence, live user activity monitoring, and section administration.';
     });
 
     tabBtnRoles.addEventListener('click', () => {
@@ -383,6 +387,8 @@
       tabBtnIntel.setAttribute('aria-selected', 'false');
       panelIntel.hidden = true;
       rolesPanel.hidden = false;
+      if (headingH1) headingH1.textContent = 'Section Administration';
+      if (headingDesc) headingDesc.textContent = 'Manage access, roles, and content for your assigned section.';
     });
 
     // Wire Search Input (Debounced)
@@ -833,3 +839,4 @@
     init();
   }
 })();
+
