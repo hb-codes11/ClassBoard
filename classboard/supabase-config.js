@@ -3,5 +3,6 @@
 // or secret key here. Database access still depends on the RLS policies.
 window.CLASSBOARD_SUPABASE_CONFIG = Object.freeze({
   url: 'https://wkexbbemcvuubhiwbpfs.supabase.co',
-  publishableKey: 'sb_publishable_6_KzoJW7vJ4WVDZ3-blfgQ_3G99A6-R'
+  publishableKey: 'sb_publishable_6_KzoJW7vJ4WVDZ3-blfgQ_3G99A6-R',
+  vapidPublicKey: 'BFjWbGKRLxuAZgRU0oWgTzz85xnTpTNjJ_868u7gtrDPfrgG9HnppGqMRQ8Yv_mbCSFNpe2GgQSE1mRRSKyEcrc'
 });

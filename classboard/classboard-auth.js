@@ -2932,6 +2932,16 @@
         const inserted = await window.classboardSupabase.from('updates').insert(update);
         if (inserted.error) throw new Error(`Update did not save: ${inserted.error.message}`);
         updateSaved = true;
+
+        // Dispatch background Web Push to students whose browser is closed
+        window.classboardSupabase.functions.invoke('send-push', {
+          body: {
+            class_id: context.classId,
+            title: update.title ? `Update: ${update.title}` : 'New Class Update',
+            body: update.body || 'New announcement published for your class.',
+            url: './#updates'
+          }
+        }).catch(() => {});
       } catch (error) {
         if (storagePath && !updateSaved) await window.classboardSupabase.storage.from('class-resources').remove([storagePath]);
         notifyApp(error.message || 'Update could not be published. Please try again.', true);
@@ -3117,11 +3127,23 @@
       if (!(context?.roles.includes('cr') || context?.roles.includes('admin'))) { notifyApp('Only a CR or section admin can publish reminders.', true); return; }
       const values = new FormData(reminderForm);
       const dueAt = new Date(`${values.get('date')}T12:00:00+05:30`).toISOString();
+      const reminderTitle = String(values.get('title')).trim();
+      const reminderBody = String(values.get('details') || '').trim() || null;
       const { error } = await window.classboardSupabase.from('reminders').insert({
-        class_id: context.classId, title: String(values.get('title')).trim(),
-        body: String(values.get('details') || '').trim() || null, due_at: dueAt, created_by: context.userId
+        class_id: context.classId, title: reminderTitle,
+        body: reminderBody, due_at: dueAt, created_by: context.userId
       });
       if (error) { notifyApp(`Reminder did not save: ${error.message}`, true); return; }
+
+      // Dispatch background Web Push to students whose browser is closed
+      window.classboardSupabase.functions.invoke('send-push', {
+        body: {
+          class_id: context.classId,
+          title: `Reminder: ${reminderTitle}`,
+          body: reminderBody || 'A reminder has been posted for your class.',
+          url: './#updates'
+        }
+      }).catch(() => {});
       reminderForm.reset(); await loadLiveClassData(context.classId); notifyApp('Reminder published for the class.');
     }, true);
   }

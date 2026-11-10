@@ -4325,6 +4325,7 @@
                   <div class="profile-section-heading"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg></span><div><div class="panel-title">Preferences</div><div class="panel-sub">Customize your experience.</div></div></div>
                   <div class="list-row"><span class="profile-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg></span><div class="list-main"><div class="list-title">Appearance</div><div class="list-detail">Switch between light and dark mode.</div></div><button class="secondary-button" type="button" id="profileThemeButton">Change theme</button></div>
                   <div class="list-row"><span class="profile-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12a2 2 0 0 0 4 0"></path></svg></span><div class="list-main"><div class="list-title">Notifications</div><div class="list-detail">Class updates, new notes and replies.</div></div><button class="text-link" type="button" data-page="notifications">View notifications →</button></div>
+                  <div class="list-row"><span class="profile-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"></rect><line x1="12" y1="18" x2="12.01" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line></svg></span><div class="list-main"><div class="list-title">Lock screen alerts</div><div class="list-detail" id="pushNotificationStatus">Get notifications when the app or browser is closed.</div></div><button class="primary-button" type="button" id="pushNotificationToggle">Enable alerts</button></div>
                 </article>
               </div>
             </div>
@@ -5371,7 +5372,8 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="classboard-auth.js?v=33"></script>
+  <script src="classboard-auth.js?v=34"></script>
+  <script src="push-manager.js?v=1"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>

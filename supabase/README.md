@@ -32,13 +32,15 @@ This folder contains the database schema and follow-up migrations for the ClassB
 15. Apply `migrations/015_restore_attendance_count_write_grants.sql` to restore the column-level write grants for shared attendance totals.
 16. Apply `migrations/016_grant_attendance_upsert_access.sql` to allow PostgREST upserts for shared totals. Row-level policies still restrict writes to CRs and admins.
 17. Apply `migrations/017_remove_reviewed_attendance_concerns.sql` to let CRs/admins remove referred or resolved attendance concerns. Replies are removed with the concern.
-18. Apply `migrations/019_add_mst_pyq_resource_type.sql` to add the MST / PYQs resource type to the existing `resource_kind` enum.
-19. Apply `migrations/020_grant_student_attendance_upsert_access.sql` to allow each Student to save their own attended-class count through PostgREST upsert. Row-level policies still restrict access to the account's own progress.
-20. Apply `migrations/021_ignore_inactive_attendance_progress.sql` so deactivated accounts' old test attendance cannot block shared class totals. The guard still protects every active student's saved count.
-21. Apply `migrations/022_allow_staff_to_correct_class_totals.sql` to let CRs/admins set the authoritative shared classes-held total without a student's saved planner count blocking the correction. Students still cannot save an attended count above the current shared total; if a total is lowered below an existing personal count, that student must correct their own count.
-22. Apply `migrations/023_class_update_pdf_attachments.sql` to allow class updates to include private PDF attachments. CRs upload and publish the PDF with the update; active class members can preview it, and deleting the update removes its PDF.
-23. Apply `migrations/027_add_class_update_pinning.sql` to add `is_pinned` support so CRs and admins can pin updates to the top of the Home preview for the whole class.
-24. In Supabase Auth, create the owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and grant the initial elevated roles. Student access is already assigned automatically:
+18. Apply `migrations/018_notify_all_members_for_updates_and_reminders.sql` to ensure all active class members receive durable notifications for updates and reminders, and backfill notifications for existing posts.
+19. Apply `migrations/019_add_mst_pyq_resource_type.sql` to add the MST / PYQs resource type to the existing `resource_kind` enum.
+20. Apply `migrations/020_grant_student_attendance_upsert_access.sql` to allow each Student to save their own attended-class count through PostgREST upsert. Row-level policies still restrict access to the account's own progress.
+21. Apply `migrations/021_ignore_inactive_attendance_progress.sql` so deactivated accounts' old test attendance cannot block shared class totals. The guard still protects every active student's saved count.
+22. Apply `migrations/022_allow_staff_to_correct_class_totals.sql` to let CRs/admins set the authoritative shared classes-held total without a student's saved planner count blocking the correction. Students still cannot save an attended count above the current shared total; if a total is lowered below an existing personal count, that student must correct their own count.
+23. Apply `migrations/023_class_update_pdf_attachments.sql` to allow class updates to include private PDF attachments. CRs upload and publish the PDF with the update; active class members can preview it, and deleting the update removes its PDF.
+24. Apply `migrations/024_notify_reviewed_attendance_concerns.sql` to send notifications to students when their attendance concerns are reviewed by a CR or admin.
+25. Apply `migrations/027_add_class_update_pinning.sql` to add `is_pinned` support so CRs and admins can pin updates to the top of the Home preview for the whole class.
+26. In Supabase Auth, create the owner accounts. Then, from the SQL Editor, find their Auth user UUIDs and grant the initial elevated roles. Student access is already assigned automatically:
 
 ```sql
 -- Replace both UUID placeholders with the two Auth user IDs.
@@ -53,10 +55,10 @@ union all
 select 'FRIEND_USER_UUID'::uuid, id, 'cr'::public.class_role from target_class;
 ```
 
-24. Confirm the two owners can sign in and that each new college account appears as a Student. Assign CR/Admin access from Admin workspace; only a CR can publish class updates, class logs, timetables, and reminders. Admins manage roles, review attendance concerns, and can upload or remove shared content.
-25. Apply `migrations/025_shared_class_calendar.sql` to publish calendar edits class-wide with real-time updates. Existing browser-local calendar overrides are copied into the shared calendar on the first successful staff load.
-26. Apply `migrations/026_add_intel2_section.sql` to create INTEL-2, copy the subject list, enable B1/B2 batch records, and update student batch setup for that section. The INTEL-2 weekly timetable is loaded from its own section-specific defaults in the app. Dated class-log entries, calendar overrides, notes, updates, attendance records, and memberships remain separate by `class_id` and start empty.
-27. Apply `migrations/032_tester_space_access.sql` to create `public.app_testers` and enforce database-level access control for the Tester Space (including the SGPA/CGPA Grade Planner). Founders automatically have access and can grant or revoke tester access for users in the Founder Dashboard.
+27. Confirm the two owners can sign in and that each new college account appears as a Student. Assign CR/Admin access from Admin workspace; only a CR can publish class updates, class logs, timetables, and reminders. Admins manage roles, review attendance concerns, and can upload or remove shared content.
+28. Apply `migrations/025_shared_class_calendar.sql` to publish calendar edits class-wide with real-time updates. Existing browser-local calendar overrides are copied into the shared calendar on the first successful staff load.
+29. Apply `migrations/026_add_intel2_section.sql` to create INTEL-2, copy the subject list, enable B1/B2 batch records, and update student batch setup for that section. The INTEL-2 weekly timetable is loaded from its own section-specific defaults in the app. Dated class-log entries, calendar overrides, notes, updates, attendance records, and memberships remain separate by `class_id` and start empty.
+30. Apply `migrations/032_tester_space_access.sql` to create `public.app_testers` and enforce database-level access control for the Tester Space (including the SGPA/CGPA Grade Planner). Founders automatically have access and can grant or revoke tester access for users in the Founder Dashboard.
 
 ## Start INTEL-2 access
 
