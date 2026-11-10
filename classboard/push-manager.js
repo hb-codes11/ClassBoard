@@ -178,28 +178,36 @@
     setTimeout(() => { banner.hidden = true; }, 360);
   }
 
+  function isUserInsideApp() {
+    const authGate = document.getElementById('authGate');
+    return (authGate && authGate.hidden) || Boolean(window.classboardContext?.userId);
+  }
+
   async function checkAndShowPushPrompt() {
     if (!isPushSupported()) return;
     if (Notification.permission === 'denied') return;
+    if (!isUserInsideApp()) return; // Only show once user enters/signs into ClassBoard
 
-    const context = window.classboardContext;
-    if (!context?.userId) return; // Only show to logged in users
+    // Check if dismissed in this current session
+    try {
+      if (sessionStorage.getItem('classboard-push-prompt-dismissed') === 'true') {
+        return;
+      }
+    } catch (_) {}
 
-    // Check if dismissed recently (within 4 days)
-    const dismissedAt = localStorage.getItem('classboard-push-prompt-dismissed');
-    if (dismissedAt) {
-      const daysSinceDismiss = (Date.now() - parseInt(dismissedAt, 10)) / (1000 * 60 * 60 * 24);
-      if (daysSinceDismiss < 4) return;
+    // Check if already subscribed on this device
+    const existingSub = await getExistingSubscription();
+    if (existingSub) {
+      updatePushUI();
+      return; // Already enabled on this device!
     }
 
-    // Check if already subscribed
-    const existingSub = await getExistingSubscription();
-    if (existingSub) return; // Already enabled on this device
-
-    // Show prompt after a short delay so the user lands on the page first
+    // Show prompt banner as soon as they enter (after brief 600ms entrance)
     setTimeout(() => {
-      showPromptBanner();
-    }, 2800);
+      if (isUserInsideApp()) {
+        showPromptBanner();
+      }
+    }, 600);
   }
 
   // Bind to button clicks
@@ -227,7 +235,9 @@
 
     if (e.target.closest('#pushPromptDismiss') || e.target.closest('#pushPromptClose')) {
       e.preventDefault();
-      localStorage.setItem('classboard-push-prompt-dismissed', Date.now());
+      try {
+        sessionStorage.setItem('classboard-push-prompt-dismissed', 'true');
+      } catch (_) {}
       hidePromptBanner();
       return;
     }
@@ -235,10 +245,9 @@
 
   // Re-sync subscription with active class when user switches section or signs in
   window.addEventListener('classboard:context-ready', async () => {
-    registerServiceWorker().then(() => {
-      updatePushUI();
-      checkAndShowPushPrompt();
-    });
+    await registerServiceWorker();
+    await updatePushUI();
+    await checkAndShowPushPrompt();
 
     const sub = await getExistingSubscription();
     const context = window.classboardContext;
@@ -261,11 +270,16 @@
     isSupported: isPushSupported,
     subscribe: subscribeToPush,
     unsubscribe: unsubscribeFromPush,
-    updateUI: updatePushUI
+    updateUI: updatePushUI,
+    checkPrompt: checkAndShowPushPrompt
   };
 
   // Auto-init on load
   if (isPushSupported()) {
-    registerServiceWorker().then(updatePushUI);
+    registerServiceWorker().then(() => {
+      updatePushUI();
+      // Also check shortly after DOM loads in case context is already present
+      setTimeout(checkAndShowPushPrompt, 1000);
+    });
   }
 })();

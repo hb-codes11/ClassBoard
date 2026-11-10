@@ -347,6 +347,7 @@
     const mobileTesterNav = document.getElementById('mobileTesterSpaceNav');
     if (mobileTesterNav) mobileTesterNav.hidden = !isTester;
     window.dispatchEvent(new Event('classboard:attendance-calendar-context'));
+    window.dispatchEvent(new CustomEvent('classboard:context-ready', { detail: window.classboardContext }));
     if (studentMembership && window.setClassboardRoll) window.setClassboardRoll(studentMembership.roll_number);
     const issueDate = document.querySelector('#issueForm input[name="date"]');
     if (issueDate) {
