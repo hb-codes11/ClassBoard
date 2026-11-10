@@ -1270,6 +1270,137 @@
     @media (max-width: 760px) { .notification-slide { top: auto; right: max(12px, env(safe-area-inset-right)); bottom: calc(74px + env(safe-area-inset-bottom)); left: max(12px, env(safe-area-inset-left)); width: auto; transform: translateX(calc(100% + 20px)); } }
     @media (prefers-reduced-motion: reduce) { .notification-slide { transition: none; } }
 
+    /* New background notification prompt banner */
+    .push-prompt-banner {
+      position: fixed;
+      z-index: 45;
+      bottom: 24px;
+      right: 24px;
+      width: min(410px, calc(100vw - 32px));
+      border: 1px solid color-mix(in srgb, var(--blue) 38%, var(--line));
+      border-radius: 18px;
+      background: color-mix(in srgb, var(--surface) 96%, transparent);
+      box-shadow: 0 24px 60px rgba(10, 35, 70, 0.22), 0 4px 16px rgba(10, 35, 70, 0.08);
+      backdrop-filter: blur(18px) saturate(145%);
+      -webkit-backdrop-filter: blur(18px) saturate(145%);
+      transform: translateY(120px) scale(0.96);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+    }
+    .push-prompt-banner[hidden] { display: none !important; }
+    .push-prompt-banner.is-visible {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    [data-theme="dark"] .push-prompt-banner {
+      background: color-mix(in srgb, var(--surface) 94%, transparent);
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65);
+    }
+    .push-prompt-shell {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      padding: 16px 18px;
+    }
+    .push-prompt-icon-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      display: grid;
+      place-items: center;
+      flex: none;
+    }
+    .push-prompt-icon-wrap svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .push-prompt-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .push-prompt-badge {
+      display: inline-block;
+      font-size: 9.5px;
+      font-weight: 750;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--blue);
+      margin-bottom: 2px;
+    }
+    .push-prompt-title {
+      font-size: 14.5px;
+      font-weight: 750;
+      color: var(--text);
+      line-height: 1.25;
+    }
+    .push-prompt-desc {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.45;
+    }
+    .push-prompt-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 13px;
+    }
+    .push-prompt-action-btn {
+      padding: 7px 16px;
+      font-size: 12px;
+      font-weight: 650;
+      border-radius: 9px;
+    }
+    .push-prompt-dismiss-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 8px;
+      transition: color 0.15s ease;
+    }
+    .push-prompt-dismiss-btn:hover { color: var(--text); }
+    .push-prompt-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      border-radius: 7px;
+      transition: color 0.15s ease;
+    }
+    .push-prompt-close:hover { color: var(--text); }
+    @media (max-width: 760px) {
+      .push-prompt-banner {
+        bottom: calc(76px + env(safe-area-inset-bottom));
+        right: max(12px, env(safe-area-inset-right));
+        left: max(12px, env(safe-area-inset-left));
+        width: auto;
+      }
+    }
+
     /* Shared workspace polish: clearer surfaces, calmer depth, and consistent controls. */
     .content { width: min(1440px, 100%); padding-top: 34px; }
     .panel, .stat-card { border-radius: 15px; }
@@ -4325,7 +4456,7 @@
                   <div class="profile-section-heading"><span class="profile-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg></span><div><div class="panel-title">Preferences</div><div class="panel-sub">Customize your experience.</div></div></div>
                   <div class="list-row"><span class="profile-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg></span><div class="list-main"><div class="list-title">Appearance</div><div class="list-detail">Switch between light and dark mode.</div></div><button class="secondary-button" type="button" id="profileThemeButton">Change theme</button></div>
                   <div class="list-row"><span class="profile-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12a2 2 0 0 0 4 0"></path></svg></span><div class="list-main"><div class="list-title">Notifications</div><div class="list-detail">Class updates, new notes and replies.</div></div><button class="text-link" type="button" data-page="notifications">View notifications →</button></div>
-                  <div class="list-row"><span class="profile-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"></rect><line x1="12" y1="18" x2="12.01" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line></svg></span><div class="list-main"><div class="list-title">Lock screen alerts</div><div class="list-detail" id="pushNotificationStatus">Get notifications when the app or browser is closed.</div></div><button class="primary-button" type="button" id="pushNotificationToggle">Enable alerts</button></div>
+                  <div class="list-row"><span class="profile-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12a2 2 0 0 0 4 0"></path></svg></span><div class="list-main"><div class="list-title">Background Notifications</div><div class="list-detail" id="pushNotificationStatus">Never miss important CR updates — sends alerts directly to your device lock screen.</div></div><button class="primary-button" type="button" id="pushNotificationToggle">Enable</button></div>
                 </article>
               </div>
             </div>
@@ -4578,6 +4709,23 @@
       </div>
     </nav>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <aside class="push-prompt-banner" id="pushPromptBanner" role="dialog" aria-labelledby="pushPromptTitle" hidden>
+      <div class="push-prompt-shell">
+        <div class="push-prompt-icon-wrap" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+        </div>
+        <div class="push-prompt-body">
+          <div class="push-prompt-badge">New Feature</div>
+          <div class="push-prompt-title" id="pushPromptTitle">Background Notifications</div>
+          <div class="push-prompt-desc">Never miss important CR updates — get instant alerts on your lock screen even when ClassBoard is closed.</div>
+          <div class="push-prompt-actions">
+            <button class="primary-button push-prompt-action-btn" id="pushPromptEnable" type="button">Turn on</button>
+            <button class="push-prompt-dismiss-btn" id="pushPromptDismiss" type="button">Maybe later</button>
+          </div>
+        </div>
+        <button class="push-prompt-close" id="pushPromptClose" type="button" aria-label="Dismiss" title="Dismiss">×</button>
+      </div>
+    </aside>
     <aside class="notification-slide" id="notificationSlide" role="status" aria-live="polite" aria-atomic="true" hidden>
       <div class="notification-slide-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></div>
       <div class="notification-slide-copy"><div class="notification-slide-kicker" id="notificationSlideKicker">New notification</div><div class="notification-slide-title" id="notificationSlideTitle"></div><div class="notification-slide-body" id="notificationSlideBody"></div><button class="notification-slide-open" id="notificationSlideOpen" type="button">View notifications →</button></div>
@@ -5373,7 +5521,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="classboard-auth.js?v=34"></script>
-  <script src="push-manager.js?v=1"></script>
+  <script src="push-manager.js?v=2"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>

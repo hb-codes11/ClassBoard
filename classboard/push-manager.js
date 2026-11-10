@@ -54,6 +54,7 @@
     if (permission !== 'granted') {
       alert('Notification permission was denied. Please allow notifications in your browser settings.');
       updatePushUI();
+      hidePromptBanner();
       return false;
     }
 
@@ -80,13 +81,14 @@
       }
 
       updatePushUI();
+      hidePromptBanner();
       if (typeof window.notifyApp === 'function') {
-        window.notifyApp('Device push notifications enabled! You will get alerts even when the browser is closed.');
+        window.notifyApp('Background notifications enabled! You will get alerts even when ClassBoard is closed.');
       }
       return true;
     } catch (err) {
       console.error('Failed to subscribe for push notifications:', err);
-      alert(`Could not enable push notifications: ${err.message}`);
+      alert(`Could not enable background notifications: ${err.message}`);
       return false;
     }
   }
@@ -109,7 +111,7 @@
       }
       updatePushUI();
       if (typeof window.notifyApp === 'function') {
-        window.notifyApp('Push notifications turned off on this device.');
+        window.notifyApp('Background notifications turned off on this device.');
       }
       return true;
     } catch (err) {
@@ -125,7 +127,10 @@
 
     if (!isPushSupported()) {
       if (statusEl) statusEl.textContent = 'Not supported on this browser';
-      if (toggleBtn) toggleBtn.disabled = true;
+      if (toggleBtn) {
+        toggleBtn.textContent = 'Not supported';
+        toggleBtn.disabled = true;
+      }
       return;
     }
 
@@ -148,9 +153,9 @@
         toggleBtn.disabled = false;
       }
     } else {
-      if (statusEl) statusEl.textContent = 'Disabled on this device';
+      if (statusEl) statusEl.textContent = 'Never miss important CR updates — sends alerts directly to your device lock screen.';
       if (toggleBtn) {
-        toggleBtn.textContent = 'Enable alerts';
+        toggleBtn.textContent = 'Enable';
         toggleBtn.classList.remove('secondary-button');
         toggleBtn.classList.add('primary-button');
         toggleBtn.disabled = false;
@@ -158,8 +163,48 @@
     }
   }
 
+  // --- Push Prompt Banner for All Users ---
+  function showPromptBanner() {
+    const banner = document.getElementById('pushPromptBanner');
+    if (!banner) return;
+    banner.hidden = false;
+    requestAnimationFrame(() => banner.classList.add('is-visible'));
+  }
+
+  function hidePromptBanner() {
+    const banner = document.getElementById('pushPromptBanner');
+    if (!banner) return;
+    banner.classList.remove('is-visible');
+    setTimeout(() => { banner.hidden = true; }, 360);
+  }
+
+  async function checkAndShowPushPrompt() {
+    if (!isPushSupported()) return;
+    if (Notification.permission === 'denied') return;
+
+    const context = window.classboardContext;
+    if (!context?.userId) return; // Only show to logged in users
+
+    // Check if dismissed recently (within 4 days)
+    const dismissedAt = localStorage.getItem('classboard-push-prompt-dismissed');
+    if (dismissedAt) {
+      const daysSinceDismiss = (Date.now() - parseInt(dismissedAt, 10)) / (1000 * 60 * 60 * 24);
+      if (daysSinceDismiss < 4) return;
+    }
+
+    // Check if already subscribed
+    const existingSub = await getExistingSubscription();
+    if (existingSub) return; // Already enabled on this device
+
+    // Show prompt after a short delay so the user lands on the page first
+    setTimeout(() => {
+      showPromptBanner();
+    }, 2800);
+  }
+
   // Bind to button clicks
   document.addEventListener('click', (e) => {
+    // Profile toggle
     const toggleBtn = e.target.closest('#pushNotificationToggle');
     if (toggleBtn) {
       e.preventDefault();
@@ -170,12 +215,31 @@
           subscribeToPush();
         }
       });
+      return;
+    }
+
+    // Prompt banner buttons
+    if (e.target.closest('#pushPromptEnable')) {
+      e.preventDefault();
+      subscribeToPush();
+      return;
+    }
+
+    if (e.target.closest('#pushPromptDismiss') || e.target.closest('#pushPromptClose')) {
+      e.preventDefault();
+      localStorage.setItem('classboard-push-prompt-dismissed', Date.now());
+      hidePromptBanner();
+      return;
     }
   });
 
-  // Re-sync subscription with active class when user switches section
+  // Re-sync subscription with active class when user switches section or signs in
   window.addEventListener('classboard:context-ready', async () => {
-    registerServiceWorker().then(updatePushUI);
+    registerServiceWorker().then(() => {
+      updatePushUI();
+      checkAndShowPushPrompt();
+    });
+
     const sub = await getExistingSubscription();
     const context = window.classboardContext;
     const client = window.classboardSupabase;
@@ -205,4 +269,3 @@
     registerServiceWorker().then(updatePushUI);
   }
 })();
-
