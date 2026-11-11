@@ -157,7 +157,15 @@
     '2026-11-27': { label: 'End of teaching', kind: 'term' },
     '2026-11-29': { label: 'Convocation', kind: 'convocation' }
   };
-  let activeMonth = 9;
+  const getInitialMonth = () => {
+    try {
+      const stored = sessionStorage.getItem('classboard-calendar-month') || localStorage.getItem('classboard-calendar-month');
+      const parsed = Number(stored);
+      if ([9, 10, 11].includes(parsed)) return parsed;
+    } catch (_) {}
+    return 10;
+  };
+  let activeMonth = getInitialMonth();
   let activeDateKey = '';
   let selectedClassId = '';
   let calendarOverrides = {};
@@ -496,6 +504,10 @@
 
   monthButtons.forEach((button) => button.addEventListener('click', () => {
     activeMonth = Number(button.dataset.calendarMonth);
+    try {
+      sessionStorage.setItem('classboard-calendar-month', String(activeMonth));
+      localStorage.setItem('classboard-calendar-month', String(activeMonth));
+    } catch (_) {}
     renderCalendar();
   }));
   batchSelect.addEventListener('change', () => {
