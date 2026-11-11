@@ -169,8 +169,9 @@
     }
     const classMemberships = memberships.filter((row) => row.class_id === classInfo.id);
     const roles = [...new Set(classMemberships.map((row) => row.role))];
-    updateClassBatchControls(classInfo.code);
-    const classLabel = `${classInfo.name} (${classInfo.code})`;
+    const classCode = classInfo.code;
+    updateClassBatchControls(classCode);
+    const classLabel = `${classInfo.name} (${classCode})`;
     document.title = `ClassBoard · ${classLabel}`;
     const sideClass = document.getElementById('sidebarProfileClass');
     if (sideClass) sideClass.textContent = classLabel;
