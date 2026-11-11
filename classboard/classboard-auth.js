@@ -147,13 +147,25 @@
     const memberships = data || [];
     const activeClasses = [...new Map(memberships.filter((row) => row.classes?.is_active).map((row) => [row.class_id, row.classes])).entries()]
       .map(([id, info]) => ({ id, ...info })).sort((a, b) => a.code.localeCompare(b.code));
-    const classCode = savedClassCode();
-    const classInfo = activeClasses.find((item) => item.code === classCode);
-    if (!classInfo) {
+
+    if (!activeClasses.length) {
       app.hidden = true;
       gate.hidden = false;
-      showMessage(`This account does not have active access to ${classCode}. Ask that section’s ClassBoard admin to grant access, then sign in again.`, true);
+      showMessage('This account does not have active access to any section. Ask a ClassBoard admin to grant access, then sign in again.', true);
       return;
+    }
+
+    const savedCode = savedClassCode();
+    // Prioritize section where user is admin or CR if savedCode doesn't match active classes
+    let classInfo = activeClasses.find((item) => item.code === savedCode);
+    if (!classInfo) {
+      const staffMembership = memberships.find((m) => (m.role === 'admin' || m.role === 'cr') && m.classes?.is_active);
+      if (staffMembership) {
+        classInfo = activeClasses.find((c) => c.id === staffMembership.class_id);
+      }
+      if (!classInfo) classInfo = activeClasses[0];
+      localStorage.setItem('classboard-selected-class', classInfo.code);
+      loginClassSelector.value = classInfo.code;
     }
     const classMemberships = memberships.filter((row) => row.class_id === classInfo.id);
     const roles = [...new Set(classMemberships.map((row) => row.role))];
