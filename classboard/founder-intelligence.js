@@ -52,6 +52,19 @@
     return 'offline';
   }
 
+  function getBatchForRollAndClass(roll, classCode) {
+    if (!roll) return null;
+    const num = Number(roll);
+    if (!Number.isInteger(num)) return null;
+    const isIntel2 = classCode === 'INTEL-2';
+    const first = isIntel2 ? 'B1' : 'A1';
+    const second = isIntel2 ? 'B2' : 'A2';
+    const maxRoll = classCode === 'IBM-1' ? 67 : 66;
+    if (num >= 1 && num <= 32) return first;
+    if (num >= 33 && num <= maxRoll) return second;
+    return null;
+  }
+
   function renderStatusBadge(status) {
     if (status === 'online') {
       return `<span class="cb-status-badge online"><span class="cb-pulse-dot"></span> Online</span>`;
@@ -106,7 +119,7 @@
 
       <!-- Panel: User Intelligence & Monitoring -->
       <div id="founderPanelIntelligence">
-        <!-- 8 Core KPI Stat Cards -->
+        <!-- Core KPI Stat Cards -->
         <div class="founder-kpi-grid" id="founderKpiGrid">
           <div class="founder-kpi-card">
             <div class="founder-kpi-top">
@@ -115,6 +128,15 @@
             </div>
             <div class="founder-kpi-value" id="kpiTotalUsers">—</div>
             <div class="founder-kpi-sub">Registered student &amp; staff accounts</div>
+          </div>
+
+          <div class="founder-kpi-card">
+            <div class="founder-kpi-top">
+              <span class="founder-kpi-label">Platform Views</span>
+              <span class="founder-kpi-icon">🌐</span>
+            </div>
+            <div class="founder-kpi-value" id="kpiTotalPageViews" style="color:#2563eb">—</div>
+            <div class="founder-kpi-sub"><span id="kpiPageViewsToday">0</span> today · Global route impressions</div>
           </div>
 
           <div class="founder-kpi-card">
@@ -464,16 +486,46 @@
     });
   }
 
+  let pageViewStats = { total_views: 0, views_today: 0 };
+
+  async function loadPageViewMetrics() {
+    if (!window.classboardSupabase) return;
+    try {
+      const { data, error } = await window.classboardSupabase.rpc('get_platform_telemetry_summary');
+      if (!error && data) {
+        pageViewStats = data;
+        return;
+      }
+    } catch (_) {}
+
+    // Fallback: query user_activity for recorded page views
+    try {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+
+      const [totalResult, todayResult] = await Promise.all([
+        window.classboardSupabase.from('user_activity').select('*', { count: 'exact', head: true }).eq('action', 'page_view'),
+        window.classboardSupabase.from('user_activity').select('*', { count: 'exact', head: true }).eq('action', 'page_view').gte('created_at', todayStart.toISOString())
+      ]);
+
+      pageViewStats = {
+        total_views: totalResult.count || 0,
+        views_today: todayResult.count || 0
+      };
+    } catch (_) {}
+  }
+
   // Load Metrics from Database
   async function loadMetrics() {
     if (!window.classboardSupabase?.rpc) return;
     try {
-      const { data, error } = await window.classboardSupabase.rpc('get_founder_user_intelligence_metrics');
-      if (error) {
-        console.warn('Metrics error:', error.message);
-        return;
-      }
-      metricsData = data;
+      await Promise.all([
+        (async () => {
+          const { data, error } = await window.classboardSupabase.rpc('get_founder_user_intelligence_metrics');
+          if (!error && data) metricsData = data;
+        })(),
+        loadPageViewMetrics()
+      ]);
       renderMetrics();
     } catch (e) {
       console.warn('Could not load founder metrics:', e);
@@ -481,19 +533,21 @@
   }
 
   function renderMetrics() {
-    if (!metricsData) return;
+    if (!metricsData && !pageViewStats) return;
     const el = (id) => document.getElementById(id);
-    if (el('kpiTotalUsers')) el('kpiTotalUsers').textContent = metricsData.total_registered_users ?? '0';
-    if (el('kpiActiveToday')) el('kpiActiveToday').textContent = metricsData.active_users_today ?? '0';
-    if (el('kpiNewRegistrations')) el('kpiNewRegistrations').textContent = metricsData.new_registrations_today ?? '0';
-    if (el('kpiLoginsToday')) el('kpiLoginsToday').textContent = metricsData.successful_logins_today ?? '0';
-    if (el('kpiSessionsToday')) el('kpiSessionsToday').textContent = metricsData.total_sessions_today ?? '0';
-    if (el('kpiReturningUsers')) el('kpiReturningUsers').textContent = metricsData.returning_users ?? '0';
-    if (el('kpiInactiveUsers')) el('kpiInactiveUsers').textContent = metricsData.inactive_7_days ?? '0';
+    if (el('kpiTotalUsers')) el('kpiTotalUsers').textContent = metricsData?.total_registered_users ?? '0';
+    if (el('kpiTotalPageViews')) el('kpiTotalPageViews').textContent = pageViewStats.total_views ?? '0';
+    if (el('kpiPageViewsToday')) el('kpiPageViewsToday').textContent = pageViewStats.views_today ?? '0';
+    if (el('kpiActiveToday')) el('kpiActiveToday').textContent = metricsData?.active_users_today ?? '0';
+    if (el('kpiNewRegistrations')) el('kpiNewRegistrations').textContent = metricsData?.new_registrations_today ?? '0';
+    if (el('kpiLoginsToday')) el('kpiLoginsToday').textContent = metricsData?.successful_logins_today ?? '0';
+    if (el('kpiSessionsToday')) el('kpiSessionsToday').textContent = metricsData?.total_sessions_today ?? '0';
+    if (el('kpiReturningUsers')) el('kpiReturningUsers').textContent = metricsData?.returning_users ?? '0';
+    if (el('kpiInactiveUsers')) el('kpiInactiveUsers').textContent = metricsData?.inactive_7_days ?? '0';
 
     // Online users: compute maximum of active heartbeat users and live Realtime presence users
     const livePresenceCount = window.classboardOnlineUserIds ? window.classboardOnlineUserIds.size : 0;
-    const dbOnline = metricsData.currently_online_users || 0;
+    const dbOnline = metricsData?.currently_online_users || 0;
     const onlineCount = Math.max(livePresenceCount, dbOnline);
     if (el('kpiOnlineUsers')) el('kpiOnlineUsers').textContent = String(onlineCount);
   }
@@ -555,7 +609,9 @@
       const initials = name.split(/[\s._-]+/).filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join('') || 'U';
       const roll = user.roll_number ? `Roll ${user.roll_number}` : '';
       const section = user.class_code || '';
-      const sub = [section, roll].filter(Boolean).join(' · ');
+      const batch = getBatchForRollAndClass(user.roll_number, user.class_code);
+      const batchTag = batch ? `Batch ${batch}` : '';
+      const sub = [section, roll, batchTag].filter(Boolean).join(' · ');
 
       return `
         <tr data-user-id="${user.user_id}">
@@ -563,7 +619,10 @@
             <div class="founder-user-cell">
               <div class="founder-avatar">${initials}</div>
               <div class="founder-user-meta">
-                <span class="founder-user-name">${name}</span>
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                  <span class="founder-user-name">${name}</span>
+                  ${batch ? `<span style="display:inline-flex;align-items:center;padding:1px 6px;border-radius:999px;font-size:0.68rem;font-weight:700;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;">Batch ${batch}</span>` : ''}
+                </div>
                 <span class="founder-user-sub">${sub || 'Student'}</span>
               </div>
             </div>
@@ -661,7 +720,8 @@
 
       const roll = data.roll_number ? `Roll ${data.roll_number}` : 'No roll assigned';
       const sec = data.class_code || 'General';
-      el('drawerSectionRoll').textContent = `${sec} (${roll})`;
+      const batch = getBatchForRollAndClass(data.roll_number, data.class_code);
+      el('drawerSectionRoll').textContent = batch ? `${sec} · ${roll} · Batch ${batch}` : `${sec} (${roll})`;
 
       el('drawerLastLogin').textContent = formatIST(data.last_signed_in_at);
       el('drawerAuthMethod').innerHTML = renderAuthBadge(data.latest_auth_method);
@@ -795,6 +855,9 @@
           }
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'user_sessions' }, () => {
+          loadMetrics();
+        })
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'platform_telemetry' }, () => {
           loadMetrics();
         })
         .subscribe();

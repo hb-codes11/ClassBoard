@@ -132,6 +132,19 @@
     }
   }
 
+  // Platform Route Telemetry Instrumentation
+  async function recordRouteTelemetry(routePath = null) {
+    if (!window.classboardSupabase?.rpc) return;
+    try {
+      const path = routePath || (window.location.pathname + (window.location.hash || ''));
+      const referrer = document.referrer || null;
+      await window.classboardSupabase.rpc('record_route_telemetry', {
+        p_route: path || '/',
+        p_referrer: referrer
+      });
+    } catch (_) {}
+  }
+
   async function initSession(user, forcedMethod = null) {
     if (!user) return;
     activeSessionId = sessionStorage.getItem('cb_session_id');
@@ -178,14 +191,23 @@
 
   // Auto-instrument DOM interactions
   function initAutoTracking() {
+    // 0. Immediate web page view on initial script execution
+    recordRouteTelemetry();
+
     // 1. Page view changes: hook into openClassboardPage if available
     const originalOpenPage = window.openClassboardPage;
     if (typeof originalOpenPage === 'function') {
       window.openClassboardPage = function (pageId) {
         originalOpenPage.apply(this, arguments);
         trackActivity('page_view', `Opened ${pageId} section`, pageId);
+        recordRouteTelemetry('/' + pageId);
       };
     }
+
+    // Hash navigation (landing page anchors, e.g. #planner, #features, #login)
+    window.addEventListener('hashchange', () => {
+      recordRouteTelemetry(window.location.pathname + window.location.hash);
+    });
 
     // 2. Resource clicks & downloads
     document.addEventListener('click', (event) => {
@@ -238,6 +260,7 @@
     initSession,
     recordUserLogin,
     trackActivity,
+    recordRouteTelemetry,
     handleLogout,
     getDeviceInfo,
     getActiveSessionId: () => activeSessionId

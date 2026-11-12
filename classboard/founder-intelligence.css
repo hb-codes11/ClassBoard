@@ -59,10 +59,10 @@
   border-color: #bfdbfe;
 }
 
-/* 8 Core KPI Stat Cards Grid (Desktop: 4x2, Tablet/Mobile: 2x4) */
+/* Core KPI Stat Cards Grid */
 .founder-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 14px;
   width: 100%;
   box-sizing: border-box;

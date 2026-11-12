@@ -2121,14 +2121,55 @@
     if (!userRows.length) addEmptyNote(container, 'No class accounts yet. New college sign-ins will appear here as students.');
     userRows.forEach((user) => {
       const row = document.createElement('div'); row.className = 'list-row account-row'; row.dataset.userId = user.userId;
-      row.dataset.search = `${user.name} ${user.email} ${user.rollNumber ?? ''}`.toLowerCase();
+      const batch = user.rollNumber ? batchForRoll(user.rollNumber, window.classboardContext?.classCode) : null;
+      row.dataset.search = `${user.name} ${user.email} ${user.rollNumber ?? ''} ${batch ? `batch ${batch}` : ''}`.toLowerCase();
       row.dataset.roles = [...user.roles].join(' ');
       const avatar = document.createElement('div'); avatar.className = 'avatar';
       avatar.textContent = user.name.split(/[\s._-]+/).filter(Boolean).slice(0, 2).map((part) => part[0].toUpperCase()).join('') || 'CB';
       const main = document.createElement('div'); main.className = 'list-main';
-      const name = document.createElement('div'); name.className = 'list-title'; name.textContent = user.name;
-      const email = document.createElement('div'); email.className = 'list-detail'; email.textContent = user.email;
-      main.append(name, email);
+      
+      const titleWrapper = document.createElement('div');
+      titleWrapper.style.display = 'flex';
+      titleWrapper.style.alignItems = 'center';
+      titleWrapper.style.gap = '8px';
+      titleWrapper.style.flexWrap = 'wrap';
+
+      const name = document.createElement('span');
+      name.className = 'list-title';
+      name.textContent = user.name;
+      titleWrapper.append(name);
+
+      if (batch) {
+        const batchBadge = document.createElement('span');
+        batchBadge.className = 'pill';
+        batchBadge.style.fontSize = '0.72rem';
+        batchBadge.style.fontWeight = '700';
+        batchBadge.style.padding = '1px 8px';
+        batchBadge.style.borderRadius = '999px';
+        batchBadge.style.background = '#eff6ff';
+        batchBadge.style.color = '#1d4ed8';
+        batchBadge.style.border = '1px solid #bfdbfe';
+        batchBadge.textContent = `Batch ${batch}`;
+        titleWrapper.append(batchBadge);
+      }
+      if (user.rollNumber) {
+        const rollBadge = document.createElement('span');
+        rollBadge.className = 'pill';
+        rollBadge.style.fontSize = '0.72rem';
+        rollBadge.style.fontWeight = '600';
+        rollBadge.style.padding = '1px 8px';
+        rollBadge.style.borderRadius = '999px';
+        rollBadge.style.background = '#f8fafc';
+        rollBadge.style.color = '#475569';
+        rollBadge.style.border = '1px solid #e2e8f0';
+        rollBadge.textContent = `Roll ${user.rollNumber}`;
+        titleWrapper.append(rollBadge);
+      }
+
+      const email = document.createElement('div');
+      email.className = 'list-detail';
+      email.textContent = user.email;
+      main.append(titleWrapper, email);
       const controls = document.createElement('div'); controls.className = 'account-controls';
       const roleGroup = document.createElement('fieldset'); roleGroup.className = 'account-role-options';
       const legend = document.createElement('legend'); legend.textContent = 'Roles'; roleGroup.append(legend);
@@ -2150,7 +2191,31 @@
       }
       const rollLabel = document.createElement('label'); rollLabel.className = 'account-roll-label'; rollLabel.textContent = 'Student roll number';
       const roll = document.createElement('input'); roll.className = 'text-field'; roll.type = 'number'; roll.min = '1'; roll.max = String(maxRollForClass()); roll.placeholder = 'Optional'; roll.value = user.rollNumber ?? '';
-      rollLabel.append(roll);
+      
+      const liveBatchIndicator = document.createElement('span');
+      liveBatchIndicator.className = 'account-live-batch';
+      liveBatchIndicator.style.fontSize = '0.74rem';
+      liveBatchIndicator.style.fontWeight = '600';
+      liveBatchIndicator.style.marginTop = '4px';
+      liveBatchIndicator.style.display = 'block';
+
+      function updateLiveBatch() {
+        const val = roll.value ? Number(roll.value) : null;
+        const b = val ? batchForRoll(val, window.classboardContext?.classCode) : null;
+        if (b) {
+          liveBatchIndicator.textContent = `Lab: Batch ${b}`;
+          liveBatchIndicator.style.color = '#0284c7';
+        } else if (roll.value) {
+          liveBatchIndicator.textContent = 'Invalid roll number';
+          liveBatchIndicator.style.color = '#ef4444';
+        } else {
+          liveBatchIndicator.textContent = 'Batch: Not assigned';
+          liveBatchIndicator.style.color = '#94a3b8';
+        }
+      }
+      updateLiveBatch();
+      roll.addEventListener('input', updateLiveBatch);
+      rollLabel.append(roll, liveBatchIndicator);
       const save = document.createElement('button'); save.className = 'secondary-button'; save.type = 'button'; save.textContent = 'Save roles';
       save.addEventListener('click', async () => {
         const roles = ['student', ...[...roleGroup.querySelectorAll('input:checked')]
