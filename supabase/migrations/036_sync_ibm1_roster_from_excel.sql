@@ -1,10 +1,9 @@
 -- 036_sync_ibm1_roster_from_excel.sql
 -- Sync official IBM-1 (Advanced AI - A) student roster with the Nasscom attendance sheet.
--- Roll 1 to 32 -> Batch A1 (includes PRAKALP JAIN at Roll 25).
--- Roll 33 to 67 -> Batch A2.
+-- Makes IBM-1 work identically to INTEL: students select their own batch and roll number on login.
 begin;
 
--- 1. Re-populate public.ibm1_student_roster table
+-- 1. Re-populate public.ibm1_student_roster table with official Nasscom Excel list
 truncate table public.ibm1_student_roster;
 
 insert into public.ibm1_student_roster (roll_number, student_name, email) values
@@ -76,7 +75,45 @@ insert into public.ibm1_student_roster (roll_number, student_name, email) values
   (66, 'ISHA BADHE', 'en25cs3090268@medicaps.ac.in'),
   (67, 'HIMANSHU PATIL', 'en25cs3090277@medicaps.ac.in');
 
--- 2. Update existing active IBM-1 memberships and profiles
+-- 2. Update bootstrap_ibm1_user:
+-- Do NOT auto-lock roll_number; set roll_number = null so IBM-1 students
+-- select their batch and roll number on first login, exactly like INTEL sections.
+create or replace function public.bootstrap_ibm1_user()
+returns trigger language plpgsql security definer set search_path = '' as $$
+declare
+  section_id uuid;
+  roster_row public.ibm1_student_roster%rowtype;
+begin
+  if new.email_confirmed_at is null or new.email is null then
+    return new;
+  end if;
+  select * into roster_row from public.ibm1_student_roster where email = lower(new.email);
+  if not found then return new; end if;
+  select id into section_id from public.classes where code = 'IBM-1' and is_active;
+  if section_id is null then return new; end if;
+
+  insert into public.profiles (user_id, display_name)
+  values (new.id, roster_row.student_name)
+  on conflict (user_id) do update set display_name = excluded.display_name
+  where public.profiles.display_name = '' or lower(public.profiles.display_name) = split_part(lower(new.email), '@', 1);
+
+  insert into public.class_member_contacts (user_id, class_id, email)
+  values (new.id, section_id, lower(new.email))
+  on conflict (user_id, class_id) do nothing;
+
+  -- Insert with roll_number NULL so student is prompted on login to choose batch & roll number
+  insert into public.class_memberships (user_id, class_id, role, roll_number, is_active)
+  values (new.id, section_id, 'student', null, true)
+  on conflict (user_id, class_id, role) do update set is_active = true;
+
+  return new;
+end;
+$$;
+
+revoke all on function public.bootstrap_ibm1_user() from public, anon, authenticated;
+
+-- 3. Reset existing IBM-1 student roll numbers to NULL so they get the setup dialog
+-- on login to choose their batch and roll number (matches INTEL flow).
 do $$
 declare
   section_id uuid;
@@ -84,30 +121,21 @@ begin
   select id into section_id from public.classes where code = 'IBM-1' and is_active;
   if section_id is null then return; end if;
 
-  -- Update display names from official roster
+  -- Sync display names
   update public.profiles p
   set display_name = r.student_name
   from auth.users u
   join public.ibm1_student_roster r on r.email = lower(u.email)
   where p.user_id = u.id;
 
-  -- First clear existing roll numbers to prevent unique constraint collision on swap
+  -- Reset roll numbers for IBM-1 students so they choose batch & roll on login
   update public.class_memberships m
   set roll_number = null
-  from auth.users u
-  join public.ibm1_student_roster r on r.email = lower(u.email)
-  where m.user_id = u.id
-    and m.class_id = section_id
-    and m.role = 'student';
-
-  -- Ensure roll numbers in class_memberships match the official Excel roster
-  update public.class_memberships m
-  set roll_number = r.roll_number
-  from auth.users u
-  join public.ibm1_student_roster r on r.email = lower(u.email)
-  where m.user_id = u.id
-    and m.class_id = section_id
-    and m.role = 'student';
+  where m.class_id = section_id
+    and m.role = 'student'
+    and m.user_id not in (select user_id from public.classboard_founders);
 end; $$;
+
+notify pgrst, 'reload schema';
 
 commit;

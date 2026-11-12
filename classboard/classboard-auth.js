@@ -382,29 +382,72 @@
     if (gate) gate.hidden = true;
     if (app) app.hidden = false;
     showMessage('');
-    if (studentMembership && !studentMembership.roll_number && !roles.includes('cr') && !roles.includes('admin')) {
+
+    function promptStudentSetup({ canCancel = false } = {}) {
+      if (!studentMembership || roles.includes('cr') || roles.includes('admin')) return;
+      const currentRoll = studentMembership.roll_number ?? null;
+      const currentBatch = currentRoll ? batchForRoll(currentRoll, classInfo.code) : '';
+      const batches = batchCodesForClass(classInfo.code);
+      const maxRoll = maxRollForClass(classInfo.code);
+
       window.openFormDialog({
-        title: 'Set up your student details',
-        description: 'Enter your lab batch and serial roll number. Your roll number and batch must match the class list.',
+        title: currentRoll ? 'Update your student details' : 'Set up your student details',
+        description: `Enter your lab batch and serial roll number. Rolls 1–32 are ${batches[0]} and 33–${maxRoll} are ${batches[1]}.`,
         fields: [
-          { name: 'batch', label: 'Lab batch', options: [{ label: 'Choose your batch', value: '' }, ...batchCodesForClass(classInfo.code)] },
-          { name: 'rollNumber', label: 'Serial roll number', type: 'number', placeholder: `1–${maxRollForClass(classInfo.code)}` }
+          {
+            name: 'batch',
+            label: 'Lab batch',
+            value: currentBatch || '',
+            options: [{ label: 'Choose your batch', value: '' }, ...batches.map((b) => ({ label: `Batch ${b}`, value: b }))]
+          },
+          {
+            name: 'rollNumber',
+            label: 'Serial roll number',
+            type: 'number',
+            value: currentRoll ? String(currentRoll) : '',
+            placeholder: `1–${maxRoll}`
+          }
         ],
-        submitLabel: 'Save and join class',
-        canCancel: false,
+        submitLabel: currentRoll ? 'Save changes' : 'Save and join class',
+        canCancel,
         onSubmit: async ({ batch, rollNumber }) => {
           const roll = Number(rollNumber);
-          if (!Number.isInteger(roll) || roll < 1 || roll > maxRollForClass(classInfo.code)) return `Enter your serial roll number from 1 to ${maxRollForClass(classInfo.code)}.`;
+          if (!Number.isInteger(roll) || roll < 1 || roll > maxRoll) {
+            return `Enter your serial roll number from 1 to ${maxRoll}.`;
+          }
           const expectedBatch = batchForRoll(roll, classInfo.code);
-          if (batch !== expectedBatch) return `Roll number ${roll} belongs to batch ${expectedBatch}. Check your details and try again.`;
+          if (batch !== expectedBatch) {
+            return `Roll number ${roll} belongs to batch ${expectedBatch}. Check your details and try again.`;
+          }
           const { error } = await window.classboardSupabase.rpc('set_own_student_setup', {
             p_class_id: classId,
             p_roll_number: roll,
             p_lab_batch: batch
           });
           if (error) return `Could not save your details: ${error.message}`;
+          studentMembership.roll_number = roll;
+          if (window.classboardContext) window.classboardContext.rollNumber = roll;
           if (window.setClassboardRoll) window.setClassboardRoll(roll);
+          await loadAttendancePlanner(classId, user.id, roles, roll);
+          notifyApp('Student details saved successfully.');
           return true;
+        }
+      });
+    }
+
+    if (studentMembership && !studentMembership.roll_number && !roles.includes('cr') && !roles.includes('admin')) {
+      promptStudentSetup({ canCancel: false });
+    }
+
+    if (studentMembership && !roles.includes('cr') && !roles.includes('admin')) {
+      ['editProfileBtn', 'profileEditRollBtn', 'profileEditBatchBtn'].forEach((btnId) => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+          btn.removeAttribute('data-toast');
+          btn.onclick = (e) => {
+            e.preventDefault();
+            promptStudentSetup({ canCancel: true });
+          };
         }
       });
     }
