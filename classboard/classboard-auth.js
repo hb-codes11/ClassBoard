@@ -2188,7 +2188,8 @@
 
   async function handleSession(session) {
     if (!session?.user) {
-      window.location.replace('./landing.html');
+      if (gate) gate.hidden = false;
+      if (app) app.hidden = true;
       return;
     }
     if (!emailPattern.test(session.user.email || '')) {
@@ -2196,7 +2197,6 @@
       if (gate) gate.hidden = false;
       showMessage('Only college Google accounts ending in @medicaps.ac.in can sign in. Switch to your Medicaps account and try again.', true);
       await window.classboardSupabase.auth.signOut();
-      window.location.replace('./landing.html');
       return;
     }
     busy(true);
