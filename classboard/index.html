@@ -15,6 +15,24 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&amp;family=Figtree:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./founder-intelligence.css?v=1" />
+  <script>
+    (function() {
+      var hasSession = false;
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && (k.indexOf('sb-') === 0 || k.indexOf('supabase.auth.token') >= 0) && k.indexOf('-auth-token') > 0) {
+          var v = localStorage.getItem(k);
+          if (v && v.indexOf('access_token') >= 0) {
+            hasSession = true;
+            break;
+          }
+        }
+      }
+      if (!hasSession && !window.location.hash.includes('access_token') && !window.location.search.includes('code=')) {
+        window.location.replace('./landing.html');
+      }
+    })();
+  </script>
   <style>
     :root {
       color-scheme: light;
@@ -937,10 +955,7 @@
       .content { min-height: calc(100svh - 68px); padding: 14px max(14px, env(safe-area-inset-right)) 22px max(14px, env(safe-area-inset-left)); }
       body[data-has-role-switcher="true"] .content,
       body[data-multiple-classes="true"] .content { min-height: calc(100svh - 124px); padding-top: 18px; }
-      .text-field, .select-field, .search-field, .text-area, .auth-field input { min-height: 44px; font-size: 16px; }
-      .auth-gate { min-height: 100svh; padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
-      .auth-card { padding: 22px; }
-      .auth-action { min-height: 48px; font-size: 15px; }
+      .text-field, .select-field, .search-field, .text-area { min-height: 44px; font-size: 16px; }
       .welcome-row, .page-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
       .welcome-row { margin-bottom: 16px; }
       h1, .page-heading h1 { font-size: clamp(25px, 7vw, 30px); }
@@ -1055,91 +1070,326 @@
       .mobile-nav button { font-size: 10px; }
     }
     .auth-gate {
-      position: relative; isolation: isolate; min-height: 100vh; min-height: 100svh;
-      display: grid; place-items: center; overflow: hidden;
-      padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
-      background:
-        radial-gradient(ellipse at 10% 12%, color-mix(in srgb, var(--blue) 13%, transparent), transparent 38%),
-        radial-gradient(ellipse at 92% 88%, color-mix(in srgb, #55c7ff 15%, transparent), transparent 36%),
-        linear-gradient(145deg, #f8fbff 0%, #edf5ff 52%, #f7fbff 100%);
+      position: fixed; inset: 0; z-index: 1000;
+      width: 100vw; height: 100vh; height: 100dvh; max-height: 100vh; max-height: 100dvh;
+      overflow: hidden; box-sizing: border-box;
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: clamp(10px, 1.8vh, 18px) clamp(20px, 3.5vw, 48px) clamp(8px, 1.4vh, 14px);
+      background-color: #062f5c;
+      background-image:
+        radial-gradient(60% 55% at 12% 8%,  rgba(95,190,255,.95) 0%, rgba(95,190,255,0) 62%),
+        radial-gradient(45% 45% at 88% 12%, rgba(255,225,122,.55) 0%, rgba(255,225,122,0) 60%),
+        radial-gradient(55% 60% at 90% 92%, rgba(22,139,255,.85) 0%, rgba(22,139,255,0) 65%),
+        radial-gradient(50% 50% at 8% 95%,  rgba(7,86,160,.9) 0%, rgba(7,86,160,0) 65%),
+        radial-gradient(30% 22% at 50% 0%,  rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 100%),
+        linear-gradient(160deg, #168BFF 0%, #0756A0 55%, #062f5c 100%);
+      background-size: 150% 150%, 140% 140%, 150% 150%, 140% 140%, 100% 100%, 100% 100%;
+      background-position: 0% 0%, 100% 0%, 100% 100%, 0% 100%, 50% 0%, 50% 50%;
+      animation: cb-shine 16s ease-in-out infinite alternate;
     }
-    .auth-gate::before, .auth-gate::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; }
-    .auth-gate::before {
-      inset: -28%;
-      background:
-        radial-gradient(circle at 23% 35%, color-mix(in srgb, var(--blue) 20%, transparent), transparent 28%),
-        radial-gradient(circle at 78% 68%, color-mix(in srgb, #35b6ff 19%, transparent), transparent 27%),
-        radial-gradient(circle at 53% 15%, color-mix(in srgb, #8cb8ff 17%, transparent), transparent 25%);
-      filter: blur(28px); opacity: .8; animation: auth-ambient-drift 24s ease-in-out infinite alternate;
+
+    /* ===== MODERN MINIMALIST SPLIT-SCREEN AUTH & SHOWCASE ===== */
+    .auth-top-nav {
+      width: min(100%, 1260px); margin: 0 auto;
+      padding: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0; z-index: 2;
     }
-    .auth-gate::after {
-      background-image: linear-gradient(to right, #317bd10c 1px, transparent 1px), linear-gradient(to bottom, #317bd10c 1px, transparent 1px);
-      background-size: 48px 48px; opacity: .72;
-      -webkit-mask-image: radial-gradient(ellipse at center, #000 10%, transparent 78%);
-      mask-image: radial-gradient(ellipse at center, #000 10%, transparent 78%);
+    .auth-top-brand {
+      display: inline-flex; align-items: center; gap: 10px;
+      color: #ffffff; text-decoration: none;
     }
-    [data-theme="dark"] .auth-gate {
-      background:
-        radial-gradient(ellipse at 12% 14%, #006bff48, transparent 38%),
-        radial-gradient(ellipse at 90% 88%, #159df53d, transparent 36%),
-        linear-gradient(145deg, #000000 0%, #050b14 55%, #000000 100%);
+    .auth-top-logo {
+      width: 36px; height: 36px; border-radius: 9px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-    [data-theme="dark"] .auth-gate::before { opacity: .9; }
-    [data-theme="dark"] .auth-gate::after {
-      background-image: linear-gradient(to right, #70aaff16 1px, transparent 1px), linear-gradient(to bottom, #70aaff16 1px, transparent 1px);
+    .auth-top-brand-text {
+      display: flex; flex-direction: column; line-height: 1.15;
     }
-    @keyframes auth-ambient-drift { from { transform: translate3d(-1.5%, -1%, 0) scale(1); } to { transform: translate3d(1.5%, 1%, 0) scale(1.05); } }
+    .auth-top-brand-title {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 17.5px; font-weight: 800; color: #ffffff;
+      letter-spacing: -0.01em;
+    }
+    .auth-top-brand-subtitle {
+      font-size: 10.5px; font-weight: 600;
+      color: rgba(224, 242, 254, 0.85);
+      letter-spacing: 0.02em;
+    }
+    .auth-top-links {
+      display: flex; align-items: center; gap: clamp(16px, 2.2vw, 28px);
+    }
+    .auth-top-links a {
+      color: rgba(255, 255, 255, 0.88); text-decoration: none;
+      font-size: 13px; font-weight: 600; letter-spacing: 0.01em; transition: color 0.16s, transform 0.16s;
+    }
+    .auth-top-links a:hover {
+      color: #ffffff; transform: translateY(-1px);
+    }
+
+    .auth-split-wrapper {
+      position: relative; width: min(100%, 1260px);
+      margin: auto; padding: 4px 0;
+      display: grid; grid-template-columns: minmax(0, 1.38fr) minmax(340px, 410px);
+      gap: clamp(24px, 3.8vw, 52px); align-items: center;
+      flex-grow: 1; flex-shrink: 1; min-height: 0; z-index: 1;
+    }
     .auth-card {
-      position: relative; width: min(100%, 432px); padding: clamp(22px, 3vw, 30px);
-      border: 1px solid color-mix(in srgb, var(--blue) 13%, var(--line)); border-radius: 20px;
-      background: var(--surface); background: color-mix(in srgb, var(--surface) 91%, transparent);
-      box-shadow: 0 24px 70px #153c6820, 0 5px 18px #153c680c, inset 0 1px #ffffffb8;
-      -webkit-backdrop-filter: blur(22px) saturate(135%); backdrop-filter: blur(22px) saturate(135%);
+      position: relative; width: 100%; max-width: 410px; margin: 0 auto;
+      padding: clamp(20px, 2.8vh, 28px) clamp(20px, 2.5vw, 28px);
+      border-radius: 24px;
+      background: #ffffff; color: #17283d;
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 24px 65px -15px rgba(2, 24, 60, 0.4), 0 4px 18px rgba(0, 0, 0, 0.06);
+      box-sizing: border-box;
     }
-    .auth-card::before { content: ""; position: absolute; top: 0; left: 18%; right: 18%; height: 1px; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--blue) 58%, #fff), transparent); }
-    [data-theme="dark"] .auth-card { border-color: #5b9fff45; background: #080a0e; background: color-mix(in srgb, #080a0e 94%, transparent); box-shadow: 0 24px 70px #000c, 0 0 50px #006bff26, inset 0 1px #ffffff16; }
-    .auth-brand { display: flex; align-items: center; gap: 11px; color: var(--blue); font-size: 13px; font-weight: 750; letter-spacing: .075em; text-transform: uppercase; }
-    .auth-brand img { width: 36px; height: 36px; }
-    .auth-card h1 { margin: 17px 0 0; font-size: clamp(29px, 4vw, 35px); line-height: 1.12; letter-spacing: -.045em; }
-    .auth-copy { max-width: 38ch; color: var(--muted); font-size: 14px; margin: 9px 0 19px; }
-    .auth-field { display: grid; gap: 7px; margin: 12px 0; font-size: 12px; font-weight: 650; }
-    .auth-field input, .auth-field select { width: 100%; min-height: 48px; padding: 10px 13px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface-2); color: var(--text); }
-    .auth-field input:focus, .auth-field select:focus { border-color: var(--blue); outline: 3px solid color-mix(in srgb, var(--blue) 16%, transparent); }
+    [data-theme="dark"] .auth-card {
+      background: rgba(14, 22, 38, 0.96); color: #f1f5f9;
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 24px 65px -15px rgba(0, 0, 0, 0.75);
+    }
+    .auth-brand {
+      display: flex; align-items: center; gap: 10px;
+      color: var(--blue); margin-bottom: 2px;
+    }
+    .auth-brand img { width: 32px; height: 32px; border-radius: 8px; }
+    .auth-brand-copy { display: flex; flex-direction: column; }
+    .auth-brand-name {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 15.5px; font-weight: 800; color: #006BFF; line-height: 1.15;
+    }
+    .auth-brand-subtitle {
+      font-size: 10px; font-weight: 700; color: #64748b;
+      letter-spacing: 0.02em;
+    }
+    [data-theme="dark"] .auth-brand-subtitle { color: #94a3b8; }
+    .auth-title {
+      margin: 6px 0 0; font-family: "Bricolage Grotesque", sans-serif;
+      font-size: clamp(23px, 2.5vw, 27px); font-weight: 800;
+      line-height: 1.15; letter-spacing: -0.025em; color: inherit;
+    }
+    .auth-copy {
+      max-width: 36ch; color: #64748b; font-size: 12.5px;
+      margin: 3px 0 12px; line-height: 1.35;
+    }
+    [data-theme="dark"] .auth-copy { color: #94a3b8; }
+    .auth-field {
+      display: grid; gap: 3px; margin: 7px 0; font-size: 11.5px; font-weight: 700;
+      color: inherit;
+    }
+    .auth-field input, .auth-field select {
+      width: 100%; min-height: 40px; height: 40px; padding: 8px 12px;
+      border: 1.5px solid #e2e8f0; border-radius: 11px;
+      background: #f8fafc; color: #17283d; font-family: inherit; font-size: 13px;
+      box-sizing: border-box; transition: all 0.16s ease;
+    }
+    .auth-field input:focus, .auth-field select:focus {
+      border-color: #006BFF; outline: none; background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(0, 107, 255, 0.13);
+    }
+    [data-theme="dark"] .auth-field input, [data-theme="dark"] .auth-field select {
+      background: #1e293b; border-color: #334155; color: #f1f5f9;
+    }
+    [data-theme="dark"] .auth-field input:focus, [data-theme="dark"] .auth-field select:focus {
+      border-color: #38bdf8; background: #0f172a;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
     .password-entry { position: relative; }
-    .password-entry input { padding-right: 72px; }
-    .password-visibility { position: absolute; inset: 0 5px 0 auto; min-width: 48px; padding: 0 7px; border: 0; background: transparent; color: var(--blue); font-size: 12px; font-weight: 700; cursor: pointer; }
+    .password-entry input { padding-right: 56px; }
+    .password-visibility {
+      position: absolute; inset: 0 4px 0 auto; min-width: 44px; padding: 0 6px;
+      border: 0; background: transparent; color: var(--blue); font-size: 11px;
+      font-weight: 700; cursor: pointer;
+    }
     .password-visibility:focus-visible { outline: 2px solid var(--blue); outline-offset: -3px; border-radius: 7px; }
-    .auth-action { width: 100%; min-height: 47px; padding: 10px 14px; margin-top: 8px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); color: var(--text); font-weight: 650; cursor: pointer; transition: border-color .16s ease, background .16s ease, transform .16s ease; }
-    .auth-action:hover { border-color: color-mix(in srgb, var(--blue) 48%, var(--line)); background: var(--surface-2); }
-    .auth-action:active { transform: scale(.99); }
-    .auth-action.primary { border-color: var(--blue); background: var(--blue); color: #fff; box-shadow: 0 8px 18px color-mix(in srgb, var(--blue) 20%, transparent); }
-    .auth-action.primary:hover { border-color: var(--blue-deep); background: var(--blue-deep); }
-    .auth-divider { display: flex; align-items: center; gap: 12px; margin: 14px 0 3px; color: var(--muted); font-size: 12px; font-weight: 600; }
-    .auth-divider::before, .auth-divider::after { content: ""; height: 1px; flex: 1; background: var(--line); }
-    .auth-google { display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .auth-google-mark { width: 19px; height: 19px; }
-    .auth-link { display: block; margin: 10px auto 0; padding: 7px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--blue); font-size: 12px; font-weight: 650; cursor: pointer; }
-    .auth-link:hover { background: var(--blue-soft); }
+    .auth-action {
+      width: 100%; min-height: 38px; height: 38px; padding: 7px 12px; margin-top: 6px;
+      border: 1.5px solid #e2e8f0; border-radius: 11px;
+      background: #ffffff; color: #1e293b; font-weight: 650; font-size: 12.5px;
+      cursor: pointer; transition: all 0.16s ease;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-sizing: border-box;
+    }
+    .auth-action svg { width: 15px; height: 15px; flex-shrink: 0; fill: none; stroke: currentColor; }
+    .auth-action.primary {
+      border: 0; background: #0A74E6; color: #ffffff;
+      font-size: 14px; font-weight: 750; min-height: 41px; height: 41px;
+      box-shadow: 0 7px 20px -3px rgba(10, 116, 230, 0.45);
+    }
+    .auth-action.primary:hover {
+      background: #0756A0; transform: translateY(-1px);
+      box-shadow: 0 9px 24px -2px rgba(10, 116, 230, 0.55);
+    }
+    .auth-action.auth-signup svg { stroke: #0A74E6; }
+    .auth-action.auth-signup:hover, .auth-action.auth-google:hover {
+      border-color: #cbd5e1; background: #f8fafc; transform: translateY(-1px);
+    }
+    [data-theme="dark"] .auth-action.auth-signup, [data-theme="dark"] .auth-action.auth-google {
+      background: #1e293b; border-color: #334155; color: #f1f5f9;
+    }
+    [data-theme="dark"] .auth-action.auth-signup:hover, [data-theme="dark"] .auth-action.auth-google:hover {
+      background: #253347; border-color: #475569;
+    }
+    .auth-divider {
+      display: flex; align-items: center; gap: 10px; margin: 7px 0 3px;
+      color: var(--muted); font-size: 11px; font-weight: 600;
+    }
+    .auth-divider::before, .auth-divider::after { content: ""; height: 1px; flex: 1; background: #e2e8f0; }
+    [data-theme="dark"] .auth-divider::before, [data-theme="dark"] .auth-divider::after { background: #334155; }
+    .auth-google-mark { width: 16px; height: 16px; flex-shrink: 0; }
+    .auth-link {
+      display: block; margin: 5px auto 0; padding: 3px 6px; border: 0;
+      background: transparent; color: var(--blue); font-size: 11px; font-weight: 650;
+      cursor: pointer;
+    }
+    .auth-link:hover { text-decoration: underline; }
     .auth-action:disabled { opacity: .6; cursor: wait; }
-    .auth-message { min-height: 22px; margin-top: 12px; color: var(--muted); font-size: 12px; }
+    .auth-message { min-height: 15px; margin-top: 3px; color: var(--muted); font-size: 11px; line-height: 1.25; }
     .auth-message.error { color: #c0392b; }
-    @media (max-width: 760px) {
-      .auth-gate { padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
-      .auth-card { width: min(100%, 410px); padding: 23px 20px; border-radius: 18px; }
-      .auth-action { min-height: 46px; font-size: 14px; }
+
+    /* Left Showcase with Clean Flat Image */
+    .auth-showcase {
+      display: flex; flex-direction: column; gap: clamp(8px, 1.4vh, 14px);
+      color: #ffffff; min-height: 0; flex-shrink: 1;
     }
-    @media (max-width: 390px) {
-      .auth-gate { padding: max(14px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); }
-      .auth-card { padding: 20px 17px; border-radius: 16px; }
-      .auth-brand { gap: 9px; font-size: 11px; }
-      .auth-brand img { width: 32px; height: 32px; }
-      .auth-card h1 { font-size: 29px; }
-      .auth-copy { font-size: 13px; margin-bottom: 16px; }
-      .auth-field input, .auth-field select { min-height: 46px; }
+    .showcase-stage {
+      width: 100%;
     }
-    @media (max-height: 700px) and (min-width: 761px) {
-      .auth-gate { align-items: start; }
-      .auth-card { margin-block: 20px; }
+    .showcase-banner {
+      position: relative; border-radius: 14px; overflow: hidden;
+      background: #ffffff;
+      border: 2px solid rgba(255, 255, 255, 0.9);
+      box-shadow:
+        0 20px 48px -12px rgba(1, 19, 48, 0.42),
+        0 6px 18px rgba(0, 0, 0, 0.12);
+    }
+    .showcase-img {
+      width: 100%; height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* Showcase Metadata & 4 Minimal Feature Items */
+    .showcase-meta-zone {
+      display: flex; flex-direction: column; gap: clamp(5px, 0.8vh, 8px);
+    }
+    .showcase-uni-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      align-self: flex-start;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+      padding: 3px 10px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 99px; color: #ffffff;
+      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    }
+    .showcase-title-glow {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: clamp(20px, 2.2vw, 26px); font-weight: 800; line-height: 1.15;
+      color: #ffffff; margin: 0; letter-spacing: -0.025em;
+    }
+    .showcase-title-glow .highlight {
+      color: #7dd3fc;
+    }
+    .showcase-sub-glow {
+      font-size: 12px; color: rgba(224, 242, 254, 0.86);
+      line-height: 1.4; margin: 0; max-width: 58ch;
+      font-weight: 450; letter-spacing: -0.005em;
+    }
+    .showcase-feat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(8px, 1.5vw, 16px);
+      margin-top: 4px;
+    }
+    .feat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #ffffff;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .feat-item:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+    .feat-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      stroke: #ffffff;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
+    }
+    .feat-text {
+      display: flex;
+      flex-direction: column;
+      font-size: 10.5px;
+      font-weight: 600;
+      line-height: 1.25;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+    }
+
+    /* Minimalist Bottom Footer Bar */
+    .auth-bar-footer {
+      width: min(100%, 1240px);
+      margin: 4px auto 0;
+      padding: 6px 8px 3px;
+      border-top: 1px solid rgba(255, 255, 255, 0.18);
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 10px; font-size: 11px; color: rgba(255, 255, 255, 0.85);
+      flex-shrink: 0; z-index: 2;
+    }
+    .footer-center {
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .badge-intel, .badge-ibm {
+      display: inline-block; padding: 2px 10px; border-radius: 99px;
+      background: #ffffff; font-weight: 800; font-size: 11.5px;
+      letter-spacing: -0.02em; vertical-align: middle;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    .badge-intel { color: #0068B5; }
+    .badge-ibm { color: #0f62fe; letter-spacing: 0.08em; font-family: monospace; }
+    .footer-sep { opacity: 0.4; }
+
+    /* Responsive adjustments */
+    @media (max-width: 960px), (max-height: 520px) {
+      .auth-gate {
+        position: relative; height: auto; min-height: 100vh; min-height: 100dvh;
+        max-height: none; overflow-y: auto; overflow-x: hidden;
+        padding: 16px 14px 20px;
+      }
+      .auth-split-wrapper {
+        grid-template-columns: 1fr; gap: 24px; padding: 10px 0;
+      }
+      .auth-card {
+        order: 1;
+        max-width: 440px; margin: 0 auto;
+      }
+      .auth-showcase {
+        order: 2;
+      }
+      .showcase-feat-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .auth-bar-footer {
+        flex-direction: column; text-align: center; gap: 8px; margin-top: 14px;
+      }
+      .footer-sep { display: none; }
+    }
+    @media (max-width: 600px) {
+      .auth-top-nav {
+        justify-content: center;
+      }
+      .auth-top-links {
+        flex-wrap: wrap; justify-content: center; gap: 12px;
+      }
     }
     @media (prefers-reduced-motion: reduce) { .auth-gate::before { animation: none; } }
     [hidden] { display: none !important; }
@@ -4166,32 +4416,132 @@
 </head>
 <body data-role="student">
   <section class="auth-gate" id="authGate" aria-labelledby="authTitle">
-    <div class="auth-card">
-      <div class="auth-brand"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJvYXJkIiB4MT0iNyIgeTE9IjUiIHgyPSI0MiIgeTI9IjQ0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiMxNjhCRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDc1NkEwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJwYXBlciIgeDE9IjE0IiB5MT0iMTEiIHgyPSIzNiIgeTI9IjM3IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiNGRkZGRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRENFRUZGIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cGF0aCBkPSJNMTMgMy41aDIyQTkuNSA5LjUgMCAwIDEgNDQuNSAxM3YyMmE5LjUgOS41IDAgMCAxLTkuNSA5LjVIMTNBOS41IDkuNSAwIDAgMSAzLjUgMzVWMTNBOS41IDkuNSAwIDAgMSAxMyAzLjVaIiBmaWxsPSJ1cmwoI2JvYXJkKSIvPgogIDxwYXRoIGQ9Ik0xMy4xIDE2LjJjMC0zLjIgMi42LTUuOCA1LjgtNS44aDE2LjN2MjEuMUgxOC45YTUuOCA1LjggMCAwIDAtNS44IDUuOFYxNi4yWiIgZmlsbD0idXJsKCNwYXBlcikiLz4KICA8cGF0aCBkPSJNMTMuMSAzNy4zYTUuOCA1LjggMCAwIDEgNS44LTUuOGgxNi4zIiBzdHJva2U9IiNCOERCRkYiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMTkuMiAxNy4zaDEwLjZNMTkuMiAyMS44aDcuMiIgc3Ryb2tlPSIjMTY4QkZGIiBzdHJva2Utd2lkdGg9IjIuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0ibTI4LjEgMjYuMyAyLjYgMi42IDUtNi4xIiBzdHJva2U9IiNGRkNFNTYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJtMzguMyA4IC44IDIuMiAyLjIuOC0yLjIuOC0uOCAyLjItLjgtMi4yLTIuMi0uOCAyLjItLjguOC0yLjJaIiBmaWxsPSIjRkZFMTdBIi8+Cjwvc3ZnPgo=" alt="" /><span class="auth-brand-copy"><span class="auth-brand-name">ClassBoard</span><span class="auth-brand-subtitle">INTEL &amp; IBM CLASS PORTAL</span></span></div>
-      <h1 id="authTitle">Welcome back!</h1>
-      <p class="auth-copy">Sign in to your Medicaps account to continue to ClassBoard.</p>
-      <form id="authForm">
-        <label class="auth-field">Section
-          <select id="loginClassSelector" name="section"><option value="INTEL-1">INTEL-1 · Section A</option><option value="INTEL-2">INTEL-2 · Section B</option><option value="IBM-1">IBM-1 · Advanced AI - A</option></select>
-        </label>
-        <label class="auth-field">College email
-          <span class="auth-icon-field"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg><input id="authEmail" name="email" type="email" autocomplete="email" required placeholder="you@medicaps.ac.in" /></span>
-        </label>
-        <div class="auth-field">
-          <label for="authPassword">Password</label>
-          <div class="password-entry">
-            <span class="auth-icon-field"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 1 1 8 0v3m-4 4v3"></path></svg><input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" required placeholder="Enter your password" /></span>
-            <button class="password-visibility" id="togglePasswordVisibility" type="button" aria-controls="authPassword" aria-pressed="false">Show</button>
+    <header class="auth-top-nav">
+      <div class="auth-top-brand">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJvYXJkIiB4MT0iNyIgeTE9IjUiIHgyPSI0MiIgeTI9IjQ0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiMxNjhCRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDc1NkEwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJwYXBlciIgeDE9IjE0IiB5MT0iMTEiIHgyPSIzNiIgeTI9IjM3IiBncmFkaFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiNGRkZGRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRENFRUZGIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cGF0aCBkPSJNMTMgMy41aDIyQTkuNSA5LjUgMCAwIDEgNDQuNSAxM3YyMmE5LjUgOS41IDAgMCAxLTkuNSA5LjVIMTNBOS41IDkuNSAwIDAgMSAzLjUgMzVWMTNBOS41IDkuNSAwIDAgMSAxMyAzLjVaIiBmaWxsPSJ1cmwoI2JvYXJkKSIvPgogIDxwYXRoIGQ9Ik0xMy4xIDE2LjJjMC0zLjIgMi42LTUuOCA1LjgtNS44aDE2LjN2MjEuMUgxOC45YTUuOCA1LjggMCAwIDAtNS44IDUuOFYxNi4yWiIgZmlsbD0idXJsKCNwYXBlcikiLz4KICA8cGF0aCBkPSJNMTMuMSAzNy4zYTUuOCA1LjggMCAwIDEgNS44LTUuOGgxNi4zIiBzdHJva2U9IiNCOERCRkYiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMTkuMiAxNy4zaDEwLjZNMTkuMiAyMS44aDcuMiIgc3Ryb2tlPSIjMTY4QkZGIiBzdHJva2Utd2lkdGg9IjIuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0ibTI4LjEgMjYuMyAyLjYgMi42IDUtNi4xIiBzdHJva2U9IiNGRkNFNTYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJtMzguMyA4IC44IDIuMiAyLjIuOC0yLjIuOC0uOCAyLjItLjgtMi4yLTIuMi0uOCAyLjItLjguOC0yLjJaIiBmaWxsPSIjRkZFMTdBIi8+Cjwvc3ZnPgo=" alt="ClassBoard" class="auth-top-logo" />
+        <div class="auth-top-brand-text">
+          <span class="auth-top-brand-title">ClassBoard</span>
+          <span class="auth-top-brand-subtitle">INTEL &amp; IBM CLASS PORTAL</span>
+        </div>
+      </div>
+      <nav class="auth-top-links">
+        <a href="./landing.html" style="background: rgba(255,255,255,0.18); padding: 4px 12px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.32); color: #ffffff;">🌟 Full Landing Page</a>
+        <a href="./about.html">About</a>
+        <a href="./privacy.html">Privacy Policy</a>
+        <a href="./terms.html">Terms of Service</a>
+        <a href="./contact.html">Contact</a>
+      </nav>
+    </header>
+
+    <div class="auth-split-wrapper">
+      <div class="auth-showcase">
+        <div class="showcase-meta-zone">
+          <div class="showcase-uni-badge">
+            <span>🎓</span>
+            <span>Medi-Caps University · 3rd Semester</span>
+          </div>
+          <h1 class="showcase-title-glow">Your Complete <span class="highlight">Classroom &amp; Academic Hub</span></h1>
+          <p class="showcase-sub-glow">Built for engineering students to track schedules, monitor attendance safety, and access verified course materials without the chaos.</p>
+        </div>
+
+        <div class="showcase-stage">
+          <div class="showcase-banner">
+            <img src="./classboard-dashboard-real.jpg" alt="ClassBoard Academic Portal UI" class="showcase-img" />
           </div>
         </div>
-        <button class="auth-action primary" id="signInButton" type="submit">Sign in</button>
-      </form>
-      <div class="auth-divider" aria-hidden="true">or</div>
-      <button class="auth-action auth-signup" id="signUpButton" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>Create account with email</button>
-      <button class="auth-action auth-google" id="googleSignInButton" type="button"><svg class="auth-google-mark" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.8 6.1-15z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.6-5.1c-1.8 1.2-4.1 2-6.9 2-5.3 0-9.8-3.6-11.4-8.4H5.8v5.3A20 20 0 0 0 24 44z"/><path fill="#FBBC05" d="M12.6 27.6a12 12 0 0 1 0-7.2v-5.3H5.8a20 20 0 0 0 0 17.8z"/><path fill="#EA4335" d="M24 11.9c3 0 5.7 1 7.8 3.1l5.8-5.8C34.1 5.8 29.5 4 24 4A20 20 0 0 0 5.8 15.1l6.8 5.3c1.6-4.9 6.1-8.5 11.4-8.5z"/></svg>Continue with Google</button>
-      <button class="auth-link" id="resetPasswordButton" type="button">Forgot password? Send reset link</button>
-      <div class="auth-message" id="authMessage" role="status" aria-live="polite"></div>
+
+        <div class="showcase-feat-row">
+          <div class="feat-item">
+            <svg class="feat-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+              <circle cx="12" cy="15" r="1.5" fill="#ffffff"></circle>
+            </svg>
+            <div class="feat-text">
+              <span>Class Timetable &amp;</span>
+              <span>Exam Schedules</span>
+            </div>
+          </div>
+          <div class="feat-item">
+            <svg class="feat-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              <line x1="9" y1="7" x2="15" y2="7"></line>
+              <line x1="9" y1="11" x2="14" y2="11"></line>
+            </svg>
+            <div class="feat-text">
+              <span>Notes, Syllabus &amp;</span>
+              <span>Resources</span>
+            </div>
+          </div>
+          <div class="feat-item">
+            <svg class="feat-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+              <path d="M3 20h18"></path>
+            </svg>
+            <div class="feat-text">
+              <span>Attendance Safety</span>
+              <span>Planner</span>
+            </div>
+          </div>
+          <div class="feat-item">
+            <svg class="feat-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <div class="feat-text">
+              <span>Important Class</span>
+              <span>Updates</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-card" id="authCard">
+        <h2 id="authTitle" class="auth-title">Welcome Back!</h2>
+        <p class="auth-copy">Sign in to your Medi-Caps account to continue to ClassBoard.</p>
+        <form id="authForm">
+          <label class="auth-field">Section
+            <select id="loginClassSelector" name="section"><option value="INTEL-1">INTEL-1 · Section A</option><option value="INTEL-2">INTEL-2 · Section B</option><option value="IBM-1">IBM-1 · Advanced AI - A</option></select>
+          </label>
+          <label class="auth-field">College email
+            <span class="auth-icon-field"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg><input id="authEmail" name="email" type="email" autocomplete="email" required placeholder="you@medicaps.ac.in" /></span>
+          </label>
+          <div class="auth-field">
+            <label for="authPassword">Password</label>
+            <div class="password-entry">
+              <span class="auth-icon-field"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 1 1 8 0v3m-4 4v3"></path></svg><input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" required placeholder="Enter your password" /></span>
+              <button class="password-visibility" id="togglePasswordVisibility" type="button" aria-controls="authPassword" aria-pressed="false">Show</button>
+            </div>
+          </div>
+          <button class="auth-action primary" id="signInButton" type="submit">Login</button>
+        </form>
+        <div class="auth-divider" aria-hidden="true">or</div>
+        <button class="auth-action auth-signup" id="signUpButton" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>Create account with email</button>
+        <button class="auth-action auth-google" id="googleSignInButton" type="button"><svg class="auth-google-mark" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.8 6.1-15z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.6-5.1c-1.8 1.2-4.1 2-6.9 2-5.3 0-9.8-3.6-11.4-8.4H5.8v5.3A20 20 0 0 0 24 44z"/><path fill="#FBBC05" d="M12.6 27.6a12 12 0 0 1 0-7.2v-5.3H5.8a20 20 0 0 0 0 17.8z"/><path fill="#EA4335" d="M24 11.9c3 0 5.7 1 7.8 3.1l5.8-5.8C34.1 5.8 29.5 4 24 4A20 20 0 0 0 5.8 15.1l6.8 5.3c1.6-4.9 6.1-8.5 11.4-8.5z"/></svg>Continue with Google</button>
+        <button class="auth-link" id="resetPasswordButton" type="button">Forgot password? Send reset link</button>
+        <div class="auth-message" id="authMessage" role="status" aria-live="polite"></div>
+      </div>
     </div>
+
+    <footer class="auth-bar-footer">
+      <div class="footer-left">© 2026 ClassBoard. Built for Medi-Caps Students.</div>
+      <span class="footer-sep" aria-hidden="true">|</span>
+      <div class="footer-center">
+        <span>Dedicated to</span>
+        <span class="badge-intel">INTEL</span>
+        <span>&amp;</span>
+        <span class="badge-ibm">IBM</span>
+      </div>
+      <span class="footer-sep" aria-hidden="true">|</span>
+      <div class="footer-right">
+        Developed by <strong style="color: #ffffff;">Hasnaat &amp; Harsh</strong> ✨
+      </div>
+    </footer>
   </section>
   <div class="app" hidden>
     <aside class="sidebar" id="appSidebar">
@@ -4700,7 +5050,18 @@
             </aside>
           </div>
         </section>
-        <footer class="site-footer"><span>About ClassBoard · AI &amp; Analytics - A (INTEL-1), 3rd Semester</span><span class="footer-credit"><span>Developed by</span><span class="footer-wordmark">Hasnaat &amp; Harsh 🕸️✨</span></span></footer>
+        <footer class="site-footer">
+          <div>
+            <span>About ClassBoard · AI &amp; Analytics - A (INTEL-1), 3rd Semester</span>
+            <nav class="portal-footer-links">
+              <a href="./about.html" target="_blank" rel="noopener">About</a>
+              <a href="./privacy.html" target="_blank" rel="noopener">Privacy Policy</a>
+              <a href="./terms.html" target="_blank" rel="noopener">Terms</a>
+              <a href="./contact.html" target="_blank" rel="noopener">Contact</a>
+            </nav>
+          </div>
+          <span class="footer-credit"><span>Developed by</span><span class="footer-wordmark">Hasnaat &amp; Harsh 🕸️✨</span></span>
+        </footer>
       </div>
     </main>
     <nav class="mobile-nav" aria-label="Mobile navigation">

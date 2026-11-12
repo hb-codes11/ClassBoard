@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Contact Us · ClassBoard</title>
+  <meta name="description" content="Get in touch with the ClassBoard development team, founded by Hasnaat Malik and Harsh Bhadrawale, for support, academic queries, or feedback." />
+  <link rel="icon" type="image/svg+xml" href="./classboard-pwa-icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue: #006BFF;
+      --blue-deep: #0056E8;
+      --blue-soft: #e5f1ff;
+      --page: #f4f8fd;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --text: #17283d;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --line-light: #edf2f7;
+      --shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+      font-family: 'Figtree', system-ui, -apple-system, sans-serif;
+      color: #17283d;
+      line-height: 1.65;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      background-color: #062f5c;
+      background-image:
+        radial-gradient(60% 55% at 12% 8%,  rgba(95,190,255,.95) 0%, rgba(95,190,255,0) 62%),
+        radial-gradient(45% 45% at 88% 12%, rgba(255,225,122,.55) 0%, rgba(255,225,122,0) 60%),
+        radial-gradient(55% 60% at 90% 92%, rgba(22,139,255,.85) 0%, rgba(22,139,255,0) 65%),
+        radial-gradient(50% 50% at 8% 95%,  rgba(7,86,160,.9) 0%, rgba(7,86,160,0) 65%),
+        radial-gradient(30% 22% at 50% 0%,  rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 100%),
+        linear-gradient(160deg, #168BFF 0%, #0756A0 55%, #062f5c 100%);
+      background-size: 150% 150%, 140% 140%, 150% 150%, 140% 140%, 100% 100%, 100% 100%;
+      background-position: 0% 0%, 100% 0%, 100% 100%, 0% 100%, 50% 0%, 50% 50%;
+      background-attachment: fixed;
+      animation: cb-shine 16s ease-in-out infinite alternate;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    @keyframes cb-shine {
+      from { background-position:0% 0%,100% 0%,100% 100%,0% 100%,50% 0%,50% 50%; }
+      to   { background-position:30% 22%,70% 25%,72% 78%,25% 70%,50% 0%,50% 50%; }
+    }
+        header.site-header {
+      background: rgba(6, 47, 92, 0.45);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #ffffff;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 19px;
+      font-weight: 750;
+    }
+    .brand-link svg { width: 36px; height: 36px; flex-shrink: 0; border-radius: 9px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      border-radius: 999px;
+      text-decoration: none;
+      backdrop-filter: blur(8px);
+      transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+    }
+    .nav-btn:hover {
+      background: #0A74E6 !important;
+      color: #ffffff !important;
+      border-color: #0A74E6 !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(10, 116, 230, 0.45);
+    }
+    
+        main.legal-container {
+      max-width: 900px;
+      margin: 36px auto 60px;
+      padding: 0 20px;
+      flex: 1;
+      width: 100%;
+    }
+    .legal-card {
+      background: #ffffff !important;
+      color: #17283d !important;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 24px;
+      padding: 44px 48px;
+      box-shadow: 0 25px 60px -15px rgba(2, 24, 60, 0.45);
+    }
+    .legal-card h1, .legal-card h2, .legal-card h3 {
+      color: #0756A0;
+    }
+    .legal-body p, .legal-body li {
+      color: #334155;
+    }
+    .legal-badge {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 12px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+    .legal-meta {
+      color: #64748b;
+      font-size: 13.5px;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .callout {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 14px;
+      padding: 16px 20px;
+      color: #166534;
+      font-size: 14px;
+      margin: 20px 0;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .feature-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .feature-box h3 {
+      font-size: 15.5px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 8px 0 6px;
+    }
+    .feature-box p {
+      font-size: 13.5px;
+      color: #64748b;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+
+    @media (max-width: 640px) {
+      .legal-card { padding: 26px 20px; border-radius: 14px; }
+      main.legal-container { margin: 20px auto 40px; }
+    }
+    .legal-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+    h1.legal-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.25;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .legal-meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line-light);
+    }
+    .contact-channels {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin: 24px 0 32px;
+    }
+    .contact-card {
+      background: var(--surface-2);
+      border: 1px solid color-mix(in srgb, var(--blue) 25%, var(--line));
+      border-radius: 14px;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .contact-card-icon {
+      font-size: 26px;
+      margin-bottom: 4px;
+    }
+    .contact-card h3 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 18px;
+      font-weight: 750;
+      color: var(--text);
+    }
+    .contact-card p {
+      font-size: 14px;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.55;
+    }
+    .contact-card a.contact-link {
+      margin-top: 10px;
+      color: var(--blue);
+      font-weight: 700;
+      font-size: 16px;
+      text-decoration: none;
+      word-break: break-all;
+    }
+    .contact-card a.contact-link:hover { text-decoration: underline; }
+    .founders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin: 24px 0 32px;
+    }
+    .founder-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 4px 18px -4px rgba(2, 24, 60, 0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .founder-card:hover {
+      transform: translateY(-2px);
+      border-color: #93c5fd;
+      box-shadow: 0 10px 26px -6px rgba(10, 116, 230, 0.14);
+    }
+    .founder-card-photo {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2.5px solid #0A74E6;
+      box-shadow: 0 4px 14px rgba(10, 116, 230, 0.25);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .founder-card-body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+    }
+    .founder-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 10.5px;
+      font-weight: 750;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      background: #e0f2fe;
+      color: #0284c7;
+      border-radius: 99px;
+      width: fit-content;
+      margin-bottom: 6px;
+    }
+    .founder-name {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 19px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.015em;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+    .founder-dept {
+      font-size: 13px;
+      line-height: 1.45;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .founder-degree {
+      color: #1e293b;
+      font-weight: 600;
+    }
+    .founder-meta {
+      color: #0A74E6;
+      font-weight: 600;
+      font-size: 12.5px;
+    }
+    .founder-inst {
+      color: #64748b;
+      font-size: 12.5px;
+    }
+    @media (max-width: 480px) {
+      .founders-grid {
+        grid-template-columns: 1fr;
+      }
+      .founder-card {
+        padding: 18px 16px;
+        gap: 14px;
+      }
+      .founder-card-photo {
+        width: 58px;
+        height: 58px;
+      }
+    }
+    .legal-body h2 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 21px;
+      font-weight: 750;
+      color: var(--text);
+      margin: 32px 0 14px;
+    }
+    .legal-body p {
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    footer.site-footer {
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+      padding: 24px 20px;
+      margin-top: 60px;
+    }
+    .footer-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .footer-links a:hover, .footer-links a.active {
+      color: var(--blue);
+      font-weight: 600;
+    }
+  
+    /* Minimalist Bottom Footer with Profile Photos matching landing page */
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 36px 0 calc(28px + env(safe-area-inset-bottom, 0));
+      color: rgba(255, 255, 255, 0.85); font-size: 13px;
+      margin-top: auto;
+      background: rgba(6, 47, 92, 0.35);
+      backdrop-filter: blur(10px);
+    }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 0 20px; width: 100%; }
+    .foot-wrap { display: flex; flex-direction: column; gap: 28px; }
+    .foot-top-bar {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 18px; padding-bottom: 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .foot-brand-name {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 19px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em;
+    }
+    .foot-brand-sub { color: rgba(224, 242, 254, 0.78); font-size: 12.5px; margin-top: 3px; }
+    .foot-links { display: flex; flex-wrap: wrap; gap: 20px; font-size: 13px; }
+    .foot-links a { text-decoration: none; color: inherit; font-weight: 500; transition: color 0.15s; }
+    .foot-links a:hover, .foot-links a.active { color: #55c7ff; text-decoration: underline; }
+    .badge-intel, .badge-ibm {
+      display: inline-block; padding: 2px 9px; border-radius: 99px;
+      background: #ffffff; font-weight: 800; font-size: 10.5px;
+      letter-spacing: -0.02em; vertical-align: middle;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+    .badge-intel { color: #0068B5; }
+    .badge-ibm { color: #0f62fe; letter-spacing: 0.08em; font-family: monospace; }
+    .foot-dev-section {
+      display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px;
+    }
+    .foot-dev-heading {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+      font-weight: 700; color: rgba(255, 255, 255, 0.65);
+    }
+    .foot-dev-cards {
+      display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 14px;
+    }
+    .foot-dev-amp {
+      color: rgba(224, 242, 254, 0.75); font-size: 16px; font-weight: 700;
+    }
+    .foot-dev-card {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 6px 16px 6px 8px; border-radius: 99px;
+      background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      transition: transform 0.15s, background 0.15s, border-color 0.15s;
+    }
+    .foot-dev-photo {
+      width: 32px; height: 32px; border-radius: 50%;
+      object-fit: cover; border: 1.5px solid #ffffff;
+    }
+    .foot-dev-details { display: flex; flex-direction: column; text-align: left; line-height: 1.25; }
+    .foot-dev-name { font-size: 13px; font-weight: 700; color: #ffffff; }
+    .foot-dev-role { font-size: 10.5px; color: rgba(224, 242, 254, 0.75); }
+    .foot-copyright { font-size: 11.5px; color: rgba(255, 255, 255, 0.55); margin-top: 4px; }
+
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="./landing.html" class="brand-link" aria-label="ClassBoard Home">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><defs><linearGradient id="board" x1="7" y1="5" x2="42" y2="44" gradientUnits="userSpaceOnUse"><stop stop-color="#168BFF"/><stop offset="1" stop-color="#0756A0"/></linearGradient><linearGradient id="paper" x1="14" y1="11" x2="36" y2="37" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCEEFF"/></linearGradient></defs><path d="M13 3.5h22A9.5 9.5 0 0 1 44.5 13v22a9.5 9.5 0 0 1-9.5 9.5H13A9.5 9.5 0 0 1 3.5 35V13A9.5 9.5 0 0 1 13 3.5Z" fill="url(#board)"/><path d="M13.1 16.2c0-3.2 2.6-5.8 5.8-5.8h16.3v21.1H18.9a5.8 5.8 0 0 0-5.8 5.8V16.2Z" fill="url(#paper)"/><path d="M13.1 37.3a5.8 5.8 0 0 1 5.8-5.8h16.3" stroke="#B8DBFF" stroke-width="2.2" stroke-linecap="round"/><path d="M19.2 17.3h10.6M19.2 21.8h7.2" stroke="#168BFF" stroke-width="2.4" stroke-linecap="round"/><path d="m28.1 26.3 2.6 2.6 5-6.1" stroke="#FFCE56" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="m38.3 8 .8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2Z" fill="#FFE17A"/></svg>
+        <div style="display:flex;flex-direction:column;line-height:1.15;"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:18px;font-weight:800;color:#ffffff;">ClassBoard</span><span style="font-size:10px;font-weight:600;color:rgba(224,242,254,0.85);letter-spacing:0.02em;">INTEL &amp; IBM CLASS PORTAL</span></div>
+      </a>
+      <a href="./landing.html" class="nav-btn">← Back to ClassBoard</a>
+    </div>
+  </header>
+
+  <main class="legal-container">
+    <article class="legal-card">
+      <span class="legal-badge">Help &amp; Support</span>
+      <h1 class="legal-title">Contact Us</h1>
+      <div class="legal-meta">We are here to assist with any questions, bug reports, or feedback</div>
+
+      <div class="legal-body">
+        <p>Have an issue with your account, spotted an incorrect timetable entry, want to suggest new study materials, or have feedback? The ClassBoard founding team is always listening.</p>
+
+        <div class="contact-channels">
+          <div class="contact-card">
+            <span class="contact-card-icon">✉️</span>
+            <h3>Official Support &amp; Communication</h3>
+            <p>For all technical support, feature requests, academic concerns, and official correspondence, email us directly:</p>
+            <a href="mailto:contact@classboardx.in" class="contact-link">contact@classboardx.in</a>
+          </div>
+        </div>
+
+        <h2>Founders &amp; Development Team</h2>
+        <p>ClassBoard is developed, maintained, and operated by student founders from Medi-Caps University:</p>
+
+        <div class="founders-grid">
+          <div class="founder-card">
+            <img src="./founder-hasnaat.jpg" alt="Hasnaat Malik" class="founder-card-photo" />
+            <div class="founder-card-body">
+              <span class="founder-badge">Co-Founder &amp; Developer</span>
+              <div class="founder-name">Hasnaat Malik</div>
+              <div class="founder-dept">
+                <div class="founder-degree">B.Tech Computer Science &amp; Engineering</div>
+                <div class="founder-meta">AI &amp; Analytics (INTEL-1) · 2nd Year</div>
+                <div class="founder-inst">Medi-Caps University, Indore</div>
+              </div>
+            </div>
+          </div>
+          <div class="founder-card">
+            <img src="./founder-harsh.jpg" alt="Harsh Bhadrawale" class="founder-card-photo" />
+            <div class="founder-card-body">
+              <span class="founder-badge">Co-Founder &amp; Developer</span>
+              <div class="founder-name">Harsh Bhadrawale</div>
+              <div class="founder-dept">
+                <div class="founder-degree">B.Tech Computer Science &amp; Engineering</div>
+                <div class="founder-meta">AI &amp; Analytics (INTEL-1) · 2nd Year</div>
+                <div class="founder-inst">Medi-Caps University, Indore</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </article>
+  </main>
+
+    <footer>
+    <div class="wrap foot-wrap">
+      <div class="foot-top-bar">
+        <div class="foot-brand-info">
+          <div class="foot-brand-name">ClassBoard</div>
+          <p class="foot-brand-sub">Dedicated to <span class="badge-intel">INTEL</span> &amp; <span class="badge-ibm">IBM</span> batches · Medi-Caps University</p>
+        </div>
+        <div class="foot-links">
+          <a href="./about.html" class="">About</a>
+          <a href="./privacy.html" class="">Privacy Policy</a>
+          <a href="./terms.html" class="">Terms of Service</a>
+          <a href="./contact.html" class="active">Contact Us</a>
+        </div>
+      </div>
+
+      <!-- Developed by Developers with Profile Photos -->
+      <div class="foot-dev-section">
+        <span class="foot-dev-heading">Developed by</span>
+        <div class="foot-dev-cards">
+          <div class="foot-dev-card">
+            <img src="./founder-hasnaat.jpg" alt="Hasnaat" class="foot-dev-photo" />
+            <div class="foot-dev-details">
+              <strong class="foot-dev-name">Hasnaat</strong>
+              <span class="foot-dev-role">Developer</span>
+            </div>
+          </div>
+          <span class="foot-dev-amp">&amp;</span>
+          <div class="foot-dev-card">
+            <img src="./founder-harsh.jpg" alt="Harsh" class="foot-dev-photo" />
+            <div class="foot-dev-details">
+              <strong class="foot-dev-name">Harsh</strong>
+              <span class="foot-dev-role">Developer</span>
+            </div>
+          </div>
+        </div>
+        <p class="foot-copyright">© 2026 ClassBoard. Built for Medi-Caps Students.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

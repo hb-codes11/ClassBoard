@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Privacy Policy · ClassBoard</title>
+  <meta name="description" content="Privacy Policy for ClassBoard - Learn how we collect, handle, and protect student information and comply with advertising standards." />
+  <link rel="icon" type="image/svg+xml" href="./classboard-pwa-icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue: #006BFF;
+      --blue-deep: #0056E8;
+      --blue-soft: #e5f1ff;
+      --page: #f4f8fd;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --text: #17283d;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --line-light: #edf2f7;
+      --shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+      font-family: 'Figtree', system-ui, -apple-system, sans-serif;
+      color: #17283d;
+      line-height: 1.65;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      background-color: #062f5c;
+      background-image:
+        radial-gradient(60% 55% at 12% 8%,  rgba(95,190,255,.95) 0%, rgba(95,190,255,0) 62%),
+        radial-gradient(45% 45% at 88% 12%, rgba(255,225,122,.55) 0%, rgba(255,225,122,0) 60%),
+        radial-gradient(55% 60% at 90% 92%, rgba(22,139,255,.85) 0%, rgba(22,139,255,0) 65%),
+        radial-gradient(50% 50% at 8% 95%,  rgba(7,86,160,.9) 0%, rgba(7,86,160,0) 65%),
+        radial-gradient(30% 22% at 50% 0%,  rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 100%),
+        linear-gradient(160deg, #168BFF 0%, #0756A0 55%, #062f5c 100%);
+      background-size: 150% 150%, 140% 140%, 150% 150%, 140% 140%, 100% 100%, 100% 100%;
+      background-position: 0% 0%, 100% 0%, 100% 100%, 0% 100%, 50% 0%, 50% 50%;
+      background-attachment: fixed;
+      animation: cb-shine 16s ease-in-out infinite alternate;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    @keyframes cb-shine {
+      from { background-position:0% 0%,100% 0%,100% 100%,0% 100%,50% 0%,50% 50%; }
+      to   { background-position:30% 22%,70% 25%,72% 78%,25% 70%,50% 0%,50% 50%; }
+    }
+        header.site-header {
+      background: rgba(6, 47, 92, 0.45);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #ffffff;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 19px;
+      font-weight: 750;
+    }
+    .brand-link svg { width: 36px; height: 36px; flex-shrink: 0; border-radius: 9px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      border-radius: 999px;
+      text-decoration: none;
+      backdrop-filter: blur(8px);
+      transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+    }
+    .nav-btn:hover {
+      background: #0A74E6 !important;
+      color: #ffffff !important;
+      border-color: #0A74E6 !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(10, 116, 230, 0.45);
+    }
+    
+        main.legal-container {
+      max-width: 900px;
+      margin: 36px auto 60px;
+      padding: 0 20px;
+      flex: 1;
+      width: 100%;
+    }
+    .legal-card {
+      background: #ffffff !important;
+      color: #17283d !important;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 24px;
+      padding: 44px 48px;
+      box-shadow: 0 25px 60px -15px rgba(2, 24, 60, 0.45);
+    }
+    .legal-card h1, .legal-card h2, .legal-card h3 {
+      color: #0756A0;
+    }
+    .legal-body p, .legal-body li {
+      color: #334155;
+    }
+    .legal-badge {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 12px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+    .legal-meta {
+      color: #64748b;
+      font-size: 13.5px;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .callout {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 14px;
+      padding: 16px 20px;
+      color: #166534;
+      font-size: 14px;
+      margin: 20px 0;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .feature-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .feature-box h3 {
+      font-size: 15.5px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 8px 0 6px;
+    }
+    .feature-box p {
+      font-size: 13.5px;
+      color: #64748b;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    /* Founder Cards with Profile Photos */
+    .founders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .founder-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+    }
+    .founder-card-photo {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2.5px solid #0A74E6;
+      box-shadow: 0 4px 12px rgba(10, 116, 230, 0.25);
+      flex-shrink: 0;
+    }
+    .founder-card-body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (max-width: 640px) {
+      .legal-card { padding: 26px 20px; border-radius: 14px; }
+      main.legal-container { margin: 20px auto 40px; }
+    }
+    .legal-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+    h1.legal-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.25;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .legal-meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line-light);
+    }
+    .legal-body h2 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 32px 0 12px;
+    }
+    .legal-body p {
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    .legal-body ul {
+      margin: 0 0 18px 22px;
+      font-size: 15px;
+    }
+    .legal-body li {
+      margin-bottom: 8px;
+    }
+    .callout {
+      background: var(--surface-2);
+      border-left: 3px solid var(--blue);
+      padding: 14px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 22px 0;
+      font-size: 14px;
+      color: var(--text);
+    }
+    footer.site-footer {
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+      padding: 24px 20px;
+      margin-top: 60px;
+    }
+    .footer-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .footer-links a:hover, .footer-links a.active {
+      color: var(--blue);
+      font-weight: 600;
+    }
+  
+    /* Minimalist Bottom Footer with Profile Photos matching landing page */
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 36px 0 calc(28px + env(safe-area-inset-bottom, 0));
+      color: rgba(255, 255, 255, 0.85); font-size: 13px;
+      margin-top: auto;
+      background: rgba(6, 47, 92, 0.35);
+      backdrop-filter: blur(10px);
+    }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 0 20px; width: 100%; }
+    .foot-wrap { display: flex; flex-direction: column; gap: 28px; }
+    .foot-top-bar {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 18px; padding-bottom: 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .foot-brand-name {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 19px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em;
+    }
+    .foot-brand-sub { color: rgba(224, 242, 254, 0.78); font-size: 12.5px; margin-top: 3px; }
+    .foot-links { display: flex; flex-wrap: wrap; gap: 20px; font-size: 13px; }
+    .foot-links a { text-decoration: none; color: inherit; font-weight: 500; transition: color 0.15s; }
+    .foot-links a:hover, .foot-links a.active { color: #55c7ff; text-decoration: underline; }
+    .badge-intel, .badge-ibm {
+      display: inline-block; padding: 2px 9px; border-radius: 99px;
+      background: #ffffff; font-weight: 800; font-size: 10.5px;
+      letter-spacing: -0.02em; vertical-align: middle;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+    .badge-intel { color: #0068B5; }
+    .badge-ibm { color: #0f62fe; letter-spacing: 0.08em; font-family: monospace; }
+    .foot-dev-section {
+      display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px;
+    }
+    .foot-dev-heading {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+      font-weight: 700; color: rgba(255, 255, 255, 0.65);
+    }
+    .foot-dev-cards {
+      display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 14px;
+    }
+    .foot-dev-amp {
+      color: rgba(224, 242, 254, 0.75); font-size: 16px; font-weight: 700;
+    }
+    .foot-dev-card {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 6px 16px 6px 8px; border-radius: 99px;
+      background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      transition: transform 0.15s, background 0.15s, border-color 0.15s;
+    }
+    .foot-dev-photo {
+      width: 32px; height: 32px; border-radius: 50%;
+      object-fit: cover; border: 1.5px solid #ffffff;
+    }
+    .foot-dev-details { display: flex; flex-direction: column; text-align: left; line-height: 1.25; }
+    .foot-dev-name { font-size: 13px; font-weight: 700; color: #ffffff; }
+    .foot-dev-role { font-size: 10.5px; color: rgba(224, 242, 254, 0.75); }
+    .foot-copyright { font-size: 11.5px; color: rgba(255, 255, 255, 0.55); margin-top: 4px; }
+
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="./landing.html" class="brand-link" aria-label="ClassBoard Home">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none"><defs><linearGradient id="board" x1="7" y1="5" x2="42" y2="44" gradientUnits="userSpaceOnUse"><stop stop-color="#168BFF"/><stop offset="1" stop-color="#0756A0"/></linearGradient><linearGradient id="paper" x1="14" y1="11" x2="36" y2="37" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCEEFF"/></linearGradient></defs><path d="M13 3.5h22A9.5 9.5 0 0 1 44.5 13v22a9.5 9.5 0 0 1-9.5 9.5H13A9.5 9.5 0 0 1 3.5 35V13A9.5 9.5 0 0 1 13 3.5Z" fill="url(#board)"/><path d="M13.1 16.2c0-3.2 2.6-5.8 5.8-5.8h16.3v21.1H18.9a5.8 5.8 0 0 0-5.8 5.8V16.2Z" fill="url(#paper)"/><path d="M13.1 37.3a5.8 5.8 0 0 1 5.8-5.8h16.3" stroke="#B8DBFF" stroke-width="2.2" stroke-linecap="round"/><path d="M19.2 17.3h10.6M19.2 21.8h7.2" stroke="#168BFF" stroke-width="2.4" stroke-linecap="round"/><path d="m28.1 26.3 2.6 2.6 5-6.1" stroke="#FFCE56" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="m38.3 8 .8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2Z" fill="#FFE17A"/></svg>
+        <div style="display:flex;flex-direction:column;line-height:1.15;"><span style="font-family:'Bricolage Grotesque',sans-serif;font-size:18px;font-weight:800;color:#ffffff;">ClassBoard</span><span style="font-size:10px;font-weight:600;color:rgba(224,242,254,0.85);letter-spacing:0.02em;">INTEL &amp; IBM CLASS PORTAL</span></div>
+      </a>
+      <a href="./landing.html" class="nav-btn">← Back to ClassBoard</a>
+    </div>
+  </header>
+
+  <main class="legal-container">
+    <article class="legal-card">
+      <span class="legal-badge">Legal &amp; Transparency</span>
+      <h1 class="legal-title">Privacy Policy</h1>
+      <div class="legal-meta">Last updated: November 2026 · Effective immediately</div>
+
+      <div class="legal-body">
+        <p>At <strong>ClassBoard</strong> (accessible from our official web domain and web application), student and user privacy is of paramount importance to us. This Privacy Policy outlines the types of information collected, how it is used, and the choices you have regarding your data.</p>
+
+        <h2>1. Information We Collect</h2>
+        <p>When you use ClassBoard, we collect certain information to provide an accurate and secure educational experience:</p>
+        <ul>
+          <li><strong>Account Information:</strong> College email address (e.g. <code>@medicaps.ac.in</code>), student display name, enrollment/class section, and roll number provided during registration or authentication.</li>
+          <li><strong>Academic Preferences &amp; Planner Records:</strong> Attendance entries, calculated projections, bookmarked subject notes, and student concerns submitted to Class Representatives.</li>
+          <li><strong>Log &amp; Telemetry Data:</strong> Browser user agent, device type, connection timestamps, and activity events (e.g., viewing notes, checking the exam schedule) to ensure portal security and uptime.</li>
+        </ul>
+
+        <h2>2. How We Use Your Information</h2>
+        <p>The information we collect is strictly utilized to:</p>
+        <ul>
+          <li>Provide, maintain, and personalize the ClassBoard portal experience.</li>
+          <li>Calculate attendance safety projections and notify students about timetable changes and MST schedules.</li>
+          <li>Verify authorized student and section administrator status.</li>
+          <li>Detect and prevent unauthorized cross-section access or security vulnerabilities.</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Student Data Guarantee:</strong> We do not sell, rent, or trade student email addresses or private academic data to third parties under any circumstances.
+        </div>
+
+        <h2>3. Google AdSense &amp; Third-Party Cookies</h2>
+        <p>ClassBoard may partner with third-party advertising vendors, including <strong>Google AdSense</strong>, to display relevant advertisements to support ongoing hosting and server infrastructure costs.</p>
+        <ul>
+          <li>Google, as a third-party vendor, uses cookies to serve ads on ClassBoard.</li>
+          <li>Google's use of advertising cookies enables it and its partners to serve ads to our users based on their visits to our site and other sites on the Internet.</li>
+          <li>Users may opt out of personalized advertising by visiting <a href="https://adssettings.google.com/" target="_blank" rel="noopener">Google Ads Settings</a>. Alternatively, you may opt out of third-party vendor cookies by visiting <a href="https://optout.aboutads.info/" target="_blank" rel="noopener">aboutads.info</a>.</li>
+        </ul>
+
+        <h2>4. Log Files and Web Beacons</h2>
+        <p>Like standard web applications, ClassBoard utilizes standard log files. The information inside the log files includes Internet Protocol (IP) addresses, browser types, Internet Service Providers (ISP), date/time stamps, referring/exit pages, and number of clicks. These are not linked to personally identifiable information and are used solely for site administration and traffic trend analysis.</p>
+
+        <h2>5. Data Security</h2>
+        <p>We employ enterprise-grade security protocols, including Row Level Security (RLS) on our backend databases, encrypted SSL/TLS connections, and multi-layered role authorization (Student, Class Representative, Admin, Founder) to protect your personal data from unauthorized access.</p>
+
+        <h2>6. Your Privacy Rights</h2>
+        <p>Every student and user is entitled to:</p>
+        <ul>
+          <li>Request access to the personal data recorded under their profile.</li>
+          <li>Request correction of any incorrect or outdated academic information.</li>
+          <li>Request deletion of their account records upon leaving the institution.</li>
+        </ul>
+
+        <h2>7. Contact Us</h2>
+        <p>If you have any questions, concerns, or requests regarding this Privacy Policy, please reach out through our <a href="./contact.html">Contact Us</a> page or email our development team directly.</p>
+      </div>
+    </article>
+  </main>
+
+    <footer>
+    <div class="wrap foot-wrap">
+      <div class="foot-top-bar">
+        <div class="foot-brand-info">
+          <div class="foot-brand-name">ClassBoard</div>
+          <p class="foot-brand-sub">Dedicated to <span class="badge-intel">INTEL</span> &amp; <span class="badge-ibm">IBM</span> batches · Medi-Caps University</p>
+        </div>
+        <div class="foot-links">
+          <a href="./about.html" class="">About</a>
+          <a href="./privacy.html" class="active">Privacy Policy</a>
+          <a href="./terms.html" class="">Terms of Service</a>
+          <a href="./contact.html" class="">Contact Us</a>
+        </div>
+      </div>
+
+      <!-- Developed by Developers with Profile Photos -->
+      <div class="foot-dev-section">
+        <span class="foot-dev-heading">Developed by</span>
+        <div class="foot-dev-cards">
+          <div class="foot-dev-card">
+            <img src="./founder-hasnaat.jpg" alt="Hasnaat" class="foot-dev-photo" />
+            <div class="foot-dev-details">
+              <strong class="foot-dev-name">Hasnaat</strong>
+              <span class="foot-dev-role">Developer</span>
+            </div>
+          </div>
+          <span class="foot-dev-amp">&amp;</span>
+          <div class="foot-dev-card">
+            <img src="./founder-harsh.jpg" alt="Harsh" class="foot-dev-photo" />
+            <div class="foot-dev-details">
+              <strong class="foot-dev-name">Harsh</strong>
+              <span class="foot-dev-role">Developer</span>
+            </div>
+          </div>
+        </div>
+        <p class="foot-copyright">© 2026 ClassBoard. Built for Medi-Caps Students.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
