@@ -7,23 +7,27 @@
   const passwordVisibility = document.getElementById('togglePasswordVisibility');
   const message = document.getElementById('authMessage');
   function hidePassword() {
-    if (passwordInput.type === 'password') return;
+    if (!passwordInput || passwordInput.type === 'password') return;
     passwordInput.type = 'password';
-    passwordVisibility.textContent = 'Show';
-    passwordVisibility.setAttribute('aria-label', 'Show password');
-    passwordVisibility.setAttribute('aria-pressed', 'false');
+    if (passwordVisibility) {
+      passwordVisibility.textContent = 'Show';
+      passwordVisibility.setAttribute('aria-label', 'Show password');
+      passwordVisibility.setAttribute('aria-pressed', 'false');
+    }
   }
-  passwordVisibility.addEventListener('click', () => {
-    const willShow = passwordInput.type === 'password';
-    passwordInput.type = willShow ? 'text' : 'password';
-    passwordVisibility.textContent = willShow ? 'Hide' : 'Show';
-    passwordVisibility.setAttribute('aria-label', willShow ? 'Hide password' : 'Show password');
-    passwordVisibility.setAttribute('aria-pressed', String(willShow));
-  });
-  document.getElementById('authForm').addEventListener('submit', hidePassword);
-  document.getElementById('signUpButton').addEventListener('click', hidePassword);
+  if (passwordVisibility && passwordInput) {
+    passwordVisibility.addEventListener('click', () => {
+      const willShow = passwordInput.type === 'password';
+      passwordInput.type = willShow ? 'text' : 'password';
+      passwordVisibility.textContent = willShow ? 'Hide' : 'Show';
+      passwordVisibility.setAttribute('aria-label', willShow ? 'Hide password' : 'Show password');
+      passwordVisibility.setAttribute('aria-pressed', String(willShow));
+    });
+  }
+  form?.addEventListener('submit', hidePassword);
+  document.getElementById('signUpButton')?.addEventListener('click', hidePassword);
   const buttons = ['signInButton', 'signUpButton', 'googleSignInButton', 'resetPasswordButton']
-    .map((id) => document.getElementById(id));
+    .map((id) => document.getElementById(id)).filter(Boolean);
   const emailPattern = /^[^@\s]+@medicaps[.]ac[.]in$/i;
   const batchCodesForClass = (classCode = window.classboardContext?.classCode) => classCode === 'INTEL-2' ? ['B1', 'B2'] : ['A1', 'A2'];
   const maxRollForClass = (classCode = window.classboardContext?.classCode) => classCode === 'IBM-1' ? 67 : 66;
@@ -61,21 +65,25 @@
   const roleSwitcher = document.getElementById('roleSwitcher');
   const loginClassSelector = document.getElementById('loginClassSelector');
   const classSwitcher = document.getElementById('classSwitcher');
-  const savedClassCode = () => localStorage.getItem('classboard-selected-class') || loginClassSelector.value || 'INTEL-1';
-  loginClassSelector.value = savedClassCode();
-  loginClassSelector.addEventListener('change', () => localStorage.setItem('classboard-selected-class', loginClassSelector.value));
-  classSwitcher.addEventListener('change', () => {
+  const savedClassCode = () => localStorage.getItem('classboard-selected-class') || loginClassSelector?.value || 'INTEL-1';
+  if (loginClassSelector) {
+    loginClassSelector.value = savedClassCode();
+    loginClassSelector.addEventListener('change', () => localStorage.setItem('classboard-selected-class', loginClassSelector.value));
+  }
+  classSwitcher?.addEventListener('change', () => {
     localStorage.setItem('classboard-selected-class', classSwitcher.value);
     window.location.reload();
   });
-  roleSwitcher.addEventListener('change', () => {
+  roleSwitcher?.addEventListener('change', () => {
     const issuePanel = document.getElementById('issueForm')?.closest('article');
     if (issuePanel) issuePanel.hidden = roleSwitcher.value !== 'student';
   });
 
   function showMessage(text, isError = false) {
-    message.textContent = text;
-    message.classList.toggle('error', isError);
+    if (message) {
+      message.textContent = text;
+      message.classList.toggle('error', isError);
+    }
   }
 
   function showGoogleCallbackError() {
@@ -149,8 +157,8 @@
       .map(([id, info]) => ({ id, ...info })).sort((a, b) => a.code.localeCompare(b.code));
 
     if (!activeClasses.length) {
-      app.hidden = true;
-      gate.hidden = false;
+      if (app) app.hidden = true;
+      if (gate) gate.hidden = false;
       showMessage('This account does not have active access to any section. Ask a ClassBoard admin to grant access, then sign in again.', true);
       return;
     }
@@ -165,7 +173,7 @@
       }
       if (!classInfo) classInfo = activeClasses[0];
       localStorage.setItem('classboard-selected-class', classInfo.code);
-      loginClassSelector.value = classInfo.code;
+      if (loginClassSelector) loginClassSelector.value = classInfo.code;
     }
     const classMemberships = memberships.filter((row) => row.class_id === classInfo.id);
     const roles = [...new Set(classMemberships.map((row) => row.role))];
@@ -286,7 +294,7 @@
     if (calendarHighlights) calendarHighlights.hidden = false;
     const calendarSource = document.getElementById('calendarSource');
     if (calendarSource) calendarSource.textContent = `Academic calendar and events for ${classLabel}.`;
-    loginClassSelector.value = classCode;
+    if (loginClassSelector) loginClassSelector.value = classCode;
     classSwitcher.replaceChildren(...activeClasses.map((item) => {
       const option = document.createElement('option');
       option.value = item.code;
@@ -371,8 +379,8 @@
     await loadAttendancePlanner(classId, user.id, roles, studentMembership?.roll_number ?? null);
     startNotificationRefresh(classId);
     if (roles.includes('admin')) await loadAdminAccounts(classId);
-    gate.hidden = true;
-    app.hidden = false;
+    if (gate) gate.hidden = true;
+    if (app) app.hidden = false;
     showMessage('');
     if (studentMembership && !studentMembership.roll_number && !roles.includes('cr') && !roles.includes('admin')) {
       window.openFormDialog({
@@ -2184,10 +2192,11 @@
       return;
     }
     if (!emailPattern.test(session.user.email || '')) {
-      app.hidden = true;
-      gate.hidden = false;
+      if (app) app.hidden = true;
+      if (gate) gate.hidden = false;
       showMessage('Only college Google accounts ending in @medicaps.ac.in can sign in. Switch to your Medicaps account and try again.', true);
       await window.classboardSupabase.auth.signOut();
+      window.location.replace('./landing.html');
       return;
     }
     busy(true);
@@ -2196,8 +2205,8 @@
       await enterClass(session.user);
       window.classboardActivityTracker?.initSession(session.user);
     } catch (error) {
-      app.hidden = true;
-      gate.hidden = false;
+      if (app) app.hidden = true;
+      if (gate) gate.hidden = false;
       showMessage(`Could not check class access: ${error.message}`, true);
     } finally {
       busy(false);
@@ -3167,7 +3176,7 @@
     }, true);
   }
 
-  form.addEventListener('submit', async (event) => {
+  form?.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!validCollegeEmail()) return;
     busy(true);
@@ -3183,7 +3192,7 @@
     busy(false);
   });
 
-  document.getElementById('signUpButton').addEventListener('click', async () => {
+  document.getElementById('signUpButton')?.addEventListener('click', async () => {
     if (!validCollegeEmail()) return;
     if (passwordInput.value.length < 8) {
       showMessage('Choose a password with at least 8 characters.', true);
@@ -3206,7 +3215,7 @@
     busy(false);
   });
 
-  document.getElementById('googleSignInButton').addEventListener('click', async () => {
+  document.getElementById('googleSignInButton')?.addEventListener('click', async () => {
     busy(true);
     showMessage('Opening Google sign-in…');
     sessionStorage.setItem('cb_pending_auth_method', 'google');
@@ -3224,7 +3233,7 @@
     }
   });
 
-  document.getElementById('resetPasswordButton').addEventListener('click', async () => {
+  document.getElementById('resetPasswordButton')?.addEventListener('click', async () => {
     if (!validCollegeEmail()) return;
     busy(true);
     const { error } = await window.classboardSupabase.auth.resetPasswordForEmail(cleanEmail(), {

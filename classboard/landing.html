@@ -339,7 +339,21 @@ h1, h2, h3 { font-family: 'Bricolage Grotesque', sans-serif; letter-spacing: -0.
   color: var(--blue); font: 600 11.5px 'Figtree', sans-serif; cursor: pointer;
 }
 .forgot-btn:hover { text-decoration: underline; }
-.login-msg { min-height: 16px; margin-top: 6px; text-align: center; font-size: 11.5px; color: #dc2626; }
+.login-msg {
+  min-height: 18px;
+  margin-top: 8px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 600;
+  color: #dc2626;
+  word-break: break-word;
+}
+button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 
 /* Dashboard Image Showcase Stage (Peeks ~80px on initial screen) */
 .stage-sec {
@@ -826,14 +840,99 @@ footer {
 })();
 </script>
 
-<!-- Login / Interaction Script -->
+<!-- Supabase SDK & Config for Real Authentication -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
+
+<!-- Login / Registration / Auth Script -->
 <script>
 (function(){
   var form = document.getElementById('heroLoginForm');
   var msg = document.getElementById('loginAlert');
   var pw = document.getElementById('userPassword');
   var email = document.getElementById('userEmail');
+  var secSelect = document.getElementById('secSelect');
   var showBtn = document.getElementById('showPwBtn');
+  var signUpBtn = document.getElementById('signUpAltBtn');
+  var googleBtn = document.getElementById('googleAltBtn');
+  var forgotBtn = document.getElementById('forgotPwBtn');
+  var submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+
+  var config = window.CLASSBOARD_SUPABASE_CONFIG;
+  var sb = (window.supabase && config?.url && config?.publishableKey)
+    ? window.supabase.createClient(config.url, config.publishableKey)
+    : null;
+
+  var emailPattern = /^[^@\s]+@medicaps[.]ac[.]in$/i;
+
+  function cleanEmail() {
+    return (email.value || '').trim().toLowerCase();
+  }
+
+  function validCollegeEmail(em) {
+    if (!em) {
+      showError('Please enter your Medi-Caps college email.');
+      email.focus();
+      return false;
+    }
+    if (!emailPattern.test(em)) {
+      showError('Use your college email ending exactly in @medicaps.ac.in.');
+      email.focus();
+      return false;
+    }
+    return true;
+  }
+
+  function showError(text) {
+    msg.style.color = '#dc2626';
+    msg.textContent = text;
+  }
+
+  function showSuccess(text) {
+    msg.style.color = '#16a34a';
+    msg.textContent = text;
+  }
+
+  function saveSection() {
+    if (secSelect && secSelect.value) {
+      localStorage.setItem('classboard-selected-class', secSelect.value);
+    }
+  }
+
+  if (secSelect) {
+    var savedClass = localStorage.getItem('classboard-selected-class');
+    if (savedClass && (savedClass === 'INTEL-1' || savedClass === 'INTEL-2' || savedClass === 'IBM-1')) {
+      secSelect.value = savedClass;
+    }
+    secSelect.addEventListener('change', saveSection);
+  }
+
+  var allButtons = [submitBtn, signUpBtn, googleBtn, forgotBtn];
+  function setBusy(isBusy, text) {
+    allButtons.forEach(function(b) {
+      if (b) b.disabled = isBusy;
+    });
+    if (isBusy && text) {
+      msg.style.color = 'var(--blue)';
+      msg.textContent = text;
+    }
+  }
+
+  // Check if session already active
+  if (sb) {
+    sb.auth.getSession().then(function(res) {
+      if (res?.data?.session?.user) {
+        var userEmail = res.data.session.user.email;
+        var prefix = userEmail ? userEmail.split('@')[0] : 'Student';
+        var loginTitle = document.querySelector('#login h2');
+        if (loginTitle) loginTitle.textContent = 'Welcome Back, ' + prefix + '!';
+        var loginSub = document.querySelector('#login .login-sub');
+        if (loginSub) loginSub.textContent = 'You are already signed in. Click below to continue to your dashboard.';
+        if (submitBtn) submitBtn.textContent = 'Go to Dashboard →';
+        if (email && !email.value) email.value = userEmail || '';
+      }
+    }).catch(function(){});
+  }
 
   showBtn.addEventListener('click', function() {
     var show = pw.type === 'password';
@@ -847,34 +946,167 @@ footer {
     });
   });
 
-  form.addEventListener('submit', function(e) {
+  // Login Handler
+  form.addEventListener('submit', async function(e) {
     e.preventDefault();
-    if (!email.value.trim() || !pw.value) {
-      msg.textContent = 'Please enter your college email and password.';
+    var em = cleanEmail();
+    var pass = pw.value;
+
+    // Check if already authenticated and clicking "Go to Dashboard"
+    if (sb) {
+      var s = await sb.auth.getSession();
+      if (s?.data?.session?.user && (!pass || em === s.data.session.user.email)) {
+        saveSection();
+        window.location.href = './index.html';
+        return;
+      }
+    }
+
+    if (!validCollegeEmail(em)) return;
+    if (!pass) {
+      showError('Please enter your password.');
+      pw.focus();
       return;
     }
-    // Redirect to main portal with credentials or login
-    msg.style.color = 'var(--blue)';
-    msg.textContent = 'Authenticating with ClassBoard...';
+
+    saveSection();
+    setBusy(true, 'Signing in to ClassBoard…');
+
+    if (!sb) {
+      showError('Unable to connect to authentication server. Please check your internet.');
+      setBusy(false);
+      return;
+    }
+
+    sessionStorage.setItem('cb_pending_auth_method', 'password');
+    var res = await sb.auth.signInWithPassword({
+      email: em,
+      password: pass
+    });
+
+    if (res.error) {
+      sessionStorage.removeItem('cb_pending_auth_method');
+      showError(res.error.message || 'Login failed. Please check your credentials.');
+      setBusy(false);
+      return;
+    }
+
+    showSuccess('Login successful! Loading your semester…');
     setTimeout(function() {
       window.location.href = './index.html';
-    }, 600);
+    }, 400);
   });
 
-  document.getElementById('signUpAltBtn').addEventListener('click', function() {
-    window.location.href = './index.html';
-  });
-  document.getElementById('googleAltBtn').addEventListener('click', function() {
-    window.location.href = './index.html';
-  });
-  document.getElementById('forgotPwBtn').addEventListener('click', function() {
-    if (!email.value.trim()) {
-      msg.textContent = 'Enter your college email above first, then click reset.';
-      email.focus();
-      return;
-    }
-    window.location.href = './reset-password.html';
-  });
+  // Register / Sign Up Handler
+  if (signUpBtn) {
+    signUpBtn.addEventListener('click', async function(e) {
+      e.preventDefault();
+      var em = cleanEmail();
+      var pass = pw.value;
+
+      if (!validCollegeEmail(em)) return;
+      if (!pass || pass.length < 8) {
+        showError('Please enter a password with at least 8 characters to register.');
+        pw.focus();
+        return;
+      }
+
+      saveSection();
+      setBusy(true, 'Creating your ClassBoard account…');
+
+      if (!sb) {
+        showError('Unable to connect to authentication server. Please check your internet.');
+        setBusy(false);
+        return;
+      }
+
+      sessionStorage.setItem('cb_pending_auth_method', 'password');
+      var res = await sb.auth.signUp({
+        email: em,
+        password: pass,
+        options: {
+          data: {
+            section: secSelect ? secSelect.value : 'INTEL-1'
+          }
+        }
+      });
+
+      if (res.error) {
+        sessionStorage.removeItem('cb_pending_auth_method');
+        showError(res.error.message || 'Registration failed.');
+        setBusy(false);
+        return;
+      }
+
+      if (!res.data?.session) {
+        showSuccess('Account created! Please check your Medi-Caps inbox to confirm your email, then login.');
+        setBusy(false);
+      } else {
+        showSuccess('Account created! Loading your semester…');
+        setTimeout(function() {
+          window.location.href = './index.html';
+        }, 400);
+      }
+    });
+  }
+
+  // Google OAuth Handler
+  if (googleBtn) {
+    googleBtn.addEventListener('click', async function(e) {
+      e.preventDefault();
+      saveSection();
+
+      if (!sb) {
+        showError('Unable to connect to authentication server. Please check your internet.');
+        return;
+      }
+
+      setBusy(true, 'Redirecting to Google sign-in…');
+      sessionStorage.setItem('cb_pending_auth_method', 'google');
+
+      var redirectUrl = new URL('./index.html', window.location.href).href;
+      var res = await sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          queryParams: { hd: 'medicaps.ac.in' }
+        }
+      });
+
+      if (res.error) {
+        sessionStorage.removeItem('cb_pending_auth_method');
+        showError(res.error.message || 'Google sign-in failed.');
+        setBusy(false);
+      }
+    });
+  }
+
+  // Forgot Password Handler
+  if (forgotBtn) {
+    forgotBtn.addEventListener('click', async function(e) {
+      e.preventDefault();
+      var em = cleanEmail();
+      if (!validCollegeEmail(em)) return;
+
+      if (!sb) {
+        showError('Unable to connect to authentication server. Please check your internet.');
+        return;
+      }
+
+      setBusy(true, 'Sending password reset link…');
+      var resetUrl = new URL('./reset-password.html', window.location.href).href;
+      var res = await sb.auth.resetPasswordForEmail(em, {
+        redirectTo: resetUrl
+      });
+
+      if (res.error) {
+        showError(res.error.message);
+      } else {
+        showSuccess('If an account exists for this email, a reset link has been sent to your inbox.');
+      }
+      setBusy(false);
+    });
+  }
 })();
 </script>
 
