@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Privacy Policy · ClassBoard</title>
-  <meta name="description" content="Privacy Policy for ClassBoard - Learn how we collect, handle, and protect student information and comply with advertising standards." />
+  <meta name="description" content="Privacy Policy for ClassBoard - How we collect, process, and protect student information, secure branch data with Row Level Security, and comply with advertising standards." />
   <link rel="icon" type="image/svg+xml" href="./classboard-pwa-icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,10 +25,10 @@
     }
     
     * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
+    body {
       font-family: 'Figtree', system-ui, -apple-system, sans-serif;
       color: #17283d;
-      line-height: 1.65;
+      line-height: 1.68;
       padding: 0;
       -webkit-font-smoothing: antialiased;
       background-color: #062f5c;
@@ -51,7 +51,8 @@
       from { background-position:0% 0%,100% 0%,100% 100%,0% 100%,50% 0%,50% 50%; }
       to   { background-position:30% 22%,70% 25%,72% 78%,25% 70%,50% 0%,50% 50%; }
     }
-        header.site-header {
+    
+    header.site-header {
       background: rgba(6, 47, 92, 0.45);
       border-bottom: 1px solid rgba(255, 255, 255, 0.15);
       position: sticky;
@@ -103,7 +104,7 @@
       box-shadow: 0 4px 16px rgba(10, 116, 230, 0.45);
     }
     
-        main.legal-container {
+    main.legal-container {
       max-width: 900px;
       margin: 36px auto 60px;
       padding: 0 20px;
@@ -118,110 +119,16 @@
       padding: 44px 48px;
       box-shadow: 0 25px 60px -15px rgba(2, 24, 60, 0.45);
     }
-    .legal-card h1, .legal-card h2, .legal-card h3 {
-      color: #0756A0;
-    }
-    .legal-body p, .legal-body li {
-      color: #334155;
-    }
     .legal-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
       background: #e0f2fe;
       color: #0284c7;
-      font-weight: 700;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 4px 12px;
       border-radius: 999px;
-      display: inline-block;
-      margin-bottom: 12px;
-    }
-    .legal-meta {
-      color: #64748b;
-      font-size: 13.5px;
-      margin-bottom: 24px;
-      padding-bottom: 18px;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    .callout {
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      border-radius: 14px;
-      padding: 16px 20px;
-      color: #166534;
-      font-size: 14px;
-      margin: 20px 0;
-    }
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-      margin: 24px 0;
-    }
-    .feature-box {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 20px;
-    }
-    .feature-box h3 {
-      font-size: 15.5px;
-      font-weight: 700;
-      color: #0f172a;
-      margin: 8px 0 6px;
-    }
-    .feature-box p {
-      font-size: 13.5px;
-      color: #64748b;
-      line-height: 1.55;
-      margin: 0;
-    }
-
-    /* Founder Cards with Profile Photos */
-    .founders-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
-      margin: 20px 0;
-    }
-    .founder-card {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
-    }
-    .founder-card-photo {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2.5px solid #0A74E6;
-      box-shadow: 0 4px 12px rgba(10, 116, 230, 0.25);
-      flex-shrink: 0;
-    }
-    .founder-card-body {
-      display: flex;
-      flex-direction: column;
-    }
-
-    @media (max-width: 640px) {
-      .legal-card { padding: 26px 20px; border-radius: 14px; }
-      main.legal-container { margin: 20px auto 40px; }
-    }
-    .legal-badge {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      background: var(--blue-soft);
-      color: var(--blue);
-      border-radius: 6px;
       margin-bottom: 12px;
     }
     h1.legal-title {
@@ -229,76 +136,82 @@
       font-size: 32px;
       font-weight: 800;
       line-height: 1.25;
-      color: var(--text);
+      color: #0756A0;
       margin-bottom: 8px;
     }
     .legal-meta {
       font-size: 13px;
-      color: var(--muted);
+      color: #64748b;
       margin-bottom: 28px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--line-light);
+      padding-bottom: 18px;
+      border-bottom: 1px solid #e2e8f0;
     }
     .legal-body h2 {
       font-family: 'Bricolage Grotesque', sans-serif;
       font-size: 20px;
-      font-weight: 700;
-      color: var(--text);
+      font-weight: 750;
+      color: #0756A0;
       margin: 32px 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legal-body h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 20px 0 8px;
     }
     .legal-body p {
       font-size: 15px;
-      color: var(--text);
-      margin-bottom: 16px;
+      color: #334155;
+      margin-bottom: 14px;
+      line-height: 1.7;
     }
-    .legal-body ul {
-      margin: 0 0 18px 22px;
-      font-size: 15px;
+    .legal-body ul, .legal-body ol {
+      margin: 0 0 18px 24px;
+      font-size: 14.5px;
+      color: #334155;
     }
     .legal-body li {
       margin-bottom: 8px;
+      line-height: 1.6;
     }
     .callout {
-      background: var(--surface-2);
-      border-left: 3px solid var(--blue);
-      padding: 14px 18px;
-      border-radius: 0 10px 10px 0;
+      border-radius: 14px;
+      padding: 18px 22px;
       margin: 22px 0;
       font-size: 14px;
-      color: var(--text);
+      line-height: 1.65;
     }
-    footer.site-footer {
-      border-top: 1px solid var(--line);
-      background: var(--surface);
-      padding: 24px 20px;
-      margin-top: 60px;
+    .callout-success {
+      background: #f0fdf4;
+      border-left: 4px solid #16a34a;
+      color: #166534;
     }
-    .footer-inner {
-      max-width: 900px;
-      margin: 0 auto;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 14px;
-      font-size: 13px;
-      color: var(--muted);
+    .callout-info {
+      background: #eff6ff;
+      border-left: 4px solid #006BFF;
+      color: #1e40af;
     }
-    .footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
+    .callout-warning {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #92400e;
     }
-    .footer-links a {
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.15s;
+    .callout-title {
+      font-weight: 700;
+      font-size: 14.5px;
+      margin-bottom: 6px;
+      display: block;
     }
-    .footer-links a:hover, .footer-links a.active {
-      color: var(--blue);
-      font-weight: 600;
+
+    @media (max-width: 640px) {
+      .legal-card { padding: 26px 20px; border-radius: 16px; }
+      main.legal-container { margin: 20px auto 40px; }
+      h1.legal-title { font-size: 26px; }
     }
-  
+
     /* Minimalist Bottom Footer with Profile Photos matching landing page */
     footer {
       border-top: 1px solid rgba(255, 255, 255, 0.16);
@@ -358,8 +271,7 @@
     .foot-dev-name { font-size: 13px; font-weight: 700; color: #ffffff; }
     .foot-dev-role { font-size: 10.5px; color: rgba(224, 242, 254, 0.75); }
     .foot-copyright { font-size: 11.5px; color: rgba(255, 255, 255, 0.55); margin-top: 4px; }
-
-</style>
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -374,63 +286,114 @@
 
   <main class="legal-container">
     <article class="legal-card">
-      <span class="legal-badge">Legal &amp; Transparency</span>
+      <span class="legal-badge">Privacy &amp; Data Governance</span>
       <h1 class="legal-title">Privacy Policy</h1>
-      <div class="legal-meta">Last updated: November 2026 · Effective immediately</div>
+      <div class="legal-meta">Last updated: November 2026 · Effective immediately for all visitors, students, and contributors</div>
 
       <div class="legal-body">
-        <p>At <strong>ClassBoard</strong> (accessible from our official web domain and web application), student and user privacy is of paramount importance to us. This Privacy Policy outlines the types of information collected, how it is used, and the choices you have regarding your data.</p>
+        <p>At <strong>ClassBoard</strong> (accessible from <code>classboardx.in</code>, its subdomains, and associated web applications), the privacy, security, and confidentiality of our student community is an absolute priority. This Privacy Policy details our operational practices regarding the collection, processing, protection, and retention of personal data, in strict accordance with the <strong>Digital Personal Data Protection Act, 2023 (DPDP Act)</strong>, the <strong>Information Technology Act, 2000 (and 2021 Intermediary Guidelines)</strong>, and global digital advertising transparency standards.</p>
 
-        <h2>1. Information We Collect</h2>
-        <p>When you use ClassBoard, we collect certain information to provide an accurate and secure educational experience:</p>
+        <p>By creating an account, authenticating through institutional or Google login, or accessing ClassBoard services, you consent to the data collection and processing practices described herein. If you do not consent, please refrain from using the platform.</p>
+
+        <h2>1. Data Controller &amp; Contact Information</h2>
+        <p>For the purposes of data governance and applicable Indian privacy laws, ClassBoard is managed by its founding engineering developers:</p>
         <ul>
-          <li><strong>Account Information:</strong> College email address (e.g. <code>@medicaps.ac.in</code>), student display name, enrollment/class section, and roll number provided during registration or authentication.</li>
-          <li><strong>Academic Preferences &amp; Planner Records:</strong> Attendance entries, calculated projections, bookmarked subject notes, and student concerns submitted to Class Representatives.</li>
-          <li><strong>Log &amp; Telemetry Data:</strong> Browser user agent, device type, connection timestamps, and activity events (e.g., viewing notes, checking the exam schedule) to ensure portal security and uptime.</li>
+          <li><strong>Data Fiduciaries:</strong> Hasnaat Malik &amp; Harsh Bhadrawale</li>
+          <li><strong>Platform:</strong> ClassBoard (<code>classboardx.in</code>)</li>
+          <li><strong>Official Inquiries &amp; Privacy Desk:</strong> <a href="mailto:contact@classboardx.in">contact@classboardx.in</a></li>
+          <li><strong>Jurisdiction:</strong> Indore, Madhya Pradesh, India</li>
         </ul>
 
-        <h2>2. How We Use Your Information</h2>
-        <p>The information we collect is strictly utilized to:</p>
+        <h2>2. Categories of Information We Collect</h2>
+        <p>We only collect data strictly necessary to deliver a streamlined academic coordination experience:</p>
+
+        <h3>A. Student Identity &amp; Profile Information</h3>
         <ul>
-          <li>Provide, maintain, and personalize the ClassBoard portal experience.</li>
-          <li>Calculate attendance safety projections and notify students about timetable changes and MST schedules.</li>
-          <li>Verify authorized student and section administrator status.</li>
-          <li>Detect and prevent unauthorized cross-section access or security vulnerabilities.</li>
+          <li><strong>Institutional Authentication:</strong> Email address (e.g., <code>student@medicaps.ac.in</code>) and verified Google profile name provided during authentication via Google OAuth.</li>
+          <li><strong>Academic Profile:</strong> Enrolled branch section (e.g., <code>INTEL-1</code>, <code>IBM-1</code>), student roll number, and designated practical laboratory batch (e.g., <code>A1</code>, <code>A2</code>, <code>B1</code>, <code>B2</code>).</li>
+          <li><strong>Role &amp; Permissions:</strong> Designations assigned to manage classroom logistics (e.g., Student, Class Representative / CR, Section Admin, Founder).</li>
         </ul>
 
-        <div class="callout">
-          <strong>Student Data Guarantee:</strong> We do not sell, rent, or trade student email addresses or private academic data to third parties under any circumstances.
+        <h3>B. Academic Planning &amp; Self-Service Records</h3>
+        <ul>
+          <li><strong>Personal Attendance Checklists:</strong> Student-recorded attended classes and subject tracking checkboxes saved to calculate individualized 75% attendance projections.</li>
+          <li><strong>Academic Grievances &amp; Concerns:</strong> Attendance disputes, subject-specific remarks, or scheduling issues submitted to Class Representatives through the "Attendance Concerns" channel.</li>
+          <li><strong>Course Resource Interactions:</strong> Subject notes bookmarked, syllabus references accessed, and exam preparation resources viewed.</li>
+        </ul>
+
+        <h3>C. Technical &amp; Operational Telemetry Data</h3>
+        <ul>
+          <li><strong>Device &amp; Connection Data:</strong> Internet Protocol (IP) address, browser family and version, operating system, device viewport dimensions, and referrer URLs.</li>
+          <li><strong>Platform Route Telemetry:</strong> Anonymized timestamps of page views, active tab navigations, and session duration to assess server capacity and prevent platform outages during peak morning attendance logging hours.</li>
+        </ul>
+
+        <div class="callout callout-success">
+          <span class="callout-title">Zero Commercial Sale Guarantee:</span>
+          We strictly pledge that <strong>ClassBoard has never sold, rented, leased, or monetized student personal data, email addresses, or academic records to third-party data brokers, commercial coaching institutes, or marketing agencies</strong>, and will never do so.
         </div>
 
-        <h2>3. Google AdSense &amp; Third-Party Cookies</h2>
-        <p>ClassBoard may partner with third-party advertising vendors, including <strong>Google AdSense</strong>, to display relevant advertisements to support ongoing hosting and server infrastructure costs.</p>
+        <h2>3. Purposes &amp; Lawful Basis of Processing</h2>
+        <p>We process your data based on legitimate student educational interests, user consent, and platform contract execution for the following specific purposes:</p>
+        <ol>
+          <li><strong>Academic Utility Delivery:</strong> Displaying accurate daily timetables, held class tallies, examination notices, and personalized safe-bunk estimates based on your assigned section and lab batch.</li>
+          <li><strong>Strict Section Isolation &amp; Privacy:</strong> Enforcing access controls so students belonging to Intel (AI &amp; Analytics) can only view Intel resources and students in IBM (Advanced AI) view IBM records.</li>
+          <li><strong>Peer Representation:</strong> Enabling elected Class Representatives to review and address student attendance concerns directly without exposing sensitive student contact info.</li>
+          <li><strong>Platform Security &amp; Abuse Prevention:</strong> Guarding against brute-force attacks, automated web scraping bots, and credential forgery.</li>
+        </ol>
+
+        <h2>4. Backend Infrastructure &amp; Row Level Security (RLS)</h2>
+        <p>Your academic records and profiles are protected by multi-layered cloud security infrastructure:</p>
         <ul>
-          <li>Google, as a third-party vendor, uses cookies to serve ads on ClassBoard.</li>
-          <li>Google's use of advertising cookies enables it and its partners to serve ads to our users based on their visits to our site and other sites on the Internet.</li>
-          <li>Users may opt out of personalized advertising by visiting <a href="https://adssettings.google.com/" target="_blank" rel="noopener">Google Ads Settings</a>. Alternatively, you may opt out of third-party vendor cookies by visiting <a href="https://optout.aboutads.info/" target="_blank" rel="noopener">aboutads.info</a>.</li>
+          <li><strong>Database Hosting &amp; Encryption:</strong> Our database is hosted on <strong>Supabase Inc.</strong> enterprise cloud servers. All communications between your browser and our servers are encrypted in transit using industry-standard TLS 1.3 (Transport Layer Security) with high-grade HTTPS encryption.</li>
+          <li><strong>Row Level Security (RLS) Enforcement:</strong> All database tables (including profiles, member roles, attendance logs, and grievance submissions) enforce strict PostgreSQL Row Level Security. Even within the database layer, an unauthenticated user or student from an unauthorized branch cannot query or extract private roll numbers, attendance checklists, or peer profiles of other cohorts.</li>
         </ul>
 
-        <h2>4. Log Files and Web Beacons</h2>
-        <p>Like standard web applications, ClassBoard utilizes standard log files. The information inside the log files includes Internet Protocol (IP) addresses, browser types, Internet Service Providers (ISP), date/time stamps, referring/exit pages, and number of clicks. These are not linked to personally identifiable information and are used solely for site administration and traffic trend analysis.</p>
-
-        <h2>5. Data Security</h2>
-        <p>We employ enterprise-grade security protocols, including Row Level Security (RLS) on our backend databases, encrypted SSL/TLS connections, and multi-layered role authorization (Student, Class Representative, Admin, Founder) to protect your personal data from unauthorized access.</p>
-
-        <h2>6. Your Privacy Rights</h2>
-        <p>Every student and user is entitled to:</p>
+        <h2>5. Google AdSense &amp; Third-Party Cookies Disclosure</h2>
+        <div class="callout callout-info">
+          <span class="callout-title">AdSense Publisher Compliance Notice:</span>
+          ClassBoard displays non-intrusive advertisements served by <strong>Google AdSense</strong> to subsidize cloud database bandwidth, compute resources, and software upkeep. Because Google serves ads on our site, we comply with all Google AdSense publisher transparency guidelines:
+        </div>
         <ul>
-          <li>Request access to the personal data recorded under their profile.</li>
-          <li>Request correction of any incorrect or outdated academic information.</li>
-          <li>Request deletion of their account records upon leaving the institution.</li>
+          <li><strong>Third-Party Vendor Cookies:</strong> Google and its certified advertising partners use cookies (such as the Google DoubleClick cookie) to serve advertisements based on a user's prior visits to ClassBoard or other websites across the Internet.</li>
+          <li><strong>Personalized Advertising Opt-Out:</strong> Users may opt out of personalized advertising by visiting the <a href="https://adssettings.google.com/" target="_blank" rel="noopener">Google Ads Settings</a> page.</li>
+          <li><strong>Network Advertising Opt-Out:</strong> Alternatively, you can opt out of third-party vendor use of cookies for personalized advertising by visiting <a href="https://optout.aboutads.info/" target="_blank" rel="noopener">www.aboutads.info</a> or the <a href="https://www.networkadvertising.org/choices/" target="_blank" rel="noopener">Network Advertising Initiative (NAI)</a> opt-out tool.</li>
         </ul>
 
-        <h2>7. Contact Us</h2>
-        <p>If you have any questions, concerns, or requests regarding this Privacy Policy, please reach out through our <a href="./contact.html">Contact Us</a> page or email our development team directly.</p>
+        <h2>6. Cookies &amp; Local Storage Usage</h2>
+        <p>ClassBoard utilizes the following client-side technologies to maintain portal functionality:</p>
+        <ul>
+          <li><strong>Essential Session Storage:</strong> Temporary browser storage maintaining your encrypted Supabase OAuth session token, preventing you from having to log in repeatedly during active campus hours.</li>
+          <li><strong>Local Preferences Cache:</strong> HTML5 LocalStorage used to store local device preferences, including dark mode styling, active section tabs, offline PWA cache, and collapsed notification banners. LocalStorage resides exclusively on your local device and is never transmitted to advertisers.</li>
+          <li><strong>Advertising Cookies:</strong> Managed directly by Google AdSense as outlined in Section 5 above.</li>
+        </ul>
+
+        <h2>7. Data Retention &amp; Right to Erasure ("Right to be Forgotten")</h2>
+        <p>In accordance with the Digital Personal Data Protection Act, 2023:</p>
+        <ul>
+          <li><strong>Semester Lifecycle Retention:</strong> Routine academic logs, attendance records, and section rosters are retained for the duration of the active academic year. Historical logs may be archived or reset at the start of each new academic session.</li>
+          <li><strong>Account Erasure:</strong> Any student who transfers, graduates, or wishes to discontinue use of ClassBoard may request complete, permanent erasure of their account profile, roll number mapping, and submitted records by emailing our data team at <a href="mailto:contact@classboardx.in">contact@classboardx.in</a>. All associated records will be purged from our active databases within 14 business days.</li>
+        </ul>
+
+        <h2>8. Children &amp; Minor Privacy</h2>
+        <p>ClassBoard is designed exclusively for university undergraduates, postgraduates, and faculty members (individuals aged 17 and above). We do not knowingly solicit, collect, or store personal information from children under 13 years of age. If we learn that personal data of a minor under 13 has been collected without parental consent, we will promptly delete it.</p>
+
+        <h2>9. Updates to This Privacy Policy</h2>
+        <p>We may periodically update this Privacy Policy to reflect technical modifications, feature additions, or legislative requirements. Any revisions will be published on this page with an updated "Last updated" date. Continued usage of ClassBoard following notification of modifications signifies your agreement to the revised policy.</p>
+
+        <h2>10. Grievance Officer &amp; Formal Legal Inquiries</h2>
+        <p>In compliance with Rule 3(2) of the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021, and the DPDP Act 2023, you may address any concerns, inquiries, or privacy disputes to our designated team:</p>
+        <ul>
+          <li><strong>Designation:</strong> Data Grievance Desk · ClassBoard</li>
+          <li><strong>Founding Team:</strong> Hasnaat Malik &amp; Harsh Bhadrawale</li>
+          <li><strong>Electronic Mail:</strong> <a href="mailto:contact@classboardx.in">contact@classboardx.in</a></li>
+          <li><strong>Physical Jurisdiction:</strong> Indore, Madhya Pradesh, India</li>
+          <li><strong>Response Window:</strong> We endeavor to investigate and resolve all formal data grievances within thirty (30) business days.</li>
+        </ul>
       </div>
     </article>
   </main>
 
-    <footer>
+  <footer>
     <div class="wrap foot-wrap">
       <div class="foot-top-bar">
         <div class="foot-brand-info">
@@ -438,10 +401,10 @@
           <p class="foot-brand-sub">Dedicated to <span class="badge-intel">INTEL</span> &amp; <span class="badge-ibm">IBM</span> batches · Medi-Caps University</p>
         </div>
         <div class="foot-links">
-          <a href="./about.html" class="">About</a>
+          <a href="./about.html">About</a>
           <a href="./privacy.html" class="active">Privacy Policy</a>
-          <a href="./terms.html" class="">Terms of Service</a>
-          <a href="./contact.html" class="">Contact Us</a>
+          <a href="./terms.html">Terms of Service</a>
+          <a href="./contact.html">Contact Us</a>
         </div>
       </div>
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Terms of Service · ClassBoard</title>
-  <meta name="description" content="Terms of Service for ClassBoard - Rules, guidelines, and terms governing the use of the ClassBoard student portal." />
+  <meta name="description" content="Comprehensive Terms of Service for ClassBoard - Rules, independent student project status, attendance and academic disclaimers, IP policy, and governing law." />
   <link rel="icon" type="image/svg+xml" href="./classboard-pwa-icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,10 +25,10 @@
     }
     
     * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
+    body {
       font-family: 'Figtree', system-ui, -apple-system, sans-serif;
       color: #17283d;
-      line-height: 1.65;
+      line-height: 1.68;
       padding: 0;
       -webkit-font-smoothing: antialiased;
       background-color: #062f5c;
@@ -51,7 +51,8 @@
       from { background-position:0% 0%,100% 0%,100% 100%,0% 100%,50% 0%,50% 50%; }
       to   { background-position:30% 22%,70% 25%,72% 78%,25% 70%,50% 0%,50% 50%; }
     }
-        header.site-header {
+    
+    header.site-header {
       background: rgba(6, 47, 92, 0.45);
       border-bottom: 1px solid rgba(255, 255, 255, 0.15);
       position: sticky;
@@ -103,7 +104,7 @@
       box-shadow: 0 4px 16px rgba(10, 116, 230, 0.45);
     }
     
-        main.legal-container {
+    main.legal-container {
       max-width: 900px;
       margin: 36px auto 60px;
       padding: 0 20px;
@@ -118,110 +119,16 @@
       padding: 44px 48px;
       box-shadow: 0 25px 60px -15px rgba(2, 24, 60, 0.45);
     }
-    .legal-card h1, .legal-card h2, .legal-card h3 {
-      color: #0756A0;
-    }
-    .legal-body p, .legal-body li {
-      color: #334155;
-    }
     .legal-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
       background: #e0f2fe;
       color: #0284c7;
-      font-weight: 700;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 4px 12px;
       border-radius: 999px;
-      display: inline-block;
-      margin-bottom: 12px;
-    }
-    .legal-meta {
-      color: #64748b;
-      font-size: 13.5px;
-      margin-bottom: 24px;
-      padding-bottom: 18px;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    .callout {
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      border-radius: 14px;
-      padding: 16px 20px;
-      color: #166534;
-      font-size: 14px;
-      margin: 20px 0;
-    }
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-      margin: 24px 0;
-    }
-    .feature-box {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 20px;
-    }
-    .feature-box h3 {
-      font-size: 15.5px;
-      font-weight: 700;
-      color: #0f172a;
-      margin: 8px 0 6px;
-    }
-    .feature-box p {
-      font-size: 13.5px;
-      color: #64748b;
-      line-height: 1.55;
-      margin: 0;
-    }
-
-    /* Founder Cards with Profile Photos */
-    .founders-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
-      margin: 20px 0;
-    }
-    .founder-card {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
-    }
-    .founder-card-photo {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2.5px solid #0A74E6;
-      box-shadow: 0 4px 12px rgba(10, 116, 230, 0.25);
-      flex-shrink: 0;
-    }
-    .founder-card-body {
-      display: flex;
-      flex-direction: column;
-    }
-
-    @media (max-width: 640px) {
-      .legal-card { padding: 26px 20px; border-radius: 14px; }
-      main.legal-container { margin: 20px auto 40px; }
-    }
-    .legal-badge {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      background: var(--blue-soft);
-      color: var(--blue);
-      border-radius: 6px;
       margin-bottom: 12px;
     }
     h1.legal-title {
@@ -229,76 +136,82 @@
       font-size: 32px;
       font-weight: 800;
       line-height: 1.25;
-      color: var(--text);
+      color: #0756A0;
       margin-bottom: 8px;
     }
     .legal-meta {
       font-size: 13px;
-      color: var(--muted);
+      color: #64748b;
       margin-bottom: 28px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--line-light);
+      padding-bottom: 18px;
+      border-bottom: 1px solid #e2e8f0;
     }
     .legal-body h2 {
       font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 21px;
+      font-size: 20px;
       font-weight: 750;
-      color: var(--text);
-      margin: 34px 0 14px;
+      color: #0756A0;
+      margin: 32px 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legal-body h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 20px 0 8px;
     }
     .legal-body p {
       font-size: 15px;
-      color: var(--text);
-      margin-bottom: 16px;
+      color: #334155;
+      margin-bottom: 14px;
+      line-height: 1.7;
     }
-    .legal-body ul {
-      margin: 0 0 18px 22px;
-      font-size: 15px;
+    .legal-body ul, .legal-body ol {
+      margin: 0 0 18px 24px;
+      font-size: 14.5px;
+      color: #334155;
     }
     .legal-body li {
       margin-bottom: 8px;
+      line-height: 1.6;
     }
     .callout {
-      background: var(--surface-2);
-      border-left: 3px solid var(--blue);
-      padding: 16px 20px;
-      border-radius: 0 12px 12px 0;
-      margin: 24px 0;
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin: 22px 0;
       font-size: 14px;
-      color: var(--text);
+      line-height: 1.65;
     }
-    footer.site-footer {
-      border-top: 1px solid var(--line);
-      background: var(--surface);
-      padding: 24px 20px;
-      margin-top: 60px;
+    .callout-warning {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #92400e;
     }
-    .footer-inner {
-      max-width: 900px;
-      margin: 0 auto;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 14px;
-      font-size: 13px;
-      color: var(--muted);
+    .callout-info {
+      background: #eff6ff;
+      border-left: 4px solid #006BFF;
+      color: #1e40af;
     }
-    .footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
+    .callout-danger {
+      background: #fef2f2;
+      border-left: 4px solid #ef4444;
+      color: #991b1b;
     }
-    .footer-links a {
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.15s;
+    .callout-title {
+      font-weight: 700;
+      font-size: 14.5px;
+      margin-bottom: 6px;
+      display: block;
     }
-    .footer-links a:hover, .footer-links a.active {
-      color: var(--blue);
-      font-weight: 600;
+
+    @media (max-width: 640px) {
+      .legal-card { padding: 26px 20px; border-radius: 16px; }
+      main.legal-container { margin: 20px auto 40px; }
+      h1.legal-title { font-size: 26px; }
     }
-  
+
     /* Minimalist Bottom Footer with Profile Photos matching landing page */
     footer {
       border-top: 1px solid rgba(255, 255, 255, 0.16);
@@ -358,8 +271,7 @@
     .foot-dev-name { font-size: 13px; font-weight: 700; color: #ffffff; }
     .foot-dev-role { font-size: 10.5px; color: rgba(224, 242, 254, 0.75); }
     .foot-copyright { font-size: 11.5px; color: rgba(255, 255, 255, 0.55); margin-top: 4px; }
-
-</style>
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -374,56 +286,115 @@
 
   <main class="legal-container">
     <article class="legal-card">
-      <span class="legal-badge">Terms &amp; Conditions</span>
+      <span class="legal-badge">Legal Documentation</span>
       <h1 class="legal-title">Terms of Service</h1>
-      <div class="legal-meta">Last updated: November 2026 · Effective immediately</div>
+      <div class="legal-meta">Last updated: November 2026 · Effective immediately for all visitors and registered users</div>
 
       <div class="legal-body">
-        <p>Welcome to <strong>ClassBoard</strong>. By accessing or using our platform via web browsers or progressive web application (PWA), you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, please discontinue using the platform.</p>
+        <p>Welcome to <strong>ClassBoard</strong> (accessible at <code>classboardx.in</code>, its subdomains, and associated Progressive Web Applications). These Terms of Service ("Terms") constitute a legally binding agreement between you ("User", "Student", or "You") and the student creators and operators of ClassBoard ("ClassBoard", "We", "Us", or "Our").</p>
 
-        <h2>1. Purpose of the Platform</h2>
-        <p>ClassBoard is an independent, student-led academic productivity platform engineered specifically for engineering students at Medi-Caps University, with dedicated support for specialized branches including <strong>Intel (AI &amp; Analytics)</strong> and <strong>IBM (Advanced AI)</strong>. It provides unified single-screen utilities for verified study notes, academic calendars with official university holidays, exam notices, and 75% attendance planning.</p>
+        <p>By registering for, accessing, browsing, or using ClassBoard, you acknowledge that you have read, understood, and agreed to be unconditionally bound by these Terms and our <a href="./privacy.html">Privacy Policy</a>. <strong>If you do not agree to these Terms in their entirety, you are strictly prohibited from using the platform and must immediately cease access.</strong></p>
 
-        <h2>2. Eligibility &amp; Account Responsibility</h2>
-        <ul>
-          <li>You must use a valid institutional email address (e.g., <code>@medicaps.ac.in</code>) or verified credentials to sign in.</li>
-          <li>You are responsible for maintaining the confidentiality of your account credentials and password.</li>
-          <li>You agree not to attempt unauthorized access to other class sections, administrative dashboards, or other students' private records.</li>
-        </ul>
+        <h2>1. Independent Student Project &amp; Institutional Disassociation</h2>
+        <div class="callout callout-info">
+          <span class="callout-title">Explicit Institutional Status Disclaimer:</span>
+          ClassBoard is an independent, non-commercial, student-led innovation and academic coordination initiative engineered by Hasnaat Malik and Harsh Bhadrawale. <strong>ClassBoard is NOT an official portal, subsidiary, administrative arm, department, or designated communication channel of Medi-Caps University, Indore, or any of its constituent colleges, boards of studies, or administrative bodies.</strong>
+        </div>
+        <p>Any use of the names "Medi-Caps University", "MU", "Intel (AI &amp; Analytics)", "IBM (Advanced AI)", department titles, semester references, or course identifiers on this platform is solely for descriptive, factual, and nominative peer identification purposes under the Fair Dealing doctrine. ClassBoard does not claim any endorsement, sponsorship, partnership, or affiliation with Medi-Caps University administration.</p>
 
-        <h2>3. Academic Records &amp; Attendance Planning Disclaimer</h2>
-        <div class="callout">
-          <strong>Attendance &amp; POD Disclaimers:</strong>
-          <ul>
-            <li><strong>Planning Nature:</strong> ClassBoard attendance calculations and projected safe misses are designed for student guidance and personal planning purposes only. Official university records maintained by Medi-Caps University administration remain the sole authoritative source for official exam eligibility.</li>
-            <li><strong>Daily Logging vs. ERP Delays:</strong> Class Representatives record held classes on a strict daily basis, which is cross-verified against faculty POD records. Because faculty members occasionally update university ERP/POD portals with weekly delays, ClassBoard's count may lead official numbers, providing true daily visibility.</li>
-          </ul>
+        <h2>2. Critical Academic &amp; Attendance Disclaimers</h2>
+        <div class="callout callout-danger">
+          <span class="callout-title">Official Records vs. Advisory Projections (Zero Legal Liability):</span>
+          <p><strong>1. Advisory and Planning Purpose Only:</strong> All attendance percentages, held class tallies, subject lecture logs, projected safe bunks, and "must attend" counts provided on ClassBoard are solely mathematical estimations created by student peers for self-guidance and daily study scheduling.</p>
+          <p><strong>2. Sole Authority of University ERP:</strong> The official university Enterprise Resource Planning (ERP) portal, Professor On Duty (POD) records, registrar databases, and official departmental notices maintained by Medi-Caps University constitute the sole, exclusive, and final legal authority determining a student's attendance percentage, eligibility for Mid-Semester Tests (MST), End-Semester Practical/Theory Examinations, and internal assessment grading.</p>
+          <p><strong>3. Absolute Exclusion of Liability:</strong> Under no legal theory (contract, tort, negligence, or strict liability) shall ClassBoard, its developers, student administrators, Class Representatives (CRs), or contributors be liable for any student's debarment, examination detention, loss of semester, reduction in attendance marks, or disciplinary inquiry arising from discrepancies between ClassBoard logs and official university records.</p>
         </div>
 
-        <h2>4. Acceptable Use Policy</h2>
-        <p>When utilizing ClassBoard, you agree not to:</p>
+        <h2>3. Daily Peer Class Logging &amp; University POD Discrepancies</h2>
+        <p>Students and faculty acknowledge the following operational realities of classroom tracking:</p>
         <ul>
-          <li>Upload malicious code, pirated commercial textbooks, or defamatory material.</li>
-          <li>Disrupt or overload portal databases with automated scripts, scraping bots, or spam requests.</li>
-          <li>Impersonate faculty members, Class Representatives (CRs), or section administrators.</li>
+          <li><strong>Real-Time Classroom Logging:</strong> Daily class held/cancelled records on ClassBoard are entered in good faith by elected Class Representatives (CRs) based on real-time classroom events, faculty substitutions, emergency cancellations, and laboratory sessions.</li>
+          <li><strong>Institutional Synchronization Delays:</strong> Faculty members occasionally update university ERP and official POD sheets on a weekly or bi-weekly batch cycle. Consequently, temporary numerical discrepancies between ClassBoard's real-time logs and the university's lagged ERP figures are normal, anticipated, and do not constitute fraudulent misrepresentation.</li>
+          <li><strong>Student Obligation to Verify:</strong> Every student bears the sole personal responsibility to independently cross-check their official attendance records on the university ERP portal and verify discrepancies directly with their subject faculty or department head.</li>
         </ul>
 
-        <h2>5. Content &amp; Course Materials</h2>
-        <p>Lecture presentations, syllabus outlines, lab manuals, and study notes uploaded to ClassBoard remain the intellectual property of their respective authors and the academic institution. ClassBoard hosts these materials strictly for non-commercial educational study and peer collaboration.</p>
+        <h2>4. User Eligibility, Identity Verification &amp; Account Security</h2>
+        <ul>
+          <li><strong>Eligibility:</strong> Access to restricted branch sections (such as INTEL-1 and IBM-1) is reserved for currently enrolled engineering students and designated academic peers of Medi-Caps University.</li>
+          <li><strong>Authentication:</strong> You must authenticate using an authorized Google Identity account or verified institutional credentials (e.g., <code>@medicaps.ac.in</code>). You agree to provide accurate, current, and genuine roll numbers and lab batch selections (e.g., A1, A2, B1, B2).</li>
+          <li><strong>Credential Confidentiality:</strong> You are strictly responsible for maintaining the confidentiality of your session tokens and credentials. You must notify us immediately at <a href="mailto:contact@classboardx.in">contact@classboardx.in</a> if you suspect any unauthorized account access or security breach.</li>
+          <li><strong>Section Isolation:</strong> Users must not attempt to spoof credentials, forge authorization headers, or manipulate URL parameters to gain unauthorized access to sections, roles, or administrative dossiers beyond their assigned class.</li>
+        </ul>
 
-        <h2>6. Third-Party Advertisements</h2>
-        <p>ClassBoard may display advertisements served by Google AdSense and third-party advertising networks to offset server, database, and infrastructure hosting overheads. We do not endorse or take responsibility for external websites linked via these advertisements.</p>
+        <h2>5. Course Materials, Peer Study Notes &amp; Intellectual Property (DMCA Policy)</h2>
+        <p>ClassBoard fosters collaborative peer learning while respecting intellectual property rights:</p>
+        <ul>
+          <li><strong>Educational Fair Dealing:</strong> Lecture notes, handwritten student summaries, assignment questions, lab code samples, and previous year examination papers (PYQs) made available on ClassBoard are uploaded and shared by students under the <em>Fair Dealing</em> exceptions of Section 52(1)(a) of the Indian Copyright Act, 1957, strictly for non-commercial, private study and educational critique.</li>
+          <li><strong>Ownership:</strong> Syllabus structures, course curriculums, and official institutional documents remain the intellectual property of their respective creators and Medi-Caps University. ClassBoard claims zero proprietary ownership over user-uploaded academic materials.</li>
+          <li><strong>Intermediary Safe Harbor:</strong> ClassBoard acts solely as an intermediary platform under Section 79 of the Information Technology Act, 2000. We do not preview, endorse, or verify user-submitted uploads prior to publication.</li>
+          <li><strong>Notice and Takedown Procedure:</strong> If any professor, author, or copyright holder believes that any content hosted on ClassBoard infringes upon their protected copyright or contains proprietary non-public assessment material, they may submit a formal takedown request to <a href="mailto:contact@classboardx.in">contact@classboardx.in</a> including: (a) description of copyrighted work, (b) specific URL/file name, and (c) proof of authorization. ClassBoard guarantees expeditious removal within 36 business hours upon verification.</li>
+        </ul>
 
-        <h2>7. Limitation of Liability</h2>
-        <p>ClassBoard is provided on an "as is" and "as available" basis without warranties of any kind. While our team works to maintain 99.9% uptime and timetable accuracy, the student developers shall not be held liable for missed lectures, exam timing discrepancies, or network outages.</p>
+        <h2>6. Acceptable Use Policy &amp; Platform Security</h2>
+        <p>You expressly agree that you will NOT engage in any of the following prohibited behaviors:</p>
+        <ol>
+          <li><strong>Automated Scraping &amp; Crawling:</strong> Deploying bots, spiders, automated scrapers, or scripts to extract student directories, class rosters, attendance logs, or database payloads without written developer consent.</li>
+          <li><strong>Security Probing &amp; Exploitation:</strong> Attempting to penetrate, probe, or scan system vulnerabilities, circumvent PostgreSQL Row Level Security (RLS) policies, conduct SQL injection, or launch Distributed Denial of Service (DDoS) attacks.</li>
+          <li><strong>Impersonation &amp; Social Engineering:</strong> Impersonating any university official, professor, student, Class Representative, or administrator, or misrepresenting your academic standing or identity.</li>
+          <li><strong>Defamatory or Harassing Conduct:</strong> Posting vulgar, abusive, derogatory, or defamatory statements against any student, professor, or university staff member in public notes or grievance submission channels.</li>
+          <li><strong>Commercial Redistribution:</strong> Selling, reselling, renting, or commercially exploiting any feature, note, or database record from ClassBoard.</li>
+        </ol>
+        <p>Violation of these rules will result in immediate termination of account access, IP blacklisting, and reporting to relevant institutional or legal authorities where warranted.</p>
 
-        <h2>8. Contact &amp; Questions</h2>
-        <p>Questions regarding these Terms of Service should be directed to the founding team at <a href="mailto:contact@classboardx.in">contact@classboardx.in</a> or through our <a href="./contact.html">Contact Us</a> page.</p>
+        <h2>7. Advertising &amp; Third-Party Networks (Google AdSense)</h2>
+        <p>To fund high-performance cloud hosting, database bandwidth (Supabase), and continuous development with zero mandatory subscription fees for students, ClassBoard displays contextual advertisements supplied by third-party advertising partners, including <strong>Google AdSense</strong>.</p>
+        <ul>
+          <li>ClassBoard has no control over the content, claims, products, or services advertised in third-party banners or interstitial ads.</li>
+          <li>Clicking on any external link or advertisement navigates you away from ClassBoard and subjects you to the third party's privacy policies and terms. We bear zero responsibility for any damages or transactions resulting from external interactions.</li>
+          <li>Users must not click advertisements fraudulently, use automated click-bots, or encourage artificial ad impressions, as doing so violates Google AdSense policies and platform rules.</li>
+        </ul>
+
+        <h2>8. Grievance Redressal &amp; Student Communication Channels</h2>
+        <p>The "Attendance Concerns" and grievance reporting utilities within ClassBoard are designed exclusively as informal, private peer-communication conduits between students and their elected Class Representatives. The submission of an attendance concern on ClassBoard does not constitute a formal administrative appeal, legal notice, or official application to university authorities.</p>
+
+        <h2>9. Disclaimer of Warranties ("AS IS" &amp; "AS AVAILABLE")</h2>
+        <div class="callout callout-warning">
+          <span class="callout-title">Warranty Disclaimer:</span>
+          CLASSBOARD AND ALL CONTENT, FEATURES, UTILITIES, AND INFORMATION ACCESSIBLE THROUGH THE PORTAL ARE PROVIDED ON AN <strong>"AS IS"</strong> AND <strong>"AS AVAILABLE"</strong> BASIS WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. TO THE MAXIMUM EXTENT PERMISSIBLE UNDER APPLICABLE LAW, THE DEVELOPERS DISCLAIM ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR EDUCATIONAL PURPOSE, TITLE, ACCURACY OF TIMETABLES OR EXAM DATES, UNINTERRUPTED AVAILABILITY, FREEDOM FROM BUGS, AND NON-INFRINGEMENT.
+        </div>
+
+        <h2>10. Limitation of Liability</h2>
+        <p>TO THE MAXIMUM EXTENT PERMITTED UNDER APPLICABLE LAW, IN NO EVENT SHALL CLASSBOARD, ITS CREATORS (HASNAAT MALIK &amp; HARSH BHADRAWALE), CONTRIBUTORS, OR CLASS REPRESENTATIVES BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES WHATSOEVER, INCLUDING WITHOUT LIMITATION:</p>
+        <ul>
+          <li>Loss of academic attendance percentage, examination admit card withholding, internal assessment marks reduction, or semester backlogs;</li>
+          <li>Missed lectures, lab practicals, test deadlines, or assignment submissions resulting from inaccurate student logs or timetable schedule modifications;</li>
+          <li>Data loss, unauthorized access to user accounts, or service interruptions resulting from power failures, server downtime, or cyber-attacks;</li>
+          <li>Any total aggregate liability arising out of or related to these Terms, which shall under all circumstances be strictly capped at <strong>Zero Indian Rupees (₹0.00 INR)</strong>.</li>
+        </ul>
+
+        <h2>11. Indemnification</h2>
+        <p>You agree to indemnify, defend, and hold harmless ClassBoard, its founders, and student contributors from and against any claims, liabilities, damages, losses, costs, or legal expenses (including reasonable attorney fees) arising from: (a) your breach of these Terms, (b) your unauthorized use or misuse of the platform, (c) content or notes uploaded by you that infringe third-party rights, or (d) any university disciplinary action instigated by your inappropriate conduct on the platform.</p>
+
+        <h2>12. Governing Law, Jurisdiction &amp; Dispute Resolution</h2>
+        <p>These Terms shall be governed by, construed, and enforced exclusively in accordance with the substantive <strong>laws of the Republic of India</strong>, without regard to conflict of law principles. Any legal suit, action, or dispute arising out of or relating to these Terms or ClassBoard shall be instituted exclusively in the competent civil courts located in <strong>Indore, Madhya Pradesh, India</strong>, and you irrevocably submit to the exclusive personal jurisdiction of such courts.</p>
+
+        <h2>13. Modifications to Terms</h2>
+        <p>ClassBoard reserves the right to revise or amend these Terms at any time to reflect software enhancements, regulatory updates, or changes in university policies. The "Last updated" date at the top of this document indicates the effective revision date. Your continued use of the platform after the posting of revised Terms signifies your full acceptance of the updated terms.</p>
+
+        <h2>14. Contact Information &amp; Grievance Officer</h2>
+        <p>For questions, formal notices, intellectual property claims, or feedback concerning these Terms of Service, please contact the founding team:</p>
+        <ul>
+          <li><strong>Platform:</strong> ClassBoard (<code>classboardx.in</code>)</li>
+          <li><strong>Founding Developers:</strong> Hasnaat Malik &amp; Harsh Bhadrawale</li>
+          <li><strong>Official Inquiries:</strong> <a href="mailto:contact@classboardx.in">contact@classboardx.in</a></li>
+          <li><strong>Contact Form:</strong> Accessible via our <a href="./contact.html">Contact Us</a> page</li>
+          <li><strong>Jurisdiction:</strong> Indore, Madhya Pradesh, India</li>
+        </ul>
       </div>
     </article>
   </main>
 
-    <footer>
+  <footer>
     <div class="wrap foot-wrap">
       <div class="foot-top-bar">
         <div class="foot-brand-info">
@@ -431,10 +402,10 @@
           <p class="foot-brand-sub">Dedicated to <span class="badge-intel">INTEL</span> &amp; <span class="badge-ibm">IBM</span> batches · Medi-Caps University</p>
         </div>
         <div class="foot-links">
-          <a href="./about.html" class="">About</a>
-          <a href="./privacy.html" class="">Privacy Policy</a>
+          <a href="./about.html">About</a>
+          <a href="./privacy.html">Privacy Policy</a>
           <a href="./terms.html" class="active">Terms of Service</a>
-          <a href="./contact.html" class="">Contact Us</a>
+          <a href="./contact.html">Contact Us</a>
         </div>
       </div>
 
