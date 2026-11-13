@@ -6,6 +6,7 @@
   let heartbeatTimer = null;
   let presenceChannel = null;
   let lastLoggedAction = { key: '', time: 0 };
+  let landingViewLoggedThisTurn = false;
 
   function getDeviceInfo() {
     const ua = navigator.userAgent || '';
@@ -32,6 +33,58 @@
       viewport: `${window.innerWidth}x${window.innerHeight}`,
       language: navigator.language || 'en-US'
     };
+  }
+
+  // Privacy-safe first-party visitor identification (persistent across refreshes)
+  function getAnonymousVisitorId() {
+    let vid = null;
+    try {
+      vid = localStorage.getItem('cb_visitor_id');
+      if (!vid) {
+        vid = (typeof crypto !== 'undefined' && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : ('cb_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36));
+        localStorage.setItem('cb_visitor_id', vid);
+      }
+    } catch (_) {
+      vid = 'cb_anon_fallback';
+    }
+    return vid;
+  }
+
+  // Privacy-safe session-scoped identifier for the current browser session
+  function getAnonymousLandingSessionId() {
+    let sid = null;
+    try {
+      sid = sessionStorage.getItem('cb_landing_session_id');
+      if (!sid) {
+        sid = (typeof crypto !== 'undefined' && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : ('sess_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36));
+        sessionStorage.setItem('cb_landing_session_id', sid);
+      }
+    } catch (_) {
+      sid = getAnonymousVisitorId();
+    }
+    return sid;
+  }
+
+  // Record a public landing pageview before authentication
+  async function recordLandingPageView() {
+    if (!window.classboardSupabase?.rpc || landingViewLoggedThisTurn) return;
+    landingViewLoggedThisTurn = true;
+    try {
+      const vid = getAnonymousVisitorId();
+      const sid = getAnonymousLandingSessionId();
+      const dev = getDeviceInfo();
+      const referrer = document.referrer || null;
+      await window.classboardSupabase.rpc('record_landing_page_view', {
+        p_visitor_id: vid,
+        p_session_id: sid,
+        p_referrer: referrer,
+        p_device_category: dev.device_type
+      });
+    } catch (_) {}
   }
 
   async function sendHeartbeat() {
@@ -101,6 +154,19 @@
         activeSessionId = data.session_id;
         sessionStorage.setItem('cb_session_id', activeSessionId);
       }
+
+      // Link anonymous landing session to this successful login event for conversion attribution
+      try {
+        const vid = localStorage.getItem('cb_visitor_id');
+        const sid = sessionStorage.getItem('cb_landing_session_id');
+        if (vid || sid) {
+          await window.classboardSupabase.rpc('record_landing_conversion', {
+            p_visitor_id: vid || null,
+            p_session_id: sid || null
+          });
+        }
+      } catch (_) {}
+
       return data;
     } catch (e) {
       console.warn('ClassBoard login recording error:', e);
@@ -191,8 +257,17 @@
 
   // Auto-instrument DOM interactions
   function initAutoTracking() {
-    // 0. Immediate web page view on initial script execution
+    // 0. Immediate web route telemetry
     recordRouteTelemetry();
+
+    // Check if landing page is visible (unauthenticated public landing)
+    setTimeout(() => {
+      const authGate = document.getElementById('authGate');
+      const isLanding = authGate ? (window.getComputedStyle(authGate).display !== 'none') : (!sessionStorage.getItem('cb_session_id'));
+      if (isLanding) {
+        recordLandingPageView();
+      }
+    }, 150);
 
     // 1. Page view changes: hook into openClassboardPage if available
     const originalOpenPage = window.openClassboardPage;
@@ -207,6 +282,10 @@
     // Hash navigation (landing page anchors, e.g. #planner, #features, #login)
     window.addEventListener('hashchange', () => {
       recordRouteTelemetry(window.location.pathname + window.location.hash);
+      const authGate = document.getElementById('authGate');
+      if (authGate && window.getComputedStyle(authGate).display !== 'none') {
+        recordLandingPageView();
+      }
     });
 
     // 2. Resource clicks & downloads
@@ -261,6 +340,9 @@
     recordUserLogin,
     trackActivity,
     recordRouteTelemetry,
+    recordLandingPageView,
+    getAnonymousVisitorId,
+    getAnonymousLandingSessionId,
     handleLogout,
     getDeviceInfo,
     getActiveSessionId: () => activeSessionId
@@ -274,4 +356,3 @@
     initAutoTracking();
   }
 })();
-

@@ -876,3 +876,279 @@
 [data-theme="dark"] .founder-sort-select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2393ABC9' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
 }
+
+
+/* ==========================================================================
+   Founder Analytics Expansion: Student Usage, Landing, Trends, Revenue
+   ========================================================================== */
+
+.founder-analytics-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.founder-analytics-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 2px;
+}
+
+.founder-analytics-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.founder-analytics-title h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text, #0f172a);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.founder-analytics-title p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted, #64748b);
+}
+
+.founder-timeframe-toolbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--line, #e2e8f0);
+  padding: 3px;
+  border-radius: 10px;
+}
+
+.founder-tf-pill {
+  border: none;
+  background: transparent;
+  padding: 5px 12px;
+  border-radius: 7px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted, #64748b);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.founder-tf-pill:hover {
+  color: var(--text, #0f172a);
+  background: #f1f5f9;
+}
+
+.founder-tf-pill.active {
+  background: #006BFF;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 107, 255, 0.25);
+}
+
+.founder-info-tip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 0.65rem;
+  font-weight: 700;
+  cursor: help;
+  margin-left: 4px;
+}
+
+/* Public Landing Analytics Box */
+.founder-landing-box {
+  background: linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.founder-landing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+/* Analytics Split Panels */
+.founder-panels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Trend Bar Chart */
+.founder-trend-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.founder-trend-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  height: 130px;
+  padding: 10px 4px 4px;
+  border-bottom: 1px solid var(--line, #e2e8f0);
+}
+
+.founder-trend-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.founder-trend-bar-track {
+  width: 100%;
+  max-width: 32px;
+  height: 90px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  position: relative;
+}
+
+.founder-trend-bar-fill {
+  width: 100%;
+  background: linear-gradient(180deg, #38bdf8 0%, #006BFF 100%);
+  border-radius: 6px 6px 0 0;
+  transition: height 0.3s ease;
+  min-height: 4px;
+}
+
+.founder-trend-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted, #64748b);
+  text-align: center;
+}
+
+.founder-trend-val {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.founder-trend-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-size: 0.75rem;
+  color: var(--muted, #64748b);
+}
+
+.founder-legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+/* Badges for Traffic Types */
+.founder-type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.founder-type-badge.public-landing {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.founder-type-badge.authenticated-app {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+/* Revenue Potential Panel */
+.founder-revenue-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.founder-revenue-stat-box {
+  background: #f8fafc;
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.founder-revenue-stat-box.highlight {
+  background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+  border-color: #86efac;
+}
+
+.founder-revenue-stat-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--muted, #64748b);
+}
+
+.founder-revenue-stat-val {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text, #0f172a);
+}
+
+.founder-revenue-disclaimer {
+  background: #f8fafc;
+  border-left: 3px solid #64748b;
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.74rem;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+@media (max-width: 768px) {
+  .founder-panels-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .founder-landing-grid {
+    grid-template-columns: 1fr;
+  }
+  .founder-revenue-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
