@@ -1948,51 +1948,53 @@
     });
 
     const studentList = document.getElementById('studentCaseList');
-    studentList.replaceChildren();
-    (issues || []).filter((issue) => issue.student_id === context.userId).forEach((issue) => {
-      const row = document.createElement('article'); row.className = 'attendance-concern-card';
-      const [header, ...messageParts] = issue.message.split(/\r?\n\r?\n/);
-      const parsedHeader = header.match(/^Subject:\s*(.*?)\s*·\s*Class dates?:\s*(.*)$/);
-      const top = document.createElement('div'); top.className = 'attendance-concern-top';
-      const title = document.createElement('div'); title.className = 'attendance-concern-title'; title.textContent = 'Attendance concern';
-      const stateLabels = { new: 'Sent', reviewing: 'Under review', reviewed: 'Reviewed', referred: 'Referred', resolved: 'Resolved' };
-      const status = document.createElement('span'); status.className = `attendance-concern-status attendance-concern-${issue.state}`; status.textContent = stateLabels[issue.state] || issue.state.replaceAll('_', ' ');
-      top.append(title, status); row.append(top);
-      if (parsedHeader) {
-        const metadata = document.createElement('div'); metadata.className = 'attendance-concern-metadata';
-        const subject = document.createElement('div'); subject.className = 'attendance-concern-meta-row';
-        const subjectLabel = document.createElement('span'); subjectLabel.className = 'attendance-concern-meta-label'; subjectLabel.textContent = 'Subject';
-        const subjectValue = document.createElement('span'); subjectValue.className = 'attendance-concern-meta-value'; subjectValue.textContent = parsedHeader[1];
-        subject.append(subjectLabel, subjectValue); metadata.append(subject);
-        if (parsedHeader[2]) {
-          const dates = document.createElement('div'); dates.className = 'attendance-concern-meta-row';
-          const datesLabel = document.createElement('span'); datesLabel.className = 'attendance-concern-meta-label'; datesLabel.textContent = 'Class dates';
-          const datesValue = document.createElement('span'); datesValue.className = 'attendance-concern-meta-value';
-          datesValue.textContent = parsedHeader[2].split(',').map((date) => {
-            const parsedDate = new Date(`${date.trim()}T00:00:00`);
-            return Number.isNaN(parsedDate.getTime()) ? date.trim() : parsedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-          }).join(' · ');
-          dates.append(datesLabel, datesValue); metadata.append(dates);
+    if (studentList) {
+      studentList.replaceChildren();
+      (issues || []).filter((issue) => issue.student_id === context.userId).forEach((issue) => {
+        const row = document.createElement('article'); row.className = 'attendance-concern-card';
+        const [header, ...messageParts] = issue.message.split(/\r?\n\r?\n/);
+        const parsedHeader = header.match(/^Subject:\s*(.*?)\s*·\s*Class dates?:\s*(.*)$/);
+        const top = document.createElement('div'); top.className = 'attendance-concern-top';
+        const title = document.createElement('div'); title.className = 'attendance-concern-title'; title.textContent = 'Attendance concern';
+        const stateLabels = { new: 'Sent', reviewing: 'Under review', reviewed: 'Reviewed', referred: 'Referred', resolved: 'Resolved' };
+        const status = document.createElement('span'); status.className = `attendance-concern-status attendance-concern-${issue.state}`; status.textContent = stateLabels[issue.state] || issue.state.replaceAll('_', ' ');
+        top.append(title, status); row.append(top);
+        if (parsedHeader) {
+          const metadata = document.createElement('div'); metadata.className = 'attendance-concern-metadata';
+          const subject = document.createElement('div'); subject.className = 'attendance-concern-meta-row';
+          const subjectLabel = document.createElement('span'); subjectLabel.className = 'attendance-concern-meta-label'; subjectLabel.textContent = 'Subject';
+          const subjectValue = document.createElement('span'); subjectValue.className = 'attendance-concern-meta-value'; subjectValue.textContent = parsedHeader[1];
+          subject.append(subjectLabel, subjectValue); metadata.append(subject);
+          if (parsedHeader[2]) {
+            const dates = document.createElement('div'); dates.className = 'attendance-concern-meta-row';
+            const datesLabel = document.createElement('span'); datesLabel.className = 'attendance-concern-meta-label'; datesLabel.textContent = 'Class dates';
+            const datesValue = document.createElement('span'); datesValue.className = 'attendance-concern-meta-value';
+            datesValue.textContent = parsedHeader[2].split(',').map((date) => {
+              const parsedDate = new Date(`${date.trim()}T00:00:00`);
+              return Number.isNaN(parsedDate.getTime()) ? date.trim() : parsedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+            }).join(' · ');
+            dates.append(datesLabel, datesValue); metadata.append(dates);
+          }
+          row.append(metadata);
         }
-        row.append(metadata);
-      }
-      const reportText = parsedHeader ? messageParts.join('\n\n').trim() : issue.message;
-      if (reportText) {
-        const report = document.createElement('div'); report.className = 'attendance-concern-section';
-        const reportLabel = document.createElement('div'); reportLabel.className = 'attendance-concern-section-label'; reportLabel.textContent = 'Your message';
-        const reportBody = document.createElement('div'); reportBody.className = 'attendance-concern-copy'; reportBody.textContent = reportText;
-        report.append(reportLabel, reportBody); row.append(report);
-      }
-      const latestReply = (replies.get(issue.id) || []).at(-1);
-      if (latestReply) {
-        const response = document.createElement('div'); response.className = 'attendance-concern-section attendance-concern-reply';
-        const replyLabel = document.createElement('div'); replyLabel.className = 'attendance-concern-section-label'; replyLabel.textContent = 'CR/Admin reply';
-        const replyBody = document.createElement('div'); replyBody.className = 'attendance-concern-copy'; replyBody.textContent = latestReply.body;
-        response.append(replyLabel, replyBody); row.append(response);
-      }
-      studentList.append(row);
-    });
-    if (!studentList.children.length) addEmptyNote(studentList, 'You have not sent an attendance concern.');
+        const reportText = parsedHeader ? messageParts.join('\n\n').trim() : issue.message;
+        if (reportText) {
+          const report = document.createElement('div'); report.className = 'attendance-concern-section';
+          const reportLabel = document.createElement('div'); reportLabel.className = 'attendance-concern-section-label'; reportLabel.textContent = 'Your message';
+          const reportBody = document.createElement('div'); reportBody.className = 'attendance-concern-copy'; reportBody.textContent = reportText;
+          report.append(reportLabel, reportBody); row.append(report);
+        }
+        const latestReply = (replies.get(issue.id) || []).at(-1);
+        if (latestReply) {
+          const response = document.createElement('div'); response.className = 'attendance-concern-section attendance-concern-reply';
+          const replyLabel = document.createElement('div'); replyLabel.className = 'attendance-concern-section-label'; replyLabel.textContent = 'CR/Admin reply';
+          const replyBody = document.createElement('div'); replyBody.className = 'attendance-concern-copy'; replyBody.textContent = latestReply.body;
+          response.append(replyLabel, replyBody); row.append(response);
+        }
+        studentList.append(row);
+      });
+      if (!studentList.children.length) addEmptyNote(studentList, 'You have not sent an attendance concern.');
+    }
 
     const crList = document.getElementById('crCaseList');
     crList.replaceChildren();
