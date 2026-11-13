@@ -128,6 +128,7 @@
 
   function setRoleOptions(roles, isFounder = false) {
     const switcher = document.getElementById('roleSwitcher');
+    if (!switcher) return;
     const labels = { student: 'Student View', cr: 'Class Representatives', admin: isFounder ? 'Founder Workspace' : 'Admin Workspace' };
     // Show every active membership so staff accounts can also use Student view.
     const orderedRoles = ['student', 'cr', 'admin'].filter((role) => roles.includes(role) || (role === 'cr' && roles.includes('admin')));
@@ -303,14 +304,16 @@
     const calendarSource = document.getElementById('calendarSource');
     if (calendarSource) calendarSource.textContent = `Academic calendar and events for ${classLabel}.`;
     if (loginClassSelector) loginClassSelector.value = classCode;
-    classSwitcher.replaceChildren(...activeClasses.map((item) => {
-      const option = document.createElement('option');
-      option.value = item.code;
-      option.textContent = `${item.code} · ${item.name}`;
-      return option;
-    }));
-    classSwitcher.value = classCode;
-    classSwitcher.hidden = activeClasses.length < 2;
+    if (classSwitcher) {
+      classSwitcher.replaceChildren(...activeClasses.map((item) => {
+        const option = document.createElement('option');
+        option.value = item.code;
+        option.textContent = `${item.code} · ${item.name}`;
+        return option;
+      }));
+      classSwitcher.value = classCode;
+      classSwitcher.hidden = activeClasses.length < 2;
+    }
     document.body.dataset.multipleClasses = String(activeClasses.length > 1);
 
     let rosterName = '';
@@ -1165,24 +1168,26 @@
     renderHomeUpdates(updateFeed);
 
     const resourceGrid = document.getElementById('resourceGrid');
-    resourceGrid.replaceChildren();
+    if (resourceGrid) resourceGrid.replaceChildren();
     const resourceEmpty = document.getElementById('resourceEmpty');
     const homeResources = document.getElementById('homeResourceGrid');
-    homeResources.querySelectorAll('.home-resource-card, .live-empty').forEach((node) => node.remove());
+    if (homeResources) homeResources.querySelectorAll('.home-resource-card, .live-empty').forEach((node) => node.remove());
     const resources = resourceResult.data || [];
     window.classboardResources = resources;
     window.dispatchEvent(new CustomEvent('classboard:resources-loaded', { detail: resources }));
     await showPublishedCalendar(resources);
     if (!resources.length) {
-      resourceEmpty.textContent = 'No resources have been published yet.';
-      resourceEmpty.style.display = 'block';
-      addEmptyNote(homeResources, 'No notes have been published yet.');
+      if (resourceEmpty) {
+        resourceEmpty.textContent = 'No resources have been published yet.';
+        resourceEmpty.style.display = 'block';
+      }
+      if (homeResources) addEmptyNote(homeResources, 'No notes have been published yet.');
     } else {
-      resourceEmpty.textContent = 'No files match. Try a different search.';
+      if (resourceEmpty) resourceEmpty.textContent = 'No files match. Try a different search.';
       const cards = await Promise.all(resources.map((resource) => addResourceCard(resource)));
-      cards.forEach((card) => resourceGrid.append(card));
+      if (resourceGrid) cards.forEach((card) => resourceGrid.append(card));
       const homeCards = await Promise.all(resources.slice(0, 2).map((resource) => addResourceCard(resource, true)));
-      homeCards.forEach((card) => homeResources.append(card));
+      if (homeResources) homeCards.forEach((card) => homeResources.append(card));
     }
     if (window.classboardFilterResources) window.classboardFilterResources();
     else if (resources.length) document.getElementById('resourceSearch')?.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1195,7 +1200,7 @@
     window.classboardCurrentSessions = sessions;
     window.classboardSubjects = subjectResult.data || [];
     const monthSelect = document.getElementById('classMonthFilter');
-    const previousMonth = monthSelect.value;
+    const previousMonth = monthSelect?.value || '';
     const monthRows = new Map();
     sessions.forEach((session) => {
       const date = new Date(session.starts_at);
@@ -1207,38 +1212,45 @@
       monthRows.set(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`, now.toLocaleString('en-IN', { month: 'long', year: 'numeric' }));
     }
     const monthOptions = [...monthRows].sort(([a], [b]) => b.localeCompare(a));
-    monthSelect.replaceChildren(...monthOptions.map(([, label]) => {
-      const option = document.createElement('option'); option.value = label; option.textContent = label; return option;
-    }));
-    monthSelect.value = monthOptions.some(([, label]) => label === previousMonth) ? previousMonth : monthOptions[0][1];
+    if (monthSelect) {
+      monthSelect.replaceChildren(...monthOptions.map(([, label]) => {
+        const option = document.createElement('option'); option.value = label; option.textContent = label; return option;
+      }));
+      monthSelect.value = monthOptions.some(([, label]) => label === previousMonth) ? previousMonth : monthOptions[0][1];
+    }
     const classLogList = document.getElementById('classLogList');
-    classLogList.replaceChildren();
-    if (!sessions.length) addEmptyNote(classLogList, 'No class sessions have been added yet.');
-    const dayGroups = new Map();
-    const chronologicalSessions = [...sessions].sort((first, second) => new Date(first.starts_at) - new Date(second.starts_at));
-    chronologicalSessions.forEach((session) => {
-      const date = new Date(session.starts_at);
-      const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-      if (!dayGroups.has(key)) {
-        const group = document.createElement('section'); group.className = 'class-log-day-group'; group.dataset.classLogDay = key;
-        const heading = document.createElement('h2'); heading.className = 'class-log-day-heading';
-        heading.innerHTML = '<span class="class-log-day-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg></span>';
-        const dateLabel = document.createElement('span'); dateLabel.textContent = date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        const grid = document.createElement('div'); grid.className = 'class-log-session-grid';
-        heading.append(dateLabel); group.append(heading, grid); classLogList.append(group); dayGroups.set(key, { group, grid });
-      }
-      const day = dayGroups.get(key);
-      day.grid.append(addSessionRow(session));
-    });
+    if (classLogList) {
+      classLogList.replaceChildren();
+      if (!sessions.length) addEmptyNote(classLogList, 'No class sessions have been added yet.');
+      const dayGroups = new Map();
+      const chronologicalSessions = [...sessions].sort((first, second) => new Date(first.starts_at) - new Date(second.starts_at));
+      chronologicalSessions.forEach((session) => {
+        const date = new Date(session.starts_at);
+        const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+        if (!dayGroups.has(key)) {
+          const group = document.createElement('section'); group.className = 'class-log-day-group'; group.dataset.classLogDay = key;
+          const heading = document.createElement('h2'); heading.className = 'class-log-day-heading';
+          heading.innerHTML = '<span class="class-log-day-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg></span>';
+          const dateLabel = document.createElement('span'); dateLabel.textContent = date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+          const grid = document.createElement('div'); grid.className = 'class-log-session-grid';
+          heading.append(dateLabel); group.append(heading, grid); classLogList.append(group); dayGroups.set(key, { group, grid });
+        }
+        const day = dayGroups.get(key);
+        day.grid.append(addSessionRow(session));
+      });
+    }
     const crRecentClasses = document.getElementById('crRecentClasses');
-    crRecentClasses.replaceChildren();
-    const recentRows = sessions.slice(0, 5);
-    if (!recentRows.length) addEmptyNote(crRecentClasses, 'No class sessions have been added yet.');
-    else recentRows.forEach((session) => crRecentClasses.append(addSessionRow(session, true)));
+    if (crRecentClasses) {
+      crRecentClasses.replaceChildren();
+      const recentRows = sessions.slice(0, 5);
+      if (!recentRows.length) addEmptyNote(crRecentClasses, 'No class sessions have been added yet.');
+      else recentRows.forEach((session) => crRecentClasses.append(addSessionRow(session, true)));
+    }
     const crSessionCount = document.getElementById('crSessionCount');
     if (crSessionCount) crSessionCount.textContent = String(sessions.length);
     const crLatestLogStat = document.getElementById('crLatestLogStat');
     if (crLatestLogStat) {
+      const recentRows = sessions.slice(0, 5);
       if (recentRows.length) {
         const latestDate = new Date(recentRows[0].starts_at);
         crLatestLogStat.textContent = Number.isNaN(latestDate.getTime()) ? '—' : latestDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
@@ -1247,13 +1259,15 @@
       }
     }
     const reminderContainer = document.getElementById('homeReminderList');
-    reminderContainer.replaceChildren();
-    const upcomingItems = (reminderResult.data || []).map((reminder) => ({
-      date: new Date(reminder.due_at),
-      card: addReminderCard(reminder),
-    })).sort((a, b) => a.date - b.date);
-    if (upcomingItems.length) reminderContainer.append(upcomingItems[0].card);
-    else addEmptyNote(reminderContainer, 'No upcoming reminders.');
+    if (reminderContainer) {
+      reminderContainer.replaceChildren();
+      const upcomingItems = (reminderResult.data || []).map((reminder) => ({
+        date: new Date(reminder.due_at),
+        card: addReminderCard(reminder),
+      })).sort((a, b) => a.date - b.date);
+      if (upcomingItems.length) reminderContainer.append(upcomingItems[0].card);
+      else addEmptyNote(reminderContainer, 'No upcoming reminders.');
+    }
     await loadNotifications(classId);
     await loadAttendanceIssues(classId);
     document.getElementById('classSubjectFilter')?.dispatchEvent(new Event('change', { bubbles: true }));
@@ -2087,6 +2101,7 @@
 
   async function loadAdminAccounts(classId) {
     const container = document.getElementById('accountList');
+    if (!container) return;
     const client = window.classboardSupabase;
     const { data: memberships, error: membershipError } = await client
       .from('class_memberships').select('user_id,role,roll_number').eq('class_id', classId).eq('is_active', true);
