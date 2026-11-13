@@ -186,6 +186,95 @@
     .home-dashboard-grid { align-items: stretch; }
     .home-dashboard-grid > .stack:first-child { display: flex; flex-direction: column; }
     .home-dashboard-grid > .stack:first-child > #homeResourceList { flex: 1 1 auto; }
+
+    /* CR stats row */
+    .cr-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 580px; }
+    @media (max-width: 600px) { .cr-stats { grid-template-columns: minmax(0, 1fr); max-width: none; } }
+
+    /* Simplified Dashboard for non-Intel-1 classes */
+    #page-home.simplified-dashboard .stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+    #page-home.simplified-dashboard .stats .stat-card {
+      grid-column: auto !important;
+      width: 100% !important;
+      box-sizing: border-box;
+    }
+    #page-home.simplified-dashboard #homeRemindersStatCard {
+      display: none !important;
+    }
+    #page-home.simplified-dashboard #homeRemindersSection {
+      display: none !important;
+    }
+    #page-home.simplified-dashboard .home-dashboard-grid {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1.35fr) minmax(260px, .95fr) !important;
+      gap: 18px !important;
+      align-items: stretch !important;
+    }
+    #page-home.simplified-dashboard .home-dashboard-grid > .stack {
+      display: contents !important;
+    }
+    #page-home.simplified-dashboard #homeUpdateList {
+      grid-column: 1 !important;
+      grid-row: 1 !important;
+      min-width: 0 !important;
+      height: 100%;
+    }
+    #page-home.simplified-dashboard .home-attendance-panel {
+      grid-column: 2 !important;
+      grid-row: 1 !important;
+      min-width: 0 !important;
+      height: 100%;
+    }
+    #page-home.simplified-dashboard #homeResourceList {
+      grid-column: 1 / -1 !important;
+      grid-row: 2 !important;
+      min-width: 0 !important;
+      width: 100% !important;
+      flex: none !important;
+    }
+    #page-home.simplified-dashboard #homeResourceGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 12px;
+      padding: 0 16px 16px;
+    }
+    @media (max-width: 960px) {
+      #page-home.simplified-dashboard .home-dashboard-grid {
+        grid-template-columns: minmax(0, 1.25fr) minmax(230px, .9fr) !important;
+        gap: 13px !important;
+      }
+    }
+    @media (max-width: 760px) {
+      #page-home.simplified-dashboard .home-dashboard-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 14px !important;
+      }
+      #page-home.simplified-dashboard #homeUpdateList {
+        grid-column: 1 !important;
+        grid-row: auto !important;
+        height: auto;
+      }
+      #page-home.simplified-dashboard .home-attendance-panel {
+        grid-column: 1 !important;
+        grid-row: auto !important;
+        height: auto;
+      }
+      #page-home.simplified-dashboard #homeResourceList {
+        grid-column: 1 !important;
+        grid-row: auto !important;
+      }
+      #page-home.simplified-dashboard #homeResourceGrid {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 0 12px 14px;
+      }
+    }
+    @media (max-width: 480px) {
+      #page-home.simplified-dashboard .stats {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+    }
     .panel { border: 1px solid color-mix(in srgb, var(--line) 78%, white 22%); border-radius: 12px; background: color-mix(in srgb, var(--surface) 84%, transparent); box-shadow: var(--shadow), inset 0 1px color-mix(in srgb, white 36%, transparent); backdrop-filter: blur(14px) saturate(125%); -webkit-backdrop-filter: blur(14px) saturate(125%); overflow: hidden; }
     .panel-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px 12px; }
     .panel-title { font-size: 12px; font-weight: 700; letter-spacing: -.01em; }
@@ -5109,7 +5198,7 @@
           <a class="stat-card" href="#resources" data-page="resources" aria-label="Open Notes and Syllabus">
             <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 1 4 17.5z"/><path d="M8 7h8M8 11h8"/></svg></div><div><div class="stat-value">—</div><div class="stat-label">Resources available</div></div>
           </a>
-          <a class="stat-card" href="#updates" data-page="updates" aria-label="Open updates and reminders">
+          <a class="stat-card" id="homeRemindersStatCard" href="#updates" data-page="updates" aria-label="Open updates and reminders">
             <div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3"/></svg></div><div><div class="stat-value">—</div><div class="stat-label">Upcoming reminders</div></div>
           </a>
         </section>
@@ -5122,7 +5211,7 @@
 
           <div class="stack">
             <article class="panel home-attendance-panel"><div class="panel-header"><div class="home-panel-link" data-home-navigation-page="attendance" tabindex="0" role="link" aria-label="Open attendance planner"><div class="panel-title">Attendance planner</div><div class="panel-sub">Top attendance · lectures and labs.</div></div><button class="text-link home-action-link" data-page="attendance">See planner →</button></div><div class="home-attendance-list" id="homeAttendanceSummary" aria-live="polite"></div></article>
-            <article class="panel">
+            <article class="panel" id="homeRemindersSection">
               <div class="panel-header"><div class="home-panel-link" data-home-navigation-page="updates" tabindex="0" role="link" aria-label="Open reminders and updates"><div class="panel-title">Coming up</div><div class="panel-sub">Dates to remember</div></div><button class="text-link home-action-link" data-page="updates">See all →</button></div>
               <div id="homeReminderList"></div>
             </article>
@@ -5365,9 +5454,9 @@
         </section>
 
         <section class="page-view" id="page-cr">
-          <div class="page-heading"><div><div class="eyebrow">Class representative tools</div><h1>Class Representatives</h1><div class="page-description">Post class updates, keep the class log current, and follow up on student concerns.</div></div></div>
+          <div class="page-heading"><div><div class="eyebrow">Class representative tools</div><h1>Class Representatives</h1><div class="page-description">Post class updates, keep the class log current, and manage class schedules.</div></div></div>
           <div class="role-banner"><strong>Class representative access</strong><span>Class representatives and section admins can publish updates, class logs, schedules, and reminders for this section.</span></div>
-          <section class="stats"><div class="stat-card"><div><div class="stat-value" id="crCaseCount">0</div><div class="stat-label">Attendance concerns</div></div></div><div class="stat-card"><div><div class="stat-value">—</div><div class="stat-label">Latest class log</div></div></div></section>
+          <section class="stats cr-stats"><div class="stat-card"><div><div class="stat-value" id="crSessionCount">—</div><div class="stat-label">Classes logged</div></div></div><div class="stat-card"><div><div class="stat-value" id="crLatestLogStat">—</div><div class="stat-label">Latest class log</div></div></div></section>
           <div class="workspace-grid">
             <div class="workspace-stack">
               <article class="panel">
@@ -5385,7 +5474,6 @@
               <article class="panel"><div class="panel-header"><div><div class="panel-title">Add a reminder</div><div class="panel-sub">Share a deadline or date students should remember.</div></div></div><form class="workspace-form" id="crReminderForm"><label class="field-label">Reminder<input class="text-field" name="title" placeholder="e.g. Submit lab record" required maxlength="90"></label><label class="field-label">Date<input class="text-field" type="date" name="date" required></label><label class="field-label">Details<input class="text-field" name="details" placeholder="Time, room, details or session link" maxlength="140"></label><div class="form-actions"><button class="primary-button" type="submit">Publish reminder</button></div></form></article>
             </div>
             <div class="workspace-stack">
-              <article class="panel workspace-table"><div class="panel-header"><div><div class="panel-title">Private attendance concerns</div><div class="panel-sub">Visible to the student, assigned CR, and class admins.</div></div><span class="status pending" id="openCaseBadge">0 open</span></div><div id="crCaseList"><div class="list-row"><div class="list-main">Loading private concerns…</div></div></div><div class="private-note">CRs can review and forward concerns; only faculty can change official attendance.</div></article>
               <article class="panel"><div class="panel-header"><div><div class="panel-title">Recent class log</div><div class="panel-sub">Latest records entered by the CR team.</div></div><button class="text-link" data-page="classes">View all →</button></div><div id="crRecentClasses"></div></article>
             </div>
           </div>
@@ -5713,6 +5801,32 @@
   </div>
   <script>
     const root = document.documentElement;
+    const isIntel1Class = (code) => {
+      const active = String(code || window.classboardContext?.classCode || localStorage.getItem('classboard-selected-class') || document.getElementById('loginClassSelector')?.value || 'INTEL-1').trim().toUpperCase();
+      return active === 'INTEL-1';
+    };
+
+    function syncDashboardClassLayout(classCode) {
+      const isIntel1 = isIntel1Class(classCode);
+      const homePage = document.getElementById('page-home');
+      const remindersStatCard = document.getElementById('homeRemindersStatCard');
+      const remindersSection = document.getElementById('homeRemindersSection');
+
+      if (homePage) {
+        homePage.classList.toggle('simplified-dashboard', !isIntel1);
+      }
+      if (remindersStatCard) {
+        remindersStatCard.hidden = !isIntel1;
+      }
+      if (remindersSection) {
+        remindersSection.hidden = !isIntel1;
+      }
+    }
+    window.syncDashboardClassLayout = syncDashboardClassLayout;
+    syncDashboardClassLayout();
+    window.addEventListener('classboard:context-ready', (e) => {
+      syncDashboardClassLayout(e.detail?.classCode);
+    });
     const classBatchCodes = () => window.classboardContext?.classCode === 'INTEL-2' ? ['B1', 'B2'] : ['A1', 'A2'];
     const classMaxRoll = () => window.classboardContext?.classCode === 'IBM-1' ? 67 : 66;
     const batchForRoll = (roll) => {
@@ -6692,7 +6806,7 @@
         type: 'page',
         pageId: 'cr',
         title: 'Class Representatives',
-        subtitle: 'CR team info, private concerns & workspace',
+        subtitle: 'CR team info, class log & workspace',
         icon: '<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
         badge: 'Page'
       },
