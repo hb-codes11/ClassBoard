@@ -280,7 +280,7 @@
       profileClassDetail.querySelector('.list-detail').textContent = classLabel;
       profileClassDetail.querySelector('[data-toast]').dataset.toast = `This portal is set up for ${classLabel}.`;
     }
-    const footerLabel = document.querySelector('.site-footer span:first-child, .site-footer > div > span:first-child');
+    const footerLabel = document.querySelector('.footer-meta-info, .site-footer span:first-child, .site-footer > div > span:first-child');
     if (footerLabel) footerLabel.textContent = `About ClassBoard · ${classLabel}, ${classInfo.semester ? `${classInfo.semester}${classInfo.semester === 1 ? 'st' : classInfo.semester === 2 ? 'nd' : classInfo.semester === 3 ? 'rd' : 'th'} Semester` : ''}`;
     document.querySelectorAll('[data-config-value="semester"]').forEach((el) => {
       const suffix = el.textContent.match(/·\s*(.*)$/)?.[1] || '';
