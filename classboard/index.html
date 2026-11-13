@@ -1166,7 +1166,276 @@
     [hidden] { display: none !important; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
     .attendance-layout { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(390px, .92fr); gap: 16px; align-items: start; }
-    .attendance-planner { min-width: 0; max-width: none !important; margin: 0 0 16px !important; }
+    .attendance-planner { min-width: 0; max-width: none !important; margin: 0 !important; }
+    
+    /* Attendance Overview / Health KPI Card */
+    .attendance-summary-card {
+      margin: 14px 0 20px;
+      padding: 18px 20px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #f0f7ff 0%, #f8fafc 100%);
+      border: 1px solid #bfdbfe;
+      box-shadow: 0 4px 18px rgba(0, 107, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    [data-theme="dark"] .attendance-summary-card {
+      background: linear-gradient(135deg, rgba(0, 107, 255, 0.09) 0%, rgba(15, 23, 42, 0.6) 100%);
+      border-color: rgba(0, 107, 255, 0.28);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+    .summary-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .summary-stat-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .summary-ring-badge {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      border: 3px solid var(--blue);
+      box-shadow: 0 4px 12px rgba(0, 107, 255, 0.15);
+      flex-shrink: 0;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .summary-ring-badge.status-safe {
+      border-color: #10b981;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
+    }
+    .summary-ring-badge.status-danger {
+      border-color: #f59e0b;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.2);
+    }
+    .summary-percent {
+      font-size: 14px;
+      font-weight: 800;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      line-height: 1.1;
+      color: var(--text);
+    }
+    .summary-ring-label {
+      font-size: 8.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+    .summary-metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .summary-title {
+      font-size: 15px;
+      font-weight: 750;
+      color: var(--text);
+    }
+    .summary-sub {
+      font-size: 12.5px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .summary-chips {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .summary-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 650;
+    }
+    .summary-chip.safe {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    [data-theme="dark"] .summary-chip.safe {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .summary-chip.danger {
+      background: #fffbeb;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+    [data-theme="dark"] .summary-chip.danger {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    .chip-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .summary-progress-bar {
+      position: relative;
+      height: 8px;
+      background: var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .summary-progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--blue);
+      transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
+    }
+    .summary-threshold-marker {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #ffffff;
+      opacity: 0.85;
+      box-shadow: 0 0 4px rgba(0,0,0,0.4);
+      z-index: 2;
+    }
+    .summary-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .summary-tip {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .summary-tip strong {
+      color: var(--text);
+    }
+    .summary-tip code {
+      font-family: inherit;
+      font-weight: 700;
+      color: #d97706;
+      background: rgba(245, 158, 11, 0.12);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    /* Full-Width Timetable Showcase Panel */
+    .timetable-showcase-panel {
+      grid-column: 1 / -1 !important;
+      width: 100%;
+      margin-top: 18px;
+      overflow: hidden;
+      border-radius: 18px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+    }
+    .timetable-showcase-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+    .timetable-showcase-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .timetable-showcase-actions .secondary-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 36px;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .timetable-showcase-canvas {
+      width: 100%;
+      max-height: 580px;
+      overflow: auto;
+      background: var(--surface-2);
+      padding: 16px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+    }
+    .timetable-showcase-canvas img {
+      width: 100%;
+      max-width: 1100px;
+      height: auto;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.07);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .timetable-showcase-canvas:hover img {
+      transform: scale(1.006);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+    .timetable-showcase-hint {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      background: rgba(15, 23, 42, 0.78);
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+      opacity: 0.88;
+      transition: opacity 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .timetable-showcase-canvas:hover .timetable-showcase-hint {
+      opacity: 1;
+    }
+    @media (max-width: 760px) {
+      .timetable-showcase-header {
+        padding: 14px 16px 10px;
+      }
+      .timetable-showcase-canvas {
+        padding: 10px;
+        max-height: 420px;
+      }
+      .timetable-showcase-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .timetable-showcase-hint {
+        bottom: 16px;
+        right: 16px;
+        font-size: 10px;
+        padding: 4px 10px;
+      }
+    }
+    
     .attendance-issue-panel { grid-column: 1; width: 100%; min-width: 0; max-width: none; }
     #studentCaseList { display: grid; gap: 10px; padding: 0 18px 18px; }
     .attendance-concern-card { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
@@ -5044,6 +5313,31 @@
           <div class="page-heading"><div><div class="eyebrow">Just for you</div><h1>Attendance</h1><div class="page-description">Plan ahead for every subject and stay above the 75% requirement.</div></div></div>
           <div class="attendance-layout">
           <article class="panel attendance-planner"><div class="panel-header"><div><div class="panel-title">Attendance safety planner</div><div class="panel-sub">Enter your attended classes and upcoming plan. CRs and admins maintain the shared classes-held total.</div></div></div><div class="attendance-mode-controls"><label class="field-label attendance-mode-control">Attendance view<select class="select-field" id="attendanceMode" aria-label="Attendance view"><option value="lecture">Lecture attendance</option><option value="lab">Lab attendance</option></select></label><label class="field-label attendance-mode-control" id="attendanceLabBatchWrap" hidden>Lab batch<select class="select-field" id="attendanceLabBatch" aria-label="Lab batch"><option value="A1">A1</option><option value="A2">A2</option></select></label></div>
+            <div class="attendance-summary-card" id="attendanceSummaryCard">
+              <div class="summary-top">
+                <div class="summary-stat-wrap">
+                  <div class="summary-ring-badge" id="summaryRingBadge">
+                    <span class="summary-percent" id="summaryOverallPercent">—</span>
+                    <span class="summary-ring-label">Overall</span>
+                  </div>
+                  <div class="summary-metrics">
+                    <div class="summary-title" id="summaryOverallStatus">Overall Semester Standing</div>
+                    <div class="summary-sub" id="summaryTotals">0 of 0 total classes attended</div>
+                  </div>
+                </div>
+                <div class="summary-chips" id="summaryChips">
+                  <span class="summary-chip safe" id="summarySafeChip"><span class="chip-dot"></span><span id="summarySafeCount">0</span> Safe (≥75%)</span>
+                  <span class="summary-chip danger" id="summaryDangerChip" hidden><span class="chip-dot"></span><span id="summaryDangerCount">0</span> Attention</span>
+                </div>
+              </div>
+              <div class="summary-progress-bar">
+                <div class="summary-progress-fill" id="summaryProgressFill" style="width: 0%"></div>
+                <div class="summary-threshold-marker" style="left: 75%" title="75% Attendance Requirement"></div>
+              </div>
+              <div class="summary-footer">
+                <div class="summary-tip" id="summaryTip">Enter your attended classes in each subject below to calculate your overall safety standing.</div>
+              </div>
+            </div>
             <div class="subject-attendance" data-subject-card data-subject-name="Software Engineering" data-section="both"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Software Engineering</div><div class="subject-attendance-count"><span data-attended>0</span> of <span data-held>0</span> classes attended</div></div><div class="subject-attendance-percent" data-percent>—</div></div><div class="progress"><span style="--percent:0%"></span></div><form class="subject-calculator"><label class="field-label">Classes held so far<input class="text-field subject-held" type="number" min="0" value="0" required></label><label class="field-label">Attended so far<input class="text-field subject-attended" type="number" min="0" value="0" required></label><button class="secondary-button" type="submit">Update record</button></form><div class="planner-label">Plan upcoming classes <span class="attendance-hint">· 75% target</span></div><div class="planner-inputs"><label class="field-label">Upcoming classes<input class="text-field future-held" type="number" min="0" value="0" inputmode="numeric"></label><label class="field-label">Plan to attend<input class="text-field future-attend" type="number" min="0" value="0" inputmode="numeric"></label></div><div class="planner-results"><div class="planner-result"><div class="planner-result-label">Projected attendance</div><div class="planner-result-value" data-projected>—</div></div><div class="planner-result"><div class="planner-result-label">Safe classes to miss</div><div class="planner-result-value" data-safe-misses>—</div></div><div class="planner-result"><div class="planner-result-label">Attend in a row to recover</div><div class="planner-result-value" data-recovery>—</div></div></div><div class="planner-guidance" data-guidance>Enter upcoming classes to see your plan.</div></div>
             <div class="subject-attendance" data-subject-card data-subject-name="Statistical Analysis" data-section="both"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Statistical Analysis (SA)</div><div class="subject-attendance-count"><span data-attended>0</span> of <span data-held>0</span> classes attended</div></div><div class="subject-attendance-percent" data-percent>—</div></div><div class="progress"><span style="--percent:0%"></span></div><form class="subject-calculator"><label class="field-label">Classes held so far<input class="text-field subject-held" type="number" min="0" value="0" required></label><label class="field-label">Attended so far<input class="text-field subject-attended" type="number" min="0" value="0" required></label><button class="secondary-button" type="submit">Update record</button></form><div class="planner-label">Plan upcoming classes <span class="attendance-hint">· 75% target</span></div><div class="planner-inputs"><label class="field-label">Upcoming classes<input class="text-field future-held" type="number" min="0" value="0" inputmode="numeric"></label><label class="field-label">Plan to attend<input class="text-field future-attend" type="number" min="0" value="0" inputmode="numeric"></label></div><div class="planner-results"><div class="planner-result"><div class="planner-result-label">Projected attendance</div><div class="planner-result-value" data-projected>—</div></div><div class="planner-result"><div class="planner-result-label">Safe classes to miss</div><div class="planner-result-value" data-safe-misses>—</div></div><div class="planner-result"><div class="planner-result-label">Attend in a row to recover</div><div class="planner-result-value" data-recovery>—</div></div></div><div class="planner-guidance" data-guidance>Enter upcoming classes to see your plan.</div></div>
             <div class="subject-attendance" data-subject-card data-subject-name="Computer Organisation &amp; Microprocessors" data-section="intel"><div class="subject-attendance-top"><div><div class="subject-attendance-name">Computer Organisation &amp; Microprocessors (COM)</div><div class="subject-attendance-count"><span data-attended>0</span> of <span data-held>0</span> classes attended</div></div><div class="subject-attendance-percent" data-percent>—</div></div><div class="progress"><span style="--percent:0%"></span></div><form class="subject-calculator"><label class="field-label">Classes held so far<input class="text-field subject-held" type="number" min="0" value="0" required></label><label class="field-label">Attended so far<input class="text-field subject-attended" type="number" min="0" value="0" required></label><button class="secondary-button" type="submit">Update record</button></form><div class="planner-label">Plan upcoming classes <span class="attendance-hint">· 75% target</span></div><div class="planner-inputs"><label class="field-label">Upcoming classes<input class="text-field future-held" type="number" min="0" value="0" inputmode="numeric"></label><label class="field-label">Plan to attend<input class="text-field future-attend" type="number" min="0" value="0" inputmode="numeric"></label></div><div class="planner-results"><div class="planner-result"><div class="planner-result-label">Projected attendance</div><div class="planner-result-value" data-projected>—</div></div><div class="planner-result"><div class="planner-result-label">Safe classes to miss</div><div class="planner-result-value" data-safe-misses>—</div></div><div class="planner-result"><div class="planner-result-label">Attend in a row to recover</div><div class="planner-result-value" data-recovery>—</div></div></div><div class="planner-guidance" data-guidance>Enter upcoming classes to see your plan.</div></div>
@@ -5079,15 +5373,33 @@
               </div>
               <p class="attendance-calendar-note" id="attendanceCalendarNote">Select any date to view its classes.</p>
             </article>
-            <article class="panel timetable-card">
-              <div class="panel-header timetable-card-header"><div><div class="eyebrow">Your week</div><div class="panel-title">Class timetable</div><div class="panel-sub">CSE · III · AI &amp; Analytics - A</div></div></div>
-              <button class="timetable-preview-button" id="viewTimetableButton" type="button" aria-label="View timetable">
-                <span class="timetable-image-wrap"><img src="./class-timetable-odd-semester-2026.png" alt="Class timetable for CSE III AI and Analytics A, July to December 2026" loading="lazy"></span>
-                <span class="timetable-preview-action">View timetable <span aria-hidden="true">→</span></span>
-              </button>
-            </article>
           </aside>
-          <article class="panel attendance-issue-panel"><div class="panel-header"><div><div class="panel-title">Tell your CR about an attendance issue</div><div class="panel-sub">Only you, your assigned CR, and class admins can see this message.</div></div></div><form class="attendance-form" id="issueForm"><label class="field-label">Subject<select class="select-field" name="subject" required><option>Loading subjects…</option></select></label><div class="attendance-date-field"><label class="field-label" for="issueDate1">Class dates</label><div class="attendance-date-list" id="issueDateList"><div class="attendance-date-row"><input class="text-field" id="issueDate1" type="date" name="date" aria-label="Class date 1" required></div></div><button class="secondary-button attendance-date-add" id="addIssueDate" type="button">+ Add another date</button></div><label class="field-label" style="grid-column:1/-1">What happened?<textarea class="text-area" name="message" placeholder="For example, I attended these classes but my record shows absent." maxlength="2500" required></textarea></label><button class="primary-button" type="submit">Send to my CR</button></form><div id="studentCaseList"><div class="list-row"><div class="list-main">Your submitted concerns will appear here.</div></div></div></article>
+          <article class="panel timetable-showcase-panel">
+            <div class="panel-header timetable-showcase-header">
+              <div>
+                <div class="eyebrow">Your weekly schedule</div>
+                <div class="panel-title">Class timetable</div>
+                <div class="panel-sub" id="attendanceTimetableSub">CSE · III · AI &amp; Analytics - A · Weekly lectures and lab sessions</div>
+              </div>
+              <div class="timetable-showcase-actions">
+                <button class="secondary-button timetable-preview-button" id="viewTimetableButton" type="button" aria-label="Open timetable full view">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                  <span>Full View</span>
+                </button>
+                <a class="secondary-button" id="timetableDownloadBtn" href="./class-timetable-odd-semester-2026.png" download="ClassBoard-Timetable.png" title="Download timetable image">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                  <span>Download</span>
+                </a>
+              </div>
+            </div>
+            <div class="timetable-showcase-canvas" id="timetableShowcaseCanvas" title="Click to view full-size timetable">
+              <img id="attendanceTimetableImage" src="./class-timetable-odd-semester-2026.png" alt="Class timetable for CSE III AI and Analytics A, July to December 2026" loading="lazy">
+              <span class="timetable-showcase-hint">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                Click to expand
+              </span>
+            </div>
+          </article>
         </div>
         </section>
 
@@ -5845,6 +6157,7 @@
     }));
     const classTimetableDialog = document.getElementById('classTimetableDialog');
     document.getElementById('viewTimetableButton').addEventListener('click', () => classTimetableDialog.showModal());
+    document.getElementById('timetableShowcaseCanvas')?.addEventListener('click', () => classTimetableDialog.showModal());
     document.getElementById('academicsTimetableButton').addEventListener('click', () => classTimetableDialog.showModal());
     const academicsTimetableImageButton = document.getElementById('academicsTimetableImageButton');
     if (academicsTimetableImageButton) {
@@ -6147,12 +6460,109 @@
       return isIbm() ? section === 'ibm' : section === 'intel';
     };
 
+    function updateOverallAttendanceSummary() {
+      const summaryCard = document.getElementById('attendanceSummaryCard');
+      if (!summaryCard) return;
+
+      const visibleCards = allAttendanceCards.filter((card) => !card.hidden);
+      if (!visibleCards.length) return;
+
+      let totalHeld = 0;
+      let totalAttended = 0;
+      let safeCount = 0;
+      let dangerCount = 0;
+      const criticalSubjects = [];
+
+      visibleCards.forEach((card) => {
+        const heldInput = card.querySelector('.subject-held');
+        const attendedInput = card.querySelector('.subject-attended');
+        const held = Number(heldInput?.value || 0);
+        const attended = Number(attendedInput?.value || 0);
+
+        if (held > 0) {
+          totalHeld += held;
+          totalAttended += attended;
+          const pct = (attended / held) * 100;
+          if (pct >= 75) {
+            safeCount++;
+          } else {
+            dangerCount++;
+            const subjectName = card.dataset.subjectName || 'Subject';
+            criticalSubjects.push(subjectName);
+          }
+        }
+      });
+
+      const percentElem = document.getElementById('summaryOverallPercent');
+      const statusElem = document.getElementById('summaryOverallStatus');
+      const totalsElem = document.getElementById('summaryTotals');
+      const safeChip = document.getElementById('summarySafeChip');
+      const dangerChip = document.getElementById('summaryDangerChip');
+      const safeCountElem = document.getElementById('summarySafeCount');
+      const dangerCountElem = document.getElementById('summaryDangerCount');
+      const progressFill = document.getElementById('summaryProgressFill');
+      const tipElem = document.getElementById('summaryTip');
+      const ringBadge = document.getElementById('summaryRingBadge');
+
+      if (totalHeld === 0) {
+        if (percentElem) percentElem.textContent = '—';
+        if (statusElem) { statusElem.textContent = 'Overall Semester Standing'; statusElem.style.color = ''; }
+        if (totalsElem) totalsElem.textContent = '0 of 0 classes attended';
+        if (progressFill) progressFill.style.width = '0%';
+        if (safeCountElem) safeCountElem.textContent = '0';
+        if (dangerCountElem) dangerCountElem.textContent = '0';
+        if (dangerChip) dangerChip.hidden = true;
+        if (tipElem) tipElem.textContent = 'Record classes held and attended in each subject to view your overall semester health.';
+        if (ringBadge) ringBadge.classList.remove('status-safe', 'status-danger');
+        return;
+      }
+
+      const overallPercent = (totalAttended / totalHeld) * 100;
+      const isSafe = overallPercent >= 75;
+
+      if (percentElem) percentElem.textContent = `${overallPercent.toFixed(1)}%`;
+      if (totalsElem) totalsElem.textContent = `${totalAttended} of ${totalHeld} total classes attended`;
+      if (safeCountElem) safeCountElem.textContent = String(safeCount);
+      if (dangerCountElem) dangerCountElem.textContent = String(dangerCount);
+
+      if (progressFill) {
+        progressFill.style.width = `${Math.min(overallPercent, 100)}%`;
+        progressFill.style.backgroundColor = isSafe ? '#10b981' : '#f59e0b';
+      }
+
+      if (ringBadge) {
+        ringBadge.classList.toggle('status-safe', isSafe);
+        ringBadge.classList.toggle('status-danger', !isSafe);
+      }
+
+      if (dangerChip) {
+        dangerChip.hidden = dangerCount === 0;
+      }
+
+      if (statusElem) {
+        statusElem.textContent = isSafe ? 'Overall Standing: Safe (≥75%)' : 'Overall Standing: Below 75% Requirement';
+        statusElem.style.color = isSafe ? '#059669' : '#d97706';
+      }
+
+      if (tipElem) {
+        if (dangerCount === 0) {
+          tipElem.innerHTML = `<strong>Great standing!</strong> All ${safeCount} subjects are at or above the 75% requirement.`;
+        } else if (criticalSubjects.length === 1) {
+          tipElem.innerHTML = `<strong>Attention needed:</strong> <code>${criticalSubjects[0]}</code> is below 75%. Attend upcoming classes to recover.`;
+        } else {
+          tipElem.innerHTML = `<strong>Attention needed:</strong> ${dangerCount} subjects (${criticalSubjects.slice(0, 2).join(', ')}${criticalSubjects.length > 2 ? '...' : ''}) are below 75%.`;
+        }
+      }
+    }
+    window.updateOverallAttendanceSummary = updateOverallAttendanceSummary;
+
     const showAttendanceMode = () => {
       allAttendanceCards.forEach((card) => {
         const modeMatches = card.dataset.attendanceMode === attendanceMode.value;
         const sectionMatches = isCardForCurrentSection(card);
         card.hidden = !modeMatches || !sectionMatches;
       });
+      updateOverallAttendanceSummary();
     };
     attendanceMode.addEventListener('change', showAttendanceMode);
     window.addEventListener('classboard:attendance-calendar-context', showAttendanceMode);
@@ -6204,6 +6614,7 @@
         else if (safeMisses === 0) guidance = `No safe absences in this plan; attend the upcoming classes to protect your ${target * 100}% target.`;
         else guidance = `With this plan, you can miss up to ${safeMisses} of the ${futureHeld} upcoming classes and stay at or above ${target * 100}%.`;
         card.querySelector('[data-guidance]').textContent = guidance;
+        updateOverallAttendanceSummary();
         return true;
       }
       card.updateAttendancePlan = updateAttendancePlan;
