@@ -192,18 +192,14 @@
     if (homeSubtitle) homeSubtitle.textContent = `Here’s what’s happening in ${classLabel} today.`;
     const timetableSubtitle = document.querySelector('.timetable-card-header .panel-sub');
     if (timetableSubtitle) timetableSubtitle.textContent = `CSE · III · ${classLabel}`;
-    const attendanceTimetableSub = document.getElementById('attendanceTimetableSub');
-    if (attendanceTimetableSub) attendanceTimetableSub.textContent = `CSE · III · ${classLabel} · Weekly lectures and lab sessions`;
     const academicsTimetableSubtitle = document.querySelector('#academicsPanelTimetable .panel-sub');
     if (academicsTimetableSubtitle) academicsTimetableSubtitle.textContent = `Weekly lectures and practicals · ${classLabel} · July–December 2026`;
     const timetableImage = classInfo.code === 'IBM-1' ? './class-timetable-ibm1-odd-semester-2026.jpg' : classInfo.code === 'INTEL-2' ? './class-timetable-intel2-odd-semester-2026.png' : './class-timetable-odd-semester-2026.png';
-    document.querySelectorAll('.timetable-preview-button img, .timetable-dialog-content img, #academicsTimetableImg, #attendanceTimetableImage').forEach((image) => {
+    document.querySelectorAll('.timetable-preview-button img, .timetable-dialog-content img, #academicsTimetableImg').forEach((image) => {
       if (timetableImage) image.src = timetableImage;
       else image.removeAttribute('src');
       image.alt = timetableImage ? `Class timetable for CSE III ${classInfo.name}, July to December 2026` : 'IBM-1 timetable image is not available yet';
     });
-    const timetableDownloadBtn = document.getElementById('timetableDownloadBtn');
-    if (timetableDownloadBtn && timetableImage) timetableDownloadBtn.href = timetableImage;
     const isAiAnalytics = classInfo.code === 'INTEL-1' || classInfo.code === 'INTEL-2';
     const isIbm = classInfo.code === 'IBM-1';
     const mstDocument = document.getElementById('mstOfficialDocument');
