@@ -94,8 +94,8 @@ begin
     and role in ('student', 'cr');
 
   -- 6. Activate or insert student membership in target section
-  insert into public.class_memberships (user_id, class_id, role, roll_number, lab_batch, is_active)
-  values (p_target_user_id, target_class_id, 'student'::public.class_role, null, null, true)
+  insert into public.class_memberships (user_id, class_id, role, roll_number, is_active)
+  values (p_target_user_id, target_class_id, 'student'::public.class_role, null, true)
   on conflict (user_id, class_id, role) do update
   set is_active = true;
 
