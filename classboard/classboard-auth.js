@@ -2435,6 +2435,84 @@
       updateLiveBatch();
       roll.addEventListener('input', updateLiveBatch);
       rollLabel.append(roll, liveBatchIndicator);
+
+      const currentClassCode = window.classboardContext?.classCode || '';
+      const sectionLabel = document.createElement('div');
+      sectionLabel.className = 'account-section-label';
+      sectionLabel.innerHTML = `<span>Section: <strong>${currentClassCode}</strong></span>`;
+
+      const sectionSelectWrapper = document.createElement('div');
+      sectionSelectWrapper.style.display = 'flex';
+      sectionSelectWrapper.style.alignItems = 'center';
+      sectionSelectWrapper.style.gap = '6px';
+      sectionSelectWrapper.style.flexWrap = 'wrap';
+
+      const sectionSelect = document.createElement('select');
+      sectionSelect.className = 'account-section-select';
+      const sections = [
+        { code: 'INTEL-1', name: 'INTEL-1 (AI & Analytics - A)' },
+        { code: 'INTEL-2', name: 'INTEL-2 (AI & Analytics - B)' },
+        { code: 'IBM-1', name: 'IBM-1 (Advanced AI - A)' },
+        { code: 'IBM-2', name: 'IBM-2 (Advanced AI - B)' },
+        { code: 'IBM-3', name: 'IBM-3 (Advanced AI - C)' },
+        { code: 'IBM-4', name: 'IBM-4 (Advanced AI - D)' }
+      ];
+      sections.forEach((sec) => {
+        const opt = document.createElement('option');
+        opt.value = sec.code;
+        opt.textContent = sec.name;
+        if (sec.code === currentClassCode) opt.selected = true;
+        sectionSelect.appendChild(opt);
+      });
+
+      const changeSecBtn = document.createElement('button');
+      changeSecBtn.type = 'button';
+      changeSecBtn.className = 'ghost-button';
+      changeSecBtn.style.padding = '5px 12px';
+      changeSecBtn.style.fontSize = '11px';
+      changeSecBtn.style.fontWeight = '700';
+      changeSecBtn.style.borderRadius = '6px';
+      changeSecBtn.style.border = '1px solid #93c5fd';
+      changeSecBtn.style.background = '#eff6ff';
+      changeSecBtn.style.color = '#1d4ed8';
+      changeSecBtn.style.cursor = 'pointer';
+      changeSecBtn.textContent = 'Transfer';
+
+      changeSecBtn.addEventListener('click', async () => {
+        const targetSection = sectionSelect.value;
+        if (!targetSection || targetSection === currentClassCode) {
+          notifyApp('Choose a different section to transfer this student.', true);
+          return;
+        }
+        const confirmed = window.confirm(`Transfer ${user.name} from ${currentClassCode} to ${targetSection}?\n\nTheir workspace and attendance data will sync to ${targetSection}.`);
+        if (!confirmed) return;
+
+        changeSecBtn.disabled = true;
+        changeSecBtn.textContent = 'Transferring...';
+
+        try {
+          const { error } = await client.rpc('admin_change_user_section', {
+            p_target_user_id: user.userId,
+            p_new_class_code: targetSection
+          });
+          if (error) {
+            notifyApp(`Transfer failed: ${error.message}`, true);
+            changeSecBtn.disabled = false;
+            changeSecBtn.textContent = 'Transfer';
+            return;
+          }
+          notifyApp(`Transferred ${user.name} to ${targetSection}.`);
+          await loadAdminAccounts(classId);
+        } catch (err) {
+          notifyApp(`Transfer failed: ${err.message}`, true);
+          changeSecBtn.disabled = false;
+          changeSecBtn.textContent = 'Transfer';
+        }
+      });
+
+      sectionSelectWrapper.append(sectionSelect, changeSecBtn);
+      sectionLabel.appendChild(sectionSelectWrapper);
+
       const save = document.createElement('button'); save.className = 'secondary-button'; save.type = 'button'; save.textContent = 'Save roles';
       save.addEventListener('click', async () => {
         const roles = ['student', ...[...roleGroup.querySelectorAll('input:checked')]
@@ -2484,7 +2562,7 @@
         await loadAdminAccounts(classId);
         notifyApp(`Removed ${user.name} from this ClassBoard class.`);
       });
-      controls.append(roleGroup, rollLabel, save, remove); row.append(avatar, main, controls); container.append(row);
+      controls.append(roleGroup, rollLabel, sectionLabel, save, remove); row.append(avatar, main, controls); container.append(row);
     });
     const accountSearch = document.getElementById('adminAccountSearch');
     const accountFilter = document.getElementById('adminAccountFilter');

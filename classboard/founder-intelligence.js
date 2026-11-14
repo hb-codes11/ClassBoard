@@ -759,6 +759,33 @@
               </div>
             </div>
 
+            <!-- Section Reassignment & Transfer Box -->
+            <div class="founder-card" style="padding:16px;background:#f0f7ff;border:1.5px solid #bddbff;border-radius:14px;display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:1.1rem;">🔄</span>
+                  <strong style="font-size:0.88rem;color:#074b94;">Reassign / Change Section</strong>
+                </div>
+                <span id="drawerCurrentSectionBadge" style="font-size:0.75rem;font-weight:750;padding:3px 10px;border-radius:999px;background:#ffffff;color:#0284c7;border:1px solid #bfdbfe;box-shadow:0 1px 3px rgba(0,0,0,0.04);">—</span>
+              </div>
+              <p style="font-size:0.75rem;color:#475569;margin:0;line-height:1.45;">If this student registered or logged into the wrong section, you can change their section here. Their active workspace, schedule, and attendance records will immediately sync to the selected section.</p>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:2px;">
+                <select id="drawerTargetSectionSelect" style="flex:1;min-width:200px;height:38px;padding:0 12px;border-radius:9px;border:1.5px solid #93c5fd;background:#ffffff;font-size:0.84rem;font-weight:600;color:#0f172a;outline:none;">
+                  <option value="">Choose target section...</option>
+                  <option value="INTEL-1">AI &amp; Analytics - A (INTEL-1)</option>
+                  <option value="INTEL-2">AI &amp; Analytics - B (INTEL-2)</option>
+                  <option value="IBM-1">IBM Advanced AI - A (IBM-1)</option>
+                  <option value="IBM-2">IBM Advanced AI - B (IBM-2)</option>
+                  <option value="IBM-3">IBM Advanced AI - C (IBM-3)</option>
+                  <option value="IBM-4">IBM Advanced AI - D (IBM-4)</option>
+                </select>
+                <button type="button" id="drawerApplySectionChangeBtn" style="height:38px;padding:0 18px;border-radius:9px;background:#006BFF;color:#ffffff;font-size:0.82rem;font-weight:750;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background 0.15s;flex-shrink:0;">
+                  <span>Transfer Section</span>
+                </button>
+              </div>
+              <div id="drawerSectionChangeStatus" style="font-size:0.76rem;font-weight:600;min-height:18px;"></div>
+            </div>
+
             <!-- Deep Engagement Stats -->
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div class="founder-dossier-card" style="background:#f0f9ff;border-color:#bae6fd;">
@@ -938,6 +965,58 @@
         if (activeDetailUserId) loadUserTimeline(activeDetailUserId, activeTimelineFilter);
       });
     });
+
+    // Wire Section Reassignment / Transfer in Dossier Drawer
+    const sectionChangeBtn = document.getElementById('drawerApplySectionChangeBtn');
+    const targetSectionSelect = document.getElementById('drawerTargetSectionSelect');
+    const sectionStatusMsg = document.getElementById('drawerSectionChangeStatus');
+    if (sectionChangeBtn && targetSectionSelect && sectionStatusMsg) {
+      sectionChangeBtn.addEventListener('click', async () => {
+        if (!activeDetailUserId) return;
+        const newCode = targetSectionSelect.value;
+        if (!newCode) {
+          sectionStatusMsg.style.color = '#dc2626';
+          sectionStatusMsg.textContent = 'Please choose a target section first.';
+          return;
+        }
+
+        const userName = document.getElementById('drawerUserName')?.textContent || 'this student';
+        const confirmed = window.confirm(`Change section for ${userName} to ${newCode}?\n\nTheir active portal data and schedule will immediately switch to ${newCode}.`);
+        if (!confirmed) return;
+
+        sectionChangeBtn.disabled = true;
+        sectionStatusMsg.style.color = '#2563eb';
+        sectionStatusMsg.textContent = 'Transferring section...';
+
+        try {
+          const { data, error } = await window.classboardSupabase.rpc('admin_change_user_section', {
+            p_target_user_id: activeDetailUserId,
+            p_new_class_code: newCode
+          });
+
+          if (error) {
+            sectionStatusMsg.style.color = '#dc2626';
+            sectionStatusMsg.textContent = error.message || 'Failed to change section.';
+          } else {
+            sectionStatusMsg.style.color = '#16a34a';
+            sectionStatusMsg.textContent = `✓ Successfully transferred to ${newCode}!`;
+            const badge = document.getElementById('drawerCurrentSectionBadge');
+            if (badge) badge.textContent = 'Current: ' + newCode;
+            const rollEl = document.getElementById('drawerSectionRoll');
+            if (rollEl) {
+              const currentRollText = rollEl.textContent.split('(')[1] || ')';
+              rollEl.textContent = `${newCode} (${currentRollText}`;
+            }
+            loadUserTable();
+          }
+        } catch (err) {
+          sectionStatusMsg.style.color = '#dc2626';
+          sectionStatusMsg.textContent = err.message || 'Unexpected error occurred.';
+        } finally {
+          sectionChangeBtn.disabled = false;
+        }
+      });
+    }
 
     // Initial render of mockup chart
     renderMultiLineTrend([]);
@@ -1411,6 +1490,16 @@
       const roll = data.roll_number ? `Serial ${data.roll_number}` : 'No serial assigned';
       const sec = data.class_code || 'General';
       el('drawerSectionRoll').textContent = `${sec} (${roll})`;
+
+      if (el('drawerCurrentSectionBadge')) {
+        el('drawerCurrentSectionBadge').textContent = 'Current: ' + sec;
+      }
+      if (el('drawerTargetSectionSelect')) {
+        el('drawerTargetSectionSelect').value = (sec !== 'General' ? sec : '');
+      }
+      if (el('drawerSectionChangeStatus')) {
+        el('drawerSectionChangeStatus').textContent = '';
+      }
 
       el('drawerLastLogin').textContent = formatIST(data.last_signed_in_at);
       el('drawerAuthMethod').innerHTML = renderAuthBadge(data.latest_auth_method);
