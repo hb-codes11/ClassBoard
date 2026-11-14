@@ -137,15 +137,18 @@
       font-size: 14px;
       font-weight: 600;
       color: rgba(255, 255, 255, 0.88);
+      white-space: nowrap;
     }
     .landing-links a {
       text-decoration: none;
+      white-space: nowrap;
       transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
     }
     .landing-links a:not(.btn) {
       padding: 6px 14px;
       border-radius: 999px;
       color: rgba(255, 255, 255, 0.9);
+      white-space: nowrap;
     }
     .landing-links a:not(.btn):hover {
       color: #55c7ff;
@@ -162,6 +165,7 @@
       border-radius: 999px;
       text-decoration: none;
       border: 1.5px solid transparent;
+      white-space: nowrap;
       transition: transform 0.15s, background 0.15s, box-shadow 0.15s, border-color 0.15s;
       cursor: pointer;
     }
@@ -869,6 +873,14 @@
       .btn-workspace-cta { width: 100%; justify-content: center; }
       .resource-grid { grid-template-columns: 1fr; }
       .select-field { width: 100%; }
+    }
+    @media (max-width: 520px) {
+      .nav-in { height: 60px; gap: 8px; }
+      .landing-brand-logo { width: 32px; height: 32px; flex-shrink: 0; }
+      .brand-title { font-size: 16px; white-space: nowrap; }
+      .brand-subtitle { font-size: 8px; letter-spacing: 0.04em; white-space: nowrap; }
+      .landing-links a:not(.btn) { font-size: 12.5px; padding: 4px 10px; }
+      .landing-nav .btn { padding: 6px 13px; font-size: 12.5px; white-space: nowrap; flex-shrink: 0; }
     }
   </style>
 </head>
