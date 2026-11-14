@@ -1152,3 +1152,233 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+
+/* ==========================================================================
+   Founder Workspace Screen Alignment (Matching Exact Mockup & Dossier Restore)
+   ========================================================================== */
+
+.founder-eyebrow {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.founder-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.founder-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.founder-four-panels {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.founder-kpi-icon-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+.founder-kpi-icon-badge.green { background: #dcfce7; color: #16a34a; }
+.founder-kpi-icon-badge.blue { background: #e0f2fe; color: #0284c7; }
+.founder-kpi-icon-badge.yellow { background: #fef3c7; color: #d97706; }
+.founder-kpi-icon-badge.purple { background: #f3e8ff; color: #9333ea; }
+
+/* SVG Multi-line Chart */
+.founder-chart-svg {
+  width: 100%;
+  height: 150px;
+  display: block;
+}
+
+.founder-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.founder-chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Top Pages Numbered List */
+.founder-top-pages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.founder-top-page-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  padding: 2px 0;
+}
+.founder-top-page-title {
+  color: #1e293b;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 75%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.founder-top-page-count {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Cohort Usage Progress Bars */
+.founder-cohort-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.founder-cohort-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.founder-cohort-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #334155;
+  min-width: 65px;
+}
+.founder-cohort-track {
+  flex: 1;
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.founder-cohort-fill {
+  height: 100%;
+  background: #006BFF;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+.founder-cohort-pct {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #64748b;
+  min-width: 42px;
+  text-align: right;
+}
+
+/* Revenue Potential Mockup Match */
+.founder-rev-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.founder-rev-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.founder-rev-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.founder-rev-estimate-badge {
+  background: #fef08a;
+  color: #854d0e;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+.founder-rev-value {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+.founder-rev-footnote {
+  font-size: 0.7rem;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+/* Platform Overview Collapsible / Grid */
+.founder-platform-overview-box {
+  background: #ffffff;
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: 14px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.founder-platform-overview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.founder-platform-overview-header h4 {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Responsive Overrides */
+@media (max-width: 1200px) {
+  .founder-four-panels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .founder-grid-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .founder-grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .founder-grid-4 {
+    grid-template-columns: 1fr;
+  }
+  .founder-grid-3 {
+    grid-template-columns: 1fr;
+  }
+  .founder-four-panels {
+    grid-template-columns: 1fr;
+  }
+}
