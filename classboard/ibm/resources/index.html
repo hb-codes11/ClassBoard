@@ -30,7 +30,6 @@
       --blue: #0A74E6;
       --blue-deep: #0756A0;
       --blue-soft: #e1f0ff;
-      --navy: #062f5c;
       --page: #f0f6fd;
       --surface: #ffffff;
       --surface-2: #f8fafc;
@@ -39,9 +38,8 @@
       --line: #e2e8f0;
       --line-light: #edf2f7;
       --radius-sm: 10px;
-      --radius-md: 16px;
+      --radius-md: 14px;
       --radius-lg: 24px;
-      --shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
       --shadow-lg: 0 25px 60px -15px rgba(2, 24, 60, 0.35);
     }
 
@@ -75,7 +73,6 @@
       to   { background-position:30% 22%,70% 25%,72% 78%,25% 70%,50% 0%,50% 50%; }
     }
 
-    /* Wrap helper matching landing page */
     .wrap {
       max-width: 1160px;
       margin: 0 auto;
@@ -83,7 +80,7 @@
       width: 100%;
     }
 
-    /* Original Sticky Frosted Header */
+    /* Landing Nav Header */
     header.landing-nav {
       position: sticky;
       top: env(safe-area-inset-top, 0);
@@ -156,7 +153,6 @@
       transform: translateY(-1px);
     }
 
-    /* Buttons matching original landing styles */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -193,7 +189,7 @@
       width: 100%;
     }
 
-    /* Banner Notice Card */
+    /* Top Banner Card */
     .public-banner-card {
       background: #ffffff;
       border-radius: var(--radius-lg);
@@ -348,22 +344,28 @@
       box-shadow: 0 0 0 3px rgba(0, 107, 255, 0.14);
     }
     .select-field {
-      padding: 10px 16px;
+      padding: 10px 36px 10px 16px;
       font-size: 14px;
       font-family: 'Figtree', sans-serif;
       font-weight: 500;
       border: 1.5px solid var(--line);
       border-radius: 11px;
-      background: #f8fafc;
+      background-color: #f8fafc;
       color: var(--text);
       outline: none;
       cursor: pointer;
       min-width: 220px;
       transition: all 0.16s ease;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235B7089' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 14px;
     }
     .select-field:focus {
       border-color: #006BFF;
-      background: #ffffff;
+      background-color: #ffffff;
       box-shadow: 0 0 0 3px rgba(0, 107, 255, 0.14);
     }
 
@@ -374,7 +376,7 @@
       align-items: center;
       padding: 10px 0 14px;
       border-bottom: 1px solid var(--line-light);
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       font-size: 13px;
       color: var(--muted);
     }
@@ -383,129 +385,224 @@
       color: var(--text);
     }
 
-    /* Resource Cards Grid */
-    .resources-grid {
+    /* EXACT NOTES SECTION CARD DESIGN COPIED FROM INSIDE APP */
+    .resource-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+      margin-top: 10px;
     }
 
-    .public-resource-card {
-      border: 1.5px solid var(--line);
-      border-radius: var(--radius-md);
-      padding: 18px 20px;
-      background: #ffffff;
+    .resource-card {
+      --resource-accent: var(--blue);
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: none;
+      padding: 15px 14px 13px 20px;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 14px;
-      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-    }
-    .public-resource-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-      border-color: #bfdbfe;
-    }
-
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      align-items: stretch;
+      justify-content: flex-start;
       gap: 8px;
+      min-height: 140px;
+      box-sizing: border-box;
+      transform: none;
+      transition: border-color .18s ease, box-shadow .18s ease;
+      text-align: left;
     }
-    .card-format-tag {
-      font-size: 10px;
-      font-weight: 800;
-      padding: 3px 7px;
-      border-radius: 6px;
-      background: #fee2e2;
-      color: #dc2626;
-      letter-spacing: 0.04em;
+    .resource-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 14px;
+      bottom: 14px;
+      width: 3px;
+      background: var(--resource-accent);
+      border-radius: 0 3px 3px 0;
+      pointer-events: none;
     }
-    .card-kind-badge {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--muted);
+    .resource-card:hover {
+      border-color: color-mix(in srgb, var(--resource-accent) 45%, var(--line)) !important;
+      box-shadow: 0 4px 16px -2px color-mix(in srgb, var(--resource-accent) 18%, transparent) !important;
+      transform: none !important;
     }
 
-    .card-title {
+    /* Subject accent color mappings exact match from internal classboard */
+    .resource-card[data-subject-color="se"] { --resource-accent: #8050c8; }
+    .resource-card[data-subject-color="sa"] { --resource-accent: #19845d; }
+    .resource-card[data-subject-color="ai"] { --resource-accent: #d94b55; }
+    .resource-card[data-subject-color="java"] { --resource-accent: #d77a15; }
+    .resource-card[data-subject-color="com"] { --resource-accent: #ad7a00; }
+    .resource-card[data-subject-color="default"] { --resource-accent: var(--blue); }
+
+    /* Row 1: Top (tag on left, kind on right) */
+    .resource-card-top {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      width: 100% !important;
+      gap: 10px;
+    }
+    .file-icon,
+    .resource-tag {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: auto !important;
+      min-width: 0 !important;
+      height: auto !important;
+      padding: 2px 6px !important;
+      border: 1px solid var(--line) !important;
+      border-radius: 5px !important;
+      background: transparent !important;
+      color: var(--muted) !important;
+      font-family: 'Figtree', sans-serif !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.06em !important;
+      text-transform: uppercase !important;
+      line-height: 1.2 !important;
+      margin: 0 !important;
+      flex-shrink: 0 !important;
+    }
+    .resource-kind-label {
+      font-family: 'Figtree', sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: right;
+      line-height: 1.2;
+      margin: 0;
+      margin-left: auto;
+    }
+
+    /* Row 2: Title */
+    .resource-title {
       font-family: 'Figtree', sans-serif;
       font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
+      font-weight: 650;
+      letter-spacing: -0.01em;
       line-height: 1.35;
+      color: var(--text);
+      margin: 2px 0 0;
+      text-align: left;
       display: -webkit-box;
-      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
       overflow: hidden;
-      margin-top: 6px;
+      width: 100% !important;
+      word-break: break-word;
     }
 
-    .card-subject-row {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: #0369a1;
-      background: #f0f9ff;
-      padding: 3px 9px;
-      border-radius: 6px;
-      align-self: flex-start;
-      margin-top: 8px;
+    /* Row 3: Subject */
+    .resource-subject-row {
+      display: flex !important;
+      align-items: center !important;
+      gap: 7px !important;
+      width: 100% !important;
+      margin: 0 !important;
+      flex-wrap: wrap !important;
     }
-    .card-subject-dot {
+    .resource-subject-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: #0284c7;
+      background: var(--resource-accent);
+      flex-shrink: 0;
+    }
+    .resource-subject {
+      font-family: 'Figtree', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--resource-accent);
+      text-align: left;
+      line-height: 1.3;
+      margin: 0;
     }
 
-    .card-bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 12px;
-      border-top: 1px solid var(--line-light);
-      gap: 8px;
+    /* Row 4: Bottom row (Date on left, actions on right) */
+    .resource-card-bottom {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      width: 100% !important;
+      gap: 12px !important;
+      margin-top: auto !important;
+      padding-top: 6px;
     }
-    .card-date {
-      font-size: 11.5px;
-      color: var(--muted);
-    }
-    .card-actions {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-    .card-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 6px 12px;
-      font-size: 12px;
-      font-weight: 700;
+    .resource-added-date {
       font-family: 'Figtree', sans-serif;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      margin: 0;
+    }
+    .resource-actions {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      margin-left: auto !important;
+      width: auto !important;
+      padding: 0 !important;
+    }
+    .resource-preview-button {
+      height: 28px;
+      min-height: 28px;
+      padding: 0 12px;
       border-radius: 8px;
       border: 1px solid var(--line);
-      background: #ffffff;
+      background: transparent;
       color: var(--text);
+      font-family: 'Figtree', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      text-decoration: none;
-      transition: all 0.15s ease;
+      box-shadow: none;
+      transition: background-color .15s ease, border-color .15s ease, color .15s ease;
     }
-    .card-btn:hover {
-      background: var(--surface-2);
-      border-color: #cbd5e1;
+    .resource-card:hover .resource-preview-button {
+      border-color: color-mix(in srgb, var(--resource-accent) 55%, var(--line));
     }
-    .card-btn-primary {
-      background: #0A74E6;
-      color: #ffffff;
-      border-color: #0A74E6;
+    .resource-card .resource-preview-button:hover {
+      background: var(--resource-accent) !important;
+      border-color: var(--resource-accent) !important;
+      color: #ffffff !important;
     }
-    .card-btn-primary:hover {
-      background: #0756A0;
-      border-color: #0756A0;
+    .resource-download-button {
+      width: 30px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0;
+      transition: border-color .15s, color .15s, background-color .15s;
+    }
+    .resource-download-button:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: var(--blue-soft);
+    }
+    .resource-download-button svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     /* Empty State */
@@ -527,7 +624,7 @@
       font-family: 'Bricolage Grotesque', sans-serif;
     }
 
-    /* Modals */
+    /* Preview Modal Dialog */
     dialog.preview-dialog {
       margin: auto;
       border: none;
@@ -583,31 +680,6 @@
     .dialog-body { flex: 1; width: 100%; height: 100%; background: #f1f5f9; }
     .dialog-iframe { width: 100%; height: 100%; border: none; }
 
-    dialog.detail-dialog {
-      margin: auto;
-      border: none;
-      border-radius: var(--radius-lg);
-      padding: 28px;
-      max-width: 560px;
-      width: 90vw;
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
-      background: #ffffff;
-    }
-    dialog.detail-dialog[open] { display: block; }
-    dialog.detail-dialog::backdrop {
-      background: rgba(6, 26, 50, 0.65);
-      backdrop-filter: blur(8px);
-    }
-    .detail-grid {
-      display: grid;
-      grid-template-columns: 120px 1fr;
-      gap: 10px 14px;
-      margin: 18px 0 22px;
-      font-size: 13.5px;
-    }
-    .detail-label { font-weight: 600; color: var(--muted); }
-    .detail-val { color: var(--text); font-weight: 500; }
-
     /* Footer */
     footer.public-footer {
       max-width: 1160px;
@@ -628,7 +700,7 @@
       .catalog-panel { padding: 22px 18px; }
       .workspace-cta-card { flex-direction: column; align-items: flex-start; }
       .btn-workspace-cta { width: 100%; justify-content: center; }
-      .resources-grid { grid-template-columns: 1fr; }
+      .resource-grid { grid-template-columns: 1fr; }
       .select-field { width: 100%; }
     }
   </style>
@@ -705,8 +777,8 @@
         <span>Sections A, B, C &amp; D single source of truth</span>
       </div>
 
-      <!-- Resource Grid -->
-      <div class="resources-grid" id="resourcesGrid">
+      <!-- Resource Grid matching Notes & Syllabus Page inside -->
+      <div class="resource-grid" id="resourcesGrid">
         <div class="empty-state" style="grid-column: 1 / -1;">
           <p>Loading published IBM resources...</p>
         </div>
@@ -721,26 +793,13 @@
         <h3 id="previewTitle">Document Preview</h3>
         <p id="previewMeta">PDF Document</p>
       </div>
-      <div class="dialog-header-actions">
-        <button type="button" class="card-btn card-btn-primary" id="previewDownloadBtn">Download</button>
+      <div class="dialog-header-actions" style="display:flex; align-items:center; gap:8px;">
+        <button type="button" class="btn btn-primary" id="previewDownloadBtn" style="padding:6px 16px; font-size:12.5px;">Download</button>
         <button type="button" class="dialog-close-btn" id="previewCloseBtn" aria-label="Close preview">&times;</button>
       </div>
     </div>
     <div class="dialog-body">
       <iframe class="dialog-iframe" id="previewIframe" title="Resource preview"></iframe>
-    </div>
-  </dialog>
-
-  <!-- Resource Detail View Modal -->
-  <dialog class="detail-dialog" id="detailDialog">
-    <div class="dialog-header" style="padding:0 0 14px; border-bottom: 1px solid var(--line);">
-      <h3 style="font-family:'Bricolage Grotesque'; font-size:1.15rem;" id="detailDialogTitle">Resource Information</h3>
-      <button type="button" class="dialog-close-btn" id="detailCloseBtn" aria-label="Close details">&times;</button>
-    </div>
-    <div class="detail-grid" id="detailGridContent"></div>
-    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
-      <button type="button" class="card-btn" id="detailPreviewBtn">Preview</button>
-      <button type="button" class="card-btn card-btn-primary" id="detailDownloadBtn">Download</button>
     </div>
   </dialog>
 
@@ -754,7 +813,6 @@
     (function () {
       let allResources = [];
       let allSubjects = [];
-      let activeDetailResource = null;
 
       // 1. Privacy-safe anonymous identification
       function getAnonymousVisitorId() {
@@ -880,7 +938,28 @@
         });
       }
 
-      // 5. Render & Filtering: ONLY Search and Subject Filter
+      // 5. Subject Color Helper matching inside ClassBoard
+      function getSubjectColorClass(subjectName) {
+        const name = String(subjectName || '').toLowerCase();
+        if (/software engineering|\bse\b/i.test(name)) return 'se';
+        if (/statistical analysis|\bsa\b/i.test(name)) return 'sa';
+        if (/artificial intelligence|machine learning|\bml\b|\bai\b/i.test(name)) return 'ai';
+        if (/java/i.test(name)) return 'java';
+        if (/computer organisation|computer organization|\bcom\b|data structures|\bdsc\b/i.test(name)) return 'com';
+        return 'default';
+      }
+
+      function kindLabel(kind) {
+        return ({
+          notes: 'Notes',
+          syllabus: 'Syllabus',
+          lab_manual: 'Lab manual',
+          mst_pyq: 'MST / PYQs',
+          calendar: 'Academic calendar'
+        })[kind] || kind;
+      }
+
+      // 6. Render & Filtering: ONLY Search and Subject Filter
       function renderResources() {
         const grid = document.getElementById('resourcesGrid');
         const searchVal = document.getElementById('publicSearch').value.trim().toLowerCase();
@@ -923,56 +1002,44 @@
         });
       }
 
-      function kindLabel(kind) {
-        return ({
-          notes: 'Notes',
-          syllabus: 'Syllabus',
-          lab_manual: 'Lab manual',
-          mst_pyq: 'MST / PYQs',
-          calendar: 'Academic calendar'
-        })[kind] || kind;
-      }
-
+      // 7. EXACT INSIDE CARD DESIGN
       function createPublicResourceCard(res) {
         const subject = Array.isArray(res.subjects) ? res.subjects[0] : res.subjects;
+        const subjectName = subject?.name || 'Class Resource';
+        const colorCode = getSubjectColorClass(subjectName);
         const extension = (res.storage_path || '').split('.').pop().toUpperCase() || 'PDF';
-        const card = document.createElement('article');
-        card.className = 'public-resource-card';
+        const kind = kindLabel(res.kind);
+        const kindText = [kind, res.unit_label].filter(Boolean).join(' · ') || 'Resource';
+        const dateText = new Date(res.published_at || res.created_at).toLocaleDateString('en-IN');
 
-        const kindText = [kindLabel(res.kind), res.unit_label].filter(Boolean).join(' · ');
-        const dateText = new Date(res.published_at || res.created_at).toLocaleDateString('en-IN', {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric'
-        });
+        const card = document.createElement('article');
+        card.className = 'resource-card';
+        card.dataset.subjectColor = colorCode;
 
         card.innerHTML = `
-          <div>
-            <div class="card-top">
-              <span class="card-format-tag">${extension}</span>
-              <span class="card-kind-badge">${kindText}</span>
-            </div>
-            <h2 class="card-title" title="${res.title}">${res.title}</h2>
-            <div>
-              <span class="card-subject-row">
-                <span class="card-subject-dot"></span>
-                <span>${subject?.name || 'IBM Advanced AI'}</span>
-              </span>
-            </div>
+          <div class="resource-card-top">
+            <span class="file-icon resource-tag">${extension}</span>
+            <span class="resource-kind-label">${kindText}</span>
           </div>
-          <div class="card-bottom">
-            <span class="card-date">Added ${dateText}</span>
-            <div class="card-actions">
-              <button type="button" class="card-btn" data-info-id="${res.id}">Info</button>
-              <button type="button" class="card-btn" data-preview-id="${res.id}">Preview</button>
-              <button type="button" class="card-btn card-btn-primary" data-download-id="${res.id}">Download</button>
+          <div class="resource-title" title="${res.title}">${res.title}</div>
+          <div class="resource-subject-row">
+            <span class="resource-subject-dot" aria-hidden="true"></span>
+            <span class="resource-subject">${subjectName}</span>
+          </div>
+          <div class="resource-card-bottom">
+            <span class="resource-added-date">Added ${dateText}</span>
+            <div class="resource-actions">
+              <button type="button" class="resource-preview-button" data-preview-id="${res.id}" aria-label="Preview ${res.title}">Preview</button>
+              <button type="button" class="resource-download-button" data-download-id="${res.id}" aria-label="Download ${res.title}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              </button>
             </div>
           </div>
         `;
         return card;
       }
 
-      // 6. Signed URLs & File Actions
+      // 8. Signed URLs & File Actions
       async function getSignedUrl(path, downloadFilename) {
         const client = window.supabaseClient;
         if (!client || !path) return null;
@@ -1029,54 +1096,11 @@
         a.remove();
       }
 
-      function handleInfo(resource) {
-        activeDetailResource = resource;
-        const dialog = document.getElementById('detailDialog');
-        const grid = document.getElementById('detailGridContent');
-        const subject = Array.isArray(resource.subjects) ? resource.subjects[0] : resource.subjects;
-        const pubDate = new Date(resource.published_at || resource.created_at).toLocaleString('en-IN');
-
-        document.getElementById('detailDialogTitle').textContent = resource.title;
-        grid.innerHTML = `
-          <span class="detail-label">Subject</span>
-          <span class="detail-val">${subject?.name || 'IBM Advanced AI'}</span>
-          <span class="detail-label">Resource Type</span>
-          <span class="detail-val">${kindLabel(resource.kind)}</span>
-          <span class="detail-label">Unit</span>
-          <span class="detail-val">${resource.unit_label || 'Full Course / General'}</span>
-          <span class="detail-label">Semester</span>
-          <span class="detail-val">3rd Semester</span>
-          <span class="detail-label">Sections</span>
-          <span class="detail-val">IBM Advanced AI (Sections A, B, C &amp; D)</span>
-          <span class="detail-label">Published</span>
-          <span class="detail-val">${pubDate}</span>
-          <span class="detail-label">Access</span>
-          <span class="detail-val" style="color:#059669; font-weight:700;">Public (No login required)</span>
-        `;
-
-        document.getElementById('detailPreviewBtn').onclick = () => {
-          dialog.close();
-          handlePreview(resource);
-        };
-        document.getElementById('detailDownloadBtn').onclick = () => {
-          handleDownload(resource);
-        };
-
-        logAnalyticsEvent('detail_view', resource.id, resource.title, { path: resource.storage_path });
-        dialog.showModal();
-      }
-
-      // 7. Event Listeners
+      // 9. Event Listeners
       document.getElementById('publicSearch').addEventListener('input', renderResources);
       document.getElementById('subjectFilter').addEventListener('change', renderResources);
 
       document.getElementById('resourcesGrid').addEventListener('click', (e) => {
-        const infoBtn = e.target.closest('[data-info-id]');
-        if (infoBtn) {
-          const res = allResources.find((r) => r.id === infoBtn.dataset.infoId);
-          if (res) handleInfo(res);
-          return;
-        }
         const prevBtn = e.target.closest('[data-preview-id]');
         if (prevBtn) {
           const res = allResources.find((r) => r.id === prevBtn.dataset.previewId);
@@ -1094,10 +1118,6 @@
       document.getElementById('previewCloseBtn').addEventListener('click', () => {
         document.getElementById('previewIframe').src = 'about:blank';
         document.getElementById('previewDialog').close();
-      });
-
-      document.getElementById('detailCloseBtn').addEventListener('click', () => {
-        document.getElementById('detailDialog').close();
       });
 
       // Track public-to-login CTA clicks
