@@ -273,8 +273,9 @@
     const overrides = calendarOverrides;
     const highlights = document.querySelector('.attendance-calendar-highlights');
     if (highlights) highlights.hidden = month === 11;
-    monthTitle.textContent = new Date(year, month, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+    if (monthTitle) monthTitle.textContent = new Date(year, month, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
     monthButtons.forEach((button) => button.setAttribute('aria-pressed', String(Number(button.dataset.calendarMonth) === month)));
+    if (!grid) return;
     grid.replaceChildren();
     for (let index = 0; index < firstWeekday; index += 1) {
       const empty = document.createElement('span'); empty.className = 'attendance-day empty'; empty.setAttribute('aria-hidden', 'true'); grid.append(empty);
@@ -418,9 +419,12 @@
     const editable = canEditCalendar();
     dialogDate.textContent = date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     dialogSub.textContent = event?.subject ? `${event.label} · ${event.time}` : [event?.label, `${classes.length} ${classes.length === 1 ? 'class' : 'classes'} for ${batchSelect.value}`].filter(Boolean).join(' · ');
-    resetButton.hidden = !editable || Boolean(event?.subject) || dateKey(date) > '2026-11-27';
-    addForm.hidden = !editable || Boolean(event?.subject) || dateKey(date) > '2026-11-27';
-    resetButton.disabled = !Object.hasOwn(calendarOverrides, activeDateKey);
+    if (resetButton) {
+      resetButton.hidden = !editable || Boolean(event?.subject) || dateKey(date) > '2026-11-27';
+      resetButton.disabled = !Object.hasOwn(calendarOverrides, activeDateKey);
+    }
+    if (addForm) addForm.hidden = !editable || Boolean(event?.subject) || dateKey(date) > '2026-11-27';
+    if (!classList) return;
     classList.replaceChildren();
     if (event?.subject) {
       const examRow = document.createElement('div'); examRow.className = 'list-row';
@@ -477,30 +481,37 @@
     if (!dialog.open) dialog.showModal();
   }
 
-  const addSubjectSelect = addForm.elements.subject;
-  function updateSubjectOptions() { addSubjectSelect.replaceChildren(...currentSubjects().map((subject) => {
-    const option = document.createElement('option'); option.value = subject.name; option.textContent = subject.name; return option;
-  })); }
+  const addSubjectSelect = addForm?.elements?.subject;
+  function updateSubjectOptions() {
+    if (!addSubjectSelect) return;
+    addSubjectSelect.replaceChildren(...currentSubjects().map((subject) => {
+      const option = document.createElement('option'); option.value = subject.name; option.textContent = subject.name; return option;
+    }));
+  }
   updateSubjectOptions();
-  const addKindSelect = addForm.elements.kind;
-  const addBatchLabel = addForm.querySelector('[data-calendar-add-batch]');
-  setBatchOptions(batchSelect);
-  setBatchOptions(addForm.elements.batch);
-  addKindSelect.addEventListener('change', () => { addBatchLabel.hidden = addKindSelect.value !== 'lab'; });
-  addForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    if (!activeDateKey || !canEditCalendar()) return;
-    const values = new FormData(addForm);
-    const start = String(values.get('start'));
-    const end = String(values.get('end'));
-    if (!start || !end || start >= end) { addForm.elements.end.setCustomValidity('End time must be after start time.'); addForm.elements.end.reportValidity(); return; }
-    addForm.elements.end.setCustomValidity('');
-    const date = new Date(`${activeDateKey}T12:00:00`);
-    const currentClasses = classesForDate(date);
-    currentClasses.push({ id: `added-${Date.now()}`, subject: String(values.get('subject')), kind: String(values.get('kind')), batch: values.get('kind') === 'lab' ? String(values.get('batch')) : 'all', start, end, room: String(values.get('room') || '').trim() });
-    addForm.reset(); addBatchLabel.hidden = true;
-    void persistClasses(currentClasses);
-  });
+  const addKindSelect = addForm?.elements?.kind;
+  const addBatchLabel = addForm?.querySelector('[data-calendar-add-batch]');
+  if (batchSelect) setBatchOptions(batchSelect);
+  if (addForm?.elements?.batch) setBatchOptions(addForm.elements.batch);
+  if (addKindSelect && addBatchLabel) {
+    addKindSelect.addEventListener('change', () => { addBatchLabel.hidden = addKindSelect.value !== 'lab'; });
+  }
+  if (addForm) {
+    addForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!activeDateKey || !canEditCalendar()) return;
+      const values = new FormData(addForm);
+      const start = String(values.get('start'));
+      const end = String(values.get('end'));
+      if (!start || !end || start >= end) { addForm.elements.end?.setCustomValidity('End time must be after start time.'); addForm.elements.end?.reportValidity(); return; }
+      addForm.elements.end?.setCustomValidity('');
+      const date = new Date(`${activeDateKey}T12:00:00`);
+      const currentClasses = classesForDate(date);
+      currentClasses.push({ id: `added-${Date.now()}`, subject: String(values.get('subject')), kind: String(values.get('kind')), batch: values.get('kind') === 'lab' ? String(values.get('batch')) : 'all', start, end, room: String(values.get('room') || '').trim() });
+      addForm.reset(); if (addBatchLabel) addBatchLabel.hidden = true;
+      void persistClasses(currentClasses);
+    });
+  }
 
   monthButtons.forEach((button) => button.addEventListener('click', () => {
     activeMonth = Number(button.dataset.calendarMonth);
@@ -510,39 +521,45 @@
     } catch (_) {}
     renderCalendar();
   }));
-  batchSelect.addEventListener('change', () => {
-    renderCalendar();
-    if (dialog.open && activeDateKey) renderDayDialog(new Date(`${activeDateKey}T12:00:00`));
-  });
-  resetButton.addEventListener('click', () => {
-    if (!canEditCalendar()) return;
-    const dateToReset = activeDateKey;
-    window.classboardSupabase.from('class_calendar_overrides').delete()
-      .eq('class_id', calendarClassId).eq('calendar_date', dateToReset).then(({ error }) => {
-        if (error) {
-          calendarNote.textContent = `Calendar day was not reset: ${error.message}`;
-          return;
-        }
-        delete calendarOverrides[dateToReset];
-        calendarNote.textContent = 'Calendar day reset to the default schedule for your class.';
-        renderCalendar();
-        renderDayDialog(new Date(`${dateToReset}T12:00:00`));
-      });
-  });
-  document.getElementById('closeCalendarDialog').addEventListener('click', () => dialog.close());
-  dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+  if (batchSelect) {
+    batchSelect.addEventListener('change', () => {
+      renderCalendar();
+      if (dialog?.open && activeDateKey) renderDayDialog(new Date(`${activeDateKey}T12:00:00`));
+    });
+  }
+  if (resetButton) {
+    resetButton.addEventListener('click', () => {
+      if (!canEditCalendar()) return;
+      const dateToReset = activeDateKey;
+      window.classboardSupabase.from('class_calendar_overrides').delete()
+        .eq('class_id', calendarClassId).eq('calendar_date', dateToReset).then(({ error }) => {
+          if (error) {
+            if (calendarNote) calendarNote.textContent = `Calendar day was not reset: ${error.message}`;
+            return;
+          }
+          delete calendarOverrides[dateToReset];
+          if (calendarNote) calendarNote.textContent = 'Calendar day reset to the default schedule for your class.';
+          renderCalendar();
+          renderDayDialog(new Date(`${dateToReset}T12:00:00`));
+        });
+    });
+  }
+  document.getElementById('closeCalendarDialog')?.addEventListener('click', () => dialog?.close());
+  if (dialog) {
+    dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+  }
   window.addEventListener('classboard:attendance-calendar-context', () => {
     updateSubjectOptions();
     const studentRoll = Number(window.classboardContext?.rollNumber);
-    setBatchOptions(batchSelect);
-    setBatchOptions(addForm.elements.batch);
-    if (studentRoll >= 1 && batchForRoll(studentRoll)) batchSelect.value = batchForRoll(studentRoll);
+    if (batchSelect) setBatchOptions(batchSelect);
+    if (addForm?.elements?.batch) setBatchOptions(addForm.elements.batch);
+    if (batchSelect && studentRoll >= 1 && batchForRoll(studentRoll)) batchSelect.value = batchForRoll(studentRoll);
     void loadSharedCalendar();
   });
   const studentBatch = Number(window.classboardContext?.rollNumber);
-  setBatchOptions(batchSelect);
-  setBatchOptions(addForm.elements.batch);
-  if (studentBatch >= 1 && batchForRoll(studentBatch)) batchSelect.value = batchForRoll(studentBatch);
-  renderCalendar();
+  if (batchSelect) setBatchOptions(batchSelect);
+  if (addForm?.elements?.batch) setBatchOptions(addForm.elements.batch);
+  if (batchSelect && studentBatch >= 1 && batchForRoll(studentBatch)) batchSelect.value = batchForRoll(studentBatch);
+  if (grid) renderCalendar();
   if (window.classboardContext?.classId) void loadSharedCalendar();
 })();

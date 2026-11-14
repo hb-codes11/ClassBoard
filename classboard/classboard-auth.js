@@ -55,7 +55,7 @@
     const rollInput = document.querySelector('#adminAddMemberForm [name=rollNumber]');
     if (rollInput) { rollInput.max = String(maxRollForClass(classCode)); rollInput.placeholder = `1–${maxRollForClass(classCode)}`; }
     document.querySelectorAll('.private-note').forEach((note) => {
-      note.textContent = note.textContent.replace(/Rolls 1–32 are [A-Z]\d and 33–(?:66|67) are [A-Z]\d\./, `Rolls 1–32 are ${batchCodesForClass(classCode)[0]} and 33–${maxRollForClass(classCode)} are ${batchCodesForClass(classCode)[1]}.`);
+      note.textContent = note.textContent.replace(/(?:Rolls|Serials) 1–32 are [A-Z]\d and 33–(?:66|67) are [A-Z]\d\./, `Serials 1–32 are ${batchCodesForClass(classCode)[0]} and 33–${maxRollForClass(classCode)} are ${batchCodesForClass(classCode)[1]}.`);
     });
     document.querySelectorAll('#crClassForm, #crScheduleForm').forEach((form) => {
       const sub = form.closest('article')?.querySelector('.panel-sub');
@@ -403,7 +403,7 @@
 
       window.openFormDialog({
         title: currentRoll ? 'Update your student details' : 'Set up your student details',
-        description: `Enter your lab batch and serial roll number. Rolls 1–32 are ${batches[0]} and 33–${maxRoll} are ${batches[1]}.`,
+        description: `Enter your lab batch and serial number. Serials 1–32 are ${batches[0]} and 33–${maxRoll} are ${batches[1]}.`,
         fields: [
           {
             name: 'batch',
@@ -413,7 +413,7 @@
           },
           {
             name: 'rollNumber',
-            label: 'Serial roll number',
+            label: 'Serial number',
             type: 'number',
             value: currentRoll ? String(currentRoll) : '',
             placeholder: `1–${maxRoll}`
@@ -424,11 +424,11 @@
         onSubmit: async ({ batch, rollNumber }) => {
           const roll = Number(rollNumber);
           if (!Number.isInteger(roll) || roll < 1 || roll > maxRoll) {
-            return `Enter your serial roll number from 1 to ${maxRoll}.`;
+            return `Enter your serial number from 1 to ${maxRoll}.`;
           }
           const expectedBatch = batchForRoll(roll, classInfo.code);
           if (batch !== expectedBatch) {
-            return `Roll number ${roll} belongs to batch ${expectedBatch}. Check your details and try again.`;
+            return `Serial number ${roll} belongs to batch ${expectedBatch}. Check your details and try again.`;
           }
           const { error } = await window.classboardSupabase.rpc('set_own_student_setup', {
             p_class_id: classId,
@@ -2204,7 +2204,7 @@
         rollBadge.style.background = '#f8fafc';
         rollBadge.style.color = '#475569';
         rollBadge.style.border = '1px solid #e2e8f0';
-        rollBadge.textContent = `Roll ${user.rollNumber}`;
+        rollBadge.textContent = `Serial ${user.rollNumber}`;
         titleWrapper.append(rollBadge);
       }
 
@@ -2231,7 +2231,7 @@
         testerLabel.append(testerCheck, document.createTextNode('Tester'));
         roleGroup.append(testerLabel);
       }
-      const rollLabel = document.createElement('label'); rollLabel.className = 'account-roll-label'; rollLabel.textContent = 'Student roll number';
+      const rollLabel = document.createElement('label'); rollLabel.className = 'account-roll-label'; rollLabel.textContent = 'Student serial number';
       const roll = document.createElement('input'); roll.className = 'text-field'; roll.type = 'number'; roll.min = '1'; roll.max = String(maxRollForClass()); roll.placeholder = 'Optional'; roll.value = user.rollNumber ?? '';
       
       const liveBatchIndicator = document.createElement('span');
@@ -2248,7 +2248,7 @@
           liveBatchIndicator.textContent = `Lab: Batch ${b}`;
           liveBatchIndicator.style.color = '#0284c7';
         } else if (roll.value) {
-          liveBatchIndicator.textContent = 'Invalid roll number';
+          liveBatchIndicator.textContent = 'Invalid serial number';
           liveBatchIndicator.style.color = '#ef4444';
         } else {
           liveBatchIndicator.textContent = 'Batch: Not assigned';
@@ -2265,7 +2265,7 @@
           .filter((val) => val !== 'tester')];
         const rollNumber = roll.value ? Number(roll.value) : null;
         if (rollNumber !== null && (!Number.isInteger(rollNumber) || rollNumber < 1 || rollNumber > maxRollForClass())) {
-          notifyApp(`Student roll number must be between 1 and ${maxRollForClass()}.`, true); return;
+          notifyApp(`Student serial number must be between 1 and ${maxRollForClass()}.`, true); return;
         }
         save.disabled = true;
 
@@ -2408,7 +2408,7 @@
       const rollText = String(values.get('rollNumber') || '').trim();
       const rollNumber = rollText ? Number(rollText) : null;
       if (!emailPattern.test(email)) { notifyApp('Enter a college email ending in @medicaps.ac.in.', true); return; }
-      if (rollNumber !== null && (!Number.isInteger(rollNumber) || rollNumber < 1 || rollNumber > maxRollForClass(context.classCode))) { notifyApp(`Enter a roll number from 1 to ${maxRollForClass(context.classCode)} or leave it blank.`, true); return; }
+      if (rollNumber !== null && (!Number.isInteger(rollNumber) || rollNumber < 1 || rollNumber > maxRollForClass(context.classCode))) { notifyApp(`Enter a serial number from 1 to ${maxRollForClass(context.classCode)} or leave it blank.`, true); return; }
       const submit = addMemberForm.querySelector('button[type="submit"]');
       submit.disabled = true;
       const { error } = await window.classboardSupabase.rpc('grant_class_student_by_email', {

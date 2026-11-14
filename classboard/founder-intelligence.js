@@ -552,7 +552,7 @@
             <div class="founder-toolbar">
               <div class="founder-search-box">
                 <span class="founder-search-icon">🔍</span>
-                <input type="search" class="founder-search-input" id="founderSearchInput" placeholder="Search name, email, roll number…" />
+                <input type="search" class="founder-search-input" id="founderSearchInput" placeholder="Search name, email, serial number…" />
               </div>
 
               <div class="founder-toolbar-actions">
@@ -642,7 +642,7 @@
                 <span class="founder-dossier-value" id="drawerStatus">—</span>
               </div>
               <div class="founder-dossier-card">
-                <span class="founder-dossier-label">Section &amp; Roll</span>
+                <span class="founder-dossier-label">Section &amp; Serial No.</span>
                 <span class="founder-dossier-value" id="drawerSectionRoll">—</span>
               </div>
               <div class="founder-dossier-card">
@@ -1173,7 +1173,7 @@
       const status = getPresenceStatus(user);
       const name = user.display_name || user.email.split('@')[0];
       const initials = name.split(/[\s._-]+/).filter(Boolean).slice(0, 2).map((p) => p[0].toUpperCase()).join('') || 'U';
-      const roll = user.roll_number ? `Roll ${user.roll_number}` : '';
+      const roll = user.roll_number ? `Serial ${user.roll_number}` : '';
       const section = user.class_code || '';
       const batch = getBatchForRollAndClass(user.roll_number, user.class_code);
       const batchTag = batch ? `Batch ${batch}` : '';
@@ -1285,7 +1285,7 @@
       el('drawerUserAvatar').textContent = initials;
       el('drawerStatus').innerHTML = renderStatusBadge(status);
 
-      const roll = data.roll_number ? `Roll ${data.roll_number}` : 'No roll assigned';
+      const roll = data.roll_number ? `Serial ${data.roll_number}` : 'No serial assigned';
       const sec = data.class_code || 'General';
       el('drawerSectionRoll').textContent = `${sec} (${roll})`;
 

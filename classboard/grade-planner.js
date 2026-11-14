@@ -165,6 +165,7 @@
   }
 
   function renderScaleInputs(container) {
+    if (!container) return;
     container.replaceChildren();
     for (let gp = 10; gp >= 4; gp--) {
       const wrap = document.createElement('label');
@@ -186,6 +187,7 @@
   }
 
   function renderCourseCards(courses, semKey, container) {
+    if (!container) return;
     container.replaceChildren();
     const semData = state[semKey];
 
