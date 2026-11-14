@@ -352,8 +352,8 @@
   };
   const batchForRoll = (roll) => {
     const code = window.classboardContext?.classCode;
-    const isNewIbm = code === 'IBM-2' || code === 'IBM-3' || code === 'IBM-4';
-    if (isNewIbm) {
+    const isSelfSelect = code === 'INTEL-2' || code === 'IBM-2' || code === 'IBM-3' || code === 'IBM-4';
+    if (isSelfSelect) {
       const stored = window.classboardContext?.labBatch
         || (window.classboardContext?.classId && window.classboardContext?.userId
             ? localStorage.getItem(`classboard_student_batch:${window.classboardContext.classId}:${window.classboardContext.userId}`)
@@ -361,8 +361,8 @@
       if (stored) return stored;
     }
     const [first, second] = batchCodes();
-    const maxRoll = code === 'IBM-1' ? 67 : isNewIbm ? 80 : 66;
-    const split = isNewIbm ? 40 : 32;
+    const maxRoll = code === 'IBM-1' ? 67 : (code === 'IBM-2' || code === 'IBM-3' || code === 'IBM-4') ? 80 : 66;
+    const split = (code === 'IBM-2' || code === 'IBM-3' || code === 'IBM-4') ? 40 : 32;
     return roll >= 1 && roll <= split ? first : roll > split && roll <= maxRoll ? second : null;
   };
   const contextKey = () => {

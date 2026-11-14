@@ -183,9 +183,9 @@ begin
   end if;
 
   -- Determine expected lab batch based on section architecture
-  if target_code in ('IBM-2', 'IBM-3', 'IBM-4') then
-    -- Free selection for Sections B, C, D (no automated division enforced)
-    if target_code = 'IBM-2' and p_lab_batch not in ('B1', 'B2') then
+  if target_code in ('INTEL-2', 'IBM-2', 'IBM-3', 'IBM-4') then
+    -- Free selection for INTEL-2, IBM-2, IBM-3, IBM-4 (no automated division enforced)
+    if target_code in ('INTEL-2', 'IBM-2') and p_lab_batch not in ('B1', 'B2') then
       raise exception 'Please select a valid lab batch for this section';
     elsif target_code = 'IBM-3' and p_lab_batch not in ('C1', 'C2') then
       raise exception 'Please select a valid lab batch for this section';
@@ -194,8 +194,6 @@ begin
     end if;
   else
     expected_batch := case
-      when target_code = 'INTEL-2' and p_roll_number <= 32 then 'B1'
-      when target_code = 'INTEL-2' then 'B2'
       when p_roll_number <= 32 then 'A1'
       else 'A2'
     end;

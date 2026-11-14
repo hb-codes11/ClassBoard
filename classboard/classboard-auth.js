@@ -43,8 +43,8 @@
     return 66;
   };
   const batchForRoll = (roll, classCode = window.classboardContext?.classCode) => {
-    const isNewIbm = classCode === 'IBM-2' || classCode === 'IBM-3' || classCode === 'IBM-4';
-    if (isNewIbm) {
+    const isSelfSelect = ['INTEL-2', 'IBM-2', 'IBM-3', 'IBM-4'].includes(classCode);
+    if (isSelfSelect) {
       const stored = window.classboardContext?.labBatch
         || (window.classboardContext?.classId && window.classboardContext?.userId
             ? localStorage.getItem(`classboard_student_batch:${window.classboardContext.classId}:${window.classboardContext.userId}`)
@@ -53,7 +53,7 @@
     }
     const [first, second] = batchCodesForClass(classCode);
     const maxRoll = maxRollForClass(classCode);
-    const split = isNewIbm ? 40 : 32;
+    const split = (classCode === 'IBM-2' || classCode === 'IBM-3' || classCode === 'IBM-4') ? 40 : 32;
     return Number(roll) >= 1 && Number(roll) <= split ? first : Number(roll) > split && Number(roll) <= maxRoll ? second : null;
   };
   const setBatchSelectOptions = (select, classCode, includeAll = false) => {
@@ -83,8 +83,9 @@
         rollInput.placeholder = `1–${maxRollForClass(classCode)}`;
       }
     }
+    const isIntel2 = classCode === 'INTEL-2';
     document.querySelectorAll('.private-note').forEach((note) => {
-      if (isNewIbm) {
+      if (isNewIbm || isIntel2) {
         note.textContent = note.textContent.replace(/(?:Rolls|Serials) 1–32 are [A-Z]\d and 33–(?:66|67|80) are [A-Z]\d\./, `Students select ${batchCodesForClass(classCode).join(' or ')} as their lab batch.`);
       } else {
         note.textContent = note.textContent.replace(/(?:Rolls|Serials) 1–32 are [A-Z]\d and 33–(?:66|67) are [A-Z]\d\./, `Serials 1–32 are ${batchCodesForClass(classCode)[0]} and 33–${maxRollForClass(classCode)} are ${batchCodesForClass(classCode)[1]}.`);
@@ -443,6 +444,7 @@
     function promptStudentSetup({ canCancel = false } = {}) {
       if (!studentMembership || roles.includes('cr') || roles.includes('admin')) return;
       const currentRoll = studentMembership.roll_number ?? null;
+      const isSelfSelect = ['INTEL-2', 'IBM-2', 'IBM-3', 'IBM-4'].includes(classInfo.code);
       const isNewIbm = ['IBM-2', 'IBM-3', 'IBM-4'].includes(classInfo.code);
       const savedBatch = window.classboardContext?.labBatch
         || ((classId && user?.id) ? localStorage.getItem(`classboard_student_batch:${classId}:${user.id}`) : null)
@@ -450,7 +452,7 @@
       const currentBatch = savedBatch || (currentRoll ? batchForRoll(currentRoll, classInfo.code) : '');
       const batches = batchCodesForClass(classInfo.code);
       const maxRoll = maxRollForClass(classInfo.code);
-      const descriptionText = isNewIbm
+      const descriptionText = isSelfSelect
         ? 'Enter your lab batch and serial number.'
         : `Enter your lab batch and serial number. Serials 1–32 are ${batches[0]} and 33–${maxRoll} are ${batches[1]}.`;
       const placeholderText = isNewIbm ? 'Your serial number' : `1–${maxRoll}`;
@@ -483,7 +485,7 @@
           if (!batch || !batches.includes(batch)) {
             return 'Please choose a lab batch.';
           }
-          if (!isNewIbm) {
+          if (!isSelfSelect) {
             const expectedBatch = batchForRoll(roll, classInfo.code);
             if (batch !== expectedBatch) {
               return `Serial number ${roll} belongs to batch ${expectedBatch}. Check your details and try again.`;
@@ -2284,7 +2286,8 @@
     if (!userRows.length) addEmptyNote(container, 'No class accounts yet. New college sign-ins will appear here as students.');
     userRows.forEach((user) => {
       const row = document.createElement('div'); row.className = 'list-row account-row'; row.dataset.userId = user.userId;
-      const batch = user.rollNumber ? batchForRoll(user.rollNumber, window.classboardContext?.classCode) : null;
+      const isSelfSelect = ['INTEL-2', 'IBM-2', 'IBM-3', 'IBM-4'].includes(window.classboardContext?.classCode);
+      const batch = (!isSelfSelect && user.rollNumber) ? batchForRoll(user.rollNumber, window.classboardContext?.classCode) : null;
       row.dataset.search = `${user.name} ${user.email} ${user.rollNumber ?? ''} ${batch ? `batch ${batch}` : ''}`.toLowerCase();
       row.dataset.roles = [...user.roles].join(' ');
       const avatar = document.createElement('div'); avatar.className = 'avatar';
@@ -2363,6 +2366,11 @@
       liveBatchIndicator.style.display = 'block';
 
       function updateLiveBatch() {
+        const isSelfSelect = ['INTEL-2', 'IBM-2', 'IBM-3', 'IBM-4'].includes(window.classboardContext?.classCode);
+        if (isSelfSelect) {
+          liveBatchIndicator.textContent = '';
+          return;
+        }
         const val = roll.value ? Number(roll.value) : null;
         const b = val ? batchForRoll(val, window.classboardContext?.classCode) : null;
         if (b) {
