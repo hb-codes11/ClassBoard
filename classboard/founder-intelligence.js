@@ -772,12 +772,12 @@
               <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:2px;">
                 <select id="drawerTargetSectionSelect" style="flex:1;min-width:200px;height:38px;padding:0 12px;border-radius:9px;border:1.5px solid #93c5fd;background:#ffffff;font-size:0.84rem;font-weight:600;color:#0f172a;outline:none;">
                   <option value="">Choose target section...</option>
-                  <option value="INTEL-1">AI &amp; Analytics - A (INTEL-1)</option>
-                  <option value="INTEL-2">AI &amp; Analytics - B (INTEL-2)</option>
-                  <option value="IBM-1">IBM Advanced AI - A (IBM-1)</option>
-                  <option value="IBM-2">IBM Advanced AI - B (IBM-2)</option>
-                  <option value="IBM-3">IBM Advanced AI - C (IBM-3)</option>
-                  <option value="IBM-4">IBM Advanced AI - D (IBM-4)</option>
+                  <option value="INTEL-1">AI &amp; Analytics - A (Intel-1)</option>
+                  <option value="INTEL-2">AI &amp; Analytics - B (Intel-2)</option>
+                  <option value="IBM-1">IBM Advanced AI - A</option>
+                  <option value="IBM-2">IBM Advanced AI - B</option>
+                  <option value="IBM-3">IBM Advanced AI - C</option>
+                  <option value="IBM-4">IBM Advanced AI - D</option>
                 </select>
                 <button type="button" id="drawerApplySectionChangeBtn" style="height:38px;padding:0 18px;border-radius:9px;background:#006BFF;color:#ffffff;font-size:0.82rem;font-weight:750;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background 0.15s;flex-shrink:0;">
                   <span>Transfer Section</span>

@@ -2482,12 +2482,12 @@
         sectionSelect.style.color = '#0f172a';
 
         const sections = [
-          { code: 'INTEL-1', name: 'INTEL-1 (AI & Analytics - A)' },
-          { code: 'INTEL-2', name: 'INTEL-2 (AI & Analytics - B)' },
-          { code: 'IBM-1', name: 'IBM-1 (Advanced AI - A)' },
-          { code: 'IBM-2', name: 'IBM-2 (Advanced AI - B)' },
-          { code: 'IBM-3', name: 'IBM-3 (Advanced AI - C)' },
-          { code: 'IBM-4', name: 'IBM-4 (Advanced AI - D)' }
+          { code: 'INTEL-1', name: 'AI & Analytics - A (Intel-1)' },
+          { code: 'INTEL-2', name: 'AI & Analytics - B (Intel-2)' },
+          { code: 'IBM-1', name: 'IBM Advanced AI - A' },
+          { code: 'IBM-2', name: 'IBM Advanced AI - B' },
+          { code: 'IBM-3', name: 'IBM Advanced AI - C' },
+          { code: 'IBM-4', name: 'IBM Advanced AI - D' }
         ];
         sections.forEach((sec) => {
           const opt = document.createElement('option');
