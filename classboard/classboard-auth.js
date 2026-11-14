@@ -1540,13 +1540,15 @@
       return null;
     };
     const isStaff = roles.includes('cr') || roles.includes('admin');
+    const isSelfHeldSection = ['IBM-2', 'IBM-3', 'IBM-4'].includes(window.classboardContext?.classCode);
+    const canEditHeld = isStaff || isSelfHeldSection;
     const batchFromRoll = batchForRoll(rollNumber);
     const batchPickerWrap = document.getElementById('attendanceLabBatchWrap');
     const batchPicker = document.getElementById('attendanceLabBatch');
     if (batchPickerWrap) batchPickerWrap.hidden = !isStaff;
     if (batchPicker && !isStaff && batchFromRoll) batchPicker.value = batchFromRoll;
     cards.forEach((card) => {
-      card.querySelector('.subject-held').readOnly = !isStaff;
+      card.querySelector('.subject-held').readOnly = !canEditHeld;
       card.querySelector('.subject-attended').readOnly = !roles.includes('student');
     });
     const activeBatch = isStaff ? batchPicker?.value || batchCodesForClass()[0] : batchFromRoll || batchCodesForClass()[0];
@@ -1576,14 +1578,18 @@
       const heldLabel = heldInput.closest('label');
       const submit = card.querySelector('.subject-calculator button[type="submit"]');
       heldInput.value = String(held);
-      heldInput.readOnly = !isStaff;
-      heldInput.setAttribute('aria-readonly', String(!isStaff));
-      heldInput.title = isStaff ? 'Shared class count managed by CRs and admins' : 'Set by a class representative or admin';
+      heldInput.readOnly = !canEditHeld;
+      heldInput.setAttribute('aria-readonly', String(!canEditHeld));
+      heldInput.title = isStaff
+        ? 'Shared class count managed by CRs and admins'
+        : isSelfHeldSection
+          ? 'Enter classes held for your section'
+          : 'Set by a class representative or admin';
       attendedInput.value = String(attended);
-      attendedInput.max = String(held);
+      attendedInput.max = String(canEditHeld ? (held > 0 ? held : 999) : held);
       attendedInput.readOnly = !roles.includes('student');
       attendedInput.title = 'Your personal attended-class count';
-      if (isStaff && !heldInput.dataset.attendanceLimitConnected) {
+      if (canEditHeld && !heldInput.dataset.attendanceLimitConnected) {
         heldInput.dataset.attendanceLimitConnected = 'true';
         heldInput.addEventListener('input', () => {
           const nextHeld = Number(heldInput.value);
@@ -1600,22 +1606,28 @@
           const activeContext = window.classboardContext;
           const activeRoles = activeContext?.roles || [];
           const activeStaff = activeRoles.includes('cr') || activeRoles.includes('admin');
+          const isSelfHeld = ['IBM-2', 'IBM-3', 'IBM-4'].includes(activeContext?.classCode);
+          const canEditHeld = activeStaff || isSelfHeld;
           const enteredHeld = Number(heldInput.value);
           const enteredAttended = Number(attendedInput.value);
           if (!Number.isInteger(enteredAttended) || enteredAttended < 0) {
             notifyApp('Attended classes must be a whole number of 0 or more.', true);
             return;
           }
-          if (!activeStaff && enteredAttended > Number(heldInput.value)) {
+          if (!canEditHeld && enteredAttended > Number(heldInput.value)) {
             notifyApp('Attended classes cannot exceed the shared classes-held total.', true);
             return;
           }
-          if (activeStaff && (!Number.isInteger(enteredHeld) || enteredHeld < 0)) {
+          if (canEditHeld && (!Number.isInteger(enteredHeld) || enteredHeld < 0)) {
             notifyApp('Classes held must be a whole number of 0 or more.', true);
             return;
           }
+          if (canEditHeld && enteredAttended > enteredHeld) {
+            notifyApp('Attended classes cannot exceed the classes-held total.', true);
+            return;
+          }
           const savePersonalAttendance = activeRoles.includes('student')
-            && enteredAttended <= (activeStaff ? enteredHeld : Number(heldInput.value));
+            && enteredAttended <= (canEditHeld ? enteredHeld : Number(heldInput.value));
           const activeSubject = resolveSubject(card.dataset.attendanceSubjectName || String(card.dataset.subjectName || '').replace(/ Lab$/, ''));
           if (!activeSubject) {
             notifyApp('Could not identify this subject. Refresh and try again.', true);
@@ -1627,12 +1639,15 @@
           const button = card.querySelector('.subject-calculator button[type="submit"]');
           button.disabled = true;
           try {
-            if (activeStaff) {
+            if (canEditHeld) {
               const savedHeld = await client.from('attendance_class_counts').upsert({
                 class_id: classId, subject_id: activeSubject.id, kind: activeKind, batch: activeBatch,
                 classes_held: enteredHeld, updated_by: userId
               }, { onConflict: 'class_id,subject_id,kind,batch' }).select('classes_held').maybeSingle();
-              if (savedHeld.error) throw savedHeld.error;
+              if (savedHeld.error) {
+                console.warn('Could not save classes-held count:', savedHeld.error.message);
+                if (activeStaff) throw savedHeld.error;
+              }
             }
             if (savePersonalAttendance) {
               const savedProgress = await client.from('student_attendance_progress').upsert({
@@ -1641,13 +1656,15 @@
               }, { onConflict: 'user_id,class_id,subject_id,kind,batch' }).select('attended_classes').maybeSingle();
               if (savedProgress.error) throw savedProgress.error;
             }
-            heldInput.value = String(activeStaff ? enteredHeld : held);
+            heldInput.value = String(canEditHeld ? enteredHeld : held);
             attendedInput.max = String(heldInput.value);
             attendedInput.value = String(enteredAttended);
             card.updateAttendancePlan?.();
-            notifyApp(activeStaff && activeRoles.includes('student') && !savePersonalAttendance
-              ? 'Shared total saved. Your attended count is above it; update your own count to continue.'
-              : activeStaff ? (activeRoles.includes('student') ? 'Shared classes-held total and your attendance were saved.' : 'Shared classes-held total was saved.') : 'Your attended-class count was saved.', activeStaff && activeRoles.includes('student') && !savePersonalAttendance);
+            notifyApp(
+              canEditHeld
+                ? (activeRoles.includes('student') ? 'Classes held and your attendance were saved.' : 'Shared classes-held total was saved.')
+                : 'Your attended-class count was saved.'
+            );
             await loadAttendancePlanner(classId, userId, roles, rollNumber);
           } catch (error) {
             notifyApp(`Attendance figures did not save: ${error.message}`, true);

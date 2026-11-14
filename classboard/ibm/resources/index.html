@@ -680,19 +680,141 @@
     .dialog-body { flex: 1; width: 100%; height: 100%; background: #f1f5f9; }
     .dialog-iframe { width: 100%; height: 100%; border: none; }
 
-    /* Footer */
-    footer.public-footer {
-      max-width: 1160px;
-      margin: 0 auto 36px;
-      padding: 0 clamp(16px, 3.5vw, 28px);
-      text-align: center;
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 12.5px;
+    /* Landing Page Footer */
+    .landing-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 36px 0 calc(28px + env(safe-area-inset-bottom, 0));
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 13px;
+      margin-top: 40px;
     }
-    footer.public-footer a {
+    .foot-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    .foot-top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .foot-brand-name {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 19px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+    .foot-brand-sub {
+      color: rgba(224, 242, 254, 0.78);
+      font-size: 12.5px;
+      margin-top: 3px;
+    }
+    .foot-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      font-size: 13px;
+    }
+    .foot-links a {
+      text-decoration: none;
+      color: inherit;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .foot-links a:hover {
       color: #ffffff;
       text-decoration: underline;
-      text-underline-offset: 3px;
+    }
+    .badge-intel, .badge-ibm {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 99px;
+      background: #ffffff;
+      font-weight: 800;
+      font-size: 10.5px;
+      letter-spacing: -0.02em;
+      vertical-align: middle;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+    .badge-intel { color: #0068B5; }
+    .badge-ibm { color: #0f62fe; letter-spacing: 0.08em; font-family: monospace; }
+
+    /* Developed by Section (with Founders Name & Profile Photos) */
+    .foot-dev-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 14px;
+    }
+    .foot-dev-heading {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.65);
+    }
+    .foot-dev-cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+    }
+    .foot-dev-amp {
+      color: rgba(224, 242, 254, 0.75);
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .foot-dev-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 16px 6px 8px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform 0.15s, background 0.15s, border-color 0.15s;
+    }
+    .foot-dev-card:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.38);
+      transform: translateY(-1px);
+    }
+    .foot-dev-photo {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+    .foot-dev-details {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+      line-height: 1.25;
+    }
+    .foot-dev-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .foot-dev-role {
+      font-size: 10.5px;
+      color: rgba(224, 242, 254, 0.75);
+    }
+    .foot-copyright {
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, 0.55);
+      margin-top: 4px;
     }
 
     @media (max-width: 768px) {
@@ -744,7 +866,7 @@
       <aside class="workspace-cta-card">
         <div class="workspace-cta-text">
           <h3>Sign in to access your class workspace</h3>
-          <p>Unlock section-specific attendance, schedules, private updates, saved calculations, and personalized tools.</p>
+          <p>Unlock section-specific features.</p>
         </div>
         <a href="../../#login" class="btn-workspace-cta" id="bannerSignInCta">
           <span>Sign in to ClassBoard</span>
@@ -803,9 +925,45 @@
     </div>
   </dialog>
 
-  <!-- Footer -->
-  <footer class="public-footer">
-    <p>ClassBoard · Dedicated to INTEL &amp; IBM Batches · Medi-Caps University · <a href="../../about.html">About</a> · <a href="../../privacy.html">Privacy</a> · <a href="../../terms.html">Terms</a></p>
+  <!-- Landing Page Footer -->
+  <footer class="landing-footer">
+    <div class="wrap foot-wrap">
+      <div class="foot-top-bar">
+        <div class="foot-brand-info">
+          <div class="foot-brand-name">ClassBoard</div>
+          <p class="foot-brand-sub">Dedicated to <span class="badge-intel">INTEL</span> &amp; <span class="badge-ibm">IBM</span> batches · Medi-Caps University</p>
+        </div>
+        <div class="foot-links">
+          <a href="../../about.html">About</a>
+          <a href="../../privacy.html">Privacy Policy</a>
+          <a href="../../terms.html">Terms of Service</a>
+          <a href="../../contact.html">Contact Us</a>
+        </div>
+      </div>
+
+      <!-- Developed by Developers with Profile Photos -->
+      <div class="foot-dev-section" id="about">
+        <span class="foot-dev-heading">Developed by</span>
+        <div class="foot-dev-cards">
+          <div class="foot-dev-card">
+            <img src="../../founder-hasnaat.jpg" alt="Hasnaat Malik" class="foot-dev-photo" />
+            <div class="foot-dev-details">
+              <strong class="foot-dev-name">Hasnaat Malik</strong>
+              <span class="foot-dev-role">Developer</span>
+            </div>
+          </div>
+          <span class="foot-dev-amp">&amp;</span>
+          <div class="foot-dev-card">
+            <img src="../../founder-harsh.jpg" alt="Harsh Bhadrawale" class="foot-dev-photo" />
+            <div class="foot-dev-details">
+              <strong class="foot-dev-name">Harsh Bhadrawale</strong>
+              <span class="foot-dev-role">Developer</span>
+            </div>
+          </div>
+        </div>
+        <div class="foot-copyright">© 2026 ClassBoard. Built for Medi-Caps Students.</div>
+      </div>
+    </div>
   </footer>
 
   <!-- Script Logic -->
