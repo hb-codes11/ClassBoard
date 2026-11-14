@@ -36,7 +36,7 @@
     .founder-landing-banner { background: #ecfdf5 !important; border: 1px solid #a7f3d0 !important; border-radius: 14px !important; padding: 16px 18px !important; display: flex !important; flex-direction: column !important; gap: 12px !important; box-sizing: border-box !important; }
     .founder-landing-header { display: flex !important; align-items: center !important; gap: 8px !important; font-size: 0.92rem !important; font-weight: 700 !important; color: #065f46 !important; }
     .founder-landing-header span.sub { font-size: 0.8rem !important; font-weight: 500 !important; color: #047857 !important; }
-    .founder-landing-grid { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 12px !important; width: 100% !important; box-sizing: border-box !important; }
+    .founder-landing-grid { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important; gap: 12px !important; width: 100% !important; box-sizing: border-box !important; }
     .founder-landing-card { background: #ffffff !important; border: 1px solid #bbf7d0 !important; border-radius: 12px !important; padding: 14px 16px !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; }
     .founder-four-panels-row { display: grid !important; grid-template-columns: 1.35fr 1fr 1fr 1.15fr !important; gap: 12px !important; width: 100% !important; box-sizing: border-box !important; align-items: stretch !important; }
     .founder-panel-box { background: #ffffff !important; border: 1px solid #e2e8f0 !important; border-radius: 14px !important; padding: 16px !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03) !important; box-sizing: border-box !important; }
@@ -4740,6 +4740,87 @@
     }
     #authGate .cta-group { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 4px; }
 
+    /* Navbar IBM Public Pill */
+    #authGate .landing-links a[href*="ibm/resources"] {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #authGate .nav-public-dot {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #10b981;
+      color: #ffffff;
+      line-height: 1.2;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Hero Public Resource Callout */
+    #authGate .hero-public-callout {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+      padding: 9px 16px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.95);
+      line-height: 1.4;
+      text-align: left;
+      transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(2, 24, 60, 0.15);
+    }
+    #authGate .hero-public-callout:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-1px);
+    }
+    #authGate .hero-public-badge {
+      display: inline-flex;
+      align-items: center;
+      background: #10b981;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: 999px;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
+      flex-shrink: 0;
+    }
+    #authGate .hero-public-text strong {
+      color: #ffffff;
+      font-weight: 700;
+    }
+    #authGate .hero-public-arrow {
+      color: #FFCE56;
+      font-weight: 750;
+      white-space: nowrap;
+      margin-left: 4px;
+    }
+
+    @media (max-width: 767px) {
+      #authGate .hero-public-callout {
+        justify-content: center;
+        text-align: center;
+        margin: 18px auto 0;
+        width: 100%;
+        max-width: 380px;
+        box-sizing: border-box;
+      }
+    }
+
     /* Right Login Card */
     #authGate .login-card-wrap {
       background: #ffffff;
@@ -5047,7 +5128,7 @@
           <a href="#preview">Preview</a>
           <a href="#planner">Planner</a>
           <a href="#features">Features</a>
-          <a href="./ibm/resources/">IBM Resources</a>
+          <a href="./ibm/resources/">IBM Resources <span class="nav-public-dot">Free</span></a>
           <a href="./about.html">About</a>
           <a href="#login" class="btn btn-primary">Sign in</a>
         </nav>
@@ -5067,6 +5148,11 @@
                 <a href="#planner" class="btn btn-primary">Try the planner</a>
                 <a href="#preview" class="btn btn-ghost">See what’s inside</a>
               </div>
+              <a href="./ibm/resources/" class="hero-public-callout">
+                <span class="hero-public-badge">OPEN ACCESS</span>
+                <span class="hero-public-text">IBM Study Materials are now public — <strong>No login required</strong></span>
+                <span class="hero-public-arrow">Browse notes &rarr;</span>
+              </a>
             </div>
 
             <!-- Login Card -->

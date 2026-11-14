@@ -368,6 +368,15 @@
               <div class="founder-kpi-sub">Total views on the public landing page</div>
             </div>
 
+            <div class="founder-landing-card" style="border-left: 3px solid #006BFF;">
+              <div class="founder-kpi-top">
+                <span class="founder-kpi-label">IBM Public Resource Views</span>
+                <span class="founder-icon-badge purple">📚</span>
+              </div>
+              <div class="founder-kpi-value" id="kpiLandingIbmViews">0</div>
+              <div class="founder-kpi-sub">Total views on /ibm/resources/</div>
+            </div>
+
             <div class="founder-landing-card">
               <div class="founder-kpi-top">
                 <span class="founder-kpi-label">Unique Landing Visitors</span>
@@ -959,6 +968,21 @@
           const { data, error } = await window.classboardSupabase.rpc('get_platform_telemetry_summary');
           if (!error && data) pageViewStats = data;
         } catch (_) {}
+      })(),
+      (async () => {
+        try {
+          if (window.classboardSupabase) {
+            const { count, error } = await window.classboardSupabase
+              .from('ibm_resource_events')
+              .select('id', { count: 'exact', head: true })
+              .eq('event_type', 'pageview');
+            if (!error && typeof count === 'number') {
+              if (!dashboardData) dashboardData = {};
+              if (!dashboardData.ibm_resources_analytics) dashboardData.ibm_resources_analytics = {};
+              dashboardData.ibm_resources_analytics.pageviews = Math.max(dashboardData.ibm_resources_analytics.pageviews || 0, count);
+            }
+          }
+        } catch (_) {}
       })()
     ]);
 
@@ -1013,6 +1037,10 @@
     // 4. Public Landing Analytics Banner
     if (el('kpiLandingPageviews')) {
       el('kpiLandingPageviews').textContent = pl.landing_pageviews ? pl.landing_pageviews.toLocaleString('en-IN') : '1,284';
+    }
+    if (el('kpiLandingIbmViews')) {
+      const ibmCount = dashboardData?.ibm_resources_analytics?.pageviews || 0;
+      el('kpiLandingIbmViews').textContent = ibmCount.toLocaleString('en-IN');
     }
     if (el('kpiLandingUniqueVisitors')) {
       el('kpiLandingUniqueVisitors').textContent = pl.unique_landing_visitors ? pl.unique_landing_visitors.toLocaleString('en-IN') : '846';
@@ -1161,9 +1189,15 @@
       { title: 'Class Log', views: 982 }
     ];
 
+    const ibmViews = dashboardData?.ibm_resources_analytics?.pageviews || 0;
     const items = (topPages && topPages.length >= 3)
       ? topPages.slice(0, 5).map((p) => ({ title: p.page_title, views: p.view_count }))
       : defaultPages;
+
+    if (ibmViews > 0 && !items.some((p) => p.title && p.title.includes('IBM Resources'))) {
+      items.push({ title: 'IBM Resources (Public)', views: ibmViews });
+      items.sort((a, b) => (b.views || 0) - (a.views || 0));
+    }
 
     list.innerHTML = items.map((p, idx) => `
       <div class="founder-top-page-item">
