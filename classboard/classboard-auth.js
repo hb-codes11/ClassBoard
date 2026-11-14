@@ -30,6 +30,7 @@
     .map((id) => document.getElementById(id)).filter(Boolean);
   const emailPattern = /^[^@\s]+@medicaps[.]ac[.]in$/i;
   const isIbmClass = (classCode = window.classboardContext?.classCode) => typeof classCode === 'string' && classCode.startsWith('IBM-');
+  const isIntelClass = (classCode = window.classboardContext?.classCode) => typeof classCode === 'string' && classCode.startsWith('INTEL-');
   const batchCodesForClass = (classCode = window.classboardContext?.classCode) => {
     if (classCode === 'INTEL-2' || classCode === 'IBM-2') return ['B1', 'B2'];
     if (classCode === 'IBM-3') return ['C1', 'C2'];
@@ -89,6 +90,13 @@
         note.textContent = note.textContent.replace(/(?:Rolls|Serials) 1–32 are [A-Z]\d and 33–(?:66|67) are [A-Z]\d\./, `Serials 1–32 are ${batchCodesForClass(classCode)[0]} and 33–${maxRollForClass(classCode)} are ${batchCodesForClass(classCode)[1]}.`);
       }
     });
+    const isIbm = isIbmClass(classCode);
+    const categorySelect = document.querySelector('#crUpdateForm select[name="category"]');
+    if (categorySelect) {
+      const deadlineOpt = categorySelect.querySelector('option[value="Deadline"]');
+      if (deadlineOpt) deadlineOpt.hidden = isIbm;
+      if (isIbm && categorySelect.value === 'Deadline') categorySelect.value = 'Important';
+    }
     document.querySelectorAll('#crClassForm, #crScheduleForm').forEach((form) => {
       const sub = form.closest('article')?.querySelector('.panel-sub');
       if (sub) sub.textContent = `Lectures are for everyone. Record labs separately for ${batchCodesForClass(classCode).join(' or ')}.`;
@@ -235,7 +243,12 @@
     if (timetableSubtitle) timetableSubtitle.textContent = `CSE · III · ${classLabel}`;
     const academicsTimetableSubtitle = document.querySelector('#academicsPanelTimetable .panel-sub');
     if (academicsTimetableSubtitle) academicsTimetableSubtitle.textContent = `Weekly lectures and practicals · ${classLabel} · July–December 2026`;
-    const timetableImage = classInfo.code === 'IBM-1' ? './class-timetable-ibm1-odd-semester-2026.jpg' : classInfo.code === 'INTEL-2' ? './class-timetable-intel2-odd-semester-2026.png' : './class-timetable-odd-semester-2026.png';
+    const timetableImage = classInfo.code === 'IBM-1' ? './class-timetable-ibm1-odd-semester-2026.jpg'
+      : classInfo.code === 'IBM-2' ? './class-timetable-ibm2-odd-semester-2026.jpg'
+      : classInfo.code === 'IBM-3' ? './class-timetable-ibm3-odd-semester-2026.jpg'
+      : classInfo.code === 'IBM-4' ? './class-timetable-ibm4-odd-semester-2026.jpg'
+      : classInfo.code === 'INTEL-2' ? './class-timetable-intel2-odd-semester-2026.png'
+      : './class-timetable-odd-semester-2026.png';
     document.querySelectorAll('.timetable-preview-button img, .timetable-dialog-content img, #academicsTimetableImg').forEach((image) => {
       if (timetableImage) image.src = timetableImage;
       else image.removeAttribute('src');
@@ -595,9 +608,14 @@
     const filter = activeChip ? activeChip.dataset.updateFilter : 'all';
     const updateList = document.getElementById('updateList');
     if (!updateList) return;
+    const isIbm = isIbmClass(window.classboardContext?.classCode);
 
     const cards = updateList.querySelectorAll('.update');
     cards.forEach((card) => {
+      if (isIbm && (card.dataset.category === 'Deadline' || card.dataset.category === 'Reminder' || card.dataset.isReminder === 'true')) {
+        card.style.display = 'none';
+        return;
+      }
       const match = filter === 'all' || card.dataset.category === filter;
       card.style.display = match ? '' : 'none';
     });
@@ -632,22 +650,48 @@
   window.applyClassboardUpdatesFilter = applyUpdatesFilter;
 
   function renderUpdatesPage(feed = window.classboardUpdateFeed) {
+    const isIbm = isIbmClass(window.classboardContext?.classCode);
+    const deadlineChip = document.querySelector('.updates-toolbar [data-update-filter="Deadline"]');
+    const reminderChip = document.querySelector('.updates-toolbar [data-update-filter="Reminder"]');
+    if (deadlineChip) deadlineChip.hidden = isIbm;
+    if (reminderChip) reminderChip.hidden = isIbm;
+
+    const descEl = document.querySelector('#page-updates .page-description');
+    if (descEl) {
+      descEl.textContent = isIbm ? 'Important announcements and updates from your class.' : 'Important updates, deadlines and reminders from your class.';
+    }
+
     const updateList = document.getElementById('updateList');
     if (!updateList) return;
     updateList.replaceChildren();
 
-    const items = Array.isArray(feed) ? feed : [];
+    let items = Array.isArray(feed) ? feed : [];
+    if (isIbm) {
+      items = items.filter((item) => !item.isReminder && String(item.category || '').toLowerCase() !== 'deadline' && String(item.category || '').toLowerCase() !== 'reminder');
+      const activeChip = document.querySelector('.updates-toolbar .filter-chip.active');
+      if (activeChip && (activeChip.dataset.updateFilter === 'Deadline' || activeChip.dataset.updateFilter === 'Reminder')) {
+        document.querySelectorAll('.updates-toolbar .filter-chip').forEach(c => {
+          c.classList.remove('active');
+          c.setAttribute('aria-pressed', 'false');
+        });
+        const allChip = document.querySelector('.updates-toolbar .filter-chip[data-update-filter="all"]');
+        if (allChip) {
+          allChip.classList.add('active');
+          allChip.setAttribute('aria-pressed', 'true');
+        }
+      }
+    }
 
     const allCount = items.length;
     const importantCount = items.filter((item) => {
       const cat = String(item.category || '').toLowerCase();
       return cat === 'important' || item.importance === 'important';
     }).length;
-    const deadlineCount = items.filter((item) => {
+    const deadlineCount = isIbm ? 0 : items.filter((item) => {
       const cat = String(item.category || '').toLowerCase();
       return cat === 'deadline';
     }).length;
-    const reminderCount = items.filter((item) => item.isReminder).length;
+    const reminderCount = isIbm ? 0 : items.filter((item) => item.isReminder).length;
 
     const countAllEl = document.getElementById('updatesCountAll');
     const countImpEl = document.getElementById('updatesCountImportant');
@@ -1166,6 +1210,7 @@
     const { data: currentClass, error: classError } = await client.from('classes').select('id,code,name,semester').eq('id', classId).single();
     if (classError) throw classError;
     const isIbm = isIbmClass(currentClass?.code);
+    const isIntel = isIntelClass(currentClass?.code);
 
     let updatesQuery = client.from('updates').select('id,title,body,category,importance,is_pinned,created_at,published_at,expires_at,attachment_path,attachment_name').not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20);
     let resourcesQuery = client.from('resources').select('id,title,kind,unit_label,storage_path,created_at,published_at,subjects(name)').not('published_at', 'is', null).is('deleted_at', null).order('published_at', { ascending: false }).limit(50);
@@ -1175,6 +1220,11 @@
       const ibmIds = (ibmClasses || []).map((c) => c.id);
       updatesQuery = updatesQuery.in('class_id', ibmIds.length ? ibmIds : [classId]);
       resourcesQuery = resourcesQuery.in('class_id', ibmIds.length ? ibmIds : [classId]);
+    } else if (isIntel) {
+      const { data: intelClasses } = await client.from('classes').select('id').in('code', ['INTEL-1', 'INTEL-2']);
+      const intelIds = (intelClasses || []).map((c) => c.id);
+      updatesQuery = updatesQuery.in('class_id', intelIds.length ? intelIds : [classId]);
+      resourcesQuery = resourcesQuery.in('class_id', intelIds.length ? intelIds : [classId]);
     } else {
       updatesQuery = updatesQuery.eq('class_id', classId);
       resourcesQuery = resourcesQuery.eq('class_id', classId);
@@ -1229,7 +1279,7 @@
 
     const updateFeed = [
       ...(updateResult.data || []).map((item) => ({ ...item, isReminder: false })),
-      ...(reminderResult.data || []).map((item) => ({ ...item, category: 'deadline', importance: 'normal', isReminder: true }))
+      ...(isIbm ? [] : (reminderResult.data || []).map((item) => ({ ...item, category: 'deadline', importance: 'normal', isReminder: true })))
     ].sort((a, b) => {
       const dateFor = (item) => item.isReminder ? item.due_at : String(item.category).toLowerCase() === 'deadline' && item.expires_at ? item.expires_at : item.published_at || item.created_at;
       return new Date(dateFor(a)) - new Date(dateFor(b));

@@ -196,8 +196,8 @@
       ['Statistical Analysis', 'lecture', 'all', ...times.second, 'V205'],
       ['Statistical Analysis', 'lab', 'C1', '10:20', '12:00', 'L.V015'],
       ['Software Engineering', 'lab', 'C2', '10:20', '12:00', 'L.V003'],
-      ['Object Oriented Programming using Java', 'lab', 'C1', ...times.afternoonLab, 'L.V002'],
-      ['Data Structures using C++', 'lab', 'C2', ...times.afternoonLab, 'L.V103']
+      ['Object Oriented Programming using Java', 'lab', 'C2', ...times.afternoonLab, 'L.V002'],
+      ['Data Structures using C++', 'lab', 'C1', ...times.afternoonLab, 'L.V103']
     ],
     3: [
       ['Statistical Analysis', 'lecture', 'all', ...times.first, 'V205'],
