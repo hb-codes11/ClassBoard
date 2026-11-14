@@ -369,6 +369,51 @@
       box-shadow: 0 0 0 3px rgba(0, 107, 255, 0.14);
     }
 
+    /* Filter Tabs (no container track) matching Notes & Syllabus */
+    .catalog-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      margin: 14px 0 16px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+    .catalog-tabs::-webkit-scrollbar {
+      display: none;
+    }
+    .catalog-tab {
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      padding: 7px 16px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-family: 'Figtree', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color .15s ease, color .15s ease;
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .catalog-tab:not(.active):hover {
+      background: var(--blue-soft) !important;
+      color: var(--blue-deep) !important;
+    }
+    .catalog-tab.active {
+      background: #0756A0 !important;
+      color: #FFFFFF !important;
+      font-weight: 700;
+      border-color: transparent !important;
+      box-shadow: none !important;
+    }
+
     /* Meta summary bar */
     .catalog-meta-bar {
       display: flex;
@@ -877,7 +922,7 @@
 
     <!-- Resources Catalog Panel -->
     <section class="catalog-panel">
-      <!-- Toolbar: ONLY Search & Subject Filter -->
+      <!-- Toolbar: Search, Subject Filter & Category Tabs -->
       <div class="catalog-toolbar">
         <div class="search-row">
           <div class="search-input-wrap">
@@ -885,11 +930,18 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="search" class="search-field" id="publicSearch" placeholder="Search resources by title or subject..." aria-label="Search resources">
+            <input type="search" class="search-field" id="publicSearch" placeholder="Search by subject or file name" aria-label="Search resources">
           </div>
           <select class="select-field" id="subjectFilter" aria-label="Filter by subject">
             <option value="all">All subjects</option>
           </select>
+        </div>
+        <div class="catalog-tabs" role="tablist" aria-label="Filter by resource type">
+          <button type="button" class="catalog-tab active" data-resource-type="all">All files</button>
+          <button type="button" class="catalog-tab" data-resource-type="Notes">Notes</button>
+          <button type="button" class="catalog-tab" data-resource-type="Syllabus">Syllabus</button>
+          <button type="button" class="catalog-tab" data-resource-type="Lab manual">Lab manuals</button>
+          <button type="button" class="catalog-tab" data-resource-type="MST / PYQs">MST / PYQs</button>
         </div>
       </div>
 
@@ -1117,11 +1169,24 @@
         })[kind] || kind;
       }
 
-      // 6. Render & Filtering: ONLY Search and Subject Filter
+      let selectedType = 'all';
+
+      function normalizeResourceType(val) {
+        const s = String(val || '').toLowerCase().trim();
+        if (s === 'all') return 'all';
+        if (/note/.test(s)) return 'notes';
+        if (/syllab/.test(s)) return 'syllabus';
+        if (/lab|manual/.test(s)) return 'lab manual';
+        if (/mst|pyq|exam|paper/.test(s)) return 'mst / pyqs';
+        return s;
+      }
+
+      // 6. Render & Filtering: Search, Subject Filter & Resource Type Tabs
       function renderResources() {
         const grid = document.getElementById('resourcesGrid');
         const searchVal = document.getElementById('publicSearch').value.trim().toLowerCase();
         const subjectVal = document.getElementById('subjectFilter').value;
+        const activeType = normalizeResourceType(selectedType);
 
         const filtered = allResources.filter((item) => {
           const subject = Array.isArray(item.subjects) ? item.subjects[0] : item.subjects;
@@ -1134,8 +1199,10 @@
             subjectName.toLowerCase().includes(searchVal) ||
             (item.unit_label || '').toLowerCase().includes(searchVal)
           );
+          const itemType = normalizeResourceType(item.kind || item.type || '');
+          const matchesType = activeType === 'all' || itemType === activeType;
 
-          return matchesSubject && matchesSearch;
+          return matchesSubject && matchesSearch && matchesType;
         });
 
         document.getElementById('resourceCount').textContent = String(filtered.length);
@@ -1257,6 +1324,15 @@
       // 9. Event Listeners
       document.getElementById('publicSearch').addEventListener('input', renderResources);
       document.getElementById('subjectFilter').addEventListener('change', renderResources);
+
+      document.querySelectorAll('.catalog-tab').forEach((tab) => {
+        tab.addEventListener('click', (e) => {
+          e.preventDefault();
+          selectedType = tab.dataset.resourceType;
+          document.querySelectorAll('.catalog-tab').forEach((b) => b.classList.toggle('active', b === tab));
+          renderResources();
+        });
+      });
 
       document.getElementById('resourcesGrid').addEventListener('click', (e) => {
         const prevBtn = e.target.closest('[data-preview-id]');
