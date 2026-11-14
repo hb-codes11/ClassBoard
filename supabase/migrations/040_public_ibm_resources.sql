@@ -639,3 +639,4 @@ revoke all on function public.get_founder_analytics_dashboard(text) from public;
 grant execute on function public.get_founder_analytics_dashboard(text) to authenticated;
 
 commit;
+
