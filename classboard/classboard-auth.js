@@ -29,12 +29,23 @@
   const buttons = ['signInButton', 'signUpButton', 'googleSignInButton', 'resetPasswordButton']
     .map((id) => document.getElementById(id)).filter(Boolean);
   const emailPattern = /^[^@\s]+@medicaps[.]ac[.]in$/i;
-  const batchCodesForClass = (classCode = window.classboardContext?.classCode) => classCode === 'INTEL-2' ? ['B1', 'B2'] : ['A1', 'A2'];
-  const maxRollForClass = (classCode = window.classboardContext?.classCode) => classCode === 'IBM-1' ? 67 : 66;
+  const isIbmClass = (classCode = window.classboardContext?.classCode) => typeof classCode === 'string' && classCode.startsWith('IBM-');
+  const batchCodesForClass = (classCode = window.classboardContext?.classCode) => {
+    if (classCode === 'INTEL-2' || classCode === 'IBM-2') return ['B1', 'B2'];
+    if (classCode === 'IBM-3') return ['C1', 'C2'];
+    if (classCode === 'IBM-4') return ['D1', 'D2'];
+    return ['A1', 'A2'];
+  };
+  const maxRollForClass = (classCode = window.classboardContext?.classCode) => {
+    if (classCode === 'IBM-1') return 67;
+    if (classCode === 'IBM-2' || classCode === 'IBM-3' || classCode === 'IBM-4') return 80;
+    return 66;
+  };
   const batchForRoll = (roll, classCode = window.classboardContext?.classCode) => {
     const [first, second] = batchCodesForClass(classCode);
-    const maxRoll = classCode === 'IBM-1' ? 67 : 66;
-    return Number(roll) >= 1 && Number(roll) <= 32 ? first : Number(roll) >= 33 && Number(roll) <= maxRoll ? second : null;
+    const maxRoll = maxRollForClass(classCode);
+    const split = (classCode === 'IBM-2' || classCode === 'IBM-3' || classCode === 'IBM-4') ? 40 : 32;
+    return Number(roll) >= 1 && Number(roll) <= split ? first : Number(roll) > split && Number(roll) <= maxRoll ? second : null;
   };
   const setBatchSelectOptions = (select, classCode, includeAll = false) => {
     if (!select) return;
@@ -207,10 +218,10 @@
     document.querySelectorAll('.timetable-preview-button img, .timetable-dialog-content img, #academicsTimetableImg').forEach((image) => {
       if (timetableImage) image.src = timetableImage;
       else image.removeAttribute('src');
-      image.alt = timetableImage ? `Class timetable for CSE III ${classInfo.name}, July to December 2026` : 'IBM-1 timetable image is not available yet';
+      image.alt = timetableImage ? `Class timetable for CSE III ${classInfo.name}, July to December 2026` : 'Timetable image is not available yet';
     });
     const isAiAnalytics = classInfo.code === 'INTEL-1' || classInfo.code === 'INTEL-2';
-    const isIbm = classInfo.code === 'IBM-1';
+    const isIbm = isIbmClass(classInfo.code);
     const mstDocument = document.getElementById('mstOfficialDocument');
     mstDocument.hidden = !(isAiAnalytics || isIbm);
     const mstImage = isIbm ? './mst2-advanced-ai-nov-2026.png' : './mst2-ai-analytics-nov-2026.png';
@@ -308,7 +319,7 @@
       classSwitcher.replaceChildren(...activeClasses.map((item) => {
         const option = document.createElement('option');
         option.value = item.code;
-        option.textContent = `${item.code} · ${item.name}`;
+        option.textContent = item.name;
         return option;
       }));
       classSwitcher.value = classCode;
@@ -317,7 +328,7 @@
     document.body.dataset.multipleClasses = String(activeClasses.length > 1);
 
     let rosterName = '';
-    if (classInfo.code === 'IBM-1') {
+    if (isIbm) {
       const { data: profile } = await window.classboardSupabase.from('profiles').select('display_name').eq('user_id', user.id).maybeSingle();
       rosterName = profile?.display_name || '';
     }
@@ -400,10 +411,15 @@
       const currentBatch = currentRoll ? batchForRoll(currentRoll, classInfo.code) : '';
       const batches = batchCodesForClass(classInfo.code);
       const maxRoll = maxRollForClass(classInfo.code);
+      const isNewIbm = ['IBM-2', 'IBM-3', 'IBM-4'].includes(classInfo.code);
+      const descriptionText = isNewIbm
+        ? 'Enter your lab batch and serial number.'
+        : `Enter your lab batch and serial number. Serials 1–32 are ${batches[0]} and 33–${maxRoll} are ${batches[1]}.`;
+      const placeholderText = isNewIbm ? 'Your serial number' : `1–${maxRoll}`;
 
       window.openFormDialog({
         title: currentRoll ? 'Update your student details' : 'Set up your student details',
-        description: `Enter your lab batch and serial number. Serials 1–32 are ${batches[0]} and 33–${maxRoll} are ${batches[1]}.`,
+        description: descriptionText,
         fields: [
           {
             name: 'batch',
@@ -416,7 +432,7 @@
             label: 'Serial number',
             type: 'number',
             value: currentRoll ? String(currentRoll) : '',
-            placeholder: `1–${maxRoll}`
+            placeholder: placeholderText
           }
         ],
         submitLabel: currentRoll ? 'Save changes' : 'Save and join class',
@@ -424,7 +440,7 @@
         onSubmit: async ({ batch, rollNumber }) => {
           const roll = Number(rollNumber);
           if (!Number.isInteger(roll) || roll < 1 || roll > maxRoll) {
-            return `Enter your serial number from 1 to ${maxRoll}.`;
+            return isNewIbm ? 'Enter a valid serial number.' : `Enter your serial number from 1 to ${maxRoll}.`;
           }
           const expectedBatch = batchForRoll(roll, classInfo.code);
           if (batch !== expectedBatch) {
@@ -1109,14 +1125,31 @@
 
   async function loadLiveClassData(classId) {
     const client = window.classboardSupabase;
-    const [classResult, subjectResult, attachmentUpdateResult, sessionResult, resourceResult, baseReminderResult] = await Promise.all([
-      client.from('classes').select('id,code,name,semester').eq('id', classId).single(),
+    const { data: currentClass, error: classError } = await client.from('classes').select('id,code,name,semester').eq('id', classId).single();
+    if (classError) throw classError;
+    const isIbm = isIbmClass(currentClass?.code);
+
+    let updatesQuery = client.from('updates').select('id,title,body,category,importance,is_pinned,created_at,published_at,expires_at,attachment_path,attachment_name').not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20);
+    let resourcesQuery = client.from('resources').select('id,title,kind,unit_label,storage_path,created_at,published_at,subjects(name)').not('published_at', 'is', null).is('deleted_at', null).order('published_at', { ascending: false }).limit(50);
+
+    if (isIbm) {
+      const { data: ibmClasses } = await client.from('classes').select('id').in('code', ['IBM-1', 'IBM-2', 'IBM-3', 'IBM-4']);
+      const ibmIds = (ibmClasses || []).map((c) => c.id);
+      updatesQuery = updatesQuery.in('class_id', ibmIds.length ? ibmIds : [classId]);
+      resourcesQuery = resourcesQuery.in('class_id', ibmIds.length ? ibmIds : [classId]);
+    } else {
+      updatesQuery = updatesQuery.eq('class_id', classId);
+      resourcesQuery = resourcesQuery.eq('class_id', classId);
+    }
+
+    const [subjectResult, attachmentUpdateResult, sessionResult, resourceResult, baseReminderResult] = await Promise.all([
       client.from('subjects').select('id,slug,name,short_name,display_order').eq('class_id', classId).eq('is_active', true).order('display_order'),
-      client.from('updates').select('id,title,body,category,importance,is_pinned,created_at,published_at,expires_at,attachment_path,attachment_name').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20),
+      updatesQuery,
       client.from('class_sessions').select('id,subject_id,class_number,kind,batch,state,starts_at,room,topic,subjects(name,short_name)').eq('class_id', classId).order('starts_at', { ascending: false }).limit(50),
-      client.from('resources').select('id,title,kind,unit_label,storage_path,created_at,published_at,subjects(name)').eq('class_id', classId).not('published_at', 'is', null).is('deleted_at', null).order('published_at', { ascending: false }).limit(50),
+      resourcesQuery,
       client.from('reminders').select('id,title,body,due_at,is_pinned,created_at').eq('class_id', classId).eq('is_active', true).gte('due_at', new Date().toISOString()).order('due_at').limit(20)
     ]);
+    const classResult = { data: currentClass, error: null };
 
     let updateResult = attachmentUpdateResult;
     if (updateResult.error && /is_pinned|attachment_(?:path|name)|column .*does not exist|schema cache/i.test(updateResult.error.message || '')) {

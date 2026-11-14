@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&amp;family=Figtree:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./founder-intelligence.css?v=52" />
+  <link rel="stylesheet" href="./founder-intelligence.css?v=53" />
   <style id="founder-mockup-inline-styles">
     .founder-workspace-container { display: flex !important; flex-direction: column !important; gap: 16px !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
     .founder-eyebrow { font-size: 0.78rem !important; font-weight: 600 !important; color: #64748b !important; margin-bottom: 2px !important; display: block !important; }
@@ -5013,9 +5013,12 @@
                 <label class="lbl" for="loginClassSelector">Section</label>
                 <div class="inp sel">
                   <select id="loginClassSelector" name="section">
-                    <option value="INTEL-1">INTEL-1 · Section A</option>
-                    <option value="INTEL-2">INTEL-2 · Section B</option>
-                    <option value="IBM-1">IBM-1 · Advanced AI - A</option>
+                    <option value="INTEL-1">AI &amp; Analytics - A</option>
+                    <option value="INTEL-2">AI &amp; Analytics - B</option>
+                    <option value="IBM-1">Advanced AI - A</option>
+                    <option value="IBM-2">Advanced AI - B</option>
+                    <option value="IBM-3">Advanced AI - C</option>
+                    <option value="IBM-4">Advanced AI - D</option>
                   </select>
                   <svg class="chev" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="m6 9 6 6 6-6"/></svg>
                 </div>
@@ -5883,11 +5886,25 @@
     window.addEventListener('classboard:context-ready', (e) => {
       syncDashboardClassLayout(e.detail?.classCode);
     });
-    const classBatchCodes = () => window.classboardContext?.classCode === 'INTEL-2' ? ['B1', 'B2'] : ['A1', 'A2'];
-    const classMaxRoll = () => window.classboardContext?.classCode === 'IBM-1' ? 67 : 66;
+    const classBatchCodes = () => {
+      const code = window.classboardContext?.classCode;
+      if (code === 'INTEL-2' || code === 'IBM-2') return ['B1', 'B2'];
+      if (code === 'IBM-3') return ['C1', 'C2'];
+      if (code === 'IBM-4') return ['D1', 'D2'];
+      return ['A1', 'A2'];
+    };
+    const classMaxRoll = () => {
+      const code = window.classboardContext?.classCode;
+      if (code === 'IBM-1') return 67;
+      if (code === 'IBM-2' || code === 'IBM-3' || code === 'IBM-4') return 80;
+      return 66;
+    };
     const batchForRoll = (roll) => {
       const sectionBatches = classBatchCodes();
-      return roll >= 1 && roll <= 32 ? sectionBatches[0] : roll >= 33 && roll <= classMaxRoll() ? sectionBatches[1] : null;
+      const code = window.classboardContext?.classCode;
+      const isNewIbm = code === 'IBM-2' || code === 'IBM-3' || code === 'IBM-4';
+      const split = isNewIbm ? 40 : 32;
+      return roll >= 1 && roll <= split ? sectionBatches[0] : roll > split && roll <= classMaxRoll() ? sectionBatches[1] : null;
     };
     let currentStudentRoll = null;
     const classSchedule = [];
@@ -5912,8 +5929,9 @@
       const context = document.getElementById('nextClassContext');
       const room = document.getElementById('nextClassRoom');
       if (!batch) {
+        const isNewIbm = ['IBM-2', 'IBM-3', 'IBM-4'].includes(window.classboardContext?.classCode);
         name.textContent = 'Serial number needed';
-        detail.textContent = `Your class admin must add your serial number (1–${classMaxRoll()}).`;
+        detail.textContent = isNewIbm ? 'Your class admin must add your serial number.' : `Your class admin must add your serial number (1–${classMaxRoll()}).`;
         timeLabel.textContent = '—'; context.textContent = 'Batch not assigned'; room.textContent = 'Ask your class admin';
         return;
       }
@@ -6524,7 +6542,7 @@
     const attendanceMode = document.getElementById('attendanceMode');
 
     const getActiveSection = () => window.classboardContext?.classCode || localStorage.getItem('classboard-selected-class') || 'INTEL-1';
-    const isIbm = () => getActiveSection() === 'IBM-1';
+    const isIbm = () => getActiveSection().startsWith('IBM-');
     const isCardForCurrentSection = (card) => {
       const section = card.dataset.section;
       if (!section || section === 'both') return true;
@@ -6705,14 +6723,14 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="activity-tracker.js?v=2"></script>
-  <script src="founder-intelligence.js?v=52"></script>
-  <script src="classboard-auth.js?v=39"></script>
+  <script src="founder-intelligence.js?v=53"></script>
+  <script src="classboard-auth.js?v=40"></script>
   <script src="push-manager.js?v=4"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
-  <script src="./attendance-calendar.js?v=11"></script>
+  <script src="./attendance-calendar.js?v=12"></script>
   <script>
     (() => {
       const slide = document.getElementById('notificationSlide');

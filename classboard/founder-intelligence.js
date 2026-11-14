@@ -77,12 +77,28 @@
     if (!roll) return null;
     const num = Number(roll);
     if (!Number.isInteger(num)) return null;
-    const isIntel2 = classCode === 'INTEL-2';
-    const first = isIntel2 ? 'B1' : 'A1';
-    const second = isIntel2 ? 'B2' : 'A2';
-    const maxRoll = classCode === 'IBM-1' ? 67 : 66;
-    if (num >= 1 && num <= 32) return first;
-    if (num >= 33 && num <= maxRoll) return second;
+    let first = 'A1';
+    let second = 'A2';
+    let split = 32;
+    let maxRoll = 66;
+
+    if (classCode === 'INTEL-2' || classCode === 'IBM-2') {
+      first = 'B1'; second = 'B2';
+    } else if (classCode === 'IBM-3') {
+      first = 'C1'; second = 'C2';
+    } else if (classCode === 'IBM-4') {
+      first = 'D1'; second = 'D2';
+    }
+
+    if (classCode === 'IBM-1') {
+      maxRoll = 67;
+    } else if (classCode === 'IBM-2' || classCode === 'IBM-3' || classCode === 'IBM-4') {
+      maxRoll = 80;
+      split = 40;
+    }
+
+    if (num >= 1 && num <= split) return first;
+    if (num > split && num <= maxRoll) return second;
     return null;
   }
 

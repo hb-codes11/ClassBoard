@@ -142,6 +142,126 @@
       ['Machine Learning', 'lecture', 'all', ...times.sixth, 'V206']
     ]
   };
+  const ibm2WeekdaySchedule = {
+    1: [
+      ['Software Engineering', 'lab', 'B1', ...times.morningLab, 'L.V003'],
+      ['Data Structures using C++', 'lab', 'B2', ...times.morningLab, 'L.V002'],
+      ['Statistical Analysis', 'lecture', 'all', ...times.third, 'V207'],
+      ['Software Engineering', 'lecture', 'all', ...times.fourth, 'V207'],
+      ['Machine Learning', 'lecture', 'all', ...times.sixth, 'V207']
+    ],
+    2: [
+      ['Data Structures using C++', 'lab', 'B1', ...times.morningLab, 'L.V002'],
+      ['Software Engineering', 'lab', 'B2', ...times.morningLab, 'L.V003'],
+      ['Software Engineering', 'lecture', 'all', ...times.third, 'V207'],
+      ['Data Structures using C++', 'lecture', 'all', ...times.fourth, 'V207'],
+      ['Machine Learning', 'lecture', 'all', ...times.sixth, 'V207'],
+      ['Statistical Analysis', 'lecture', 'all', ...times.seventh, 'V207']
+    ],
+    3: [
+      ['Object Oriented Programming using Java', 'lecture', 'all', ...times.first, 'V207'],
+      ['Data Structures using C++', 'lecture', 'all', ...times.second, 'V207'],
+      ['Soft Skills-I', 'lecture', 'all', ...times.third, 'V207'],
+      ['Soft Skills-I', 'lecture', 'all', ...times.fourth, 'V207'],
+      ['Object Oriented Programming using Java', 'lab', 'B1', ...times.afternoonLab, 'L.V102'],
+      ['Machine Learning', 'lab', 'B2', ...times.afternoonLab, 'L.V103']
+    ],
+    4: [
+      ['Statistical Analysis', 'lab', 'B1', ...times.morningLab, 'L.V015'],
+      ['Object Oriented Programming using Java', 'lab', 'B2', ...times.morningLab, 'L.V102'],
+      ['Data Structures using C++', 'lecture', 'all', ...times.third, 'V207'],
+      ['Object Oriented Programming using Java', 'lecture', 'all', ...times.fourth, 'V207'],
+      ['Machine Learning', 'lecture', 'all', ...times.sixth, 'V207']
+    ],
+    5: [
+      ['Machine Learning', 'lab', 'B1', ...times.morningLab, 'L.V103'],
+      ['Statistical Analysis', 'lab', 'B2', ...times.morningLab, 'L.V015'],
+      ['Mentoring-III', 'lecture', 'all', ...times.third, 'V207'],
+      ['Statistical Analysis', 'lecture', 'all', ...times.fourth, 'V207'],
+      ['Software Engineering', 'lecture', 'all', ...times.sixth, 'V207'],
+      ['Object Oriented Programming using Java', 'lecture', 'all', ...times.seventh, 'V004']
+    ]
+  };
+  const ibm3WeekdaySchedule = {
+    1: [
+      ['Software Engineering', 'lecture', 'all', ...times.first, 'V304'],
+      ['Statistical Analysis', 'lecture', 'all', ...times.second, 'V205'],
+      ['Mentoring-III', 'lecture', 'all', ...times.third, 'V304'],
+      ['Object Oriented Programming using Java', 'lecture', 'all', ...times.fourth, 'V304'],
+      ['Object Oriented Programming using Java', 'lab', 'C1', ...times.afternoonLab, 'L.V002'],
+      ['Data Structures using C++', 'lab', 'C2', ...times.afternoonLab, 'L.V102']
+    ],
+    2: [
+      ['Data Structures using C++', 'lecture', 'all', ...times.first, 'V304'],
+      ['Statistical Analysis', 'lecture', 'all', ...times.second, 'V205'],
+      ['Statistical Analysis', 'lab', 'C1', '10:20', '12:00', 'L.V015'],
+      ['Software Engineering', 'lab', 'C2', '10:20', '12:00', 'L.V003'],
+      ['Object Oriented Programming using Java', 'lab', 'C1', ...times.afternoonLab, 'L.V002'],
+      ['Data Structures using C++', 'lab', 'C2', ...times.afternoonLab, 'L.V103']
+    ],
+    3: [
+      ['Statistical Analysis', 'lecture', 'all', ...times.first, 'V205'],
+      ['Software Engineering', 'lecture', 'all', ...times.second, 'V205'],
+      ['Data Structures using C++', 'lecture', 'all', ...times.third, 'V304'],
+      ['Object Oriented Programming using Java', 'lecture', 'all', ...times.sixth, 'V304'],
+      ['Machine Learning', 'lecture', 'all', ...times.seventh, 'V304']
+    ],
+    4: [
+      ['Object Oriented Programming using Java', 'lecture', 'all', ...times.first, 'V304'],
+      ['Machine Learning', 'lecture', 'all', ...times.second, 'V304'],
+      ['Machine Learning', 'lab', 'C1', '10:20', '12:00', 'L.V103'],
+      ['Statistical Analysis', 'lab', 'C2', '10:20', '12:00', 'L.V015'],
+      ['Soft Skills-I', 'lecture', 'all', ...times.sixth, 'V304'],
+      ['Soft Skills-I', 'lecture', 'all', ...times.seventh, 'V304']
+    ],
+    5: [
+      ['Machine Learning', 'lecture', 'all', ...times.first, 'V304'],
+      ['Data Structures using C++', 'lecture', 'all', ...times.second, 'V304'],
+      ['Software Engineering', 'lab', 'C1', '10:20', '12:00', 'L.V003'],
+      ['Machine Learning', 'lab', 'C2', '10:20', '12:00', 'L.V103'],
+      ['Software Engineering', 'lecture', 'all', ...times.sixth, 'V205']
+    ]
+  };
+  const ibm4WeekdaySchedule = {
+    1: [
+      ['Machine Learning', 'lecture', 'all', ...times.first, 'V305'],
+      ['Object Oriented Programming using Java', 'lecture', 'all', ...times.second, 'V305'],
+      ['Soft Skills-I', 'lecture', 'all', ...times.third, 'V305'],
+      ['Soft Skills-I', 'lecture', 'all', ...times.fourth, 'V305'],
+      ['Software Engineering', 'lecture', 'all', ...times.sixth, 'V305'],
+      ['Data Structures using C++', 'lecture', 'all', ...times.seventh, 'V305']
+    ],
+    2: [
+      ['Statistical Analysis', 'lab', 'D1', ...times.morningLab, 'L.V015'],
+      ['Object Oriented Programming using Java', 'lab', 'D2', ...times.morningLab, 'L.V102'],
+      ['Machine Learning', 'lecture', 'all', ...times.third, 'V305'],
+      ['Statistical Analysis', 'lecture', 'all', ...times.fourth, 'V305'],
+      ['Software Engineering', 'lecture', 'all', ...times.sixth, 'V305'],
+      ['Mentoring-III', 'lecture', 'all', ...times.seventh, 'V305']
+    ],
+    3: [
+      ['Machine Learning', 'lecture', 'all', ...times.first, 'V305'],
+      ['Software Engineering', 'lecture', 'all', ...times.second, 'V305'],
+      ['Object Oriented Programming using Java', 'lecture', 'all', ...times.third, 'V305'],
+      ['Statistical Analysis', 'lecture', 'all', ...times.fourth, 'V305'],
+      ['Machine Learning', 'lab', 'D1', ...times.afternoonLab, 'L.V302'],
+      ['Data Structures using C++', 'lab', 'D2', ...times.afternoonLab, 'L.V002']
+    ],
+    4: [
+      ['Data Structures using C++', 'lab', 'D1', ...times.morningLab, 'L.V002'],
+      ['Machine Learning', 'lab', 'D2', ...times.morningLab, 'L.V103'],
+      ['Object Oriented Programming using Java', 'lecture', 'all', ...times.third, 'V305'],
+      ['Data Structures using C++', 'lecture', 'all', ...times.fourth, 'V305'],
+      ['Software Engineering', 'lab', 'D1', ...times.afternoonLab, 'L.V003'],
+      ['Statistical Analysis', 'lab', 'D2', ...times.afternoonLab, 'L.V015']
+    ],
+    5: [
+      ['Object Oriented Programming using Java', 'lab', 'D1', ...times.morningLab, 'L.V102'],
+      ['Software Engineering', 'lab', 'D2', ...times.morningLab, 'L.V203'],
+      ['Statistical Analysis', 'lecture', 'all', ...times.third, 'V305'],
+      ['Data Structures using C++', 'lecture', 'all', ...times.fourth, 'V305']
+    ]
+  };
   const eventMap = {
     '2026-10-01': { label: 'MST-I', kind: 'exam' },
     '2026-10-02': { label: 'Gandhi Jayanti', kind: 'holiday' },
@@ -203,16 +323,23 @@
     '2026-12-21': ['JAVA', 'Object Oriented Programming using Java', 'CS3013T'],
     '2026-12-26': ['ML', 'Machine Learning', 'CS3022T']
   };
+  const isIbmCode = (code = window.classboardContext?.classCode) => typeof code === 'string' && code.startsWith('IBM-');
   const eventForDate = (date) => {
     const key = dateKey(date);
     const code = window.classboardContext?.classCode;
-    const mst = code === 'IBM-1' ? ibmMstExams[key] : (code === 'INTEL-1' || code === 'INTEL-2') ? mstExams[key] : null;
+    const mst = isIbmCode(code) ? ibmMstExams[key] : (code === 'INTEL-1' || code === 'INTEL-2') ? mstExams[key] : null;
     if (mst) return { label: 'MST-II', kind: 'exam', short: mst[0], subject: mst[1], code: mst[2], time: '9:30 AM–10:00 AM' };
-    const exam = code === 'IBM-1' ? ibmEndSemExams[key] : (code === 'INTEL-1' || code === 'INTEL-2') ? endSemExams[key] : null;
+    const exam = isIbmCode(code) ? ibmEndSemExams[key] : (code === 'INTEL-1' || code === 'INTEL-2') ? endSemExams[key] : null;
     if (exam) return { label: `End Sem · ${exam[0]}`, kind: 'exam', subject: exam[1], code: exam[2], time: '9:30 AM–12:30 PM' };
     return eventMap[key] || null;
   };
-  const batchCodes = () => window.classboardContext?.classCode === 'INTEL-2' ? ['B1', 'B2'] : ['A1', 'A2'];
+  const batchCodes = () => {
+    const code = window.classboardContext?.classCode;
+    if (code === 'INTEL-2' || code === 'IBM-2') return ['B1', 'B2'];
+    if (code === 'IBM-3') return ['C1', 'C2'];
+    if (code === 'IBM-4') return ['D1', 'D2'];
+    return ['A1', 'A2'];
+  };
   const setBatchOptions = (select) => {
     if (!select) return;
     const current = select.value;
@@ -225,8 +352,11 @@
   };
   const batchForRoll = (roll) => {
     const [first, second] = batchCodes();
-    const maxRoll = window.classboardContext?.classCode === 'IBM-1' ? 67 : 66;
-    return roll >= 1 && roll <= 32 ? first : roll >= 33 && roll <= maxRoll ? second : null;
+    const code = window.classboardContext?.classCode;
+    const isNewIbm = code === 'IBM-2' || code === 'IBM-3' || code === 'IBM-4';
+    const maxRoll = code === 'IBM-1' ? 67 : isNewIbm ? 80 : 66;
+    const split = isNewIbm ? 40 : 32;
+    return roll >= 1 && roll <= split ? first : roll > split && roll <= maxRoll ? second : null;
   };
   const contextKey = () => {
     const context = window.classboardContext;
@@ -235,14 +365,23 @@
   const readLegacyOverrides = () => {
     try { return JSON.parse(localStorage.getItem(contextKey()) || '{}') || {}; } catch { return {}; }
   };
-  const currentSubjects = () => window.classboardContext?.classCode === 'IBM-1' ? subjects.filter(s => !['Computer Organisation & Microprocessors', 'Java Programming', 'Artificial Intelligence'].includes(s.name)) : subjects.filter(s => !['Data Structures using C++', 'Machine Learning', 'Object Oriented Programming using Java'].includes(s.name));
+  const currentSubjects = () => isIbmCode()
+    ? subjects.filter(s => !['Computer Organisation & Microprocessors', 'Java Programming', 'Artificial Intelligence'].includes(s.name))
+    : subjects.filter(s => !['Data Structures using C++', 'Machine Learning', 'Object Oriented Programming using Java'].includes(s.name));
   const subjectInfo = (name) => subjects.find((subject) => subject.name === name) || { name, short: name.slice(0, 6).toUpperCase() };
   const canEditCalendar = () => sharedCalendarReady && (window.classboardContext?.roles?.some((role) => role === 'cr' || role === 'admin') || false);
   const createClass = ([subject, kind, batch, start, end, room], id) => ({ id, subject, kind, batch, start, end, room });
   const defaultClasses = (date) => {
     const event = eventForDate(date);
     if (['holiday', 'convocation', 'exam'].includes(event?.kind) || dateKey(date) > '2026-11-27') return [];
-    const schedule = window.classboardContext?.classCode === 'IBM-1' ? ibmWeekdaySchedule : window.classboardContext?.classCode === 'INTEL-2' ? intel2WeekdaySchedule : weekdaySchedule;
+    const code = window.classboardContext?.classCode;
+    const schedule =
+      code === 'IBM-1' ? ibmWeekdaySchedule :
+      code === 'IBM-2' ? ibm2WeekdaySchedule :
+      code === 'IBM-3' ? ibm3WeekdaySchedule :
+      code === 'IBM-4' ? ibm4WeekdaySchedule :
+      code === 'INTEL-2' ? intel2WeekdaySchedule :
+      weekdaySchedule;
     return (schedule[date.getDay()] || []).map((item, index) => createClass(item, `base-${date.getDay()}-${index}`));
   };
   const classesForDate = (date, overrides = calendarOverrides) => {
