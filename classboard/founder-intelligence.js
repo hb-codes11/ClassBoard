@@ -388,6 +388,69 @@
           </div>
         </div>
 
+        <!-- SECTION 2.5: Public IBM Resources Analytics Banner -->
+        <div class="founder-section-wrap" style="margin-top: 14px;">
+          <div class="founder-section-header">
+            <span>📚 Public IBM Resources Analytics (Sections A–D)</span>
+            <span class="founder-meta-note">Public Route · /ibm/resources · Shared single source of truth</span>
+          </div>
+          <div class="founder-landing-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+            <div class="founder-landing-card">
+              <div class="founder-kpi-top">
+                <span class="founder-kpi-label">IBM Resources Pageviews</span>
+                <span class="founder-icon-badge blue">👁️</span>
+              </div>
+              <div class="founder-kpi-value" id="kpiIbmPageviews">0</div>
+              <div class="founder-kpi-sub">Genuine non-bot pageviews</div>
+            </div>
+
+            <div class="founder-landing-card">
+              <div class="founder-kpi-top">
+                <span class="founder-kpi-label">Unique Visitors</span>
+                <span class="founder-icon-badge green">👤</span>
+              </div>
+              <div class="founder-kpi-value" id="kpiIbmVisitors">0</div>
+              <div class="founder-kpi-sub">Anonymous unique visitors</div>
+            </div>
+
+            <div class="founder-landing-card">
+              <div class="founder-kpi-top">
+                <span class="founder-kpi-label">Detail Views &amp; Previews</span>
+                <span class="founder-icon-badge amber">📄</span>
+              </div>
+              <div class="founder-kpi-value" id="kpiIbmDetailViews">0</div>
+              <div class="founder-kpi-sub"><span id="kpiIbmPreviews">0</span> in-page PDF previews</div>
+            </div>
+
+            <div class="founder-landing-card">
+              <div class="founder-kpi-top">
+                <span class="founder-kpi-label">Resource Downloads</span>
+                <span class="founder-icon-badge purple">📥</span>
+              </div>
+              <div class="founder-kpi-value" id="kpiIbmDownloads">0</div>
+              <div class="founder-kpi-sub">Public signed URL downloads</div>
+            </div>
+
+            <div class="founder-landing-card">
+              <div class="founder-kpi-top">
+                <span class="founder-kpi-label">Public-to-Login Clicks</span>
+                <span class="founder-icon-badge blue">🔑</span>
+              </div>
+              <div class="founder-kpi-value" id="kpiIbmCtaClicks">0</div>
+              <div class="founder-kpi-sub">CTA clicks to join workspace</div>
+            </div>
+
+            <div class="founder-landing-card">
+              <div class="founder-kpi-top">
+                <span class="founder-kpi-label">IBM Monetizable Views</span>
+                <span class="founder-icon-badge green">💎</span>
+              </div>
+              <div class="founder-kpi-value" id="kpiIbmMonetizable">0</div>
+              <div class="founder-kpi-sub">Ad-inventory eligible views</div>
+            </div>
+          </div>
+        </div>
+
         <!-- SECTION 3: The 4 Panels Row (Exact Mockup Match) -->
         <div class="founder-four-panels-row">
           <!-- Panel 1: Traffic & Retention Trend Chart -->
@@ -957,6 +1020,16 @@
     if (el('kpiLandingConversion')) {
       el('kpiLandingConversion').textContent = pl.conversion_rate ? `${pl.conversion_rate}%` : '38.4%';
     }
+
+    // 4.5. Public IBM Resources Analytics Banner
+    const ibm = dashboardData?.ibm_resources_analytics || {};
+    if (el('kpiIbmPageviews')) el('kpiIbmPageviews').textContent = (ibm.pageviews || 0).toLocaleString('en-IN');
+    if (el('kpiIbmVisitors')) el('kpiIbmVisitors').textContent = (ibm.unique_visitors || 0).toLocaleString('en-IN');
+    if (el('kpiIbmDetailViews')) el('kpiIbmDetailViews').textContent = (ibm.detail_views || 0).toLocaleString('en-IN');
+    if (el('kpiIbmPreviews')) el('kpiIbmPreviews').textContent = (ibm.previews || 0).toLocaleString('en-IN');
+    if (el('kpiIbmDownloads')) el('kpiIbmDownloads').textContent = (ibm.downloads || 0).toLocaleString('en-IN');
+    if (el('kpiIbmCtaClicks')) el('kpiIbmCtaClicks').textContent = (ibm.cta_login_clicks || 0).toLocaleString('en-IN');
+    if (el('kpiIbmMonetizable')) el('kpiIbmMonetizable').textContent = (ibm.monetizable_pageviews || 0).toLocaleString('en-IN');
 
     // 5. The 4 Panels
     renderMultiLineTrend(dashboardData?.traffic_retention_trend || []);

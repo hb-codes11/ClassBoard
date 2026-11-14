@@ -1194,6 +1194,28 @@
 
     actions.append(preview, download);
 
+    card.dataset.visibility = resource.visibility || 'authenticated';
+    const canManageResources = window.classboardContext?.roles.some((role) => role === 'cr' || role === 'admin');
+    if (canManageResources) {
+      const visBadge = document.createElement('span');
+      visBadge.className = `resource-visibility-badge ${resource.visibility || 'authenticated'}`;
+      visBadge.textContent = resource.visibility === 'public' ? 'Public' : resource.visibility === 'private' ? 'Draft' : 'Members';
+      visBadge.title = resource.visibility === 'public' ? 'Public note: visible on public IBM Resources page' : resource.visibility === 'private' ? 'Private / draft note' : 'Class members only';
+      kindLabel.prepend(visBadge);
+
+      const toggleVis = document.createElement('button');
+      toggleVis.type = 'button';
+      toggleVis.className = 'resource-visibility-toggle-button';
+      toggleVis.dataset.toggleVisibility = 'true';
+      const isPublic = resource.visibility === 'public';
+      toggleVis.title = isPublic ? 'Unpublish from public IBM Resources page' : 'Publish publicly on IBM Resources';
+      toggleVis.setAttribute('aria-label', toggleVis.title);
+      toggleVis.innerHTML = isPublic
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>';
+      actions.append(toggleVis);
+    }
+
     const remove = makeDeleteButton('Delete resource');
     remove.classList.add('resource-delete-button');
     remove.setAttribute('aria-label', `Delete ${resource.title}`);
@@ -1215,7 +1237,7 @@
     const isIntel = isIntelClass(currentClass?.code);
 
     let updatesQuery = client.from('updates').select('id,class_id,title,body,category,importance,is_pinned,created_at,published_at,expires_at,attachment_path,attachment_name').not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20);
-    let resourcesQuery = client.from('resources').select('id,title,kind,unit_label,storage_path,created_at,published_at,subjects(name)').not('published_at', 'is', null).is('deleted_at', null).order('published_at', { ascending: false }).limit(50);
+    let resourcesQuery = client.from('resources').select('id,class_id,title,kind,unit_label,storage_path,visibility,created_at,published_at,subjects(name)').not('published_at', 'is', null).is('deleted_at', null).order('published_at', { ascending: false }).limit(50);
 
     if (isIbm) {
       const { data: ibmClasses } = await client.from('classes').select('id').in('code', ['IBM-1', 'IBM-2', 'IBM-3', 'IBM-4']);
@@ -2763,6 +2785,34 @@
       notifyApp(`Item deleted for the class.${cleanupWarning}`, Boolean(cleanupWarning));
     });
 
+    document.addEventListener('click', async (event) => {
+      const button = event.target.closest('[data-toggle-visibility]');
+      if (!button) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const context = window.classboardContext;
+      if (!context?.roles.some((role) => role === 'cr' || role === 'admin')) {
+        notifyApp('Only class representatives and admins can change resource visibility.', true);
+        return;
+      }
+      const card = button.closest('[data-content-id]');
+      const resourceId = card?.dataset.contentId;
+      if (!resourceId) return;
+      button.disabled = true;
+      const currentVis = card.dataset.visibility || 'authenticated';
+      const nextVis = currentVis === 'public' ? 'authenticated' : 'public';
+      const client = window.classboardSupabase;
+      const { error } = await client.from('resources').update({ visibility: nextVis }).eq('id', resourceId);
+      if (error) {
+        button.disabled = false;
+        notifyApp(`Could not change visibility: ${error.message}`, true);
+        return;
+      }
+      card.dataset.visibility = nextVis;
+      notifyApp(nextVis === 'public' ? 'Resource published on public IBM Resources page.' : 'Resource unpublished from public page (now restricted to class members).');
+      await loadLiveClassData(context.classId);
+    });
+
     document.addEventListener('click', (event) => {
       const button = event.target.closest('[data-edit-class-session]');
       if (!button) return;
@@ -3406,6 +3456,7 @@
         const kind = ({ Notes: 'notes', Syllabus: 'syllabus', 'Lab manual': 'lab_manual', 'MST / PYQs': 'mst_pyq', 'Academic calendar': 'calendar' })[String(values.get('type'))];
         const subject = kind === 'calendar' ? null : subjectResult.data.find((item) => item.name === values.get('subject'));
         if (kind !== 'calendar' && !subject) throw new Error('Choose one of the listed class subjects.');
+        const visibility = String(values.get('visibility') || 'authenticated');
         const records = [];
         for (const file of files) {
           const extension = file.name.split('.').pop().toLowerCase();
@@ -3415,7 +3466,7 @@
           const upload = await window.classboardSupabase.storage.from('class-resources').upload(storagePath, file, { contentType: mimeTypes[extension], upsert: false });
           if (upload.error) throw new Error(`Could not upload ${file.name}: ${upload.error.message}`);
           uploadedPaths.push(storagePath);
-          records.push({ id: resourceId, class_id: context.classId, subject_id: subject?.id || null, title: files.length === 1 ? String(values.get('title')).trim() : file.name.replace(/\.[^.]+$/, '').slice(0, 180) || file.name.slice(0, 180), kind, storage_path: storagePath, uploaded_by: context.userId, published_at: new Date().toISOString() });
+          records.push({ id: resourceId, class_id: context.classId, subject_id: subject?.id || null, title: files.length === 1 ? String(values.get('title')).trim() : file.name.replace(/\.[^.]+$/, '').slice(0, 180) || file.name.slice(0, 180), kind, storage_path: storagePath, uploaded_by: context.userId, published_at: new Date().toISOString(), visibility });
         }
         const insert = await window.classboardSupabase.from('resources').insert(records);
         if (insert.error) throw new Error(`Resources could not be saved: ${insert.error.message}`);
