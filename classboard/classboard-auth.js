@@ -1214,7 +1214,7 @@
     const isIbm = isIbmClass(currentClass?.code);
     const isIntel = isIntelClass(currentClass?.code);
 
-    let updatesQuery = client.from('updates').select('id,title,body,category,importance,is_pinned,created_at,published_at,expires_at,attachment_path,attachment_name').not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20);
+    let updatesQuery = client.from('updates').select('id,class_id,title,body,category,importance,is_pinned,created_at,published_at,expires_at,attachment_path,attachment_name').not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20);
     let resourcesQuery = client.from('resources').select('id,title,kind,unit_label,storage_path,created_at,published_at,subjects(name)').not('published_at', 'is', null).is('deleted_at', null).order('published_at', { ascending: false }).limit(50);
 
     if (isIbm) {
@@ -1243,7 +1243,7 @@
 
     let updateResult = attachmentUpdateResult;
     if (updateResult.error && /is_pinned|attachment_(?:path|name)|column .*does not exist|schema cache/i.test(updateResult.error.message || '')) {
-      const legacyUpdates = await client.from('updates').select('id,title,body,category,importance,created_at,published_at,expires_at').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20);
+      const legacyUpdates = await client.from('updates').select('id,class_id,title,body,category,importance,created_at,published_at,expires_at').eq('class_id', classId).not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20);
       if (!legacyUpdates.error) updateResult = legacyUpdates;
     }
     let reminderResult = baseReminderResult;
@@ -1279,8 +1279,16 @@
       }));
     });
 
+    let updatesList = (updateResult.data || []).filter((item) => {
+      if (isIntel && item.class_id && item.class_id !== classId) {
+        const cat = String(item.category || '').toLowerCase();
+        if (cat === 'deadline' || cat === 'reminder' || item.isReminder) return false;
+      }
+      return true;
+    });
+
     const updateFeed = [
-      ...(updateResult.data || []).map((item) => ({ ...item, isReminder: false })),
+      ...updatesList.map((item) => ({ ...item, isReminder: false })),
       ...(isIbm ? [] : (reminderResult.data || []).map((item) => ({ ...item, category: 'deadline', importance: 'normal', isReminder: true })))
     ].sort((a, b) => {
       const dateFor = (item) => item.isReminder ? item.due_at : String(item.category).toLowerCase() === 'deadline' && item.expires_at ? item.expires_at : item.published_at || item.created_at;

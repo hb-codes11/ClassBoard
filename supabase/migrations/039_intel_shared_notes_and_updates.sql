@@ -33,7 +33,7 @@ create policy resources_read_published_member on public.resources for select to 
     )
   );
 
--- Allow members of any Intel section to read published updates
+-- Allow members of any Intel section to read published updates (deadlines & reminders stay strictly section-specific)
 drop policy if exists updates_read_published_member on public.updates;
 create policy updates_read_published_member on public.updates for select to authenticated
   using (
@@ -42,7 +42,11 @@ create policy updates_read_published_member on public.updates for select to auth
     and (
       public.is_active_class_member(class_id)
       or (public.is_ibm_class(class_id) and public.is_active_ibm_member())
-      or (public.is_intel_class(class_id) and public.is_active_intel_member())
+      or (
+        public.is_intel_class(class_id)
+        and public.is_active_intel_member()
+        and lower(coalesce(category, '')) not in ('deadline', 'reminder')
+      )
     )
   );
 
