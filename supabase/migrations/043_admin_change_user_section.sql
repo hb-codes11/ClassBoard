@@ -28,15 +28,10 @@ begin
     raise exception 'Authentication required' using errcode = '42501';
   end if;
 
-  -- 1. Authorization: Caller must be a Founder or an active Admin
+  -- 1. Authorization: Caller MUST be a Founder (only founders can change sections)
   is_founder := public.is_classboard_founder();
   if not is_founder then
-    if not exists (
-      select 1 from public.class_memberships
-      where user_id = caller_id and role = 'admin' and is_active = true
-    ) then
-      raise exception 'Only administrators and founders can change a student section' using errcode = '42501';
-    end if;
+    raise exception 'Only ClassBoard founders can change student sections' using errcode = '42501';
   end if;
 
   -- 2. Resolve target section

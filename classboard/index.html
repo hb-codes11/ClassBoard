@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&amp;family=Figtree:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./founder-intelligence.css?v=53" />
+  <link rel="stylesheet" href="./founder-intelligence.css?v=54" />
   <style id="founder-mockup-inline-styles">
     .founder-workspace-container { display: flex !important; flex-direction: column !important; gap: 16px !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
     .founder-eyebrow { font-size: 0.78rem !important; font-weight: 600 !important; color: #64748b !important; margin-bottom: 2px !important; display: block !important; }
@@ -729,14 +729,13 @@
     #accountList .account-row > .avatar { grid-column: 1; grid-row: 1; }
     #accountList .account-row > .list-main { grid-column: 2; grid-row: 1; align-self: center; }
     #accountList .account-controls { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(110px, 150px); align-items: end; gap: 8px 12px; width: 100%; min-width: 0; margin: 4px 0 0; }
-    #accountList .account-role-options { grid-column: 1; grid-row: 1; min-width: 0; }
-    #accountList .account-roll-label { grid-column: 2; grid-row: 1; min-width: 0; }
+    #accountList .account-role-options { grid-column: 1; min-width: 0; }
+    #accountList .account-roll-label { grid-column: 2; min-width: 0; }
     #accountList .account-roll-label input { width: 100%; }
-    #accountList .account-section-label { grid-column: 1 / -1; grid-row: 2; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 6px 10px; font-size: 11px; font-weight: 600; color: #475569; }
-    #accountList .account-section-label select { min-width: 170px; height: 32px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 2px 6px; background: #fff; color: #0f172a; }
+    #accountList .account-section-box { grid-column: 1 / -1; }
     #accountList .account-controls > button { min-width: 0; white-space: nowrap; }
-    #accountList .account-controls > .secondary-button { grid-column: 1; grid-row: 3; justify-self: start; }
-    #accountList .account-controls > .account-remove-button { grid-column: 2; grid-row: 3; justify-self: end; }
+    #accountList .account-controls > .secondary-button { grid-column: 1; justify-self: start; }
+    #accountList .account-controls > .account-remove-button { grid-column: 2; justify-self: end; }
     #accountList .account-row .list-detail { overflow-wrap: anywhere; }
     .admin-account-no-results { padding: 16px; color: var(--muted); text-align: center; font-size: 12px; }
     @media (max-width: 760px) {
@@ -745,11 +744,11 @@
       .admin-add-member-form > button, .admin-add-member-note { grid-column: 1 / -1; }
       .admin-account-count { grid-column: 1 / -1; justify-self: start; }
       #accountList .account-controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-      #accountList .account-role-options { grid-column: 1 / -1; grid-row: 1; }
-      #accountList .account-roll-label { grid-column: 1 / -1; grid-row: 2; }
-      #accountList .account-section-label { grid-column: 1 / -1; grid-row: 3; }
-      #accountList .account-controls > .secondary-button { grid-column: 1; grid-row: 4; justify-self: start; }
-      #accountList .account-controls > .account-remove-button { grid-column: 2; grid-row: 4; justify-self: end; }
+      #accountList .account-role-options { grid-column: 1 / -1; }
+      #accountList .account-roll-label { grid-column: 1 / -1; }
+      #accountList .account-section-box { grid-column: 1 / -1; }
+      #accountList .account-controls > .secondary-button { grid-column: 1; justify-self: start; }
+      #accountList .account-controls > .account-remove-button { grid-column: 2; justify-self: end; }
     }
     @media (max-width: 480px) {
       .admin-account-toolbar { grid-template-columns: minmax(0, 1fr); }
@@ -7213,8 +7212,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="activity-tracker.js?v=2"></script>
-  <script src="founder-intelligence.js?v=53"></script>
-  <script src="classboard-auth.js?v=44"></script>
+  <script src="founder-intelligence.js?v=54"></script>
+  <script src="classboard-auth.js?v=45"></script>
   <script src="push-manager.js?v=4"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };

@@ -2436,82 +2436,116 @@
       roll.addEventListener('input', updateLiveBatch);
       rollLabel.append(roll, liveBatchIndicator);
 
-      const currentClassCode = window.classboardContext?.classCode || '';
-      const sectionLabel = document.createElement('div');
-      sectionLabel.className = 'account-section-label';
-      sectionLabel.innerHTML = `<span>Section: <strong>${currentClassCode}</strong></span>`;
+      let sectionBox = null;
+      if (window.classboardContext?.isFounder) {
+        const currentClassCode = window.classboardContext?.classCode || '';
+        sectionBox = document.createElement('div');
+        sectionBox.className = 'account-section-box';
+        sectionBox.style.display = 'flex';
+        sectionBox.style.alignItems = 'center';
+        sectionBox.style.justifyContent = 'space-between';
+        sectionBox.style.gap = '10px';
+        sectionBox.style.flexWrap = 'wrap';
+        sectionBox.style.background = '#f0f7ff';
+        sectionBox.style.border = '1.5px solid #bfdbfe';
+        sectionBox.style.borderRadius = '9px';
+        sectionBox.style.padding = '8px 12px';
+        sectionBox.style.margin = '4px 0';
 
-      const sectionSelectWrapper = document.createElement('div');
-      sectionSelectWrapper.style.display = 'flex';
-      sectionSelectWrapper.style.alignItems = 'center';
-      sectionSelectWrapper.style.gap = '6px';
-      sectionSelectWrapper.style.flexWrap = 'wrap';
+        const infoDiv = document.createElement('div');
+        infoDiv.style.display = 'flex';
+        infoDiv.style.alignItems = 'center';
+        infoDiv.style.gap = '8px';
+        infoDiv.innerHTML = `
+          <span style="font-size:1.1rem;">🔄</span>
+          <div>
+            <div style="font-size:0.72rem;font-weight:750;color:#1e40af;text-transform:uppercase;letter-spacing:0.04em;">Founder Action · Transfer Section</div>
+            <div style="font-size:0.78rem;color:#334155;">Current Section: <strong style="color:#0284c7;">${currentClassCode}</strong></div>
+          </div>
+        `;
 
-      const sectionSelect = document.createElement('select');
-      sectionSelect.className = 'account-section-select';
-      const sections = [
-        { code: 'INTEL-1', name: 'INTEL-1 (AI & Analytics - A)' },
-        { code: 'INTEL-2', name: 'INTEL-2 (AI & Analytics - B)' },
-        { code: 'IBM-1', name: 'IBM-1 (Advanced AI - A)' },
-        { code: 'IBM-2', name: 'IBM-2 (Advanced AI - B)' },
-        { code: 'IBM-3', name: 'IBM-3 (Advanced AI - C)' },
-        { code: 'IBM-4', name: 'IBM-4 (Advanced AI - D)' }
-      ];
-      sections.forEach((sec) => {
-        const opt = document.createElement('option');
-        opt.value = sec.code;
-        opt.textContent = sec.name;
-        if (sec.code === currentClassCode) opt.selected = true;
-        sectionSelect.appendChild(opt);
-      });
+        const actionDiv = document.createElement('div');
+        actionDiv.style.display = 'flex';
+        actionDiv.style.alignItems = 'center';
+        actionDiv.style.gap = '8px';
+        actionDiv.style.flexWrap = 'wrap';
 
-      const changeSecBtn = document.createElement('button');
-      changeSecBtn.type = 'button';
-      changeSecBtn.className = 'ghost-button';
-      changeSecBtn.style.padding = '5px 12px';
-      changeSecBtn.style.fontSize = '11px';
-      changeSecBtn.style.fontWeight = '700';
-      changeSecBtn.style.borderRadius = '6px';
-      changeSecBtn.style.border = '1px solid #93c5fd';
-      changeSecBtn.style.background = '#eff6ff';
-      changeSecBtn.style.color = '#1d4ed8';
-      changeSecBtn.style.cursor = 'pointer';
-      changeSecBtn.textContent = 'Transfer';
+        const sectionSelect = document.createElement('select');
+        sectionSelect.className = 'account-section-select';
+        sectionSelect.style.height = '34px';
+        sectionSelect.style.padding = '0 10px';
+        sectionSelect.style.borderRadius = '7px';
+        sectionSelect.style.border = '1.5px solid #93c5fd';
+        sectionSelect.style.background = '#ffffff';
+        sectionSelect.style.fontSize = '0.8rem';
+        sectionSelect.style.fontWeight = '600';
+        sectionSelect.style.color = '#0f172a';
 
-      changeSecBtn.addEventListener('click', async () => {
-        const targetSection = sectionSelect.value;
-        if (!targetSection || targetSection === currentClassCode) {
-          notifyApp('Choose a different section to transfer this student.', true);
-          return;
-        }
-        const confirmed = window.confirm(`Transfer ${user.name} from ${currentClassCode} to ${targetSection}?\n\nTheir workspace and attendance data will sync to ${targetSection}.`);
-        if (!confirmed) return;
+        const sections = [
+          { code: 'INTEL-1', name: 'INTEL-1 (AI & Analytics - A)' },
+          { code: 'INTEL-2', name: 'INTEL-2 (AI & Analytics - B)' },
+          { code: 'IBM-1', name: 'IBM-1 (Advanced AI - A)' },
+          { code: 'IBM-2', name: 'IBM-2 (Advanced AI - B)' },
+          { code: 'IBM-3', name: 'IBM-3 (Advanced AI - C)' },
+          { code: 'IBM-4', name: 'IBM-4 (Advanced AI - D)' }
+        ];
+        sections.forEach((sec) => {
+          const opt = document.createElement('option');
+          opt.value = sec.code;
+          opt.textContent = sec.name;
+          if (sec.code === currentClassCode) opt.selected = true;
+          sectionSelect.appendChild(opt);
+        });
 
-        changeSecBtn.disabled = true;
-        changeSecBtn.textContent = 'Transferring...';
+        const changeSecBtn = document.createElement('button');
+        changeSecBtn.type = 'button';
+        changeSecBtn.className = 'primary-button';
+        changeSecBtn.style.height = '34px';
+        changeSecBtn.style.padding = '0 14px';
+        changeSecBtn.style.fontSize = '0.78rem';
+        changeSecBtn.style.fontWeight = '750';
+        changeSecBtn.style.borderRadius = '7px';
+        changeSecBtn.style.background = '#006BFF';
+        changeSecBtn.style.color = '#ffffff';
+        changeSecBtn.style.border = 'none';
+        changeSecBtn.style.cursor = 'pointer';
+        changeSecBtn.textContent = 'Change section';
 
-        try {
-          const { error } = await client.rpc('admin_change_user_section', {
-            p_target_user_id: user.userId,
-            p_new_class_code: targetSection
-          });
-          if (error) {
-            notifyApp(`Transfer failed: ${error.message}`, true);
-            changeSecBtn.disabled = false;
-            changeSecBtn.textContent = 'Transfer';
+        changeSecBtn.addEventListener('click', async () => {
+          const targetSection = sectionSelect.value;
+          if (!targetSection || targetSection === currentClassCode) {
+            notifyApp(`Please select a different section to transfer (currently in ${currentClassCode}).`, true);
             return;
           }
-          notifyApp(`Transferred ${user.name} to ${targetSection}.`);
-          await loadAdminAccounts(classId);
-        } catch (err) {
-          notifyApp(`Transfer failed: ${err.message}`, true);
-          changeSecBtn.disabled = false;
-          changeSecBtn.textContent = 'Transfer';
-        }
-      });
+          const confirmed = window.confirm(`Transfer ${user.name} from ${currentClassCode} to ${targetSection}?\n\nTheir workspace and attendance data will sync to ${targetSection}.`);
+          if (!confirmed) return;
 
-      sectionSelectWrapper.append(sectionSelect, changeSecBtn);
-      sectionLabel.appendChild(sectionSelectWrapper);
+          changeSecBtn.disabled = true;
+          changeSecBtn.textContent = 'Transferring...';
+
+          try {
+            const { error } = await client.rpc('admin_change_user_section', {
+              p_target_user_id: user.userId,
+              p_new_class_code: targetSection
+            });
+            if (error) {
+              notifyApp(`Transfer failed: ${error.message}`, true);
+              changeSecBtn.disabled = false;
+              changeSecBtn.textContent = 'Change section';
+              return;
+            }
+            notifyApp(`✓ Successfully transferred ${user.name} to ${targetSection}.`);
+            await loadAdminAccounts(classId);
+          } catch (err) {
+            notifyApp(`Transfer failed: ${err.message}`, true);
+            changeSecBtn.disabled = false;
+            changeSecBtn.textContent = 'Change section';
+          }
+        });
+
+        actionDiv.append(sectionSelect, changeSecBtn);
+        sectionBox.append(infoDiv, actionDiv);
+      }
 
       const save = document.createElement('button'); save.className = 'secondary-button'; save.type = 'button'; save.textContent = 'Save roles';
       save.addEventListener('click', async () => {
@@ -2562,7 +2596,12 @@
         await loadAdminAccounts(classId);
         notifyApp(`Removed ${user.name} from this ClassBoard class.`);
       });
-      controls.append(roleGroup, rollLabel, sectionLabel, save, remove); row.append(avatar, main, controls); container.append(row);
+      if (sectionBox) {
+        controls.append(roleGroup, rollLabel, sectionBox, save, remove);
+      } else {
+        controls.append(roleGroup, rollLabel, save, remove);
+      }
+      row.append(avatar, main, controls); container.append(row);
     });
     const accountSearch = document.getElementById('adminAccountSearch');
     const accountFilter = document.getElementById('adminAccountFilter');
