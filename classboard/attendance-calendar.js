@@ -351,9 +351,16 @@
     select.value = batches.includes(current) ? current : batches[0];
   };
   const batchForRoll = (roll) => {
-    const [first, second] = batchCodes();
     const code = window.classboardContext?.classCode;
     const isNewIbm = code === 'IBM-2' || code === 'IBM-3' || code === 'IBM-4';
+    if (isNewIbm) {
+      const stored = window.classboardContext?.labBatch
+        || (window.classboardContext?.classId && window.classboardContext?.userId
+            ? localStorage.getItem(`classboard_student_batch:${window.classboardContext.classId}:${window.classboardContext.userId}`)
+            : null);
+      if (stored) return stored;
+    }
+    const [first, second] = batchCodes();
     const maxRoll = code === 'IBM-1' ? 67 : isNewIbm ? 80 : 66;
     const split = isNewIbm ? 40 : 32;
     return roll >= 1 && roll <= split ? first : roll > split && roll <= maxRoll ? second : null;
@@ -690,15 +697,31 @@
   window.addEventListener('classboard:attendance-calendar-context', () => {
     updateSubjectOptions();
     const studentRoll = Number(window.classboardContext?.rollNumber);
+    const savedBatch = window.classboardContext?.labBatch
+      || (window.classboardContext?.classId && window.classboardContext?.userId
+          ? localStorage.getItem(`classboard_student_batch:${window.classboardContext.classId}:${window.classboardContext.userId}`)
+          : null);
     if (batchSelect) setBatchOptions(batchSelect);
     if (addForm?.elements?.batch) setBatchOptions(addForm.elements.batch);
-    if (batchSelect && studentRoll >= 1 && batchForRoll(studentRoll)) batchSelect.value = batchForRoll(studentRoll);
+    if (batchSelect && savedBatch) {
+      batchSelect.value = savedBatch;
+    } else if (batchSelect && studentRoll >= 1 && batchForRoll(studentRoll)) {
+      batchSelect.value = batchForRoll(studentRoll);
+    }
     void loadSharedCalendar();
   });
   const studentBatch = Number(window.classboardContext?.rollNumber);
+  const initialSavedBatch = window.classboardContext?.labBatch
+    || (window.classboardContext?.classId && window.classboardContext?.userId
+        ? localStorage.getItem(`classboard_student_batch:${window.classboardContext.classId}:${window.classboardContext.userId}`)
+        : null);
   if (batchSelect) setBatchOptions(batchSelect);
   if (addForm?.elements?.batch) setBatchOptions(addForm.elements.batch);
-  if (batchSelect && studentBatch >= 1 && batchForRoll(studentBatch)) batchSelect.value = batchForRoll(studentBatch);
+  if (batchSelect && initialSavedBatch) {
+    batchSelect.value = initialSavedBatch;
+  } else if (batchSelect && studentBatch >= 1 && batchForRoll(studentBatch)) {
+    batchSelect.value = batchForRoll(studentBatch);
+  }
   if (grid) renderCalendar();
   if (window.classboardContext?.classId) void loadSharedCalendar();
 })();

@@ -42,9 +42,17 @@
     return 66;
   };
   const batchForRoll = (roll, classCode = window.classboardContext?.classCode) => {
+    const isNewIbm = classCode === 'IBM-2' || classCode === 'IBM-3' || classCode === 'IBM-4';
+    if (isNewIbm) {
+      const stored = window.classboardContext?.labBatch
+        || (window.classboardContext?.classId && window.classboardContext?.userId
+            ? localStorage.getItem(`classboard_student_batch:${window.classboardContext.classId}:${window.classboardContext.userId}`)
+            : null);
+      if (stored) return stored;
+    }
     const [first, second] = batchCodesForClass(classCode);
     const maxRoll = maxRollForClass(classCode);
-    const split = (classCode === 'IBM-2' || classCode === 'IBM-3' || classCode === 'IBM-4') ? 40 : 32;
+    const split = isNewIbm ? 40 : 32;
     return Number(roll) >= 1 && Number(roll) <= split ? first : Number(roll) > split && Number(roll) <= maxRoll ? second : null;
   };
   const setBatchSelectOptions = (select, classCode, includeAll = false) => {
@@ -63,10 +71,23 @@
     setBatchSelectOptions(document.querySelector('#calendarAddForm [name="batch"]'), classCode);
     setBatchSelectOptions(document.querySelector('#crClassForm [name="batch"]'), classCode, true);
     document.querySelectorAll('#crScheduleForm [name="batch"]').forEach((select) => setBatchSelectOptions(select, classCode, true));
+    const isNewIbm = classCode === 'IBM-2' || classCode === 'IBM-3' || classCode === 'IBM-4';
     const rollInput = document.querySelector('#adminAddMemberForm [name=rollNumber]');
-    if (rollInput) { rollInput.max = String(maxRollForClass(classCode)); rollInput.placeholder = `1–${maxRollForClass(classCode)}`; }
+    if (rollInput) {
+      if (isNewIbm) {
+        rollInput.removeAttribute('max');
+        rollInput.placeholder = 'Serial number';
+      } else {
+        rollInput.max = String(maxRollForClass(classCode));
+        rollInput.placeholder = `1–${maxRollForClass(classCode)}`;
+      }
+    }
     document.querySelectorAll('.private-note').forEach((note) => {
-      note.textContent = note.textContent.replace(/(?:Rolls|Serials) 1–32 are [A-Z]\d and 33–(?:66|67) are [A-Z]\d\./, `Serials 1–32 are ${batchCodesForClass(classCode)[0]} and 33–${maxRollForClass(classCode)} are ${batchCodesForClass(classCode)[1]}.`);
+      if (isNewIbm) {
+        note.textContent = note.textContent.replace(/(?:Rolls|Serials) 1–32 are [A-Z]\d and 33–(?:66|67|80) are [A-Z]\d\./, `Students select ${batchCodesForClass(classCode).join(' or ')} as their lab batch.`);
+      } else {
+        note.textContent = note.textContent.replace(/(?:Rolls|Serials) 1–32 are [A-Z]\d and 33–(?:66|67) are [A-Z]\d\./, `Serials 1–32 are ${batchCodesForClass(classCode)[0]} and 33–${maxRollForClass(classCode)} are ${batchCodesForClass(classCode)[1]}.`);
+      }
     });
     document.querySelectorAll('#crClassForm, #crScheduleForm').forEach((form) => {
       const sub = form.closest('article')?.querySelector('.panel-sub');
@@ -382,7 +403,8 @@
 
     const studentMembership = classMemberships.find((row) => row.role === 'student');
     const classId = classInfo.id;
-    window.classboardContext = { classId, classCode: classInfo.code, className: classInfo.name, userId: user.id, userEmail, roles, isFounder, isTester, rollNumber: studentMembership?.roll_number ?? null };
+    const savedBatch = (classId && user?.id) ? localStorage.getItem(`classboard_student_batch:${classId}:${user.id}`) : null;
+    window.classboardContext = { classId, classCode: classInfo.code, className: classInfo.name, userId: user.id, userEmail, roles, isFounder, isTester, rollNumber: studentMembership?.roll_number ?? null, labBatch: savedBatch };
     setRoleOptions(roles, isFounder);
 
     const testerNav = document.getElementById('testerSpaceNav');
@@ -408,10 +430,13 @@
     function promptStudentSetup({ canCancel = false } = {}) {
       if (!studentMembership || roles.includes('cr') || roles.includes('admin')) return;
       const currentRoll = studentMembership.roll_number ?? null;
-      const currentBatch = currentRoll ? batchForRoll(currentRoll, classInfo.code) : '';
+      const isNewIbm = ['IBM-2', 'IBM-3', 'IBM-4'].includes(classInfo.code);
+      const savedBatch = window.classboardContext?.labBatch
+        || ((classId && user?.id) ? localStorage.getItem(`classboard_student_batch:${classId}:${user.id}`) : null)
+        || studentMembership.lab_batch;
+      const currentBatch = savedBatch || (currentRoll ? batchForRoll(currentRoll, classInfo.code) : '');
       const batches = batchCodesForClass(classInfo.code);
       const maxRoll = maxRollForClass(classInfo.code);
-      const isNewIbm = ['IBM-2', 'IBM-3', 'IBM-4'].includes(classInfo.code);
       const descriptionText = isNewIbm
         ? 'Enter your lab batch and serial number.'
         : `Enter your lab batch and serial number. Serials 1–32 are ${batches[0]} and 33–${maxRoll} are ${batches[1]}.`;
@@ -442,9 +467,14 @@
           if (!Number.isInteger(roll) || roll < 1 || roll > maxRoll) {
             return isNewIbm ? 'Enter a valid serial number.' : `Enter your serial number from 1 to ${maxRoll}.`;
           }
-          const expectedBatch = batchForRoll(roll, classInfo.code);
-          if (batch !== expectedBatch) {
-            return `Serial number ${roll} belongs to batch ${expectedBatch}. Check your details and try again.`;
+          if (!batch || !batches.includes(batch)) {
+            return 'Please choose a lab batch.';
+          }
+          if (!isNewIbm) {
+            const expectedBatch = batchForRoll(roll, classInfo.code);
+            if (batch !== expectedBatch) {
+              return `Serial number ${roll} belongs to batch ${expectedBatch}. Check your details and try again.`;
+            }
           }
           const { error } = await window.classboardSupabase.rpc('set_own_student_setup', {
             p_class_id: classId,
@@ -452,9 +482,17 @@
             p_lab_batch: batch
           });
           if (error) return `Could not save your details: ${error.message}`;
+          if (classId && user?.id) {
+            localStorage.setItem(`classboard_student_batch:${classId}:${user.id}`, batch);
+          }
           studentMembership.roll_number = roll;
-          if (window.classboardContext) window.classboardContext.rollNumber = roll;
+          studentMembership.lab_batch = batch;
+          if (window.classboardContext) {
+            window.classboardContext.rollNumber = roll;
+            window.classboardContext.labBatch = batch;
+          }
           if (window.setClassboardRoll) window.setClassboardRoll(roll);
+          window.dispatchEvent(new Event('classboard:attendance-calendar-context'));
           await loadAttendancePlanner(classId, user.id, roles, roll);
           notifyApp('Student details saved successfully.');
           return true;

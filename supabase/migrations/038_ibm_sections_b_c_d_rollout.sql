@@ -19,6 +19,8 @@ commit;
 begin;
 
 -- Step 2: Update check constraints on session batch
+alter table public.class_memberships add column if not exists lab_batch text;
+
 alter table public.class_sessions drop constraint if exists lecture_all_students_lab_one_batch;
 alter table public.class_sessions add constraint lecture_all_students_lab_one_batch check (
   (kind = 'lecture' and batch = 'all') or (kind = 'lab' and batch in ('A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2'))
@@ -181,21 +183,26 @@ begin
   end if;
 
   -- Determine expected lab batch based on section architecture
-  expected_batch := case
-    when target_code = 'INTEL-2' and p_roll_number <= 32 then 'B1'
-    when target_code = 'INTEL-2' then 'B2'
-    when target_code = 'IBM-2' and p_roll_number <= 40 then 'B1'
-    when target_code = 'IBM-2' then 'B2'
-    when target_code = 'IBM-3' and p_roll_number <= 40 then 'C1'
-    when target_code = 'IBM-3' then 'C2'
-    when target_code = 'IBM-4' and p_roll_number <= 40 then 'D1'
-    when target_code = 'IBM-4' then 'D2'
-    when p_roll_number <= 32 then 'A1'
-    else 'A2'
-  end;
+  if target_code in ('IBM-2', 'IBM-3', 'IBM-4') then
+    -- Free selection for Sections B, C, D (no automated division enforced)
+    if target_code = 'IBM-2' and p_lab_batch not in ('B1', 'B2') then
+      raise exception 'Please select a valid lab batch for this section';
+    elsif target_code = 'IBM-3' and p_lab_batch not in ('C1', 'C2') then
+      raise exception 'Please select a valid lab batch for this section';
+    elsif target_code = 'IBM-4' and p_lab_batch not in ('D1', 'D2') then
+      raise exception 'Please select a valid lab batch for this section';
+    end if;
+  else
+    expected_batch := case
+      when target_code = 'INTEL-2' and p_roll_number <= 32 then 'B1'
+      when target_code = 'INTEL-2' then 'B2'
+      when p_roll_number <= 32 then 'A1'
+      else 'A2'
+    end;
 
-  if p_lab_batch is distinct from expected_batch then
-    raise exception 'That serial number belongs to batch %', expected_batch;
+    if p_lab_batch is distinct from expected_batch then
+      raise exception 'That serial number belongs to batch %', expected_batch;
+    end if;
   end if;
 
   -- Check hidden internal capacity of 80 approved students for B, C, D
@@ -220,16 +227,18 @@ begin
     and role = 'student';
 
   -- Upsert student membership for target section
-  insert into public.class_memberships (user_id, class_id, role, roll_number, is_active)
+  insert into public.class_memberships (user_id, class_id, role, roll_number, lab_batch, is_active)
   values (
     (select auth.uid()),
     p_class_id,
     'student'::public.class_role,
     p_roll_number,
+    p_lab_batch,
     not is_pending
   )
   on conflict (user_id, class_id, role) do update
   set roll_number = p_roll_number,
+      lab_batch = p_lab_batch,
       is_active = not is_pending;
 
   if is_pending then
