@@ -47,3 +47,4 @@ create policy attendance_counts_staff_update on public.attendance_class_counts f
   );
 
 commit;
+
