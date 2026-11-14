@@ -69,3 +69,4 @@ set is_active = false
 where slug = 'mentoring' or lower(name) like '%mentor%';
 
 commit;
+
