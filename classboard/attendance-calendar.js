@@ -372,9 +372,10 @@
   const readLegacyOverrides = () => {
     try { return JSON.parse(localStorage.getItem(contextKey()) || '{}') || {}; } catch { return {}; }
   };
-  const currentSubjects = () => isIbmCode()
+  const currentSubjects = () => (isIbmCode()
     ? subjects.filter(s => !['Computer Organisation & Microprocessors', 'Java Programming', 'Artificial Intelligence'].includes(s.name))
-    : subjects.filter(s => !['Data Structures using C++', 'Machine Learning', 'Object Oriented Programming using Java'].includes(s.name));
+    : subjects.filter(s => !['Data Structures using C++', 'Machine Learning', 'Object Oriented Programming using Java'].includes(s.name)))
+    .filter(s => !/mentor/i.test(s.name));
   const subjectInfo = (name) => subjects.find((subject) => subject.name === name) || { name, short: name.slice(0, 6).toUpperCase() };
   const canEditCalendar = () => sharedCalendarReady && (window.classboardContext?.roles?.some((role) => role === 'cr' || role === 'admin') || false);
   const createClass = ([subject, kind, batch, start, end, room], id) => ({ id, subject, kind, batch, start, end, room });

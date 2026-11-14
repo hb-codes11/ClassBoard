@@ -1282,7 +1282,8 @@
     document.querySelectorAll('.page-heading .eyebrow').forEach((el) => {
       if (el.textContent.includes('INTEL-1')) el.textContent = `${classInfo.name} (${classInfo.code})`;
     });
-    const subjectOptions = [{ value: 'all', label: 'All subjects' }, ...subjectResult.data.map((subject) => ({ value: subject.name, label: subject.name }))];
+    const cleanSubjectData = (subjectResult.data || []).filter((s) => !/mentor/i.test(s.name));
+    const subjectOptions = [{ value: 'all', label: 'All subjects' }, ...cleanSubjectData.map((subject) => ({ value: subject.name, label: subject.name }))];
     ['subjectFilter', 'classSubjectFilter'].forEach((id) => {
       const select = document.getElementById(id);
       if (!select) return;
@@ -1296,7 +1297,7 @@
       const subjectOptions = select.id === 'crResourceSubject' ? [{ value: '', label: 'Select a subject' }] : [];
       select.replaceChildren(...subjectOptions.map(({ value, label }) => {
         const option = document.createElement('option'); option.value = value; option.textContent = label; return option;
-      }), ...subjectResult.data.map((subject) => {
+      }), ...cleanSubjectData.map((subject) => {
         const option = document.createElement('option'); option.value = subject.name; option.textContent = subject.short_name ? `${subject.name} (${subject.short_name})` : subject.name; return option;
       }));
     });

@@ -3,22 +3,23 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>IBM Resources · CSE Advanced AI (Sections A, B, C &amp; D) · ClassBoard</title>
+  <title>IBM Resources · CSE Advanced AI (Sections A–D) · ClassBoard</title>
   <meta name="description" content="Browse and download official lecture notes, syllabus, lab manuals, and exam materials for IBM Advanced AI Sections A, B, C, and D at Medi-Caps University. No account required." />
   <link rel="canonical" href="https://classboardx.in/ibm/resources/" />
-  <link rel="icon" type="image/svg+xml" href="../../classboard-pwa-icon.svg" />
+  <link rel="icon" type="image/svg+xml" href="../../classboard-logo.svg" />
+  <link rel="shortcut icon" href="../../classboard-logo.svg" />
 
   <!-- OpenGraph & SEO Cards -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="IBM Advanced AI Resources · ClassBoard" />
   <meta property="og:description" content="Browse verified course notes, lab manuals, syllabus, and PYQs for IBM Advanced AI Sections A–D. Free, open, and no account required." />
   <meta property="og:url" content="https://classboardx.in/ibm/resources/" />
-  <meta property="og:image" content="https://classboardx.in/classboard-pwa-icon.svg" />
+  <meta property="og:image" content="https://classboardx.in/classboard-logo.svg" />
   <meta name="twitter:card" content="summary" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&amp;family=Figtree:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
 
   <!-- Supabase JS Client & Config -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -26,11 +27,11 @@
 
   <style>
     :root {
-      --blue: #006BFF;
-      --blue-deep: #0056E8;
-      --blue-soft: #e5f1ff;
-      --navy: #0b1e36;
-      --page: #f4f8fd;
+      --blue: #0A74E6;
+      --blue-deep: #0756A0;
+      --blue-soft: #e1f0ff;
+      --navy: #062f5c;
+      --page: #f0f6fd;
       --surface: #ffffff;
       --surface-2: #f8fafc;
       --text: #17283d;
@@ -74,155 +75,187 @@
       to   { background-position:30% 22%,70% 25%,72% 78%,25% 70%,50% 0%,50% 50%; }
     }
 
-    /* Site Header */
-    header.site-header {
-      background: rgba(6, 47, 92, 0.55);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    /* Wrap helper matching landing page */
+    .wrap {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 clamp(16px, 3.5vw, 28px);
+      width: 100%;
+    }
+
+    /* Original Sticky Frosted Header */
+    header.landing-nav {
       position: sticky;
-      top: 0;
+      top: env(safe-area-inset-top, 0);
       z-index: 50;
+      background: rgba(6, 47, 92, 0.45);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
-    .header-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 14px 24px;
+    .nav-in {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      height: 68px;
       gap: 16px;
     }
-    .brand-link {
+    .landing-brand {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       text-decoration: none;
       color: #ffffff;
-      font-family: 'Bricolage Grotesque', sans-serif;
     }
-    .brand-link svg {
-      width: 38px;
-      height: 38px;
-      flex-shrink: 0;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    .landing-brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-    .brand-title-wrap {
+    .brand-text {
       display: flex;
       flex-direction: column;
       line-height: 1.15;
     }
     .brand-title {
-      font-size: 19px;
-      font-weight: 750;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 17.5px;
+      font-weight: 800;
+      color: #ffffff;
       letter-spacing: -0.01em;
     }
     .brand-subtitle {
-      font-size: 10.5px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      opacity: 0.85;
-      text-transform: uppercase;
       font-family: 'Figtree', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(224, 242, 254, 0.85);
+      letter-spacing: 0.02em;
     }
 
-    .header-nav {
+    .landing-links {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: clamp(8px, 1.4vw, 18px);
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.88);
     }
-    .nav-btn {
+    .landing-links a {
+      text-decoration: none;
+      transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+    }
+    .landing-links a:not(.btn) {
+      padding: 6px 14px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    .landing-links a:not(.btn):hover {
+      color: #55c7ff;
+      background: rgba(85, 199, 255, 0.14);
+      transform: translateY(-1px);
+    }
+
+    /* Buttons matching original landing styles */
+    .btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      font: 600 14px 'Figtree', sans-serif;
       padding: 8px 18px;
-      font-size: 13.5px;
-      font-weight: 600;
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.14);
-      border: 1.5px solid rgba(255, 255, 255, 0.3);
       border-radius: 999px;
       text-decoration: none;
-      backdrop-filter: blur(8px);
-      transition: all 0.18s ease;
+      border: 1.5px solid transparent;
+      transition: transform 0.15s, background 0.15s, box-shadow 0.15s, border-color 0.15s;
       cursor: pointer;
     }
-    .nav-btn:hover {
-      background: #0A74E6;
-      border-color: #0A74E6;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(10, 116, 230, 0.45);
-    }
-    .nav-btn-primary {
+    .btn-primary {
       background: #ffffff;
-      color: var(--blue-deep);
-      border-color: #ffffff;
-      font-weight: 700;
+      color: #0A74E6;
+      border: 1.5px solid #ffffff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+      font-weight: 750;
     }
-    .nav-btn-primary:hover {
-      background: #e5f1ff;
-      color: var(--blue-deep);
-      border-color: #ffffff;
-      box-shadow: 0 4px 18px rgba(255, 255, 255, 0.35);
+    .btn-primary:hover {
+      background: #0A74E6 !important;
+      color: #ffffff !important;
+      border-color: #0A74E6 !important;
+      box-shadow: 0 6px 20px rgba(10, 116, 230, 0.45);
+      transform: translateY(-1px);
     }
 
     /* Main Container */
     main.public-container {
-      max-width: 1200px;
+      max-width: 1160px;
       margin: 32px auto 60px;
-      padding: 0 24px;
+      padding: 0 clamp(16px, 3.5vw, 28px);
       flex: 1;
       width: 100%;
     }
 
-    /* Banner Notice & Sign-in CTA */
+    /* Banner Notice Card */
     .public-banner-card {
       background: #ffffff;
       border-radius: var(--radius-lg);
       padding: 32px 36px;
       box-shadow: var(--shadow-lg);
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.6);
+      gap: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
     }
+
     .public-eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      font-size: 12.5px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      color: var(--blue-deep);
-      background: var(--blue-soft);
+      color: #0756A0;
+      background: #e1f0ff;
       padding: 4px 12px;
       border-radius: 999px;
       align-self: flex-start;
     }
+    .badge-ibm {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: #ffffff;
+      font-weight: 800;
+      font-size: 10px;
+      color: #0f62fe;
+      letter-spacing: 0.08em;
+      font-family: monospace;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+
     .public-banner-header h1 {
       font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 2.2rem;
+      font-size: clamp(26px, 3.6vw, 36px);
       font-weight: 800;
-      color: var(--text);
-      line-height: 1.2;
-      margin-top: 8px;
+      letter-spacing: -0.025em;
+      color: #17283d;
+      line-height: 1.15;
+      margin-top: 6px;
     }
     .public-banner-sub {
       color: var(--muted);
-      font-size: 1.05rem;
+      font-size: clamp(14px, 1.4vw, 15.5px);
+      line-height: 1.5;
       max-width: 820px;
       margin-top: 6px;
     }
 
-    /* CTA Workspace Card */
+    /* Workspace CTA Card */
     .workspace-cta-card {
       background: linear-gradient(135deg, #f0f7ff 0%, #e5f1ff 100%);
       border: 1.5px solid #bddbff;
       border-radius: var(--radius-md);
-      padding: 20px 24px;
+      padding: 18px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -231,13 +264,14 @@
     }
     .workspace-cta-text h3 {
       font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1.15rem;
-      font-weight: 750;
+      font-size: 17px;
+      font-weight: 800;
       color: #074b94;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
+      letter-spacing: -0.01em;
     }
     .workspace-cta-text p {
-      font-size: 0.95rem;
+      font-size: 13.5px;
       color: #274b70;
       max-width: 680px;
     }
@@ -245,40 +279,37 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 22px;
+      padding: 9px 20px;
       border-radius: 999px;
-      background: var(--blue);
+      background: #0A74E6;
       color: #ffffff;
       text-decoration: none;
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 13.5px;
       transition: all 0.18s ease;
-      box-shadow: 0 4px 14px rgba(0, 107, 255, 0.35);
+      box-shadow: 0 4px 14px rgba(10, 116, 230, 0.35);
       border: none;
       cursor: pointer;
       flex-shrink: 0;
     }
     .btn-workspace-cta:hover {
-      background: var(--blue-deep);
+      background: #0756A0;
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(0, 107, 255, 0.45);
+      box-shadow: 0 6px 20px rgba(10, 116, 230, 0.45);
     }
 
     /* Content Area */
     .catalog-panel {
       background: #ffffff;
       border-radius: var(--radius-lg);
-      padding: 32px 36px;
+      padding: 30px 34px;
       box-shadow: var(--shadow-lg);
-      border: 1px solid rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.4);
     }
 
-    /* Toolbar & Filters */
+    /* Toolbar: ONLY Search & Subject Filter */
     .catalog-toolbar {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
     .search-row {
       display: flex;
@@ -288,79 +319,52 @@
     }
     .search-input-wrap {
       position: relative;
-      flex: 1;
-      min-width: 260px;
+      flex: 1 1 320px;
     }
     .search-input-wrap svg {
       position: absolute;
       left: 14px;
       top: 50%;
       transform: translateY(-50%);
-      width: 18px;
-      height: 18px;
+      width: 17px;
+      height: 17px;
       color: var(--muted);
       pointer-events: none;
     }
     .search-field {
       width: 100%;
-      padding: 11px 16px 11px 42px;
-      font-size: 0.95rem;
+      padding: 10px 16px 10px 40px;
+      font-size: 14px;
+      font-family: 'Figtree', sans-serif;
       border: 1.5px solid var(--line);
-      border-radius: var(--radius-sm);
+      border-radius: 11px;
       outline: none;
-      transition: border-color 0.16s ease, box-shadow 0.16s ease;
-      font-family: inherit;
+      background: #f8fafc;
+      transition: all 0.16s ease;
     }
     .search-field:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(0, 107, 255, 0.15);
+      border-color: #006BFF;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(0, 107, 255, 0.14);
     }
     .select-field {
-      padding: 11px 16px;
-      font-size: 0.92rem;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-family: 'Figtree', sans-serif;
+      font-weight: 500;
       border: 1.5px solid var(--line);
-      border-radius: var(--radius-sm);
-      background: #ffffff;
-      outline: none;
-      font-family: inherit;
+      border-radius: 11px;
+      background: #f8fafc;
       color: var(--text);
+      outline: none;
       cursor: pointer;
+      min-width: 220px;
+      transition: all 0.16s ease;
     }
     .select-field:focus {
-      border-color: var(--blue);
-    }
-
-    /* Category Tabs */
-    .filter-tabs {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 6px;
-      scrollbar-width: none;
-    }
-    .filter-tabs::-webkit-scrollbar { display: none; }
-    .filter-tab {
-      padding: 8px 18px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      border-radius: 999px;
-      border: 1.5px solid var(--line);
-      background: var(--surface-2);
-      color: var(--muted);
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.15s ease;
-    }
-    .filter-tab:hover {
+      border-color: #006BFF;
       background: #ffffff;
-      color: var(--text);
-      border-color: #cbd5e1;
-    }
-    .filter-tab.active {
-      background: var(--blue);
-      color: #ffffff;
-      border-color: var(--blue);
-      box-shadow: 0 2px 8px rgba(0, 107, 255, 0.25);
+      box-shadow: 0 0 0 3px rgba(0, 107, 255, 0.14);
     }
 
     /* Meta summary bar */
@@ -368,10 +372,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 0;
+      padding: 10px 0 14px;
       border-bottom: 1px solid var(--line-light);
       margin-bottom: 20px;
-      font-size: 0.9rem;
+      font-size: 13px;
       color: var(--muted);
     }
     .catalog-count-highlight {
@@ -383,20 +387,19 @@
     .resources-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 20px;
+      gap: 18px;
     }
 
     .public-resource-card {
       border: 1.5px solid var(--line);
       border-radius: var(--radius-md);
-      padding: 20px 22px;
+      padding: 18px 20px;
       background: #ffffff;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 16px;
+      gap: 14px;
       transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-      position: relative;
     }
     .public-resource-card:hover {
       transform: translateY(-2px);
@@ -411,24 +414,24 @@
       gap: 8px;
     }
     .card-format-tag {
-      font-size: 0.75rem;
-      font-weight: 750;
-      padding: 3px 8px;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 7px;
       border-radius: 6px;
       background: #fee2e2;
       color: #dc2626;
       letter-spacing: 0.04em;
     }
     .card-kind-badge {
-      font-size: 0.8rem;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 500;
       color: var(--muted);
     }
 
     .card-title {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1.12rem;
-      font-weight: 750;
+      font-family: 'Figtree', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
       color: var(--text);
       line-height: 1.35;
       display: -webkit-box;
@@ -442,17 +445,18 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.88rem;
+      font-size: 12.5px;
       font-weight: 600;
       color: #0369a1;
       background: #f0f9ff;
-      padding: 4px 10px;
+      padding: 3px 9px;
       border-radius: 6px;
       align-self: flex-start;
+      margin-top: 8px;
     }
     .card-subject-dot {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: #0284c7;
     }
@@ -461,28 +465,29 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-top: 14px;
+      padding-top: 12px;
       border-top: 1px solid var(--line-light);
       gap: 8px;
     }
     .card-date {
-      font-size: 0.8rem;
+      font-size: 11.5px;
       color: var(--muted);
     }
     .card-actions {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       align-items: center;
     }
     .card-btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 7px 14px;
-      font-size: 0.86rem;
-      font-weight: 600;
+      gap: 5px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: 'Figtree', sans-serif;
       border-radius: 8px;
-      border: 1.5px solid var(--line);
+      border: 1px solid var(--line);
       background: #ffffff;
       color: var(--text);
       cursor: pointer;
@@ -494,15 +499,14 @@
       border-color: #cbd5e1;
     }
     .card-btn-primary {
-      background: var(--blue);
+      background: #0A74E6;
       color: #ffffff;
-      border-color: var(--blue);
+      border-color: #0A74E6;
     }
     .card-btn-primary:hover {
-      background: var(--blue-deep);
-      border-color: var(--blue-deep);
+      background: #0756A0;
+      border-color: #0756A0;
     }
-    .card-btn svg { width: 14px; height: 14px; }
 
     /* Empty State */
     .empty-state {
@@ -511,19 +515,19 @@
       color: var(--muted);
     }
     .empty-state svg {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       margin-bottom: 12px;
       color: #94a3b8;
     }
     .empty-state h3 {
-      font-size: 1.15rem;
+      font-size: 17px;
       color: var(--text);
       margin-bottom: 6px;
       font-family: 'Bricolage Grotesque', sans-serif;
     }
 
-    /* Preview Modal Dialog */
+    /* Modals */
     dialog.preview-dialog {
       margin: auto;
       border: none;
@@ -537,15 +541,13 @@
       overflow: hidden;
       flex-direction: column;
     }
-    dialog.preview-dialog[open] {
-      display: flex;
-    }
+    dialog.preview-dialog[open] { display: flex; }
     dialog.preview-dialog::backdrop {
       background: rgba(6, 26, 50, 0.65);
       backdrop-filter: blur(8px);
     }
     .dialog-header {
-      padding: 18px 24px;
+      padding: 16px 22px;
       border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
@@ -555,22 +557,17 @@
     }
     .dialog-header-info h3 {
       font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1.15rem;
+      font-size: 16px;
       font-weight: 750;
       color: var(--text);
     }
     .dialog-header-info p {
-      font-size: 0.85rem;
+      font-size: 12px;
       color: var(--muted);
     }
-    .dialog-header-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
     .dialog-close-btn {
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       border: 1px solid var(--line);
       background: #ffffff;
@@ -579,33 +576,19 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 1.2rem;
+      font-size: 18px;
       line-height: 1;
     }
-    .dialog-close-btn:hover {
-      background: var(--surface-2);
-      color: var(--text);
-    }
-    .dialog-body {
-      flex: 1;
-      width: 100%;
-      height: 100%;
-      background: #f1f5f9;
-      position: relative;
-    }
-    .dialog-iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
+    .dialog-close-btn:hover { background: var(--surface-2); color: var(--text); }
+    .dialog-body { flex: 1; width: 100%; height: 100%; background: #f1f5f9; }
+    .dialog-iframe { width: 100%; height: 100%; border: none; }
 
-    /* Detail View Modal */
     dialog.detail-dialog {
       margin: auto;
       border: none;
       border-radius: var(--radius-lg);
-      padding: 32px;
-      max-width: 580px;
+      padding: 28px;
+      max-width: 560px;
       width: 90vw;
       box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
       background: #ffffff;
@@ -617,28 +600,22 @@
     }
     .detail-grid {
       display: grid;
-      grid-template-columns: 130px 1fr;
-      gap: 12px 16px;
-      margin: 20px 0 24px;
-      font-size: 0.92rem;
+      grid-template-columns: 120px 1fr;
+      gap: 10px 14px;
+      margin: 18px 0 22px;
+      font-size: 13.5px;
     }
-    .detail-label {
-      font-weight: 600;
-      color: var(--muted);
-    }
-    .detail-val {
-      color: var(--text);
-      font-weight: 500;
-    }
+    .detail-label { font-weight: 600; color: var(--muted); }
+    .detail-val { color: var(--text); font-weight: 500; }
 
     /* Footer */
     footer.public-footer {
-      max-width: 1200px;
-      margin: 0 auto 40px;
-      padding: 0 24px;
+      max-width: 1160px;
+      margin: 0 auto 36px;
+      padding: 0 clamp(16px, 3.5vw, 28px);
       text-align: center;
-      color: rgba(255, 255, 255, 0.75);
-      font-size: 0.88rem;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 12.5px;
     }
     footer.public-footer a {
       color: #ffffff;
@@ -647,35 +624,30 @@
     }
 
     @media (max-width: 768px) {
-      .public-banner-card { padding: 24px 20px; }
-      .catalog-panel { padding: 24px 20px; }
-      .public-banner-header h1 { font-size: 1.65rem; }
+      .public-banner-card { padding: 22px 18px; }
+      .catalog-panel { padding: 22px 18px; }
       .workspace-cta-card { flex-direction: column; align-items: flex-start; }
       .btn-workspace-cta { width: 100%; justify-content: center; }
       .resources-grid { grid-template-columns: 1fr; }
+      .select-field { width: 100%; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Site Navigation -->
-  <header class="site-header">
-    <div class="header-inner">
-      <a href="../../" class="brand-link" aria-label="ClassBoard Home">
-        <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="120" height="120" rx="28" fill="#006BFF"/>
-          <path d="M34 40C34 35.5817 37.5817 32 42 32H78C82.4183 32 86 35.5817 86 40V72C86 76.4183 82.4183 80 78 80H50L36 92V40Z" fill="#FFFFFF"/>
-          <rect x="46" y="46" width="28" height="6" rx="3" fill="#006BFF"/>
-          <rect x="46" y="58" width="18" height="6" rx="3" fill="#006BFF"/>
-        </svg>
-        <div class="brand-title-wrap">
+  <!-- Original Sticky Frosted Landing Nav Header -->
+  <header class="landing-nav">
+    <div class="wrap nav-in">
+      <a href="../../" class="landing-brand" aria-label="ClassBoard home">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJvYXJkIiB4MT0iNyIgeTE9IjUiIHgyPSI0MiIgeTI9IjQ0IiBncmFkaFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiMxNjhCRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDc1NkEwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJwYXBlciIgeDE9IjE0IiB5MT0iMTEiIHgyPSIzNiIgeTI9IjM3IiBncmFkaFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiNGRkZGRkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRENFRUZGIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cGF0aCBkPSJNMTMgMy41aDIyQTkuNSA5LjUgMCAwIDEgNDQuNSAxM3YyMmE5LjUgOS41IDAgMCAxLTkuNSA5LjVIMTNBOS41IDkuNSAwIDAgMSAzLjUgMzVWMTNBOS41IDkuNSAwIDAgMSAxMyAzLjVaIiBmaWxsPSJ1cmwoI2JvYXJkKSIvPgogIDxwYXRoIGQ9Ik0xMy4xIDE2LjJjMC0zLjIgMi42LTUuOCA1LjgtNS44aDE2LjN2MjEuMUgxOC45YTUuOCA1LjggMCAwIDAtNS44IDUuOFYxNi4yWiIgZmlsbD0idXJsKCNwYXBlcikiLz4KICA8cGF0aCBkPSJNMTMuMSAzNy4zYTUuOCA1LjggMCAwIDEgNS44LTUuOGgxNi4zIiBzdHJva2U9IiNCOERCRkYiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMTkuMiAxNy4zaDEwLjZNMTkuMiAyMS44aDcuMiIgc3Ryb2tlPSIjMTY4QkZGIiBzdHJva2Utd2lkdGg9IjIuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0ibTI4LjEgMjYuMyAyLjYgMi42IDUtNi4xIiBzdHJva2U9IiNGRkNFNTYiIHN0cm9rZS13aWR0aD0iMy4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJtMzguMyA4IC44IDIuMiAyLjIuOC0yLjIuOC0uOCAyLjItLjgtMi4yLTIuMi0uOCAyLjItLjguOC0yLjJaIiBmaWxsPSIjRkZFMTdBIi8+Cjwvc3ZnPgo=" alt="ClassBoard" class="landing-brand-logo" />
+        <div class="brand-text">
           <span class="brand-title">ClassBoard</span>
-          <span class="brand-subtitle">IBM ADVANCED AI · SECTIONS A–D</span>
+          <span class="brand-subtitle">INTEL &amp; IBM CLASS PORTAL</span>
         </div>
       </a>
-      <nav class="header-nav">
-        <a href="../../" class="nav-btn">← Portal Home</a>
-        <a href="../../#login" class="nav-btn nav-btn-primary" id="headerSignInBtn">Sign in</a>
+      <nav class="landing-links" aria-label="Primary">
+        <a href="../../">← Portal Home</a>
+        <a href="../../#login" class="btn btn-primary" id="headerSignInBtn">Sign in</a>
       </nav>
     </div>
   </header>
@@ -686,10 +658,10 @@
     <!-- Header Banner & Notice -->
     <section class="public-banner-card">
       <div class="public-banner-header">
-        <span class="public-eyebrow">
-          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#006BFF;"></span>
-          No account required to browse IBM resources
-        </span>
+        <div class="public-eyebrow">
+          <span class="badge-ibm">IBM ADVANCED AI</span>
+          <span>No account required to browse IBM resources</span>
+        </div>
         <h1>IBM Advanced AI Resources</h1>
         <p class="public-banner-sub">
           Official study materials, syllabus, lecture notes, lab manuals, and exam resources shared across IBM Advanced AI Sections A, B, C, and D.
@@ -711,7 +683,7 @@
 
     <!-- Resources Catalog Panel -->
     <section class="catalog-panel">
-      <!-- Toolbar: Search & Selectors -->
+      <!-- Toolbar: ONLY Search & Subject Filter -->
       <div class="catalog-toolbar">
         <div class="search-row">
           <div class="search-input-wrap">
@@ -719,32 +691,11 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="search" class="search-field" id="publicSearch" placeholder="Search resources by title, subject or unit..." aria-label="Search resources">
+            <input type="search" class="search-field" id="publicSearch" placeholder="Search resources by title or subject..." aria-label="Search resources">
           </div>
-          <select class="select-field" id="semesterFilter" aria-label="Filter by semester">
-            <option value="3">3rd Semester (Current)</option>
-          </select>
           <select class="select-field" id="subjectFilter" aria-label="Filter by subject">
-            <option value="all">All Subjects</option>
+            <option value="all">All subjects</option>
           </select>
-          <select class="select-field" id="unitFilter" aria-label="Filter by unit">
-            <option value="all">All Units</option>
-            <option value="Unit 1">Unit 1</option>
-            <option value="Unit 2">Unit 2</option>
-            <option value="Unit 3">Unit 3</option>
-            <option value="Unit 4">Unit 4</option>
-            <option value="Unit 5">Unit 5</option>
-          </select>
-        </div>
-
-        <!-- Resource Type Chips -->
-        <div class="filter-tabs" role="tablist" aria-label="Filter by resource type">
-          <button class="filter-tab active" data-type="all">All files</button>
-          <button class="filter-tab" data-type="notes">Notes</button>
-          <button class="filter-tab" data-type="syllabus">Syllabus</button>
-          <button class="filter-tab" data-type="lab_manual">Lab manuals</button>
-          <button class="filter-tab" data-type="mst_pyq">MST / PYQs</button>
-          <button class="filter-tab" data-type="calendar">Academic calendar</button>
         </div>
       </div>
 
@@ -782,12 +733,12 @@
 
   <!-- Resource Detail View Modal -->
   <dialog class="detail-dialog" id="detailDialog">
-    <div class="dialog-header" style="padding:0 0 16px; border-bottom: 1px solid var(--line);">
-      <h3 style="font-family:'Bricolage Grotesque'; font-size:1.25rem;" id="detailDialogTitle">Resource Information</h3>
+    <div class="dialog-header" style="padding:0 0 14px; border-bottom: 1px solid var(--line);">
+      <h3 style="font-family:'Bricolage Grotesque'; font-size:1.15rem;" id="detailDialogTitle">Resource Information</h3>
       <button type="button" class="dialog-close-btn" id="detailCloseBtn" aria-label="Close details">&times;</button>
     </div>
     <div class="detail-grid" id="detailGridContent"></div>
-    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
       <button type="button" class="card-btn" id="detailPreviewBtn">Preview</button>
       <button type="button" class="card-btn card-btn-primary" id="detailDownloadBtn">Download</button>
     </div>
@@ -795,7 +746,7 @@
 
   <!-- Footer -->
   <footer class="public-footer">
-    <p>ClassBoard · Academic Portal for Medi-Caps University · <a href="../../about.html">About</a> · <a href="../../privacy.html">Privacy</a> · <a href="../../terms.html">Terms</a></p>
+    <p>ClassBoard · Dedicated to INTEL &amp; IBM Batches · Medi-Caps University · <a href="../../about.html">About</a> · <a href="../../privacy.html">Privacy</a> · <a href="../../terms.html">Terms</a></p>
   </footer>
 
   <!-- Script Logic -->
@@ -803,7 +754,6 @@
     (function () {
       let allResources = [];
       let allSubjects = [];
-      let activeTypeFilter = 'all';
       let activeDetailResource = null;
 
       // 1. Privacy-safe anonymous identification
@@ -839,7 +789,7 @@
         return sid;
       }
 
-      // 2. Strict Counting Analytics (guards against bots, re-renders, filter changes, duplicate firing)
+      // 2. Strict Counting Analytics
       async function logAnalyticsEvent(eventType, resourceId, resourceTitle, metadata) {
         if (/bot|crawler|spider|crawling/i.test(navigator.userAgent) || navigator.webdriver) {
           return;
@@ -883,11 +833,11 @@
         }
 
         try {
-          // Fetch IBM public resources
+          // Fetch IBM public resources (excluding private notes)
           const { data: resources, error: resError } = await client
             .from('resources')
-            .select('id,class_id,subject_id,title,kind,unit_label,storage_path,created_at,published_at,subjects(name,short_name),classes(name,code)')
-            .eq('visibility', 'public')
+            .select('id,class_id,subject_id,title,kind,unit_label,storage_path,visibility,created_at,published_at,subjects(name,short_name),classes(name,code)')
+            .neq('visibility', 'private')
             .is('deleted_at', null)
             .not('published_at', 'is', null)
             .order('published_at', { ascending: false });
@@ -895,7 +845,7 @@
           if (resError) throw resError;
           allResources = resources || [];
 
-          // Fetch IBM subjects for the filter dropdown
+          // Fetch IBM subjects for the filter dropdown (exclude Mentoring everywhere)
           const { data: subjects } = await client
             .from('subjects')
             .select('id,name,short_name')
@@ -903,7 +853,7 @@
 
           const subjectMap = new Map();
           (subjects || []).forEach((s) => {
-            if (s.name && !subjectMap.has(s.name)) {
+            if (s.name && !/mentor/i.test(s.name) && !subjectMap.has(s.name)) {
               subjectMap.set(s.name, s);
             }
           });
@@ -920,8 +870,9 @@
 
       function populateSubjectDropdown(subjects) {
         const select = document.getElementById('subjectFilter');
-        select.innerHTML = '<option value="all">All Subjects</option>';
+        select.innerHTML = '<option value="all">All subjects</option>';
         subjects.forEach((s) => {
+          if (/mentor/i.test(s.name)) return;
           const opt = document.createElement('option');
           opt.value = s.name;
           opt.textContent = s.name;
@@ -929,27 +880,25 @@
         });
       }
 
-      // 5. Render & Filtering
+      // 5. Render & Filtering: ONLY Search and Subject Filter
       function renderResources() {
         const grid = document.getElementById('resourcesGrid');
         const searchVal = document.getElementById('publicSearch').value.trim().toLowerCase();
         const subjectVal = document.getElementById('subjectFilter').value;
-        const unitVal = document.getElementById('unitFilter').value;
 
         const filtered = allResources.filter((item) => {
           const subject = Array.isArray(item.subjects) ? item.subjects[0] : item.subjects;
           const subjectName = subject?.name || '';
-          const matchesType = activeTypeFilter === 'all' || item.kind === activeTypeFilter;
-          const matchesSubject = subjectVal === 'all' || subjectName === subjectVal;
-          const matchesUnit = unitVal === 'all' || (item.unit_label || '').toLowerCase() === unitVal.toLowerCase();
+          if (/mentor/i.test(subjectName)) return false;
 
+          const matchesSubject = subjectVal === 'all' || subjectName === subjectVal;
           const matchesSearch = !searchVal || (
             item.title.toLowerCase().includes(searchVal) ||
             subjectName.toLowerCase().includes(searchVal) ||
             (item.unit_label || '').toLowerCase().includes(searchVal)
           );
 
-          return matchesType && matchesSubject && matchesUnit && matchesSearch;
+          return matchesSubject && matchesSearch;
         });
 
         document.getElementById('resourceCount').textContent = String(filtered.length);
@@ -962,7 +911,7 @@
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
               <h3>No resources found</h3>
-              <p>Try clearing your search or selecting a different subject/unit.</p>
+              <p>Try clearing your search or selecting a different subject.</p>
             </div>
           `;
           return;
@@ -1004,7 +953,7 @@
               <span class="card-kind-badge">${kindText}</span>
             </div>
             <h2 class="card-title" title="${res.title}">${res.title}</h2>
-            <div style="margin-top: 10px;">
+            <div>
               <span class="card-subject-row">
                 <span class="card-subject-dot"></span>
                 <span>${subject?.name || 'IBM Advanced AI'}</span>
@@ -1012,7 +961,7 @@
             </div>
           </div>
           <div class="card-bottom">
-            <span class="card-date">Published ${dateText}</span>
+            <span class="card-date">Added ${dateText}</span>
             <div class="card-actions">
               <button type="button" class="card-btn" data-info-id="${res.id}">Info</button>
               <button type="button" class="card-btn" data-preview-id="${res.id}">Preview</button>
@@ -1120,16 +1069,6 @@
       // 7. Event Listeners
       document.getElementById('publicSearch').addEventListener('input', renderResources);
       document.getElementById('subjectFilter').addEventListener('change', renderResources);
-      document.getElementById('unitFilter').addEventListener('change', renderResources);
-
-      document.querySelectorAll('.filter-tab').forEach((tab) => {
-        tab.addEventListener('click', () => {
-          document.querySelectorAll('.filter-tab').forEach((t) => t.classList.remove('active'));
-          tab.classList.add('active');
-          activeTypeFilter = tab.dataset.type;
-          renderResources();
-        });
-      });
 
       document.getElementById('resourcesGrid').addEventListener('click', (e) => {
         const infoBtn = e.target.closest('[data-info-id]');
@@ -1174,4 +1113,3 @@
   </script>
 </body>
 </html>
-
