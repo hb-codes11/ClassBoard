@@ -83,3 +83,36 @@ That admin can then use INTEL-2 Admin Workspace to add other section accounts an
 - Review college approval, account onboarding, data retention, backups, and who should receive CR/Admin permissions before sharing the sign-in link broadly.
 
 The SQL migrations must be applied in the Supabase project before the matching role behavior is active in production.
+
+
+## November roster deployment repair
+
+The failed check on commit `023c969` is migration 044's membership backfill:
+`class_memberships_unique_student_roll` rejects a roll already held by another
+active student. Its user/class/role upsert does not handle this separate index.
+
+The corrected 044 preserves the current holder and skips conflicting candidates,
+with a warning for founder review. It processes confirmed accounts only and
+preserves existing CR/admin roles while cleaning up incorrect student memberships.
+It does not delete users, attendance, resources, or existing roll holders.
+Run `diagnostics/roster-roll-conflicts.sql` after deployment to list unresolved
+assignments. Skipped accounts may still need a founder to resolve their access;
+a successful migration does not prove every roster assignment was completed.
+
+The SQL Editor helper now lives in `manual/044_to_046_all_in_one_run.sql`, outside
+the migration directory. Keeping it in `migrations/` duplicated version 044 and
+replayed migrations 044–046. Prefer the separate numbered migrations. Do not run
+the helper as well as the migration runner or blindly repair migration history.
+Check production history and backup availability before deploying database changes.
+An already-applied migration will not rerun merely because its file changed.
+
+Local regression checks (no connection to production):
+
+```sh
+node tests/attendance-save.mjs
+npm install --prefix /tmp/classboard-regression-tools --no-audit --no-fund @electric-sql/pglite
+PGLITE_MODULE=/tmp/classboard-regression-tools/node_modules/@electric-sql/pglite/dist/index.js node tests/roster-migrations.mjs
+```
+
+The database tests use an isolated PostgreSQL runtime with a minimal schema fixture;
+they cover migrations 044–046, not a full Supabase service deployment.

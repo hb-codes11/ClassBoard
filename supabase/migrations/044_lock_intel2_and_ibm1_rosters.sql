@@ -283,10 +283,34 @@ declare
   intel1_id uuid;
   intel2_id uuid;
   ibm1_id uuid;
+  conflict_row record;
 begin
+  -- Keep the conflict check and inserts atomic against concurrent onboarding.
+  lock table public.class_memberships in share row exclusive mode;
   select id into intel1_id from public.classes where code = 'INTEL-1';
   select id into intel2_id from public.classes where code = 'INTEL-2';
   select id into ibm1_id from public.classes where code = 'IBM-1';
+
+  -- Existing owners keep their rolls. Report collisions for founder review;
+  -- ON CONFLICT(user_id, class_id, role) cannot handle the separate roll index.
+  for conflict_row in
+    select c.code, r.roll_number, u.id as candidate_id, m.user_id as holder_id
+    from (
+      select 'INTEL-2' as code, email, roll_number from public.intel2_student_roster
+      union all
+      select 'IBM-1', email, roll_number from public.ibm1_student_roster
+    ) r
+    join public.classes c on c.code = r.code
+    join auth.users u on lower(u.email) = r.email
+    join public.class_memberships m on m.class_id = c.id
+      and m.role = 'student' and m.is_active and m.roll_number = r.roll_number
+      and m.user_id <> u.id
+    where u.email_confirmed_at is not null
+      and not exists (select 1 from public.classboard_founders f where f.user_id = u.id)
+  loop
+    raise warning 'Roster assignment skipped: section %, roll %, candidate %, existing holder %. Founder review required.',
+      conflict_row.code, conflict_row.roll_number, conflict_row.candidate_id, conflict_row.holder_id;
+  end loop;
 
   -- A. INTEL-2 Students cleanup
   if intel1_id is not null and intel2_id is not null then
@@ -294,6 +318,7 @@ begin
     update public.class_memberships
     set is_active = false
     where class_id = intel1_id
+      and role = 'student'
       and user_id in (
         select u.id from auth.users u
         join public.intel2_student_roster r on r.email = lower(u.email)
@@ -305,7 +330,14 @@ begin
     select u.id, intel2_id, 'student'::public.class_role, r.roll_number, true
     from auth.users u
     join public.intel2_student_roster r on r.email = lower(u.email)
-    where not exists (select 1 from public.classboard_founders f where f.user_id = u.id)
+    where u.email_confirmed_at is not null
+      and not exists (select 1 from public.classboard_founders f where f.user_id = u.id)
+      and not exists (
+        select 1 from public.class_memberships existing
+        where existing.class_id = intel2_id and existing.role = 'student'
+          and existing.is_active and existing.roll_number = r.roll_number
+          and existing.user_id <> u.id
+      )
     on conflict (user_id, class_id, role) do update
     set roll_number = excluded.roll_number, is_active = true;
 
@@ -314,6 +346,7 @@ begin
     select u.id, intel2_id, lower(u.email)
     from auth.users u
     join public.intel2_student_roster r on r.email = lower(u.email)
+    where u.email_confirmed_at is not null
     on conflict (user_id, class_id) do update set email = excluded.email;
   end if;
 
@@ -323,6 +356,7 @@ begin
     update public.class_memberships
     set is_active = false
     where class_id = intel1_id
+      and role = 'student'
       and user_id in (
         select u.id from auth.users u
         join public.ibm1_student_roster r on r.email = lower(u.email)
@@ -334,7 +368,14 @@ begin
     select u.id, ibm1_id, 'student'::public.class_role, r.roll_number, true
     from auth.users u
     join public.ibm1_student_roster r on r.email = lower(u.email)
-    where not exists (select 1 from public.classboard_founders f where f.user_id = u.id)
+    where u.email_confirmed_at is not null
+      and not exists (select 1 from public.classboard_founders f where f.user_id = u.id)
+      and not exists (
+        select 1 from public.class_memberships existing
+        where existing.class_id = ibm1_id and existing.role = 'student'
+          and existing.is_active and existing.roll_number = r.roll_number
+          and existing.user_id <> u.id
+      )
     on conflict (user_id, class_id, role) do update
     set roll_number = excluded.roll_number, is_active = true;
 
@@ -343,6 +384,7 @@ begin
     select u.id, ibm1_id, lower(u.email)
     from auth.users u
     join public.ibm1_student_roster r on r.email = lower(u.email)
+    where u.email_confirmed_at is not null
     on conflict (user_id, class_id) do update set email = excluded.email;
   end if;
 end;

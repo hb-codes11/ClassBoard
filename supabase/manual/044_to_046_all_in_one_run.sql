@@ -1,8 +1,5 @@
--- All-In-One Execution: Migrations 044, 045 & 046
--- 1. Sets up INTEL-2 (62 students) and IBM-1 (67 students) locked rosters
--- 2. Sets up INTEL-1 (16 new students + existing) locked roster
--- 3. Enables real-time section validation and explicit error messages
--- 4. Closes auto-enrollment loopholes and moves wrongly enrolled students to their actual sections
+-- Manual SQL Editor helper only. Do not place in migrations/.
+-- Prefer the numbered migrations with tracked deployment history.
 
 -- Migration 044: Lock INTEL-2 and IBM-1 student rosters and prevent cross-section leakage
 -- Enforces strict section boundaries for INTEL-2 (AI & Analytics - B) and IBM-1 (Advanced AI - A).
@@ -289,10 +286,34 @@ declare
   intel1_id uuid;
   intel2_id uuid;
   ibm1_id uuid;
+  conflict_row record;
 begin
+  -- Keep the conflict check and inserts atomic against concurrent onboarding.
+  lock table public.class_memberships in share row exclusive mode;
   select id into intel1_id from public.classes where code = 'INTEL-1';
   select id into intel2_id from public.classes where code = 'INTEL-2';
   select id into ibm1_id from public.classes where code = 'IBM-1';
+
+  -- Existing owners keep their rolls. Report collisions for founder review;
+  -- ON CONFLICT(user_id, class_id, role) cannot handle the separate roll index.
+  for conflict_row in
+    select c.code, r.roll_number, u.id as candidate_id, m.user_id as holder_id
+    from (
+      select 'INTEL-2' as code, email, roll_number from public.intel2_student_roster
+      union all
+      select 'IBM-1', email, roll_number from public.ibm1_student_roster
+    ) r
+    join public.classes c on c.code = r.code
+    join auth.users u on lower(u.email) = r.email
+    join public.class_memberships m on m.class_id = c.id
+      and m.role = 'student' and m.is_active and m.roll_number = r.roll_number
+      and m.user_id <> u.id
+    where u.email_confirmed_at is not null
+      and not exists (select 1 from public.classboard_founders f where f.user_id = u.id)
+  loop
+    raise warning 'Roster assignment skipped: section %, roll %, candidate %, existing holder %. Founder review required.',
+      conflict_row.code, conflict_row.roll_number, conflict_row.candidate_id, conflict_row.holder_id;
+  end loop;
 
   -- A. INTEL-2 Students cleanup
   if intel1_id is not null and intel2_id is not null then
@@ -300,6 +321,7 @@ begin
     update public.class_memberships
     set is_active = false
     where class_id = intel1_id
+      and role = 'student'
       and user_id in (
         select u.id from auth.users u
         join public.intel2_student_roster r on r.email = lower(u.email)
@@ -311,7 +333,14 @@ begin
     select u.id, intel2_id, 'student'::public.class_role, r.roll_number, true
     from auth.users u
     join public.intel2_student_roster r on r.email = lower(u.email)
-    where not exists (select 1 from public.classboard_founders f where f.user_id = u.id)
+    where u.email_confirmed_at is not null
+      and not exists (select 1 from public.classboard_founders f where f.user_id = u.id)
+      and not exists (
+        select 1 from public.class_memberships existing
+        where existing.class_id = intel2_id and existing.role = 'student'
+          and existing.is_active and existing.roll_number = r.roll_number
+          and existing.user_id <> u.id
+      )
     on conflict (user_id, class_id, role) do update
     set roll_number = excluded.roll_number, is_active = true;
 
@@ -320,6 +349,7 @@ begin
     select u.id, intel2_id, lower(u.email)
     from auth.users u
     join public.intel2_student_roster r on r.email = lower(u.email)
+    where u.email_confirmed_at is not null
     on conflict (user_id, class_id) do update set email = excluded.email;
   end if;
 
@@ -329,6 +359,7 @@ begin
     update public.class_memberships
     set is_active = false
     where class_id = intel1_id
+      and role = 'student'
       and user_id in (
         select u.id from auth.users u
         join public.ibm1_student_roster r on r.email = lower(u.email)
@@ -340,7 +371,14 @@ begin
     select u.id, ibm1_id, 'student'::public.class_role, r.roll_number, true
     from auth.users u
     join public.ibm1_student_roster r on r.email = lower(u.email)
-    where not exists (select 1 from public.classboard_founders f where f.user_id = u.id)
+    where u.email_confirmed_at is not null
+      and not exists (select 1 from public.classboard_founders f where f.user_id = u.id)
+      and not exists (
+        select 1 from public.class_memberships existing
+        where existing.class_id = ibm1_id and existing.role = 'student'
+          and existing.is_active and existing.roll_number = r.roll_number
+          and existing.user_id <> u.id
+      )
     on conflict (user_id, class_id, role) do update
     set roll_number = excluded.roll_number, is_active = true;
 
@@ -349,6 +387,7 @@ begin
     select u.id, ibm1_id, lower(u.email)
     from auth.users u
     join public.ibm1_student_roster r on r.email = lower(u.email)
+    where u.email_confirmed_at is not null
     on conflict (user_id, class_id) do update set email = excluded.email;
   end if;
 end;
@@ -358,6 +397,112 @@ notify pgrst, 'reload schema';
 
 commit;
 
+-- Migration 045: Real-time Section Selection Validation
+-- Validates student section choice against locked rosters (INTEL-2, IBM-1).
+-- If a student selects the wrong section, returns an explicit English error message.
+
+begin;
+
+create or replace function public.verify_student_section_choice(
+  p_email_or_enrollment text,
+  p_selected_section_code text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  raw_input text := lower(trim(coalesce(p_email_or_enrollment, '')));
+  norm_email text;
+  norm_enroll text;
+  norm_code text := upper(trim(coalesce(p_selected_section_code, '')));
+  actual_code text := null;
+  actual_name text := null;
+  roster_name text := null;
+begin
+  if raw_input = '' then
+    return jsonb_build_object('allowed', true);
+  end if;
+
+  if position('@' in raw_input) > 0 then
+    norm_email := raw_input;
+    norm_enroll := upper(split_part(raw_input, '@', 1));
+  else
+    norm_email := raw_input || '@medicaps.ac.in';
+    norm_enroll := upper(raw_input);
+  end if;
+
+  -- 1. Exclude founders (founders have universal access to all sections)
+  if exists (
+    select 1 from public.classboard_founders f
+    join auth.users u on u.id = f.user_id
+    where lower(u.email) = norm_email
+  ) or norm_email in ('en25cs3070059@medicaps.ac.in', 'hasnaatmalik29@gmail.com') then
+    return jsonb_build_object('allowed', true, 'is_founder', true);
+  end if;
+
+  -- 2. Check INTEL-2 roster
+  if exists (
+    select 1 from public.intel2_student_roster
+    where email = norm_email or upper(enrollment_no) = norm_enroll
+  ) then
+    select 'INTEL-2', 'AI & Analytics - B (Intel-2)', student_name
+    into actual_code, actual_name, roster_name
+    from public.intel2_student_roster
+    where email = norm_email or upper(enrollment_no) = norm_enroll
+    limit 1;
+
+  -- 3. Check IBM-1 roster
+  elsif exists (
+    select 1 from public.ibm1_student_roster
+    where email = norm_email or upper(enrollment_no) = norm_enroll
+  ) then
+    select 'IBM-1', 'IBM Advanced AI - A', student_name
+    into actual_code, actual_name, roster_name
+    from public.ibm1_student_roster
+    where email = norm_email or upper(enrollment_no) = norm_enroll
+    limit 1;
+
+  -- 4. Check active membership in other sections (if user already has assigned section)
+  else
+    select c.code, c.name into actual_code, actual_name
+    from public.class_memberships m
+    join public.classes c on c.id = m.class_id
+    join auth.users u on u.id = m.user_id
+    where lower(u.email) = norm_email and m.role = 'student' and m.is_active = true
+    order by m.created_at desc limit 1;
+  end if;
+
+  -- If student belongs to a specific section
+  if actual_code is not null then
+    if norm_code <> '' and norm_code <> actual_code then
+      return jsonb_build_object(
+        'allowed', false,
+        'assigned_section_code', actual_code,
+        'assigned_section_name', actual_name,
+        'student_name', roster_name,
+        'message', 'You have selected the wrong section. According to official records, your account belongs to ' || actual_name || '. Please select ' || actual_name || ' in the section dropdown to continue.'
+      );
+    end if;
+
+    return jsonb_build_object(
+      'allowed', true,
+      'assigned_section_code', actual_code,
+      'assigned_section_name', actual_name
+    );
+  end if;
+
+  return jsonb_build_object('allowed', true);
+end;
+$$;
+
+revoke all on function public.verify_student_section_choice(text, text) from public;
+grant execute on function public.verify_student_section_choice(text, text) to anon, authenticated;
+
+notify pgrst, 'reload schema';
+
+commit;
 
 -- Migration 046: Lock INTEL-1 Roster and Enforce Strict Whitelist
 -- Adds INTEL-1 student roster (including the 16 newly provided enrollments)
@@ -584,5 +729,4 @@ revoke all on function public.bootstrap_intel1_user() from public, anon, authent
 notify pgrst, 'reload schema';
 
 commit;
-
 

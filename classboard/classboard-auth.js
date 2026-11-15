@@ -1684,7 +1684,6 @@
           const activeSubject = resolveSubject(card.dataset.attendanceSubjectName || String(card.dataset.subjectName || '').replace(/ Lab$/, ''));
           if (!activeSubject) {
             notifyApp('Could not identify this subject. Refresh and try again.', true);
-            button.disabled = false;
             return;
           }
           const activeKind = card.dataset.attendanceMode === 'lab' ? 'lab' : 'lecture';
@@ -1697,10 +1696,7 @@
                 class_id: classId, subject_id: activeSubject.id, kind: activeKind, batch: activeBatch,
                 classes_held: enteredHeld, updated_by: userId
               }, { onConflict: 'class_id,subject_id,kind,batch' }).select('classes_held').maybeSingle();
-              if (savedHeld.error) {
-                console.warn('Could not save classes-held count:', savedHeld.error.message);
-                if (activeStaff) throw savedHeld.error;
-              }
+              if (savedHeld.error) throw savedHeld.error;
             }
             if (savePersonalAttendance) {
               const savedProgress = await client.from('student_attendance_progress').upsert({
