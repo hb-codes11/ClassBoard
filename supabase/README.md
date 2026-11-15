@@ -84,6 +84,13 @@ That admin can then use INTEL-2 Admin Workspace to add other section accounts an
 
 The SQL migrations must be applied in the Supabase project before the matching role behavior is active in production.
 
+## Gemini timetable import
+
+Set `GEMINI_API_KEY` in Edge Function Secrets for your test Supabase project and deploy the `import-timetable` Edge Function. The default model is `gemini-3.1-flash-lite`. Set `GEMINI_TIMETABLE_MODEL` to use a different model that supports document input and structured outputs.
+
+From the repository root, deploy with `supabase functions deploy import-timetable --project-ref YOUR_TEST_PROJECT_REF`. Apply migration `047_generate_timetable_class_log.sql` to that same project and point the local ClassBoard frontend at it.
+
+In **Class Representatives → Generate Class Log from timetable**, select a Monday, attach a PDF, PNG, or JPEG up to 5 MB, and click **Preview week**. Verify the extracted slots and section before publishing. The upload is sent to Google Gemini for extraction. Keep student records out of the file.
 
 ## November roster deployment repair
 

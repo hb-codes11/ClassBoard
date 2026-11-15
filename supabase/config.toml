@@ -1,2 +1,5 @@
 [functions.admin-membership]
 verify_jwt = true
+
+[functions.import-timetable]
+verify_jwt = false

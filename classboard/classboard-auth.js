@@ -1071,10 +1071,11 @@
     const actions = compact ? row : document.createElement('div');
     if (!compact) actions.className = 'class-log-actions';
     actions.append(makeDeleteButton('Delete'));
-    if (!compact && session.state !== 'scheduled' && (window.classboardContext?.roles.includes('cr') || window.classboardContext?.roles.includes('admin'))) {
+    if (!compact && (session.state !== 'scheduled' || session.timetable_slot_key) && (window.classboardContext?.roles.includes('cr') || window.classboardContext?.roles.includes('admin'))) {
       const edit = document.createElement('button');
       edit.type = 'button'; edit.className = 'secondary-button class-log-edit-button';
-      edit.dataset.editClassSession = session.id; edit.textContent = 'Edit';
+      edit.dataset.editClassSession = session.id;
+      edit.textContent = session.state === 'scheduled' ? 'Record outcome' : 'Edit';
       edit.setAttribute('aria-label', `Edit ${subject?.name || 'class'} class log`);
       actions.append(edit);
     }
@@ -1307,10 +1308,25 @@
       resourcesQuery = resourcesQuery.eq('class_id', classId);
     }
 
+    const sessionColumns = 'id,subject_id,class_number,kind,batch,state,starts_at,room,topic,subjects(name,short_name)';
+    const sessionQuery = (columns) => client.from('class_sessions').select(columns).eq('class_id', classId);
+    async function loadSessions() {
+      const columns = `${sessionColumns},timetable_slot_key`;
+      const [manual, generated] = await Promise.all([
+        sessionQuery(columns).is('timetable_slot_key', null).order('starts_at', { ascending: false }).limit(50),
+        sessionQuery(columns).not('timetable_slot_key', 'is', null).order('starts_at', { ascending: false }).limit(1000),
+      ]);
+      if (manual.error && /timetable_slot_key/i.test(manual.error.message || '')) {
+        return sessionQuery(sessionColumns).order('starts_at', { ascending: false }).limit(50);
+      }
+      if (manual.error || generated.error) return { error: manual.error || generated.error };
+      const data = [...manual.data, ...generated.data].sort((a, b) => Date.parse(b.starts_at) - Date.parse(a.starts_at));
+      return { data };
+    }
     const [subjectResult, attachmentUpdateResult, sessionResult, resourceResult, baseReminderResult] = await Promise.all([
       client.from('subjects').select('id,slug,name,short_name,display_order').eq('class_id', classId).eq('is_active', true).order('display_order'),
       updatesQuery,
-      client.from('class_sessions').select('id,subject_id,class_number,kind,batch,state,starts_at,room,topic,subjects(name,short_name)').eq('class_id', classId).order('starts_at', { ascending: false }).limit(50),
+      loadSessions(),
       resourcesQuery,
       client.from('reminders').select('id,title,body,due_at,is_pinned,created_at').eq('class_id', classId).eq('is_active', true).gte('due_at', new Date().toISOString()).order('due_at').limit(20)
     ]);
@@ -2740,7 +2756,186 @@
     window.classboardToastTimer = window.setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
+  function connectTimetableImport() {
+    const form = document.getElementById('timetableImportForm');
+    if (!form) return;
+    const weekInput = form.elements.week;
+    const fileInput = form.elements.timetableFile;
+    const previewButton = form.querySelector('[type="submit"]');
+    const publishButton = document.getElementById('publishTimetableWeek');
+    const preview = document.getElementById('timetableImportPreview');
+    const list = document.getElementById('timetableImportRows');
+    const status = document.getElementById('timetableImportStatus');
+    let draft;
+    let extractedTimetable;
+
+    async function extractTimetable(file, context) {
+      if (extractedTimetable?.file === file && extractedTimetable.context === context) return extractedTimetable;
+      if (!['application/pdf', 'image/png', 'image/jpeg'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+        throw new Error('Choose a PDF, PNG, or JPEG timetable up to 5 MB.');
+      }
+      showStatus('Reading your timetable with Gemini…');
+      const { data, error } = await window.classboardSupabase.functions.invoke(
+        `import-timetable?class_id=${encodeURIComponent(context.classId)}`,
+        { body: file, headers: { 'Content-Type': file.type } },
+      );
+      if (error) {
+        const response = await error.context?.json?.().catch(() => null);
+        throw new Error(response?.error || 'Gemini import is unavailable. Try again or preview the saved timetable.');
+      }
+      if (window.classboardContext !== context) throw new Error('The selected section changed. Preview again.');
+      if (!Array.isArray(data?.slots) || !data.slots.length) {
+        throw new Error(data?.warnings?.[0] || 'Gemini could not find any class slots for this section.');
+      }
+      extractedTimetable = { file, context, slots: data.slots, warnings: data.warnings || [] };
+      return extractedTimetable;
+    }
+
+    function showStatus(message) {
+      status.textContent = message;
+      status.hidden = !message;
+    }
+
+    function clearPreview() {
+      draft = null;
+      preview.hidden = true;
+      publishButton.disabled = true;
+      showStatus('');
+    }
+
+    function staffContext() {
+      const context = window.classboardContext;
+      if (!context?.roles.some((role) => role === 'cr' || role === 'admin')) {
+        throw new Error('Only a CR or section admin can publish timetable entries.');
+      }
+      return context;
+    }
+
+    async function createDraft(week, context, source = null) {
+      const days = await window.getClassboardTimetableWeek(week, context, source?.slots);
+      const subjects = await window.classboardSupabase.from('subjects').select('id, name, slug')
+        .eq('class_id', context.classId).eq('is_active', true);
+      if (subjects.error) throw new Error('Could not load the subjects for this section.');
+      const rows = [];
+      const lines = (source?.warnings || []).map((warning) => `Gemini: ${warning}`);
+      let skipped = 0;
+      for (const day of days) {
+        if (!day.slots.length && day.note) lines.push(`${day.date} · ${day.note}`);
+        for (const slot of day.slots) {
+          const subject = subjects.data.find((item) => item.name === slot.subject ||
+            (slot.subject === 'Soft Skills-I' && item.slug === 'soft-skills'));
+          const batch = slot.kind === 'lecture' ? 'all' : slot.batch;
+          const validKind = slot.kind === 'lecture' || (slot.kind === 'lab' && batchCodesForClass(context.classCode).includes(batch));
+          const label = `${day.date} · ${slot.start}–${slot.end} · ${slot.subject} · ${batch === 'all' ? 'Lecture' : `Lab ${batch}`}${slot.room ? ` · ${slot.room}` : ''}`;
+          const validTime = /^([01]\d|2[0-3]):[0-5]\d$/;
+          if (!subject || !validKind || !validTime.test(slot.start) || !validTime.test(slot.end) || slot.end <= slot.start) {
+            skipped++;
+            lines.push(`${label} (skipped: check subject, batch, or time)`);
+            continue;
+          }
+          lines.push(label);
+          rows.push({
+            subject_id: subject.id, kind: slot.kind, batch,
+            starts_at: `${day.date}T${slot.start}:00+05:30`,
+            ends_at: `${day.date}T${slot.end}:00+05:30`,
+            room: slot.room || null,
+          });
+        }
+      }
+      return { week, context, source, rows, lines, skipped };
+    }
+
+    function showPreview(nextDraft) {
+      draft = nextDraft;
+      list.replaceChildren(...draft.lines.map((line) => {
+        const item = document.createElement('li');
+        item.textContent = line;
+        return item;
+      }));
+      preview.hidden = false;
+      publishButton.disabled = !draft.rows.length;
+      showStatus(draft.rows.length
+        ? `${draft.rows.length} scheduled entries to check for ${draft.context.classCode}. Existing entries are skipped on publish.${draft.source ? ' Check the extracted slots against your file before publishing.' : ''}${draft.skipped ? ` ${draft.skipped} timetable slots could not be matched.` : ''}`
+        : `No entries can be published for this week.${draft.skipped ? ` ${draft.skipped} timetable slots could not be matched.` : ''}`);
+    }
+
+    const today = new Date(new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Kolkata' }) + 'T12:00:00Z');
+    today.setUTCDate(today.getUTCDate() - ((today.getUTCDay() + 6) % 7));
+    const currentWeek = today.toISOString().slice(0, 10);
+    if (currentWeek >= weekInput.min && currentWeek <= weekInput.max) weekInput.value = currentWeek;
+    weekInput.addEventListener('input', clearPreview);
+    function clearImport() {
+      extractedTimetable = null;
+      clearPreview();
+    }
+    fileInput.addEventListener('change', clearImport);
+    window.addEventListener('classboard:context-ready', clearImport);
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      clearPreview();
+      const week = weekInput.value;
+      previewButton.disabled = true;
+      weekInput.disabled = true;
+      fileInput.disabled = true;
+      try {
+        const context = staffContext();
+        const file = fileInput.files[0];
+        const source = file ? await extractTimetable(file, context) : null;
+        const nextDraft = await createDraft(week, context, source);
+        if (window.classboardContext !== context) return;
+        showPreview(nextDraft);
+      } catch (error) {
+        showStatus(error.message || 'Could not preview this week.');
+      } finally {
+        previewButton.disabled = false;
+        weekInput.disabled = false;
+        fileInput.disabled = false;
+      }
+    });
+
+    publishButton.addEventListener('click', async () => {
+      const reviewed = draft;
+      if (!reviewed?.rows.length) return;
+      publishButton.disabled = true;
+      previewButton.disabled = true;
+      weekInput.disabled = true;
+      fileInput.disabled = true;
+      try {
+        const context = staffContext();
+        if (context !== reviewed.context) throw new Error('The selected section changed. Preview again.');
+        const fresh = await createDraft(reviewed.week, context, reviewed.source);
+        if (window.classboardContext !== context) throw new Error('The selected section changed. Preview again.');
+        if (JSON.stringify(fresh.rows) !== JSON.stringify(reviewed.rows)
+          || JSON.stringify(fresh.lines) !== JSON.stringify(reviewed.lines)) {
+          showPreview(fresh);
+          showStatus('The timetable changed. Review the updated preview before publishing.');
+          return;
+        }
+
+        const { data, error } = await window.classboardSupabase.rpc('publish_timetable_sessions', {
+          p_class_id: context.classId, p_sessions: reviewed.rows,
+        });
+        if (error?.code === 'PGRST202') throw new Error('Publishing is unavailable until migration 047 is applied.');
+        if (error) throw error;
+        clearPreview();
+        showStatus(`${data} scheduled entries published. ${reviewed.rows.length - data} existing entries skipped.`);
+        if (window.classboardContext === context) {
+          try { await loadLiveClassData(context.classId); }
+          catch { notifyApp('Entries saved. Reload to see them in the Class Log.', true); }
+        }
+      } catch (error) {
+        showStatus(error.message || 'Could not publish this week.');
+        publishButton.disabled = !draft?.rows.length;
+      } finally {
+        previewButton.disabled = false;
+        weekInput.disabled = false;
+        fileInput.disabled = false;
+      }
+    });
+  }
+
   function connectCrForms() {
+    connectTimetableImport();
     const addMemberForm = document.getElementById('adminAddMemberForm');
     addMemberForm?.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -3005,12 +3200,43 @@
       const context = window.classboardContext;
       if (!(context?.roles.includes('cr') || context?.roles.includes('admin'))) { notifyApp('Only a CR or section admin can edit saved class-log entries.', true); return; }
       const session = window.classboardCurrentSessions?.find((item) => item.id === button.dataset.editClassSession);
-      if (!session || session.state === 'scheduled') { notifyApp('This saved class-log entry is no longer available to edit.', true); return; }
+      if (!session || (session.state === 'scheduled' && !session.timetable_slot_key)) { notifyApp('This saved class-log entry is no longer available to edit.', true); return; }
       const subjects = window.classboardSubjects || [];
       const classDate = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
         timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit'
       }).formatToParts(new Date(session.starts_at)).map((part) => [part.type, part.value]));
       if (typeof window.openFormDialog !== 'function') return;
+      if (session.timetable_slot_key) {
+        if (new Date(session.starts_at) > new Date()) {
+          notifyApp('Record the outcome after the scheduled start time.', true);
+          return;
+        }
+        window.openFormDialog({
+          title: 'Record class outcome',
+          description: 'Only the Class Log is updated. Attendance totals are managed separately.',
+          fields: [
+            { name: 'status', label: 'Status', value: session.state === 'scheduled' ? 'held' : session.state,
+              options: [{ value: 'held', label: 'Held' }, { value: 'no_class', label: 'No class' }, { value: 'cancelled', label: 'Cancelled' }] },
+            { name: 'note', label: 'Topic or note', required: false, value: session.topic || '' },
+          ],
+          submitLabel: 'Save outcome',
+          onSubmit: async ({ status, note }) => {
+            if (window.classboardContext !== context) return 'The selected section changed. Open the entry again.';
+            const { data, error } = await window.classboardSupabase.from('class_sessions')
+              .update({ state: status, topic: String(note || '').trim() || null, updated_by: context.userId })
+              .eq('id', session.id).eq('class_id', context.classId).select('id');
+            if (error) return error.message;
+            if (!data?.length) return 'The entry could not be updated.';
+            try {
+              await loadLiveClassData(context.classId);
+              notifyApp('Class outcome saved.');
+            } catch {
+              notifyApp('Outcome saved. Reload to see it.', true);
+            }
+          },
+        });
+        return;
+      }
       window.openFormDialog({
         title: 'Edit class-log entry',
         description: 'Correct this saved class record. Only CRs can edit class-log details.',

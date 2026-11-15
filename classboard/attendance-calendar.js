@@ -397,6 +397,47 @@
     if (['holiday', 'convocation', 'exam'].includes(event?.kind) || dateKey(date) > '2026-11-27') return [];
     return Object.hasOwn(overrides, dateKey(date)) ? overrides[dateKey(date)] : defaultClasses(date);
   };
+  // Publishing reads fresh shared overrides rather than the calendar's rendered snapshot.
+  window.getClassboardTimetableWeek = async (weekStart, context, importedSlots = null) => {
+    const monday = new Date(`${weekStart}T12:00:00`);
+    if (Number.isNaN(monday.getTime()) || dateKey(monday) !== weekStart || monday.getDay() !== 1) {
+      throw new Error('Choose the Monday of the week to preview.');
+    }
+    if (!['INTEL-1', 'INTEL-2', 'IBM-1', 'IBM-2', 'IBM-3', 'IBM-4'].includes(context.classCode)) {
+      throw new Error('This section has no timetable to import.');
+    }
+
+    const days = Array.from({ length: 7 }, (_, offset) => {
+      const date = new Date(monday);
+      date.setDate(date.getDate() + offset);
+      return date;
+    });
+    const end = dateKey(days.at(-1));
+    const { data, error } = await window.classboardSupabase.from('class_calendar_overrides')
+      .select('calendar_date,classes').eq('class_id', context.classId)
+      .gte('calendar_date', weekStart).lte('calendar_date', end);
+    if (error) throw new Error('The shared calendar could not load. Try again before publishing.');
+    if (window.classboardContext !== context) throw new Error('The selected section changed. Preview again.');
+
+    const overrides = Object.fromEntries((data || []).map((row) => [row.calendar_date, row.classes]));
+    return days.map((date) => {
+      const key = dateKey(date);
+      const event = eventForDate(date);
+      const inTeachingRange = key >= '2026-10-01' && key <= '2026-11-27';
+      const blocked = ['holiday', 'convocation', 'exam'].includes(event?.kind);
+      let slots = [];
+      if (inTeachingRange && !blocked) {
+        if (Object.hasOwn(overrides, key)) slots = overrides[key];
+        else if (importedSlots) slots = importedSlots.filter((slot) => slot.weekday === (date.getDay() || 7));
+        else slots = defaultClasses(date);
+      }
+      return {
+        date: key,
+        note: inTeachingRange ? event?.label : 'Outside the October–November teaching calendar',
+        slots,
+      };
+    });
+  };
   const visibleClasses = (classes) => classes.filter((item) => item.kind !== 'lab' || item.batch === batchSelect.value);
   const calendarLabels = (date, classes) => {
     const event = eventForDate(date);
