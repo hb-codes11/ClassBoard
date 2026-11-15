@@ -135,6 +135,32 @@
     }
   }
 
+  async function checkSectionValidity(email) {
+    if (!email || !loginClassSelector) return { allowed: true };
+    const selectedCode = loginClassSelector.value;
+    try {
+      const { data, error } = await window.classboardSupabase.rpc('verify_student_section_choice', {
+        p_email_or_enrollment: email.trim().toLowerCase(),
+        p_selected_section_code: selectedCode
+      });
+      if (error || !data) return { allowed: true };
+      if (data.allowed === false) {
+        if (loginClassSelector.parentElement) {
+          loginClassSelector.parentElement.style.borderColor = '#ef4444';
+          loginClassSelector.parentElement.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.15)';
+        }
+        return { allowed: false, message: data.message, assignedCode: data.assigned_section_code, assignedName: data.assigned_section_name };
+      }
+      if (loginClassSelector.parentElement) {
+        loginClassSelector.parentElement.style.borderColor = '';
+        loginClassSelector.parentElement.style.boxShadow = '';
+      }
+      return { allowed: true };
+    } catch (_) {
+      return { allowed: true };
+    }
+  }
+
   function showGoogleCallbackError() {
     const params = new URLSearchParams(window.location.search);
     const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
@@ -214,8 +240,34 @@
     }
 
     const savedCode = savedClassCode();
+
+    // Verify student is not attempting to enter a different section than assigned
+    try {
+      const { data: sectionCheck } = await window.classboardSupabase.rpc('verify_student_section_choice', {
+        p_email_or_enrollment: user.email,
+        p_selected_section_code: savedCode
+      });
+      if (sectionCheck && sectionCheck.allowed === false && !sectionCheck.is_founder) {
+        const correctCode = sectionCheck.assigned_section_code;
+        const matchingClass = activeClasses.find((c) => c.code === correctCode);
+        if (matchingClass) {
+          classInfo = matchingClass;
+          localStorage.setItem('classboard-selected-class', correctCode);
+          if (loginClassSelector) loginClassSelector.value = correctCode;
+          notifyApp(`Notice: You belong to ${matchingClass.name} (${correctCode}). We routed you to your assigned section.`);
+        } else {
+          if (app) app.hidden = true;
+          if (gate) gate.hidden = false;
+          showMessage(sectionCheck.message, true);
+          return;
+        }
+      }
+    } catch (_) {}
+
     // Prioritize section where user is admin or CR if savedCode doesn't match active classes
-    let classInfo = activeClasses.find((item) => item.code === savedCode);
+    if (!classInfo) {
+      classInfo = activeClasses.find((item) => item.code === savedCode);
+    }
     if (!classInfo) {
       const staffMembership = memberships.find((m) => (m.role === 'admin' || m.role === 'cr') && m.classes?.is_active);
       if (staffMembership) {
@@ -3653,9 +3705,18 @@
     event.preventDefault();
     if (!validCollegeEmail()) return;
     busy(true);
+
+    const email = cleanEmail();
+    const sectionCheck = await checkSectionValidity(email);
+    if (!sectionCheck.allowed) {
+      busy(false);
+      showMessage(sectionCheck.message, true);
+      return;
+    }
+
     showMessage('Signing in…');
     sessionStorage.setItem('cb_pending_auth_method', 'password');
-    const { data, error } = await window.classboardSupabase.auth.signInWithPassword({ email: cleanEmail(), password: passwordInput.value });
+    const { data, error } = await window.classboardSupabase.auth.signInWithPassword({ email, password: passwordInput.value });
     if (error) {
       sessionStorage.removeItem('cb_pending_auth_method');
       showMessage(error.message, true);
@@ -3673,9 +3734,18 @@
       return;
     }
     busy(true);
+
+    const email = cleanEmail();
+    const sectionCheck = await checkSectionValidity(email);
+    if (!sectionCheck.allowed) {
+      busy(false);
+      showMessage(sectionCheck.message, true);
+      return;
+    }
+
     showMessage('Creating your account…');
     sessionStorage.setItem('cb_pending_auth_method', 'password');
-    const { data, error } = await window.classboardSupabase.auth.signUp({ email: cleanEmail(), password: passwordInput.value });
+    const { data, error } = await window.classboardSupabase.auth.signUp({ email, password: passwordInput.value });
     if (error) {
       sessionStorage.removeItem('cb_pending_auth_method');
       showMessage(error.message, true);
@@ -3689,6 +3759,14 @@
   });
 
   document.getElementById('googleSignInButton')?.addEventListener('click', async () => {
+    if (emailInput?.value?.trim()) {
+      const email = cleanEmail();
+      const sectionCheck = await checkSectionValidity(email);
+      if (!sectionCheck.allowed) {
+        showMessage(sectionCheck.message, true);
+        return;
+      }
+    }
     busy(true);
     showMessage('Opening Google sign-in…');
     sessionStorage.setItem('cb_pending_auth_method', 'google');
@@ -3703,6 +3781,29 @@
       sessionStorage.removeItem('cb_pending_auth_method');
       showMessage(error.message, true);
       busy(false);
+    }
+  });
+
+  // Proactive section match check on email blur and section dropdown change
+  emailInput?.addEventListener('blur', async () => {
+    if (emailInput.value && emailPattern.test(emailInput.value.trim())) {
+      const check = await checkSectionValidity(emailInput.value.trim());
+      if (!check.allowed) {
+        showMessage(check.message, true);
+      }
+    }
+  });
+
+  loginClassSelector?.addEventListener('change', async () => {
+    if (emailInput?.value && emailPattern.test(emailInput.value.trim())) {
+      const check = await checkSectionValidity(emailInput.value.trim());
+      if (!check.allowed) {
+        showMessage(check.message, true);
+      } else {
+        if (message && message.textContent.includes('wrong section')) {
+          showMessage('');
+        }
+      }
     }
   });
 
