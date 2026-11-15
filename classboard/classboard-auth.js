@@ -240,6 +240,7 @@
     }
 
     const savedCode = savedClassCode();
+    let classInfo = null;
 
     // Verify student is not attempting to enter a different section than assigned
     try {
