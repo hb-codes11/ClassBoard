@@ -223,3 +223,4 @@ revoke all on function public.bootstrap_intel1_user() from public, anon, authent
 notify pgrst, 'reload schema';
 
 commit;
+
