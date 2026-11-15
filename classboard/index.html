@@ -949,9 +949,6 @@
     .workspace-form .text-area { min-height: 86px; padding: 10px 11px; resize: vertical; }
     .form-actions { display: flex; justify-content: flex-end; gap: 8px; }
     #scheduleEntries { display: grid; gap: 14px; min-width: 0; }
-    #timetableImportStatus { margin: 0; color: var(--muted); }
-    #timetableImportRows { max-height: 280px; overflow-y: auto; margin: 0 0 12px; padding-inline-start: 24px; color: var(--text); }
-    #timetableImportRows li { padding: 5px 0; }
     .schedule-entry { display: grid; gap: 12px; min-width: 0; }
     .schedule-entry:not(:first-child) { border-top: 1px solid var(--line); padding-top: 14px; }
     .schedule-entry-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--text); }
@@ -6019,24 +6016,6 @@
                 <form class="workspace-form" id="crClassForm"><label class="field-label">Subject<select class="select-field" name="subject"><option>Software Engineering</option><option>Statistical Analysis (SA)</option><option>Computer Organisation &amp; Microprocessors (COM)</option><option>Java Programming</option><option>Soft Skills</option><option>Artificial Intelligence (AI)</option></select></label><label class="field-label">Class type<select class="select-field" name="sessionType"><option>Lecture</option><option>Lab</option></select></label><label class="field-label" data-lab-batch-field>Lab batch<select class="select-field" name="batch"><option>All students</option><option>A1</option><option>A2</option></select></label><div class="toolbar" style="margin:0"><label class="field-label" style="flex:1">Date<input class="text-field" type="date" name="date" required></label><label class="field-label" style="flex:1">Class number<input class="text-field" type="number" min="1" name="classNumber" placeholder="e.g. 21" required></label></div><label class="field-label">Status<select class="select-field" name="status"><option>Held</option><option>No class</option></select></label><label class="field-label">Topic or note<input class="text-field" name="note" placeholder="What was covered? (optional)" maxlength="120"></label><div class="form-actions"><button class="primary-button" type="submit">Save class log</button></div></form>
               </article>
               <article class="panel">
-                <div class="panel-header"><div><div class="panel-title">Generate Class Log from timetable</div><div class="panel-sub">Preview lectures and labs for your section before publishing scheduled entries.</div></div></div>
-                <form class="workspace-form" id="timetableImportForm">
-                  <label class="field-label">Week starting Monday
-                    <input class="text-field" type="date" name="week" min="2026-09-28" max="2026-11-23" step="7" required>
-                  </label>
-                  <label class="field-label">Timetable PDF or image (optional)
-                    <input class="text-field" type="file" name="timetableFile" accept="application/pdf,image/png,image/jpeg" aria-describedby="geminiTimetableHint">
-                  </label>
-                  <div class="field-hint" id="geminiTimetableHint">Choose a PDF, PNG, or JPEG up to 5 MB to preview a timetable with Google Gemini. Upload the timetable only, without student records.</div>
-                  <div class="form-actions"><button class="secondary-button" type="submit">Preview week</button></div>
-                  <p id="timetableImportStatus" role="status" hidden></p>
-                  <div id="timetableImportPreview" hidden>
-                    <ul id="timetableImportRows" aria-label="Timetable preview" tabindex="0"></ul>
-                    <div class="form-actions"><button class="primary-button" type="button" id="publishTimetableWeek" disabled>Publish scheduled entries</button></div>
-                  </div>
-                </form>
-              </article>
-              <article class="panel">
                 <div class="panel-header"><div><div class="panel-title">Add to the timetable</div><div class="panel-sub">Lectures apply to both batches. Schedule each lab separately for A1 or A2.</div></div></div>
                 <form class="workspace-form" id="crScheduleForm"><div id="scheduleEntries"><div class="schedule-entry"><label class="field-label">Subject<select class="select-field" name="subject"><option>Software Engineering</option><option>Statistical Analysis (SA)</option><option>Computer Organisation &amp; Microprocessors (COM)</option><option>Java Programming</option><option>Soft Skills</option><option>Artificial Intelligence (AI)</option></select></label><label class="field-label">Class type<select class="select-field" name="sessionType"><option>Lecture</option><option>Lab</option></select></label><label class="field-label" data-lab-batch-field>Lab batch<select class="select-field" name="batch"><option>All students</option><option>A1</option><option>A2</option></select></label><div class="toolbar" style="margin:0"><label class="field-label" style="flex:1">Date<input class="text-field" type="date" name="date" required></label><label class="field-label" style="flex:1">Start time<input class="text-field" type="time" name="time" required></label></div><label class="field-label">Room / lab<input class="text-field" name="room" placeholder="Building or room number" required maxlength="60"></label></div></div><div class="form-actions"><button class="secondary-button" id="addScheduleEntry" type="button">＋ Add another schedule</button><button class="primary-button" type="submit">Add schedules</button></div></form><div id="crScheduleList" class="workspace-table"></div>
               </article>
@@ -7234,13 +7213,13 @@
   <script src="supabase-config.js"></script>
   <script src="activity-tracker.js?v=2"></script>
   <script src="founder-intelligence.js?v=55"></script>
-  <script src="classboard-auth.js?v=50"></script>
+  <script src="classboard-auth.js?v=51"></script>
   <script src="push-manager.js?v=4"></script>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
-  <script src="./attendance-calendar.js?v=17"></script>
+  <script src="./attendance-calendar.js?v=18"></script>
   <script>
     (() => {
       const slide = document.getElementById('notificationSlide');
