@@ -19,6 +19,7 @@ revoke all on public.intel2_student_roster from public, anon, authenticated;
 alter table public.ibm1_student_roster add column if not exists enrollment_no text;
 
 -- 2. Populate INTEL-2 student roster
+delete from public.intel2_student_roster;
 insert into public.intel2_student_roster (roll_number, enrollment_no, email, student_name)
 values
   (1, 'EN25CS3070003', 'en25cs3070003@medicaps.ac.in', 'AAYUSH SURYAVANSHI'),
@@ -83,12 +84,13 @@ values
   (60, 'EN25CS3070133', 'en25cs3070133@medicaps.ac.in', 'AKSHAT SURYAWANSHI'),
   (61, 'EN25CS3070134', 'en25cs3070134@medicaps.ac.in', 'ANUSHREE PATIDAR'),
   (62, 'EN25CS3070135', 'en25cs3070135@medicaps.ac.in', 'JASMAN SINGH ARORA')
-on conflict (email) do update
-set roll_number = excluded.roll_number,
-    enrollment_no = excluded.enrollment_no,
+on conflict (roll_number) do update
+set enrollment_no = excluded.enrollment_no,
+    email = excluded.email,
     student_name = excluded.student_name;
 
 -- 3. Populate IBM-1 student roster
+delete from public.ibm1_student_roster;
 insert into public.ibm1_student_roster (roll_number, enrollment_no, email, student_name)
 values
   (1, 'EN25CS3090211', 'en25cs3090211@medicaps.ac.in', 'SIYA AGRAWAL'),
@@ -158,9 +160,9 @@ values
   (65, 'EN25CS3090150', 'en25cs3090150@medicaps.ac.in', 'PIYUSH MANDLOI'),
   (66, 'EN25CS3090268', 'en25cs3090268@medicaps.ac.in', 'ISHA BADHE'),
   (67, 'EN25CS3090277', 'en25cs3090277@medicaps.ac.in', 'HIMANSHU PATIL')
-on conflict (email) do update
-set roll_number = excluded.roll_number,
-    enrollment_no = excluded.enrollment_no,
+on conflict (roll_number) do update
+set enrollment_no = excluded.enrollment_no,
+    email = excluded.email,
     student_name = excluded.student_name;
 
 -- 4. Create bootstrap trigger for INTEL-2 students
