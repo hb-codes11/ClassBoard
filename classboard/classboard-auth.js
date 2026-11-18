@@ -2770,7 +2770,15 @@
     uploadToggle?.addEventListener('click', () => {
       uploadPanel.hidden = !uploadPanel.hidden;
       uploadToggle.setAttribute('aria-expanded', String(!uploadPanel.hidden));
-      if (!uploadPanel.hidden) uploadPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      if (!uploadPanel.hidden) {
+        const activeType = document.querySelector('#page-resources [data-resource-type].active')?.dataset.resourceType;
+        const typeSelect = document.getElementById('crResourceForm')?.elements.namedItem('type');
+        if (typeSelect && [...typeSelect.options].some((option) => option.value === activeType)) {
+          typeSelect.value = activeType;
+          typeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        uploadPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
     });
     document.getElementById('cancelResourceUpload')?.addEventListener('click', closeUpload);
 
@@ -3656,6 +3664,11 @@
         if (insert.error) throw new Error(`Resources could not be saved: ${insert.error.message}`);
         saved = true;
         resourceForm.reset(); syncResourceSubject(); syncResourceTitle(); closeUpload();
+        // Show the saved category even when the uploader changed it in the form.
+        const publishedType = String(values.get('type'));
+        document.querySelectorAll('#page-resources [data-resource-type]').forEach((tab) => {
+          if (tab.dataset.resourceType === publishedType) tab.click();
+        });
         try { await loadLiveClassData(context.classId); } catch (_) { notifyApp('Resources published, but the page could not refresh. Reload to see them.', true); return; }
         notifyApp(`${files.length} ${files.length === 1 ? 'resource published' : 'resources published'} to the class.`);
       } catch (error) {
