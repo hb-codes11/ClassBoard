@@ -1606,3 +1606,14 @@
     flex-direction: column !important;
   }
 }
+
+#founderPanelTrend .founder-panel-top {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+#founderPanelTrend .founder-trend-legend {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 6px 12px;
+}
+#founderPanelTrend .founder-trend-legend > span { white-space: nowrap; }

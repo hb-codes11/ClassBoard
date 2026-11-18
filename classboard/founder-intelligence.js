@@ -1173,15 +1173,12 @@
     const svg = document.getElementById('founderMultiLineChart');
     if (!svg) return;
 
-    const data = (trendList && trendList.length >= 7) ? trendList : [
-      { day_name: '7 Nov', valid_pageviews: 2000, sessions: 650, active_students: 180 },
-      { day_name: '8 Nov', valid_pageviews: 2350, sessions: 700, active_students: 210 },
-      { day_name: '9 Nov', valid_pageviews: 1950, sessions: 680, active_students: 190 },
-      { day_name: '10 Nov', valid_pageviews: 2300, sessions: 720, active_students: 210 },
-      { day_name: '11 Nov', valid_pageviews: 2450, sessions: 780, active_students: 230 },
-      { day_name: '12 Nov', valid_pageviews: 3100, sessions: 850, active_students: 240 },
-      { day_name: '13 Nov', valid_pageviews: 2750, sessions: 800, active_students: 230 }
-    ];
+    const data = Array.isArray(trendList) ? trendList : [];
+    if (!data.length) {
+      svg.innerHTML = '<text x="220" y="78" text-anchor="middle" font-size="11" fill="#94a3b8">No traffic data available</text>';
+      return;
+    }
+    const count = (value) => Math.max(0, Number(value) || 0);
 
     const width = 440;
     const height = 155;
@@ -1191,14 +1188,18 @@
     const padBottom = 24;
     const printWidth = width - padLeft - padRight;
     const printHeight = height - padTop - padBottom;
-    const maxVal = 3500;
+    const highest = Math.max(...data.flatMap((d) => [count(d.valid_pageviews), count(d.sessions), count(d.active_students)]));
+    const rawStep = Math.max(1, highest / 4);
+    const magnitude = 10 ** Math.floor(Math.log10(rawStep));
+    const step = [1, 2, 5, 10].map((n) => n * magnitude).find((n) => n >= rawStep);
+    const maxVal = Math.max(step * 4, Math.ceil(highest / step) * step);
 
-    const getX = (i) => padLeft + (i / (data.length - 1)) * printWidth;
+    const getX = (i) => padLeft + (data.length === 1 ? 0.5 : i / (data.length - 1)) * printWidth;
     const getY = (val) => padTop + printHeight - (Math.min(val, maxVal) / maxVal) * printHeight;
 
-    const viewsPoints = data.map((d, i) => ({ x: getX(i), y: getY(d.valid_pageviews || 0) }));
-    const sessPoints = data.map((d, i) => ({ x: getX(i), y: getY(d.sessions || 0) }));
-    const studPoints = data.map((d, i) => ({ x: getX(i), y: getY(d.active_students || 0) }));
+    const viewsPoints = data.map((d, i) => ({ x: getX(i), y: getY(count(d.valid_pageviews)) }));
+    const sessPoints = data.map((d, i) => ({ x: getX(i), y: getY(count(d.sessions)) }));
+    const studPoints = data.map((d, i) => ({ x: getX(i), y: getY(count(d.active_students)) }));
 
     const makeSmoothPath = (pts) => {
       if (!pts.length) return '';
@@ -1218,20 +1219,23 @@
 
     const viewsArea = `${viewsPath} L ${viewsPoints[viewsPoints.length - 1].x} ${padTop + printHeight} L ${viewsPoints[0].x} ${padTop + printHeight} Z`;
 
-    const yGridValues = [3500, 3000, 2500, 2000, 1500, 1000, 500, 0];
+    const yGridValues = Array.from({ length: Math.round(maxVal / step) + 1 }, (_, i) => maxVal - i * step);
     const gridLines = yGridValues.map((v) => {
       const y = getY(v);
-      const label = v >= 1000 ? `${(v / 1000).toLocaleString('en-IN')}k` : String(v);
+      const label = v.toLocaleString('en-IN');
       return `
         <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="#f1f5f9" stroke-dasharray="2,2" stroke-width="1" />
-        <text x="${padLeft - 6}" y="${y + 3}" text-anchor="end" font-size="8.5" fill="#94a3b8" font-family="sans-serif">${v === 0 ? '0' : (v % 1000 === 0 ? (v / 1000) + ',000' : (v / 1000) + ',500')}</text>
+        <text x="${padLeft - 6}" y="${y + 3}" text-anchor="end" font-size="8.5" fill="#94a3b8" font-family="sans-serif">${label}</text>
       `;
     }).join('');
 
     const xLabels = data.map((d, i) => {
       const x = getX(i);
-      const name = d.day_name || d.date || '';
-      return `<text x="${x}" y="${height - 6}" text-anchor="middle" font-size="8.5" fill="#94a3b8" font-family="sans-serif">${name}</text>`;
+      const rawDate = String(d.date || d.day_name || '');
+      const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(rawDate);
+      const name = match ? `${Number(match[3])} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][Number(match[2]) - 1] || ''}` : rawDate;
+      const label = name.replace(/[&<>"']/g, '');
+      return `<text x="${x}" y="${height - 6}" text-anchor="middle" font-size="8.5" fill="#94a3b8" font-family="sans-serif">${label}</text>`;
     }).join('');
 
     const makeDots = (pts, color) => pts.map((p) => `<circle cx="${p.x}" cy="${p.y}" r="3" fill="${color}" stroke="#ffffff" stroke-width="1.5" />`).join('');
