@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
+const source = readFileSync(new URL('../classboard/classboard-auth.js', import.meta.url), 'utf8');
+const start = source.indexOf('async function loadAllResources(query)');
+const end = source.indexOf('\n    const [subjectResult', start);
+assert(start >= 0 && end > start);
+const load = vm.runInNewContext(`(${source.slice(start, end)})`);
+const rows = Array.from({length: 251}, (_, i) => ({id: i, kind: i === 250 ? 'syllabus' : 'notes'}));
+const result = await load({ range: async (start, end) => ({data: rows.slice(start, end + 1), error: null}) });
+assert.equal(result.data.length, 251);
+assert.equal(result.data[250].kind, 'syllabus');
+let calls = 0;
+const failed = await load({range: async () => ++calls === 1 ? {data: rows.slice(0, 100), error: null} : {data: null, error: {message: 'network error'}}});
+assert.equal(failed.data, null);
+assert.equal(failed.error.message, 'network error');
+console.log('PASS: all pages loaded and errors do not return partial results');

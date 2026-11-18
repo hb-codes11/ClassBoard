@@ -1290,7 +1290,7 @@
     const isIntel = isIntelClass(currentClass?.code);
 
     let updatesQuery = client.from('updates').select('id,class_id,title,body,category,importance,is_pinned,created_at,published_at,expires_at,attachment_path,attachment_name').not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20);
-    let resourcesQuery = client.from('resources').select('id,class_id,title,kind,unit_label,storage_path,visibility,created_at,published_at,subjects(name)').not('published_at', 'is', null).is('deleted_at', null).order('published_at', { ascending: false }).limit(50);
+    let resourcesQuery = client.from('resources').select('id,class_id,title,kind,unit_label,storage_path,visibility,created_at,published_at,subjects(name)').not('published_at', 'is', null).is('deleted_at', null).order('published_at', { ascending: false }).order('id', { ascending: false });
 
     if (isIbm) {
       const { data: ibmClasses } = await client.from('classes').select('id').in('code', ['IBM-1', 'IBM-2', 'IBM-3', 'IBM-4']);
@@ -1307,11 +1307,23 @@
       resourcesQuery = resourcesQuery.eq('class_id', classId);
     }
 
+    // Fetch every page before filtering by category so older notes and syllabi remain visible.
+    async function loadAllResources(query) {
+      const pageSize = 100;
+      const resources = [];
+      for (let offset = 0; ; offset += pageSize) {
+        const { data, error } = await query.range(offset, offset + pageSize - 1);
+        if (error) return { data: null, error };
+        resources.push(...data);
+        if (data.length < pageSize) return { data: resources, error: null };
+      }
+    }
+
     const [subjectResult, attachmentUpdateResult, sessionResult, resourceResult, baseReminderResult] = await Promise.all([
       client.from('subjects').select('id,slug,name,short_name,display_order').eq('class_id', classId).eq('is_active', true).order('display_order'),
       updatesQuery,
       client.from('class_sessions').select('id,subject_id,class_number,kind,batch,state,starts_at,room,topic,subjects(name,short_name)').eq('class_id', classId).order('starts_at', { ascending: false }).limit(50),
-      resourcesQuery,
+      loadAllResources(resourcesQuery),
       client.from('reminders').select('id,title,body,due_at,is_pinned,created_at').eq('class_id', classId).eq('is_active', true).gte('due_at', new Date().toISOString()).order('due_at').limit(20)
     ]);
     const classResult = { data: currentClass, error: null };
