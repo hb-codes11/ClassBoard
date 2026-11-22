@@ -1292,20 +1292,29 @@
     let updatesQuery = client.from('updates').select('id,class_id,title,body,category,importance,is_pinned,created_at,published_at,expires_at,attachment_path,attachment_name').not('published_at', 'is', null).order('published_at', { ascending: false }).limit(20);
     let resourcesQuery = client.from('resources').select('id,class_id,title,kind,unit_label,storage_path,visibility,created_at,published_at,subjects(name)').not('published_at', 'is', null).is('deleted_at', null).order('published_at', { ascending: false }).order('id', { ascending: false });
 
+    let existingResourceSectionIds = [classId];
     if (isIbm) {
       const { data: ibmClasses } = await client.from('classes').select('id').in('code', ['IBM-1', 'IBM-2', 'IBM-3', 'IBM-4']);
       const ibmIds = (ibmClasses || []).map((c) => c.id);
-      updatesQuery = updatesQuery.in('class_id', ibmIds.length ? ibmIds : [classId]);
-      resourcesQuery = resourcesQuery.in('class_id', ibmIds.length ? ibmIds : [classId]);
+      existingResourceSectionIds = ibmIds.length ? ibmIds : [classId];
+      updatesQuery = updatesQuery.in('class_id', existingResourceSectionIds);
     } else if (isIntel) {
       const { data: intelClasses } = await client.from('classes').select('id').in('code', ['INTEL-1', 'INTEL-2']);
       const intelIds = (intelClasses || []).map((c) => c.id);
-      updatesQuery = updatesQuery.in('class_id', intelIds.length ? intelIds : [classId]);
-      resourcesQuery = resourcesQuery.in('class_id', intelIds.length ? intelIds : [classId]);
+      existingResourceSectionIds = intelIds.length ? intelIds : [classId];
+      updatesQuery = updatesQuery.in('class_id', existingResourceSectionIds);
     } else {
       updatesQuery = updatesQuery.eq('class_id', classId);
-      resourcesQuery = resourcesQuery.eq('class_id', classId);
     }
+
+    // Class metadata is section-scoped, so ask the database for the shared resource cohort.
+    const sharedSections = await client.rpc('shared_resource_section_ids', { p_class_id: classId });
+    if (sharedSections.error && sharedSections.error.code !== 'PGRST202') throw sharedSections.error;
+    const resourceSectionIds = sharedSections.error
+      ? existingResourceSectionIds
+      : (sharedSections.data || []).filter((id) => typeof id === 'string');
+    if (!resourceSectionIds.includes(classId)) throw new Error('Could not verify resource access for this section.');
+    resourcesQuery = resourcesQuery.in('class_id', resourceSectionIds);
 
     // Fetch every page before filtering by category so older notes and syllabi remain visible.
     async function loadAllResources(query) {
